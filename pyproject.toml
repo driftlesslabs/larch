@@ -1,0 +1,27 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel",
+    "setuptools_scm[toml]>=3.4",
+    "setuptools_scm_git_archive",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+fallback_version = "0.1"
+write_to = "larix/_version.py"
+
+[tool.isort]
+profile = "black"
+skip_gitignore = true
+float_to_top = true
+default_section = "THIRDPARTY"
+known_first_party = "larix"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-v --nbmake --disable-warnings"
+testpaths = [
+    "larix/tests",
+    "docs",
+]
