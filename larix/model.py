@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from .compiled import compiledmethod
+from .folding import fold_dataset
 
 
 class Model(lx.Model):
@@ -14,6 +15,19 @@ class Model(lx.Model):
         self._mixtures = []
         self._n_draws = 100
         self._draws = None
+        self._groupid = None
+
+    @property
+    def groupid(self):
+        return self._groupid
+
+    @groupid.setter
+    def groupid(self, g):
+        if isinstance(g, str) and g == self._groupid:
+            return
+        else:
+            self._groupid = g
+            self.mangle()
 
     @property
     def n_draws(self):
@@ -39,6 +53,8 @@ class Model(lx.Model):
         for mix in self._mixtures:
             mix.mean = self._frame.index.get_loc(mix.mean_)
             mix.std = self._frame.index.get_loc(mix.std_)
+        if self.groupid is not None:
+            self.dataset = fold_dataset(self.dataset, self.groupid)
 
     def set_value(self, name, value=None, **kwargs):
         """
@@ -147,22 +163,25 @@ class Model(lx.Model):
 
         @jax.jit
         def jax_utility(params):
-            n_cases = self.dataset.n_cases
             n_alts = self.dataset.n_alts
             n_nodes = len(self.graph)
 
-            ca = jnp.asarray(self.dataset["ca"])
+            if "ca" in self.dataset:
+                ca = jnp.asarray(self.dataset["ca"])
+            else:
+                ca = None
             co = jnp.asarray(self.dataset["co"])
             av = jnp.asarray(self.dataset["av"])
+            n_cases = av.shape[:-1]
 
             x = jnp.zeros([self.dataset.n_alts, self.dataset.dims["var_co"] + 1])
             x = x.at[self._fixed_arrays.uco_alt_slot, self._fixed_arrays.uco_data_slot].add(
                 params[self._fixed_arrays.uco_param_slot]
             )
 
-            u = jnp.zeros([n_cases, n_nodes])
+            u = jnp.zeros([*n_cases, n_nodes])
             u = u.at[..., :n_alts].add(jnp.dot(
-                ca[:, :, self._fixed_arrays.uca_data_slot],
+                ca[..., self._fixed_arrays.uca_data_slot],
                 params[self._fixed_arrays.uca_param_slot],
             ))
             u = u.at[..., :n_alts].add(
@@ -319,7 +338,6 @@ class Model(lx.Model):
 
         @jax.jit
         def probability_(params):
-            n_cases = self.dataset.n_cases
             n_alts = self.dataset.n_alts
             n_nodes = len(self.graph)
             utility_array = self.jax_utility(params)
