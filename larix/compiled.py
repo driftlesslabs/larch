@@ -30,6 +30,9 @@ class compiledmethod:
         # self : compiledmethod
         # obj : instance of parent class that has `self` as a member
         # objtype : class of `obj`
+        unmangle = getattr(obj, 'unmangle', None)
+        if unmangle is not None:
+            unmangle()
         result = getattr(obj, self.private_name, None)
         if result is None:
             result = self.compiler(obj)
