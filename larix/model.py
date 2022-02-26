@@ -381,18 +381,25 @@ class Model(lx.Model):
                 self._make_random_draws(n_draws=self.n_draws)
             @jax.jit
             def loglike(params):
+                ch = jnp.asarray(self.dataset['ch'])
                 n_alts = self.dataset.n_alts
                 av = jnp.asarray(self.dataset["av"])
                 pr = jax.vmap(self.jax_probability)(
                     self.apply_random_draws(params)
-                ).mean(0)
-                logpr = jnp.log(jnp.where(
-                    av[..., :n_alts],
-                    jnp.clip(pr, 1e-35),
-                    1.0
-                ))
-                ch = jnp.asarray(self.dataset['ch'])
-                return (logpr[:,:n_alts] * ch[:,:n_alts]).sum()
+                )
+                likelihood = jnp.where(ch, pr, 1.0)
+                if self.groupid is not None:
+                    in_group_likelihood = likelihood.prod(2).mean(0)
+                    in_group_log_likelihood = jnp.log(in_group_likelihood)
+                    return in_group_log_likelihood.sum()
+                else:
+                    return jnp.log(likelihood.mean(0)).sum()
+                # logpr = jnp.log(jnp.where(
+                #     av[..., :n_alts],
+                #     jnp.clip(pr, 1e-35),
+                #     1.0
+                # ))
+                #return (logpr[:,:n_alts] * ch[:,:n_alts]).sum()
         return loglike
 
     @compiledmethod
