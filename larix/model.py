@@ -6,9 +6,14 @@ import pandas as pd
 
 from .compiled import compiledmethod
 from .folding import fold_dataset
+from .optimize import OptimizeMixin
 
+def _get_jnp_array(dataset, name):
+    if name not in dataset:
+        return None
+    return jnp.asarray(dataset[name])
 
-class Model(lx.Model):
+class Model(lx.Model, OptimizeMixin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -16,6 +21,7 @@ class Model(lx.Model):
         self._n_draws = 100
         self._draws = None
         self._groupid = None
+        self._parameter_bucket = None
 
     @property
     def groupid(self):
@@ -40,6 +46,17 @@ class Model(lx.Model):
         else:
             self._n_draws = n
             self.mangle()
+
+    @property
+    def pvals(self):
+        if self._parameter_bucket is None:
+            return super().pvals
+        else:
+            return self._parameter_bucket.pvals
+
+    @pvals.setter
+    def pvals(self, x):
+        self.set_values(x)
 
     def mangle(self, *args, **kwargs):
         super().mangle(*args, **kwargs)
@@ -159,40 +176,45 @@ class Model(lx.Model):
 
     @compiledmethod
     def jax_utility(self):
-        # params = jnp.asarray(self.pvals)
 
         @jax.jit
         def jax_utility(params):
             n_alts = self.dataset.n_alts
             n_nodes = len(self.graph)
 
-            if "ca" in self.dataset:
-                ca = jnp.asarray(self.dataset["ca"])
-            else:
-                ca = None
-            co = jnp.asarray(self.dataset["co"])
-            av = jnp.asarray(self.dataset["av"])
-            n_cases = av.shape[:-1]
+            ca = _get_jnp_array(self.dataset, "ca")
+            co = _get_jnp_array(self.dataset, "co")
+            av = _get_jnp_array(self.dataset, "av")
 
-            x = jnp.zeros([self.dataset.n_alts, self.dataset.dims["var_co"] + 1])
+            if av is not None:
+                n_cases = av.shape[:-1]
+            elif co is not None:
+                n_cases = co.shape[:-1]
+            elif ca is not None:
+                n_cases = ca.shape[:-2]
+
+            x = jnp.zeros([self.dataset.n_alts, self.dataset.dims.get("var_co", 0) + 1])
             x = x.at[self._fixed_arrays.uco_alt_slot, self._fixed_arrays.uco_data_slot].add(
                 params[self._fixed_arrays.uco_param_slot]
             )
 
             u = jnp.zeros([*n_cases, n_nodes])
-            u = u.at[..., :n_alts].add(jnp.dot(
-                ca[..., self._fixed_arrays.uca_data_slot],
-                params[self._fixed_arrays.uca_param_slot],
-            ))
-            u = u.at[..., :n_alts].add(
-                jnp.dot(co, x[:, :-1].T)
-            )
+            if ca is not None:
+                u = u.at[..., :n_alts].add(jnp.dot(
+                    ca[..., self._fixed_arrays.uca_data_slot],
+                    params[self._fixed_arrays.uca_param_slot],
+                ))
+            if co is not None:
+                u = u.at[..., :n_alts].add(
+                    jnp.dot(co, x[:, :-1].T)
+                )
             u = u.at[..., :n_alts].add(
                 x[:, -1].T
             )
-            u = u.at[..., :n_alts].set(
-                jnp.where(av[..., :n_alts], u[..., :n_alts], -jnp.inf)
-            )
+            if av is not None:
+                u = u.at[..., :n_alts].set(
+                    jnp.where(av[..., :n_alts], u[..., :n_alts], -jnp.inf)
+                )
             return u
 
         return jax_utility
@@ -240,6 +262,15 @@ class Model(lx.Model):
     def utility_for_nests(self):
         n_alts = self.graph.n_elementals()
         n_nodes = len(self.graph)
+
+        def u_nesting_none(out, beta, array_av):
+            # TODO Maybe filter on av
+            return out.at[...,-1].set(
+                jnp.log(jnp.exp(out[...,:-1]).sum(-1))
+            )
+
+        if n_nodes - n_alts <= 1:
+            return u_nesting_none
 
         #@jit
         def u_nesting_few(out, beta, array_av):
@@ -341,17 +372,22 @@ class Model(lx.Model):
             n_alts = self.dataset.n_alts
             n_nodes = len(self.graph)
             utility_array = self.jax_utility(params)
-            av = jnp.asarray(self.dataset["av"])
+            av = _get_jnp_array(self.dataset, "av")
 
             # downshift to prevent over/underflow
             shifter = utility_array[..., :n_alts].max(axis=-1)
-            utility_array = utility_array.at[..., :n_alts].add(
-                jnp.where(
-                    av[..., :n_alts],
-                    -shifter[..., None],
-                    0
+            if av is not None:
+                utility_array = utility_array.at[..., :n_alts].add(
+                    jnp.where(
+                        av[..., :n_alts],
+                        -shifter[..., None],
+                        0
+                    )
                 )
-            )
+            else:
+                utility_array = utility_array.at[..., :n_alts].add(
+                    -shifter[..., None]
+                )
             utility_array = self.utility_for_nests(utility_array, params, av)
             logprobability = jnp.zeros_like(utility_array)
             for slot in range(n_nodes, n_alts, -1):
@@ -383,7 +419,7 @@ class Model(lx.Model):
             def loglike(params):
                 ch = jnp.asarray(self.dataset['ch'])
                 n_alts = self.dataset.n_alts
-                av = jnp.asarray(self.dataset["av"])
+                av = _get_jnp_array(self.dataset, "av")
                 pr = jax.vmap(self.jax_probability)(
                     self.apply_random_draws(params)
                 )
