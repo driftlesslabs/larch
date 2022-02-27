@@ -35,7 +35,13 @@ class LatentClass(ParameterBucket, OptimizeMixin):
             n_alts = self.dataset.n_alts
             ch = jnp.asarray(self.dataset['ch'])
             pr = self.jax_probability(params)
-            return (jnp.log(jnp.clip(pr, 1e-35))[...,:n_alts] * ch[...,:n_alts]).sum()
+            masked_pr = jnp.where(
+                ch[...,:n_alts]>0,
+                pr[..., :n_alts],
+                1.0
+            )
+            log_pr = jnp.log(masked_pr)
+            return (log_pr[...,:n_alts] * ch[...,:n_alts]).sum()
         return loglike
 
     @compiledmethod
