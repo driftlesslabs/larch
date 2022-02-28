@@ -1,5 +1,5 @@
 from scipy.optimize import minimize
-from .compiled import compiledmethod
+from .compiled import compiledmethod, jitmethod
 import jax
 import jax.numpy as jnp
 from abc import abstractmethod, ABC
@@ -37,32 +37,22 @@ class OptimizeMixin(BucketAccess):
     def jax_loglike(self, params):
         raise NotImplementedError
 
-    @compiledmethod
-    def jax_d_loglike(self):
-        return jax.grad(self.jax_loglike)
+    @jitmethod
+    def jax_d_loglike(self, params):
+        return jax.grad(self.jax_loglike)(params)
 
-    @compiledmethod
-    def jax_hvp_loglike(self):
-        @jax.jit
-        def hvp(params, vector):
-            return jax.grad(lambda x: jnp.vdot(self.jax_d_loglike(x), vector))(params)
-        return hvp
+    @jitmethod
+    def jax_hvp_loglike(self, params, vector):
+        return jax.grad(lambda x: jnp.vdot(self.jax_d_loglike(x), vector))(params)
 
-    @compiledmethod
-    def jax_d2_loglike(self):
-        return jax.jacfwd(jax.jacrev(self.jax_neg_loglike))
+    @jitmethod
+    def jax_d2_loglike(self, params):
+        return jax.jacfwd(jax.jacrev(self.jax_neg_loglike))(params)
 
-    @compiledmethod
-    def jax_d2_loglike_(self):
-        return jax.jacrev(jax.jacfwd(self.jax_neg_loglike))
-
-    @compiledmethod
-    def jax_invhess_loglike(self):
-        @jax.jit
-        def ihess(params):
-            hess = self.jax_d2_loglike(params)
-            return jnp.linalg.inv(hess)
-        return ihess
+    @jitmethod
+    def jax_invhess_loglike(self, params):
+        hess = self.jax_d2_loglike(params)
+        return jnp.linalg.inv(hess)
 
     def jax_neg_loglike(self, *args, **kwargs):
         return -self.jax_loglike(*args, **kwargs)
