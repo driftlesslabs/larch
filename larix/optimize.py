@@ -2,10 +2,9 @@ from scipy.optimize import minimize
 from .compiled import compiledmethod
 import jax
 import jax.numpy as jnp
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 
-
-class OptimizeMixin:
+class BucketAccess(ABC):
 
     @abstractmethod
     def jax_loglike(self, params):
@@ -19,6 +18,23 @@ class OptimizeMixin:
     @pvals.setter
     @abstractmethod
     def pvals(self, x):
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def pstderr(self):
+        raise NotImplementedError
+
+    @pstderr.setter
+    @abstractmethod
+    def pstderr(self, x):
+        raise NotImplementedError
+
+
+class OptimizeMixin(BucketAccess):
+
+    @abstractmethod
+    def jax_loglike(self, params):
         raise NotImplementedError
 
     @compiledmethod
@@ -71,6 +87,8 @@ class OptimizeMixin:
         return result
 
     def jax_param_cov(self, params):
-        ihess = self.jax_invhess_loglike(params)
+        hess = self.jax_d2_loglike(params)
+        ihess = jnp.linalg.inv(hess)
         se = jnp.sqrt(ihess.diagonal())
-        return se
+        self.pstderr = se
+        return se, hess, ihess

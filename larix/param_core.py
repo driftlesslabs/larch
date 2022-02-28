@@ -89,6 +89,19 @@ class ParameterBucket():
     def pnames(self):
         return self._params['index'].to_numpy()
 
+    @property
+    def pstderr(self):
+        if "std_err" in self._params:
+            return self._params['std_err'].to_numpy()
+        else:
+            return np.full_like(self.pvals, np.nan)
+
+    @pstderr.setter
+    def pstderr(self, x):
+        self._params = self._params.assign({
+            'std_err': xr.DataArray(x, dims=self._params['value'].dims)
+        })
+
     def __getitem__(self, item):
         if item in self._models:
             return self._models[item]

@@ -1,8 +1,9 @@
+import jax
 
-
-def _reset_compiled_methods(obj):
-    for name in obj._compiledmethods:
-        delattr(obj, name)
+def reset_compiled_methods(obj):
+    precompiled_funcs = [i for i in obj.__dict__ if i.startswith("_precompiled_")]
+    for i in precompiled_funcs:
+        delattr(obj, i)
 
 
 class compiledmethod:
@@ -22,9 +23,6 @@ class compiledmethod:
         # name : the name of the attribute that `self` will be
         self.public_name = name
         self.private_name = '_precompiled_' + name
-        if not hasattr(owner, '_compiledmethods'):
-            owner._compiledmethods = []
-        owner._compiledmethods.append(name)
 
     def __get__(self, obj, objtype=None):
         # self : compiledmethod
@@ -49,5 +47,79 @@ class compiledmethod:
     def __delete__(self, obj):
         # self : compiledmethod
         # obj : instance of parent class that has `self` as a member
+        setattr(obj, self.private_name, None)
+
+
+class jitmethod:
+    """
+    Decorator for a class method that returns a compiled function.
+    """
+
+    def __init__(self, wrapped_method):
+        """
+        Initialize a jit compile wrapper.
+
+        Parameters
+        ----------
+        wrapped_method : Callable
+            The class method being decorated.
+        """
+        # self : compiledmethod
+        # compiler : the class method being decorated
+        self.wrapped_method = wrapped_method
+        self.docstring = wrapped_method.__doc__
+
+    def __set_name__(self, owner, name):
+        """
+        Triggered on assignment to a class name.
+
+        Parameters
+        ----------
+        owner : Any
+            Parent class that will have `self` as a member.
+        name : str
+            The name of the attribute to which self is being assigned.
+        """
+        self.public_name = name
+        self.private_name = '_precompiled_' + name
+
+    def __get__(self, obj, objtype=None):
+        """
+        Access to jit'ed method.
+
+        Parameters
+        ----------
+        obj : Any
+            Instance of parent class that has `self` as a member.
+        objtype : class
+            Class of `obj`.
+        """
+        unmangle = getattr(obj, 'unmangle', None)
+        if unmangle is not None:
+            unmangle()
+        result = getattr(obj, self.private_name, None)
+        if result is None:
+
+            @jax.jit
+            def func(*args, **kwargs):
+                return self.wrapped_method(obj, *args, **kwargs)
+
+            result = func
+            result.__doc__ = self.docstring
+            setattr(obj, self.private_name, result)
+        return result
+
+    def __set__(self, obj, value):
+        raise AttributeError(f"can't set {self.public_name} is is a jitmethod")
+
+    def __delete__(self, obj):
+        """
+        Clear precompiled jit'ed method.
+
+        Parameters
+        ----------
+        obj : Any
+            Instance of parent class that has `self` as a member.
+        """
         setattr(obj, self.private_name, None)
 
