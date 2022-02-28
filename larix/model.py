@@ -4,6 +4,8 @@ import larch.numba as lx
 import numpy as np
 import pandas as pd
 
+from larch.numba import Dataset, DataArray
+
 from .compiled import compiledmethod, jitmethod, reset_compiled_methods
 from .folding import fold_dataset
 from .optimize import OptimizeMixin
@@ -90,6 +92,69 @@ class Model(lx.Model, OptimizeMixin):
             mix.std = self._frame.index.get_loc(mix.std_)
         if self.groupid is not None:
             self.dataset = fold_dataset(self.dataset, self.groupid)
+
+    def reflow_data_arrays(self):
+        """
+        Reload the internal data_arrays so they are consistent with the datatree.
+        """
+        if self.graph is None:
+            self._data_arrays = None
+            return
+
+        datatree = self.datatree
+        if datatree is not None:
+            from larch.numba.data_arrays import prepare_data
+            self.dataset, self.dataflows = prepare_data(
+                datasource=datatree,
+                request=self,
+                float_dtype=self.float_dtype,
+                cache_dir=datatree.cache_dir,
+                flows=getattr(self, 'dataflows', None),
+            )
+            self._data_arrays = self.dataset.to_arrays(
+                self.graph,
+                float_dtype=self.float_dtype,
+            )
+            if self.work_arrays is not None:
+                self._rebuild_work_arrays()
+
+        elif self.dataframes is not None: # work from old DataFrames
+            raise NotImplementedError("use Dataset not Dtaframes")
+
+    @property
+    def data_as_loaded(self):
+        return self._dataset
+
+    @property
+    def dataset(self):
+        """larch.Dataset : Data arrays as loaded for model computation."""
+        super().unmangle()
+        if self._dataset is None:
+            self.reflow_data_arrays()
+        try:
+            return self._dataset
+        except AttributeError:
+            return None
+
+    @dataset.setter
+    def dataset(self, dataset):
+        if dataset is self._dataset:
+            return
+        from xarray import Dataset as _Dataset
+        if isinstance(dataset, Dataset):
+            if self.groupid is not None:
+                dataset = fold_dataset(dataset, self.groupid)
+            self._dataset = dataset
+            self._data_arrays = None
+            self._rebuild_fixed_arrays()
+        elif isinstance(dataset, _Dataset):
+            if self.groupid is not None:
+                dataset = fold_dataset(dataset, self.groupid)
+            self._dataset = Dataset(dataset)
+            self._data_arrays = None
+            self._rebuild_fixed_arrays()
+        else:
+            raise TypeError(f"dataset must be Dataset not {type(dataset)}")
 
     def set_value(self, name, value=None, **kwargs):
         """
