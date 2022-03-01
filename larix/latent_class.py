@@ -1,14 +1,17 @@
 from .param_core import ParameterBucket
 from .compiled import compiledmethod, jitmethod, reset_compiled_methods
 from .optimize import OptimizeMixin
+from .folding import fold_dataset
+from .model import PanelMixin
 import jax.numpy as jnp
 import jax
 from larch.numba import Dataset, DataTree
 import numpy as np
 
-class LatentClass(ParameterBucket, OptimizeMixin):
+class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
 
-    def __init__(self, classmodel, choicemodels, datatree=None, float_dtype=np.float32):
+    def __init__(self, classmodel, choicemodels, datatree=None, float_dtype=np.float32, **kwargs):
+        PanelMixin.__init__(self, **kwargs)
         self._is_mangled = True
         self._dataset = None
         super().__init__(choicemodels, classmodel=classmodel)
@@ -23,26 +26,47 @@ class LatentClass(ParameterBucket, OptimizeMixin):
     @jitmethod
     def jax_probability(self, params):
         classmodel = self['classmodel']
-
         pr_parts = []
         for n, k in enumerate(self['classmodel'].dataset.altids()):
             pr_parts.append(
-                self._models[k].jax_probability(params) * jnp.expand_dims(classmodel.jax_probability(params)[:, n], -1)
+                self._models[k].jax_probability(params)
+                * jnp.expand_dims(classmodel.jax_probability(params)[..., n], -1)
             )
         return sum(pr_parts)
 
     @jitmethod
-    def jax_loglike(self, params):
+    def jax_loglike_casewise(self, params):
         n_alts = self.dataset.n_alts
         ch = jnp.asarray(self.dataset['ch'])
-        pr = self.jax_probability(params)
-        masked_pr = jnp.where(
-            ch[...,:n_alts]>0,
-            pr[..., :n_alts],
-            1.0
-        )
-        log_pr = jnp.log(masked_pr)
-        return (log_pr[...,:n_alts] * ch[...,:n_alts]).sum()
+        if ch.ndim == 2:
+            pr = self.jax_probability(params)
+            masked_pr = jnp.where(
+                ch[..., :n_alts]>0,
+                pr[..., :n_alts],
+                1.0
+            )
+            log_pr = jnp.log(masked_pr)
+            return (log_pr[...,:n_alts] * ch[...,:n_alts]).sum()
+        elif ch.ndim >= 3:
+            classmodel = self['classmodel']
+            likely_parts = []
+            for n, k in enumerate(self['classmodel'].dataset.altids()):
+                k_pr = self._models[k].jax_probability(params)
+                masked_k_pr = jnp.where(
+                    ch[..., :n_alts] > 0,
+                    k_pr[..., :n_alts],
+                    1.0
+                )
+                k_likely = jnp.power(masked_k_pr, ch[..., :n_alts]).prod([-2,-1])
+                likely_parts.append(
+                    k_likely
+                    * classmodel.jax_probability(params)[..., 0, n]
+                )
+            return jnp.log(sum(likely_parts))
+
+    @jitmethod
+    def jax_loglike(self, params):
+        return self.jax_loglike_casewise(params).sum()
 
     @jitmethod
     def jax_d_loglike(self, params):
@@ -74,14 +98,22 @@ class LatentClass(ParameterBucket, OptimizeMixin):
                         if request[k] != v:
                             raise ValueError("incompatible requests")
 
+        if isinstance(self.groupid, str):
+            request['group_co'] = self.groupid
+
         from larch.numba.data_arrays import prepare_data
-        self.dataset, self.dataflows = prepare_data(
+        dataset, self.dataflows = prepare_data(
             datasource=datatree,
             request=request,
             float_dtype=np.float32,
             cache_dir=datatree.cache_dir,
             flows=getattr(self, 'dataflows', None),
         )
+        if isinstance(self.groupid, str):
+            dataset = fold_dataset(dataset, 'group')
+        elif self.groupid is not None:
+            dataset = fold_dataset(dataset, self.groupid)
+        self.dataset = dataset
 
         for kname, kmodel in self._models.items():
             if kname == 'classmodel':

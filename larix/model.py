@@ -15,15 +15,10 @@ def _get_jnp_array(dataset, name):
         return None
     return jnp.asarray(dataset[name])
 
-class Model(lx.Model, OptimizeMixin):
+class PanelMixin:
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._mixtures = []
-        self._n_draws = 100
-        self._draws = None
-        self._groupid = None
-        self._parameter_bucket = None
+        self._groupid = kwargs.pop('groupid', None)
 
     @property
     def groupid(self):
@@ -31,11 +26,24 @@ class Model(lx.Model, OptimizeMixin):
 
     @groupid.setter
     def groupid(self, g):
-        if isinstance(g, str) and g == self._groupid:
-            return
+        if g is None or isinstance(g, str):
+            if self._groupid != g:
+                self.mangle()
         else:
-            self._groupid = g
             self.mangle()
+        self._groupid = g
+
+
+class Model(lx.Model, OptimizeMixin, PanelMixin):
+
+    def __init__(self, *args, **kwargs):
+        PanelMixin.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
+        self._mixtures = []
+        self._n_draws = 100
+        self._draws = None
+        self._parameter_bucket = None
+
 
     @property
     def n_draws(self):
@@ -62,6 +70,13 @@ class Model(lx.Model, OptimizeMixin):
             self.set_values(x)
         else:
             self._parameter_bucket.pvals = x
+
+    @property
+    def pholdfast(self):
+        if self._parameter_bucket is None:
+            return self._frame['holdfast'].to_numpy()
+        else:
+            return self._parameter_bucket._params["holdfast"].to_numpy()
 
     @property
     def pstderr(self):
@@ -103,20 +118,35 @@ class Model(lx.Model, OptimizeMixin):
 
         datatree = self.datatree
         if datatree is not None:
+
+            request = self.required_data()
+            if isinstance(self.groupid, str):
+                request['group_co'] = self.groupid
+
             from larch.numba.data_arrays import prepare_data
-            self.dataset, self.dataflows = prepare_data(
+            dataset, self.dataflows = prepare_data(
                 datasource=datatree,
-                request=self,
+                request=request,
                 float_dtype=self.float_dtype,
                 cache_dir=datatree.cache_dir,
                 flows=getattr(self, 'dataflows', None),
             )
-            self._data_arrays = self.dataset.to_arrays(
-                self.graph,
-                float_dtype=self.float_dtype,
-            )
-            if self.work_arrays is not None:
-                self._rebuild_work_arrays()
+            if isinstance(self.groupid, str):
+                dataset = fold_dataset(dataset, 'group')
+            elif self.groupid is not None:
+                dataset = fold_dataset(dataset, self.groupid)
+            self.dataset = dataset
+            try:
+                self._data_arrays = self.dataset.to_arrays(
+                    self.graph,
+                    float_dtype=self.float_dtype,
+                )
+            except KeyError: # no defined caseid dimension, JAX only
+                self._data_arrays = None
+                self.work_arrays = None
+            else:
+                if self.work_arrays is not None:
+                    self._rebuild_work_arrays()
 
         elif self.dataframes is not None: # work from old DataFrames
             raise NotImplementedError("use Dataset not Dtaframes")
@@ -272,9 +302,8 @@ class Model(lx.Model, OptimizeMixin):
                 params[self._fixed_arrays.uca_param_slot],
             ))
         if co is not None:
-            u = u.at[:n_alts].add(
-                jnp.dot(co, x[:, :-1].T)
-            )
+            temp = jnp.dot(co, x[:, :-1].T)
+            u = u.at[:n_alts].add(temp)
         u = u.at[:n_alts].add(
             x[:, -1].T
         )
@@ -564,17 +593,30 @@ class Model(lx.Model, OptimizeMixin):
         if len(self._mixtures) == 0:
             @jax.jit
             def loglike_casewise(params):
-                ca = jnp.asarray(self.dataset['ca'])
-                co = jnp.asarray(self.dataset['co'])
-                av = jnp.asarray(self.dataset['av'])
-                ch = jnp.asarray(self.dataset['ch'])
-                f = jax.vmap(self._jax_loglike, in_axes=(
-                    None,
-                    None if ca is None else 0,
-                    None if co is None else 0,
-                    None if av is None else 0,
-                    None if ch is None else 0,
-                ), out_axes=0)
+                params = jnp.where(self.pholdfast, self.pvals, params)
+                co = _get_jnp_array(self.dataset, 'co')
+                ca = _get_jnp_array(self.dataset, 'ca')
+                av = _get_jnp_array(self.dataset, 'av')
+                ch = _get_jnp_array(self.dataset, 'ch')
+                if co is not None:
+                    axes = tuple(range(co.ndim-1))
+                elif ca is not None:
+                    axes = tuple(range(ca.ndim-2))
+                elif ch is not None:
+                    axes = tuple(range(ch.ndim - 1))
+                elif av is not None:
+                    axes = tuple(range(av.ndim-1))
+                else:
+                    raise ValueError('missing all data')
+                f = self._jax_loglike
+                for _ in axes:
+                    f = jax.vmap(f, in_axes=(
+                        None,
+                        None if ca is None else 0,
+                        None if co is None else 0,
+                        None if av is None else 0,
+                        None if ch is None else 0,
+                    ), out_axes=0)
                 return f(params, ca, co, av, ch)
         else:
             raise NotImplementedError
