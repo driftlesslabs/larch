@@ -9,6 +9,7 @@ from larch.numba import Dataset, DataArray
 from .compiled import compiledmethod, jitmethod, reset_compiled_methods
 from .folding import fold_dataset
 from .optimize import OptimizeMixin
+from .param_core import ParameterBucket
 
 def _get_jnp_array(dataset, name):
     if name not in dataset:
@@ -44,6 +45,12 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
         self._draws = None
         self._parameter_bucket = None
 
+    @property
+    def parameters(self) -> Dataset:
+        if self._parameter_bucket is None:
+            return Dataset.from_dataframe(self.pf.rename_axis(index=ParameterBucket.index_name))
+        else:
+            return self._parameter_bucket.parameters
 
     @property
     def n_draws(self):
