@@ -3,6 +3,8 @@ from .compiled import compiledmethod, jitmethod
 import jax
 import jax.numpy as jnp
 from abc import abstractmethod, ABC
+from larch.numba import Dataset
+import numpy as np
 
 class BucketAccess(ABC):
 
@@ -12,7 +14,7 @@ class BucketAccess(ABC):
 
     @property
     @abstractmethod
-    def pvals(self):
+    def pvals(self) -> np.ndarray:
         raise NotImplementedError
 
     @pvals.setter
@@ -22,12 +24,17 @@ class BucketAccess(ABC):
 
     @property
     @abstractmethod
-    def pstderr(self):
+    def pstderr(self) -> np.ndarray:
         raise NotImplementedError
 
     @pstderr.setter
     @abstractmethod
     def pstderr(self, x):
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def parameters(self) -> Dataset:
         raise NotImplementedError
 
 
@@ -78,7 +85,10 @@ class OptimizeMixin(BucketAccess):
 
     def jax_param_cov(self, params):
         hess = self.jax_d2_loglike(params)
-        ihess = jnp.linalg.inv(hess)
+        if self.parameters['holdfast'].sum():
+            ihess = jnp.linalg.pinv(hess)
+        else:
+            ihess = jnp.linalg.inv(hess)
         se = jnp.sqrt(ihess.diagonal())
         self.pstderr = se
         return se, hess, ihess
