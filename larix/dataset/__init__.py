@@ -87,6 +87,45 @@ def zeros(cls, *coords, dtype=np.float64, name=None, attrs=None):
         attrs=attrs,
     )
 
+@register_dataarray_classmethod
+def ones(cls, *coords, dtype=np.float64, name=None, attrs=None):
+    """
+    Construct a dataset filled with ones.
+
+    Parameters
+    ----------
+    coords : Tuple[array-like]
+        A sequence of coordinate vectors.  Ideally each should have a
+        `name` attribute that names a dimension, otherwise placeholder
+        names are used.
+    dtype : dtype, default np.float64
+        dtype of the new array. If omitted, it defaults to np.float64.
+    name : str or None, optional
+        Name of this array.
+    attrs : dict_like or None, optional
+        Attributes to assign to the new instance. By default, an empty
+        attribute dictionary is initialized.
+
+    Returns
+    -------
+    DataArray
+    """
+    dims = []
+    shape = []
+    coo = {}
+    for n, c in enumerate(coords):
+        i = getattr(c, "name", f"dim_{n}")
+        dims.append(i)
+        shape.append(len(c))
+        coo[i] = c
+    return cls(
+        data=np.ones(shape, dtype=dtype),
+        coords=coo,
+        dims=dims,
+        name=name,
+        attrs=attrs,
+    )
+
 @register_dataarray_method
 def to_zarr(self, store=None, *args, **kwargs):
     """

@@ -465,6 +465,12 @@ class LinearComponent:
 		except AttributeError:
 			return f"<{self.__class__.__name__} {id(self)} with error>"
 
+	def __radd__(self, other):
+		if other == 0:
+			return self
+		else:
+			raise TypeError(f"unsupported operand type(s) for +: {type(other)} and {type(self)}")
+
 	def __add__(self, other):
 		if isinstance(self, LinearComponent):
 			if other == () or other == 0:
@@ -766,6 +772,8 @@ def _try_mangle_h(instance_holder):
 
 
 class LinearFunction:
+
+	_instance = None
 
 	def __init__(self, init=None):
 		if init is not None and init != 0:

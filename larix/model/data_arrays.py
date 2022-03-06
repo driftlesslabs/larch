@@ -357,7 +357,13 @@ def prepare_data(
         )
     if 'avail_any' in request:
         log.debug(f"requested avail_any data: {request['avail_any']}")
-        raise NotImplementedError('avail_any')
+        model_dataset = model_dataset.assign({
+            'av': DataArray.ones(
+                model_dataset.dc.caseids(),
+                model_dataset.dc.altids(),
+                dtype=np.int8,
+            ),
+        })
 
     return model_dataset, flows
 
