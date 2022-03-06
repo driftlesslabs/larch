@@ -1,6 +1,6 @@
 import numpy as np
 import xarray as xr
-from larch.numba import DataArray, Dataset
+from xarray import DataArray, Dataset
 import warnings
 
 _GROUPID = "_groupid_"
@@ -68,9 +68,9 @@ def fold_dataset(d, groupid='groupid', group_dim='groupid', ingroup_dim='ingroup
             temp = fold(d[i], g, group_dim=group_dim, ingroup_dim=ingroup_dim, lens=lens, where_to_pad=where_to_pad, gids=gids)
             out = out.assign({i:temp})
     for c in d.coords:
-        if d.CASEID not in d[c].dims:
+        if d.dc.CASEID not in d[c].dims:
             out.coords[c] = d.coords[c]
-    out.ALTID = d.ALTID
-    out.GROUPID = group_dim
-    out.INGROUP = ingroup_dim
+    out.dc.ALTID = d.dc.ALTID
+    out.dc.GROUPID = group_dim
+    out.dc.INGROUP = ingroup_dim
     return out

@@ -1,11 +1,11 @@
 from .param_core import ParameterBucket
-from .compiled import compiledmethod, jitmethod, reset_compiled_methods
-from .optimize import OptimizeMixin
-from .folding import fold_dataset
-from .model import PanelMixin
+from ..compiled import compiledmethod, jitmethod, reset_compiled_methods
+from ..optimize import OptimizeMixin
+from ..folding import fold_dataset
+from .jaxmodel import PanelMixin
 import jax.numpy as jnp
 import jax
-from larch.numba import Dataset, DataTree
+from ..dataset import Dataset, DataTree
 import numpy as np
 
 class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
@@ -16,7 +16,7 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
         self._dataset = None
         super().__init__(choicemodels, classmodel=classmodel)
         self.datatree = datatree
-        assert sorted(classmodel.dataset.altids()) == sorted(choicemodels.keys())
+        assert sorted(classmodel.dataset.dc.altids()) == sorted(choicemodels.keys())
         for choicemodel in choicemodels.values():
             self.dataset = choicemodel.dataset
         if float_dtype is not None:
@@ -27,7 +27,7 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
     def jax_probability(self, params):
         classmodel = self['classmodel']
         pr_parts = []
-        for n, k in enumerate(self['classmodel'].dataset.altids()):
+        for n, k in enumerate(self['classmodel'].dataset.dc.altids()):
             pr_parts.append(
                 self._models[k].jax_probability(params)
                 * jnp.expand_dims(classmodel.jax_probability(params)[..., n], -1)
@@ -36,7 +36,7 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
 
     @jitmethod
     def jax_loglike_casewise(self, params):
-        n_alts = self.dataset.n_alts
+        n_alts = self.dataset.dc.n_alts
         ch = jnp.asarray(self.dataset['ch'])
         if ch.ndim == 2:
             pr = self.jax_probability(params)
@@ -50,7 +50,7 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
         elif ch.ndim >= 3:
             classmodel = self['classmodel']
             likely_parts = []
-            for n, k in enumerate(self['classmodel'].dataset.altids()):
+            for n, k in enumerate(self['classmodel'].dataset.dc.altids()):
                 k_pr = self._models[k].jax_probability(params)
                 masked_k_pr = jnp.where(
                     ch[..., :n_alts] > 0,
@@ -101,7 +101,7 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
         if isinstance(self.groupid, str):
             request['group_co'] = self.groupid
 
-        from larch.numba.data_arrays import prepare_data
+        from .data_arrays import prepare_data
         dataset, self.dataflows = prepare_data(
             datasource=datatree,
             request=request,
@@ -120,8 +120,8 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
                 continue
             kmodel.dataset = self.dataset
         self._models['classmodel'].dataset = self.dataset.drop_dims(
-            self.dataset.ALTID
-        ).set_altids(self._models['classmodel'].dataset.altids())
+            self.dataset.dc.ALTID
+        ).dc.set_altids(self._models['classmodel'].dataset.dc.altids())
 
     def mangle(self):
         super().mangle()
@@ -177,7 +177,7 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
             self._datatree = tree
             self.mangle()
         elif isinstance(tree, Dataset):
-            self._datatree = tree.as_tree()
+            self._datatree = tree.dc.as_tree()
             self.mangle()
         else:
             try:

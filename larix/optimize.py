@@ -3,7 +3,7 @@ from .compiled import compiledmethod, jitmethod
 import jax
 import jax.numpy as jnp
 from abc import abstractmethod, ABC
-from larch.numba import Dataset
+from xarray import Dataset
 import numpy as np
 
 class BucketAccess(ABC):

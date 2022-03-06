@@ -1,15 +1,15 @@
 import jax
 import jax.numpy as jnp
-import larch.numba as lx
 import numpy as np
 import pandas as pd
 
-from larch.numba import Dataset, DataArray
+from xarray import Dataset, DataArray
 
-from .compiled import compiledmethod, jitmethod, reset_compiled_methods
-from .folding import fold_dataset
-from .optimize import OptimizeMixin
+from ..compiled import compiledmethod, jitmethod, reset_compiled_methods
+from ..folding import fold_dataset
+from ..optimize import OptimizeMixin
 from .param_core import ParameterBucket
+from .numbamodel import NumbaModel
 
 def _get_jnp_array(dataset, name):
     if name not in dataset:
@@ -35,7 +35,7 @@ class PanelMixin:
         self._groupid = g
 
 
-class Model(lx.Model, OptimizeMixin, PanelMixin):
+class Model(NumbaModel, OptimizeMixin, PanelMixin):
 
     def __init__(self, *args, **kwargs):
         PanelMixin.__init__(self, *args, **kwargs)
@@ -43,14 +43,13 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
         self._mixtures = []
         self._n_draws = 100
         self._draws = None
-        self._parameter_bucket = None
 
-    @property
-    def parameters(self) -> Dataset:
-        if self._parameter_bucket is None:
-            return Dataset.from_dataframe(self.pf.rename_axis(index=ParameterBucket.index_name))
-        else:
-            return self._parameter_bucket.parameters
+    # @property
+    # def parameters(self) -> Dataset:
+    #     if self._parameter_bucket is None:
+    #         return Dataset.from_dataframe(self.pf.rename_axis(index=ParameterBucket.index_name))
+    #     else:
+    #         return self._parameter_bucket.parameters
 
     @property
     def n_draws(self):
@@ -64,56 +63,57 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
             self._n_draws = n
             self.mangle()
 
-    @property
-    def pvals(self):
-        if self._parameter_bucket is None:
-            return super().pvals
-        else:
-            return self._parameter_bucket.pvals
+    # @property
+    # def pvals(self):
+    #     if self._parameter_bucket is None:
+    #         return super().pvals
+    #     else:
+    #         return self._parameter_bucket.pvals
+    #
+    # @pvals.setter
+    # def pvals(self, x):
+    #     if self._parameter_bucket is None:
+    #         self.set_values(x)
+    #     else:
+    #         self._parameter_bucket.pvals = x
 
-    @pvals.setter
-    def pvals(self, x):
-        if self._parameter_bucket is None:
-            self.set_values(x)
-        else:
-            self._parameter_bucket.pvals = x
-
-    @property
-    def pholdfast(self):
-        if self._parameter_bucket is None:
-            return self._frame['holdfast'].to_numpy()
-        else:
-            return self._parameter_bucket._params["holdfast"].to_numpy()
+    # @property
+    # def pholdfast(self):
+    #     if self._parameter_bucket is None:
+    #         return self._frame['holdfast'].to_numpy()
+    #     else:
+    #         return self._parameter_bucket._params["holdfast"].to_numpy()
 
     @property
     def pstderr(self):
-        if self._parameter_bucket is None:
-            if "std_err" in self._frame:
-                return self._frame['std_err'].to_numpy()
-            else:
-                return np.full_like(self.pvals, np.nan)
-        else:
-            return self._parameter_bucket.pstderr
+        self.unmangle()
+        return self._parameter_bucket.pstderr
 
     @pstderr.setter
     def pstderr(self, x):
-        if self._parameter_bucket is None:
-            self._frame['std_err'] = x
-        else:
-            self._parameter_bucket.pstderr = x
+        self._parameter_bucket.pstderr = x
 
-    def mangle(self, *args, **kwargs):
-        super().mangle(*args, **kwargs)
+    def mangle(self):
+        super().mangle()
         self._draws = None
         reset_compiled_methods(self)
 
     def unmangle(self, force=False):
-        super().unmangle(force=force)
-        for mix in self._mixtures:
-            mix.mean = self._frame.index.get_loc(mix.mean_)
-            mix.std = self._frame.index.get_loc(mix.std_)
-        if self.groupid is not None:
-            self.dataset = fold_dataset(self.dataset, self.groupid)
+        if not self._mangled and not force:
+            return
+        marker = f"_currently_unmangling_{__file__}"
+        if getattr(self, marker, False):
+            return
+        try:
+            setattr(self, marker, True)
+            super().unmangle(force=force)
+            for mix in self._mixtures:
+                mix.mean = self.get_param_loc(mix.mean_)
+                mix.std = self.get_param_loc(mix.std_)
+            if self.groupid is not None:
+                self.dataset = fold_dataset(self.dataset, self.groupid)
+        finally:
+            delattr(self, marker)
 
     def reflow_data_arrays(self):
         """
@@ -130,7 +130,7 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
             if isinstance(self.groupid, str):
                 request['group_co'] = self.groupid
 
-            from larch.numba.data_arrays import prepare_data
+            from .data_arrays import prepare_data
             dataset, self.dataflows = prepare_data(
                 datasource=datatree,
                 request=request,
@@ -144,7 +144,7 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
                 dataset = fold_dataset(dataset, self.groupid)
             self.dataset = dataset
             try:
-                self._data_arrays = self.dataset.to_arrays(
+                self._data_arrays = self.dataset.dc.to_arrays(
                     self.graph,
                     float_dtype=self.float_dtype,
                 )
@@ -154,9 +154,6 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
             else:
                 if self.work_arrays is not None:
                     self._rebuild_work_arrays()
-
-        elif self.dataframes is not None: # work from old DataFrames
-            raise NotImplementedError("use Dataset not Dtaframes")
 
     @property
     def data_as_loaded(self):
@@ -193,76 +190,24 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
         else:
             raise TypeError(f"dataset must be Dataset not {type(dataset)}")
 
-    def set_value(self, name, value=None, **kwargs):
-        """
-        Set the value for a single model parameter.
-
-        This function will set the current value of a parameter.
-        Unless explicitly instructed with an alternate value,
-        the new value will also be saved as the "initial" value
-        of the parameter.
-
-        Parameters
-        ----------
-        name : str
-            The name of the parameter to set to a fixed value.
-        value : float
-            The numerical value to set for the parameter.
-        initvalue : float, optional
-            If given, this value is used to indicate the initial value
-            for the parameter, which may be different from the
-            current value.
-        nullvalue : float, optional
-            If given, this will overwrite any existing null value for
-            the parameter.  If not given, the null value for the
-            parameter is not changed.
-
-        """
-        dtypes = self._frame.dtypes.copy()
-        name = str(name)
-        if name not in self._frame.index:
-            self.unmangle()
-        if value is not None:
-            kwargs['value'] = value
-        for k, v in kwargs.items():
-            if k in self._frame.columns:
-                if dtypes[k] == 'float64':
-                    v = np.float64(v)
-                elif dtypes[k] == 'float32':
-                    v = np.float32(v)
-                elif dtypes[k] == 'int8':
-                    v = np.int8(v)
-                self._frame.loc[name, k] = v
-
-            # update init values when they are implied
-            if k == 'value':
-                if 'initvalue' not in kwargs and pd.isnull(self._frame.loc[name, 'initvalue']):
-                    self._frame.loc[name, 'initvalue'] = np.float32(v)
-
-        # update null values when they are implied
-        if 'nullvalue' not in kwargs and pd.isnull(self._frame.loc[name, 'nullvalue']):
-            self._frame.loc[name, 'nullvalue'] = 0
-
-        self._frame = self._frame.astype(dtypes)
-
-        self._check_if_frame_values_changed()
-
     def mix_parameter(self, *args, distribution='normal', cap=50):
         if distribution == 'normal':
             from .mixtures import Normal
 
-            if args[1] not in self.pf.index:
-                self.set_value(
-                    args[1],
-                    0.001,
-                    minimum=-cap,
-                    maximum=cap,
-                    holdfast=0,
-                    note='',
+            if args[1] not in self.pnames:
+                self._parameter_bucket.add_parameters(
+                    [args[1]],
+                    fill_values=dict(
+                        value=0.001,
+                        minimum=-cap,
+                        maximum=cap,
+                        holdfast=0,
+                        note='',
+                    )
                 )
 
-            m_ = self.pf.index.get_loc(args[0])
-            s_ = self.pf.index.get_loc(args[1])
+            m_ = self.get_param_loc(args[0])
+            s_ = self.get_param_loc(args[1])
             self._mixtures.append(Normal(args[0], args[1], m_, s_))
             self.mangle()
         else:
@@ -296,9 +241,9 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
 
     @jitmethod
     def _jax_utility(self, params, ca=None, co=None, av=None):
-        n_alts = self.dataset.n_alts
+        n_alts = self.dataset.dc.n_alts
         n_nodes = len(self.graph)
-        x = jnp.zeros([self.dataset.n_alts, self.dataset.dims.get("var_co", 0) + 1])
+        x = jnp.zeros([self.dataset.dc.n_alts, self.dataset.dims.get("var_co", 0) + 1])
         x = x.at[self._fixed_arrays.uco_alt_slot, self._fixed_arrays.uco_data_slot].add(
             params[self._fixed_arrays.uco_param_slot]
         )
@@ -322,7 +267,7 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
 
     @jitmethod
     def jax_utility(self, params):
-        n_alts = self.dataset.n_alts
+        n_alts = self.dataset.dc.n_alts
         n_nodes = len(self.graph)
 
         ca = _get_jnp_array(self.dataset, "ca")
@@ -335,8 +280,10 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
             n_cases = co.shape[:-1]
         elif ca is not None:
             n_cases = ca.shape[:-2]
+        else:
+            raise ValueError("missing n_cases")
 
-        x = jnp.zeros([self.dataset.n_alts, self.dataset.dims.get("var_co", 0) + 1])
+        x = jnp.zeros([self.dataset.dc.n_alts, self.dataset.dims.get("var_co", 0) + 1])
         x = x.at[self._fixed_arrays.uco_alt_slot, self._fixed_arrays.uco_data_slot].add(
             params[self._fixed_arrays.uco_param_slot]
         )
@@ -367,7 +314,7 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
         if mu_name is None:
             mu_slot = -1
         else:
-            mu_slot = self.pf.index.get_loc(mu_name)
+            mu_slot = self.get_param_loc(mu_name)
 
         #@jit
         def u_nest(params, utility_array, array_av):
@@ -423,10 +370,10 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
             return u_nesting_few
 
         # many nests, use more efficient loop
-        n_params = len(self.pf)
+        n_params = self.n_params
         mu_names = [self.graph.nodes[i].get('parameter') for i in self.graph.standard_sort]
         mu_slots = jnp.asarray(
-            [(self.pf.index.get_loc(mu_name) if mu_name is not None else n_params) for mu_name in mu_names]
+            [(self.get_param_loc(mu_name) if mu_name is not None else n_params) for mu_name in mu_names]
         )
         def add_u_to_parent(u, params, child_slot, parent_slot, avail):
             mu = params[mu_slots[parent_slot]]
@@ -486,7 +433,7 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
         if mu_name is None:
             mu_slot = -1
         else:
-            mu_slot = self.pf.index.get_loc(mu_name)
+            mu_slot = self.get_param_loc(mu_name)
 
         # @jit
         def probability_nest(params, utility_array, probability_array):
@@ -507,7 +454,7 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
 
     @jitmethod
     def _jax_log_probability(self, params, ca=None, co=None, av=None):
-        n_alts = self.dataset.n_alts
+        n_alts = self.dataset.dc.n_alts
         n_nodes = len(self.graph)
         utility_array = self._jax_utility(params, ca, co, av)
         # downshift to prevent over/underflow
@@ -533,7 +480,7 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
 
     @jitmethod
     def jax_log_probability(self, params):
-        n_alts = self.dataset.n_alts
+        n_alts = self.dataset.dc.n_alts
         n_nodes = len(self.graph)
         utility_array = self.jax_utility(params)
         av = _get_jnp_array(self.dataset, "av")
@@ -561,12 +508,12 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
 
     @jitmethod
     def _jax_probability(self, params, ca=None, co=None, av=None):
-        n_alts = self.dataset.n_alts
+        n_alts = self.dataset.dc.n_alts
         return jnp.exp(self._jax_log_probability(params, ca, co, av)[:n_alts])
 
     @jitmethod
     def jax_probability(self, params):
-        n_alts = self.dataset.n_alts
+        n_alts = self.dataset.dc.n_alts
         return jnp.exp(self.jax_log_probability(params)[..., :n_alts])
 
     @compiledmethod
@@ -641,7 +588,7 @@ class Model(lx.Model, OptimizeMixin, PanelMixin):
             @jax.jit
             def loglike(params):
                 ch = jnp.asarray(self.dataset['ch'])
-                n_alts = self.dataset.n_alts
+                n_alts = self.dataset.dc.n_alts
                 av = _get_jnp_array(self.dataset, "av")
                 pr = jax.vmap(self.jax_probability)(
                     self.apply_random_draws(params)
