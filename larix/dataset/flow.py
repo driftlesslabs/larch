@@ -582,3 +582,15 @@ class _DatasetDC(_GenericFlow):
         return DataArrays(
             ch, av, wt, co, ca, ce_data, ce_altidx, ce_caseptr
         )
+
+
+@xr.register_dataset_accessor("icase")
+class _DatasetCaseIslice(_GenericFlow):
+    def __getitem__(self, item):
+        if self.CASEID is not None:
+            return self._obj.isel({self.CASEID: item})
+        elif self.GROUPID is not None:
+            return self._obj.isel({self.GROUPID: item})
+        else:
+            raise ValueError("neither CASEID nor GROUPID is defined")
+

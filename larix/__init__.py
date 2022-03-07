@@ -6,3 +6,4 @@ from .model.basemodel import BaseModel
 from .shorts import P, X, PX
 from .dataset import Dataset, DataTree, DataArray
 from . import examples
+from .examples import example_file

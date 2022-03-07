@@ -240,6 +240,11 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         return parameters
 
     @jitmethod
+    def _jax_utility_bundle(self, params, databundle):
+        ca, co, ch, av, wt = databundle
+        return self._jax_utility(params, ca, co, av)
+
+    @jitmethod
     def _jax_utility(self, params, ca=None, co=None, av=None):
         n_alts = self.dataset.dc.n_alts
         n_nodes = len(self.graph)
@@ -453,6 +458,11 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         return probability_nest
 
     @jitmethod
+    def _jax_log_probability_bundle(self, params, databundle):
+        ca, co, ch, av, wt = databundle
+        return self._jax_log_probability(params, ca, co, av)
+
+    @jitmethod
     def _jax_log_probability(self, params, ca=None, co=None, av=None):
         n_alts = self.dataset.dc.n_alts
         n_nodes = len(self.graph)
@@ -505,6 +515,11 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             logprobability = self.__probability_for_nest(slot - 1)(params, utility_array, logprobability)
         #return jnp.exp(logprobability[..., :n_alts])
         return logprobability
+
+    @jitmethod
+    def _jax_probability_bundle(self, params, databundle):
+        ca, co, ch, av, wt = databundle
+        return self._jax_probability(params, ca, co, av)
 
     @jitmethod
     def _jax_probability(self, params, ca=None, co=None, av=None):

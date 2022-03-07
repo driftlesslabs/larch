@@ -22,10 +22,10 @@ from .data_arrays import DataArrays
 import warnings
 warnings.warn( ### EXPERIMENTAL ### )
     "\n\n"
-    "### larch.numba is experimental, and not feature-complete ###\n"
-    " the first time you import on a new system, this package will\n"
-    " compile optimized binaries for your machine, which may take \n"
-    " a little while, please be patient \n"
+    "##### larix is experimental, and not feature-complete  #####\n"
+    "the first time you import on a new system, this package will\n"
+    "compile optimized binaries for your machine, which may take \n"
+    "a little while, please be patient \n"
 )
 
 @njit(cache=True)
