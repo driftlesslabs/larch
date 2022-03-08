@@ -19,3 +19,8 @@ def MTC(**kwargs):
     dataset['avail'] = DataArray(dataset['_avail_'].values, dims=['caseid', 'altid'], coords=dataset.coords)
     dataset['chose'] = dataset['chose'].fillna(0.0)
     return dataset
+
+def ARTIFICIAL(**kwargs):
+    df = pd.read_csv(example_file('artificial_long.csv.gz'))
+    df['panel'] = np.ceil(df['id'] / 10).astype(int)
+    return Dataset.construct.from_idca(df.set_index(['id', 'alt']))

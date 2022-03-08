@@ -2,24 +2,24 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import pandas as pd
-
-from xarray import Dataset, DataArray
+from xarray import DataArray, Dataset
 
 from ..compiled import compiledmethod, jitmethod, reset_compiled_methods
 from ..folding import fold_dataset
 from ..optimize import OptimizeMixin
-from .param_core import ParameterBucket
 from .numbamodel import NumbaModel
+from .param_core import ParameterBucket
+
 
 def _get_jnp_array(dataset, name):
     if name not in dataset:
         return None
     return jnp.asarray(dataset[name])
 
-class PanelMixin:
 
+class PanelMixin:
     def __init__(self, *args, **kwargs):
-        self._groupid = kwargs.pop('groupid', None)
+        self._groupid = kwargs.pop("groupid", None)
 
     @property
     def groupid(self):
@@ -36,20 +36,14 @@ class PanelMixin:
 
 
 class Model(NumbaModel, OptimizeMixin, PanelMixin):
-
     def __init__(self, *args, **kwargs):
         PanelMixin.__init__(self, *args, **kwargs)
         super().__init__(*args, **kwargs)
         self._mixtures = []
         self._n_draws = 100
         self._draws = None
-
-    # @property
-    # def parameters(self) -> Dataset:
-    #     if self._parameter_bucket is None:
-    #         return Dataset.from_dataframe(self.pf.rename_axis(index=ParameterBucket.index_name))
-    #     else:
-    #         return self._parameter_bucket.parameters
+        self.prerolled_draws = True
+        self.common_draws = False
 
     @property
     def n_draws(self):
@@ -62,27 +56,6 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         else:
             self._n_draws = n
             self.mangle()
-
-    # @property
-    # def pvals(self):
-    #     if self._parameter_bucket is None:
-    #         return super().pvals
-    #     else:
-    #         return self._parameter_bucket.pvals
-    #
-    # @pvals.setter
-    # def pvals(self, x):
-    #     if self._parameter_bucket is None:
-    #         self.set_values(x)
-    #     else:
-    #         self._parameter_bucket.pvals = x
-
-    # @property
-    # def pholdfast(self):
-    #     if self._parameter_bucket is None:
-    #         return self._frame['holdfast'].to_numpy()
-    #     else:
-    #         return self._parameter_bucket._params["holdfast"].to_numpy()
 
     @property
     def pstderr(self):
@@ -112,6 +85,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                 mix.std = self.get_param_loc(mix.std_)
             if self.groupid is not None:
                 self.dataset = fold_dataset(self.dataset, self.groupid)
+            # self._make_random_draws()
         finally:
             delattr(self, marker)
 
@@ -128,27 +102,27 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
 
             request = self.required_data()
             if isinstance(self.groupid, str):
-                request['group_co'] = self.groupid
+                request["group_co"] = self.groupid
 
             from .data_arrays import prepare_data
+
             dataset, self.dataflows = prepare_data(
                 datasource=datatree,
                 request=request,
                 float_dtype=self.float_dtype,
                 cache_dir=datatree.cache_dir,
-                flows=getattr(self, 'dataflows', None),
+                flows=getattr(self, "dataflows", None),
             )
             if isinstance(self.groupid, str):
-                dataset = fold_dataset(dataset, 'group')
+                dataset = fold_dataset(dataset, "group")
             elif self.groupid is not None:
                 dataset = fold_dataset(dataset, self.groupid)
             self.dataset = dataset
             try:
                 self._data_arrays = self.dataset.dc.to_arrays(
-                    self.graph,
-                    float_dtype=self.float_dtype,
+                    self.graph, float_dtype=self.float_dtype,
                 )
-            except KeyError: # no defined caseid dimension, JAX only
+            except KeyError:  # no defined caseid dimension, JAX only
                 self._data_arrays = None
                 self.work_arrays = None
             else:
@@ -175,6 +149,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         if dataset is self._dataset:
             return
         from xarray import Dataset as _Dataset
+
         if isinstance(dataset, Dataset):
             if self.groupid is not None:
                 dataset = fold_dataset(dataset, self.groupid)
@@ -190,20 +165,16 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         else:
             raise TypeError(f"dataset must be Dataset not {type(dataset)}")
 
-    def mix_parameter(self, *args, distribution='normal', cap=50):
-        if distribution == 'normal':
+    def mix_parameter(self, *args, distribution="normal", cap=50):
+        if distribution == "normal":
             from .mixtures import Normal
 
             if args[1] not in self.pnames:
                 self._parameter_bucket.add_parameters(
                     [args[1]],
                     fill_values=dict(
-                        value=0.001,
-                        minimum=-cap,
-                        maximum=cap,
-                        holdfast=0,
-                        note='',
-                    )
+                        value=0.001, minimum=-cap, maximum=cap, holdfast=0, note="",
+                    ),
                 )
 
             m_ = self.get_param_loc(args[0])
@@ -213,12 +184,29 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         else:
             raise ValueError(f"unknown distribution {distribution}")
 
-    def _make_random_draws(self, n_draws, seed=0):
-        random_key = jax.random.PRNGKey(seed)
-        self._draws = jax.random.uniform(
-            random_key,
-            [n_draws, len(self._mixtures)],
-        )
+    def _make_random_draws(self):
+        if self.prerolled_draws:
+            seed = getattr(self, "seed", 0)
+            rk = jax.random.PRNGKey(seed)
+            n_panels = self.dataset.dc.n_panels
+            n_mixtures = len(self._mixtures)
+            n_draws = self.n_draws
+            if self.common_draws:
+                if n_draws > 0 and n_mixtures > 0:
+                    self._draws = self._make_random_draws_out(n_draws, n_mixtures, rk)[
+                        0
+                    ]
+            else:
+                if n_draws > 0 and n_mixtures > 0 and n_panels > 0:
+                    self._draws = self._make_random_draws_out_2(
+                        n_draws, n_mixtures, n_panels, rk
+                    )[0]
+                else:
+                    self._draws = None
+
+    # @jitmethod(static_argnums=(0,1), static_argnames=('n_draws', 'n_mixtures'))
+    def _make_random_draws_out(self, n_draws, n_mixtures, random_key):
+        draws = jax.random.uniform(random_key, [n_draws, n_mixtures],)
 
         def body(i, carry):
             draws, rnd_key = carry
@@ -226,107 +214,96 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             draws = draws.at[:, i].add(jax.random.permutation(subkey, draws.shape[0]))
             return draws, rnd_key
 
-        self._draws, random_key = jax.lax.fori_loop(0, self._draws.shape[1], body, (self._draws, random_key))
-        self._draws = self._draws * (1 / n_draws)
+        draws, random_key = jax.lax.fori_loop(
+            0, draws.shape[1], body, (draws, random_key)
+        )
+        return draws * (1 / n_draws), random_key
 
-    def apply_random_draws(self, parameters):
+    # @jitmethod(static_argnums=(0,1,2), static_argnames=('n_draws', 'n_mixtures', 'n_cases'))
+    def _make_random_draws_out_2(self, n_draws, n_mixtures, n_cases, random_key):
+        def body(carry, x):
+            rkey = carry
+            draws, rkey = self._make_random_draws_out(n_draws, n_mixtures, rkey)
+            return rkey, draws
+
+        random_key, draws = jax.lax.scan(body, random_key, None, n_cases)
+        return draws, random_key
+
+    def apply_random_draws(self, parameters, draws=None):
+        # if draws is None:
+        #     draws = self._draws
         parameters = jnp.broadcast_to(
-            parameters,
-            [self._draws.shape[0], parameters.shape[0]]
+            parameters, [*draws.shape[:-1], parameters.shape[0]]
         )
         for mix_n, mix in enumerate(self._mixtures):
-            u = self._draws[:, mix_n]
+            u = draws[..., mix_n]
             parameters = mix.roll(u, parameters)
         return parameters
 
     @jitmethod
-    def _jax_utility_bundle(self, params, databundle):
-        ca, co, ch, av, wt = databundle
-        return self._jax_utility(params, ca, co, av)
-
-    @jitmethod
-    def _jax_utility(self, params, ca=None, co=None, av=None):
+    def _jax_utility(self, params, databundle):
+        ca = databundle.get("ca", None)
+        co = databundle.get("co", None)
+        av = databundle.get("av", None)
+        if co is None:
+            n_vars_co = 0
+        else:
+            n_vars_co = co.shape[-1]
         n_alts = self.dataset.dc.n_alts
         n_nodes = len(self.graph)
-        x = jnp.zeros([self.dataset.dc.n_alts, self.dataset.dims.get("var_co", 0) + 1])
+        x = jnp.zeros([self.dataset.dc.n_alts, n_vars_co + 1])
         x = x.at[self._fixed_arrays.uco_alt_slot, self._fixed_arrays.uco_data_slot].add(
             params[self._fixed_arrays.uco_param_slot]
         )
         u = jnp.zeros([n_nodes])
         if ca is not None:
-            u = u.at[:n_alts].add(jnp.dot(
-                ca[..., self._fixed_arrays.uca_data_slot],
-                params[self._fixed_arrays.uca_param_slot],
-            ))
+            u = u.at[:n_alts].add(
+                jnp.dot(
+                    ca[..., self._fixed_arrays.uca_data_slot],
+                    params[self._fixed_arrays.uca_param_slot],
+                )
+            )
         if co is not None:
             temp = jnp.dot(co, x[:, :-1].T)
             u = u.at[:n_alts].add(temp)
-        u = u.at[:n_alts].add(
-            x[:, -1].T
-        )
+        u = u.at[:n_alts].add(x[:, -1].T)
         if av is not None:
-            u = u.at[:n_alts].set(
-                jnp.where(av[:n_alts], u[:n_alts], -jnp.inf)
-            )
+            u = u.at[:n_alts].set(jnp.where(av[:n_alts], u[:n_alts], -jnp.inf))
         return u
 
     @jitmethod
     def jax_utility(self, params):
-        n_alts = self.dataset.dc.n_alts
-        n_nodes = len(self.graph)
-
         ca = _get_jnp_array(self.dataset, "ca")
         co = _get_jnp_array(self.dataset, "co")
         av = _get_jnp_array(self.dataset, "av")
-
         if av is not None:
-            n_cases = av.shape[:-1]
+            depth = av.ndim - 1
         elif co is not None:
-            n_cases = co.shape[:-1]
+            depth = co.ndim - 1
         elif ca is not None:
-            n_cases = ca.shape[:-2]
+            depth = ca.ndim - 2
         else:
-            raise ValueError("missing n_cases")
-
-        x = jnp.zeros([self.dataset.dc.n_alts, self.dataset.dims.get("var_co", 0) + 1])
-        x = x.at[self._fixed_arrays.uco_alt_slot, self._fixed_arrays.uco_data_slot].add(
-            params[self._fixed_arrays.uco_param_slot]
-        )
-
-        u = jnp.zeros([*n_cases, n_nodes])
-        if ca is not None:
-            u = u.at[..., :n_alts].add(jnp.dot(
-                ca[..., self._fixed_arrays.uca_data_slot],
-                params[self._fixed_arrays.uca_param_slot],
-            ))
-        if co is not None:
-            u = u.at[..., :n_alts].add(
-                jnp.dot(co, x[:, :-1].T)
-            )
-        u = u.at[..., :n_alts].add(
-            x[:, -1].T
-        )
-        if av is not None:
-            u = u.at[..., :n_alts].set(
-                jnp.where(av[..., :n_alts], u[..., :n_alts], -jnp.inf)
-            )
-        return u
+            raise ValueError("missing data")
+        f = self._jax_utility
+        for level in range(depth):
+            f = jax.vmap(f, in_axes=(None, 0))
+        return f(params, {"ca": ca, "co": co, "av": av})
 
     def __utility_for_nest(self, slot):
         nest_code = self.graph.standard_sort[slot]
         child_slots = self.graph.successor_slots(nest_code)
-        mu_name = self.graph.nodes[nest_code].get('parameter')
+        mu_name = self.graph.nodes[nest_code].get("parameter")
         if mu_name is None:
             mu_slot = -1
         else:
             mu_slot = self.get_param_loc(mu_name)
 
-        #@jit
+        # @jit
         def u_nest(params, utility_array, array_av):
             mu = params[mu_slot] if mu_slot >= 0 else 1.0
             carry = jnp.zeros(utility_array.shape[:-1])
-            #num_av = jnp.sum(utility_array[..., child_slots] > -1e30, axis=-1)
-            num_av = array_av[...,slot]
+            # num_av = jnp.sum(utility_array[..., child_slots] > -1e30, axis=-1)
+            num_av = array_av[..., slot]
 
             def body(carry, child_slot):
                 carry = jnp.add(
@@ -335,7 +312,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                         num_av > 1,
                         jnp.exp(jnp.clip(utility_array[..., child_slot], -1e37) / mu),
                         jnp.exp(jnp.clip(utility_array[..., child_slot], -1e37)),
-                    )
+                    ),
                 )
                 return carry, None
 
@@ -358,14 +335,12 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
 
         def u_nesting_none(out, beta, array_av):
             # TODO Maybe filter on av
-            return out.at[...,-1].set(
-                jnp.log(jnp.exp(out[...,:-1]).sum(-1))
-            )
+            return out.at[..., -1].set(jnp.log(jnp.exp(out[..., :-1]).sum(-1)))
 
         if n_nodes - n_alts <= 1:
             return u_nesting_none
 
-        #@jit
+        # @jit
         def u_nesting_few(out, beta, array_av):
             for slot in range(n_alts, n_nodes):
                 out = self.__utility_for_nest(slot)(beta, out, array_av)
@@ -376,30 +351,38 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
 
         # many nests, use more efficient loop
         n_params = self.n_params
-        mu_names = [self.graph.nodes[i].get('parameter') for i in self.graph.standard_sort]
+        mu_names = [
+            self.graph.nodes[i].get("parameter") for i in self.graph.standard_sort
+        ]
         mu_slots = jnp.asarray(
-            [(self.get_param_loc(mu_name) if mu_name is not None else n_params) for mu_name in mu_names]
+            [
+                (self.get_param_loc(mu_name) if mu_name is not None else n_params)
+                for mu_name in mu_names
+            ]
         )
+
         def add_u_to_parent(u, params, child_slot, parent_slot, avail):
             mu = params[mu_slots[parent_slot]]
-            u = u.at[...,parent_slot].add(
+            u = u.at[..., parent_slot].add(
                 jnp.where(
-                    avail[...,parent_slot] > 1,
+                    avail[..., parent_slot] > 1,
                     jnp.exp(jnp.clip(u[..., child_slot], -1e37) / mu),
-                    jnp.exp(jnp.clip(u[..., child_slot], -1e37)     ),
+                    jnp.exp(jnp.clip(u[..., child_slot], -1e37)),
                 )
             )
             return u
+
         def log_self(u, params, self_slot, avail):
             mu = params[mu_slots[self_slot]]
             u = u.at[..., self_slot].set(
                 jnp.where(
                     avail[..., self_slot] > 1,
                     jnp.clip(jnp.log(u[..., self_slot]), -1e38) * mu,
-                    jnp.clip(jnp.log(u[..., self_slot]), -1e38)
+                    jnp.clip(jnp.log(u[..., self_slot]), -1e38),
                 )
             )
             return u
+
         slotarray = np.stack(self.graph.edge_slot_arrays()).T
 
         @jax.jit
@@ -414,14 +397,17 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                 # if firstvisit >= 0 and dn_slot>=n_alts:
                 #     u = log_self(u, params, dn_slot)
                 u = jax.lax.cond(
-                    (firstvisit >= 0) & (dn_slot>=n_alts),
+                    (firstvisit >= 0) & (dn_slot >= n_alts),
                     lambda u: log_self(u, params, dn_slot, avail_ca),
                     lambda u: u,
-                    operand=u
+                    operand=u,
                 )
                 u = add_u_to_parent(u, params, dn_slot, up_slot, avail_ca)
                 return (u, params), None
-            (utility_array, _ignore_1), _ignore_2 = jax.lax.scan(body, (utility_array, params), slotarray)
+
+            (utility_array, _ignore_1), _ignore_2 = jax.lax.scan(
+                body, (utility_array, params), slotarray
+            )
             # log utility at root
             utility_array = utility_array.at[..., -1].set(
                 jnp.clip(jnp.log(utility_array[..., -1]), -1e38)
@@ -430,11 +416,10 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
 
         return u_rollup
 
-
     def __probability_for_nest(self, slot):
         nest_code = self.graph.standard_sort[slot]
         child_slots = self.graph.successor_slots(nest_code)
-        mu_name = self.graph.nodes[nest_code].get('parameter')
+        mu_name = self.graph.nodes[nest_code].get("parameter")
         if mu_name is None:
             mu_slot = -1
         else:
@@ -447,8 +432,9 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
 
             def body(carry, child_slot):
                 add_me = (
-                        (jnp.clip(utility_array[..., child_slot], -1e33) - jnp.clip(u_nest, -1e33)) / mu
-                )
+                    jnp.clip(utility_array[..., child_slot], -1e33)
+                    - jnp.clip(u_nest, -1e33)
+                ) / mu
                 carry = carry.at[..., child_slot].set(add_me + carry[..., slot])
                 return carry, None
 
@@ -463,166 +449,164 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         return self._jax_log_probability(params, ca, co, av)
 
     @jitmethod
-    def _jax_log_probability(self, params, ca=None, co=None, av=None):
+    def _jax_log_probability(self, params, databundle):
+        av = databundle.get("av", None)
         n_alts = self.dataset.dc.n_alts
         n_nodes = len(self.graph)
-        utility_array = self._jax_utility(params, ca, co, av)
+        utility_array = self._jax_utility(params, databundle)
         # downshift to prevent over/underflow
         shifter = utility_array[:n_alts].max(axis=-1)
         if av is not None:
             utility_array = utility_array.at[:n_alts].add(
-                jnp.where(
-                    av[:n_alts],
-                    -shifter,
-                    0
-                )
+                jnp.where(av[:n_alts], -shifter, 0)
             )
         else:
-            utility_array = utility_array.at[:n_alts].add(
-                -shifter
-            )
+            utility_array = utility_array.at[:n_alts].add(-shifter)
         utility_array = self.utility_for_nests(utility_array, params, av)
         logprobability = jnp.zeros_like(utility_array)
         for slot in range(n_nodes, n_alts, -1):
-            logprobability = self.__probability_for_nest(slot - 1)(params, utility_array, logprobability)
+            logprobability = self.__probability_for_nest(slot - 1)(
+                params, utility_array, logprobability
+            )
         return logprobability
-
 
     @jitmethod
     def jax_log_probability(self, params):
-        n_alts = self.dataset.dc.n_alts
-        n_nodes = len(self.graph)
-        utility_array = self.jax_utility(params)
+        ca = _get_jnp_array(self.dataset, "ca")
+        co = _get_jnp_array(self.dataset, "co")
         av = _get_jnp_array(self.dataset, "av")
-
-        # downshift to prevent over/underflow
-        shifter = utility_array[..., :n_alts].max(axis=-1)
         if av is not None:
-            utility_array = utility_array.at[..., :n_alts].add(
-                jnp.where(
-                    av[..., :n_alts],
-                    -shifter[..., None],
-                    0
-                )
-            )
+            depth = av.ndim - 1
+        elif co is not None:
+            depth = co.ndim - 1
+        elif ca is not None:
+            depth = ca.ndim - 2
         else:
-            utility_array = utility_array.at[..., :n_alts].add(
-                -shifter[..., None]
-            )
-        utility_array = self.utility_for_nests(utility_array, params, av)
-        logprobability = jnp.zeros_like(utility_array)
-        for slot in range(n_nodes, n_alts, -1):
-            logprobability = self.__probability_for_nest(slot - 1)(params, utility_array, logprobability)
-        #return jnp.exp(logprobability[..., :n_alts])
-        return logprobability
+            raise ValueError("missing data")
+        f = self._jax_log_probability
+        for level in range(depth):
+            f = jax.vmap(f, in_axes=(None, 0))
+        return f(params, {"ca": ca, "co": co, "av": av})
 
     @jitmethod
-    def _jax_probability_bundle(self, params, databundle):
-        ca, co, ch, av, wt = databundle
-        return self._jax_probability(params, ca, co, av)
-
-    @jitmethod
-    def _jax_probability(self, params, ca=None, co=None, av=None):
+    def _jax_probability(self, params, databundle):
         n_alts = self.dataset.dc.n_alts
-        return jnp.exp(self._jax_log_probability(params, ca, co, av)[:n_alts])
+        return jnp.exp(self._jax_log_probability(params, databundle)[:n_alts])
 
     @jitmethod
     def jax_probability(self, params):
+        ca = _get_jnp_array(self.dataset, "ca")
+        co = _get_jnp_array(self.dataset, "co")
+        av = _get_jnp_array(self.dataset, "av")
+        if av is not None:
+            depth = av.ndim - 1
+        elif co is not None:
+            depth = co.ndim - 1
+        elif ca is not None:
+            depth = ca.ndim - 2
+        else:
+            raise ValueError("missing data")
+        f = self._jax_probability
+        for level in range(depth):
+            f = jax.vmap(f, in_axes=(None, 0))
+        return f(params, {"ca": ca, "co": co, "av": av})
+
+    @jitmethod
+    def _jax_likelihood(self, params, databundle):
         n_alts = self.dataset.dc.n_alts
-        return jnp.exp(self.jax_log_probability(params)[..., :n_alts])
+        ch = databundle.get("ch", None)[:n_alts]
+        pr = self._jax_probability(params, databundle)[:n_alts]
+        likely = jnp.where(ch, pr, 1.0)  # TODO make power if needed
+        return likely
 
-    @compiledmethod
-    def _jax_loglike(self):
+    @jitmethod(static_argnums=(3,), static_argnames="n_draws")
+    def _jax_loglike_casewise(self, params, databundle, groupbundle=None, n_draws=100):
         if len(self._mixtures) == 0:
-            @jax.jit
-            def loglike(params, ca=None, co=None, av=None, ch=None):
-                # ch = jnp.asarray(self.dataset['ch'])
-                logpr = self._jax_log_probability(params, ca, co, av)
-                return (logpr[:ch.size] * ch).sum()
+            logpr = self._jax_log_probability(params, databundle)
+            ch = databundle.get("ch", None)
+            return (logpr[: ch.size] * ch).sum()
         else:
-            raise NotImplementedError
-            # if self._draws is None:
-            #     self._make_random_draws(n_draws=self.n_draws)
-            # @jax.jit
-            # def loglike(params, ca=None, co=None, av=None, ch=None):
-            #     pr = jax.vmap(self.jax_probability)(
-            #         self.apply_random_draws(params)
-            #     )
-            #     likelihood = jnp.where(ch, pr, 1.0)
-            #     if self.groupid is not None:
-            #         in_group_likelihood = likelihood.prod(2).mean(0)
-            #         in_group_log_likelihood = jnp.log(in_group_likelihood)
-            #         return in_group_log_likelihood.sum()
-            #     else:
-            #         return jnp.log(likelihood.mean(0)).sum()
-        return loglike
-
-    @compiledmethod
-    def jax_loglike_casewise(self):
-        if len(self._mixtures) == 0:
-            @jax.jit
-            def loglike_casewise(params):
-                params = jnp.where(self.pholdfast, self.pvals, params)
-                co = _get_jnp_array(self.dataset, 'co')
-                ca = _get_jnp_array(self.dataset, 'ca')
-                av = _get_jnp_array(self.dataset, 'av')
-                ch = _get_jnp_array(self.dataset, 'ch')
-                if co is not None:
-                    axes = tuple(range(co.ndim-1))
-                elif ca is not None:
-                    axes = tuple(range(ca.ndim-2))
-                elif ch is not None:
-                    axes = tuple(range(ch.ndim - 1))
-                elif av is not None:
-                    axes = tuple(range(av.ndim-1))
-                else:
-                    raise ValueError('missing all data')
-                f = self._jax_loglike
-                for _ in axes:
-                    f = jax.vmap(f, in_axes=(
-                        None,
-                        None if ca is None else 0,
-                        None if co is None else 0,
-                        None if av is None else 0,
-                        None if ch is None else 0,
-                    ), out_axes=0)
-                return f(params, ca, co, av, ch)
-        else:
-            raise NotImplementedError
-        return loglike_casewise
-
-    @compiledmethod
-    def jax_loglike(self):
-        if len(self._mixtures) == 0:
-            @jax.jit
-            def loglike(params):
-                return self.jax_loglike_casewise(params).sum()
-        else:
-            if self._draws is None:
-                self._make_random_draws(n_draws=self.n_draws)
-            @jax.jit
-            def loglike(params):
-                ch = jnp.asarray(self.dataset['ch'])
-                n_alts = self.dataset.dc.n_alts
-                av = _get_jnp_array(self.dataset, "av")
-                pr = jax.vmap(self.jax_probability)(
-                    self.apply_random_draws(params)
+            if self.prerolled_draws:
+                draws = groupbundle.get("draws", None)
+            else:
+                rk = groupbundle.get("rk", None)
+                draws, _ = self._make_random_draws_out(n_draws, len(self._mixtures), rk)
+            ch = databundle.get("ch", None)
+            rand_params = self.apply_random_draws(params, draws)
+            if ch.ndim == 2:  # PANEL DATA
+                # vmap over ingroup
+                likelihood_f = jax.vmap(self._jax_likelihood, in_axes=(None, 0),)
+                # vmap over draws
+                likelihood = jax.vmap(likelihood_f, in_axes=(0, None), out_axes=-1,)(
+                    rand_params, databundle
                 )
-                likelihood = jnp.where(ch, pr, 1.0)
-                if self.groupid is not None:
-                    in_group_likelihood = likelihood.prod(2).mean(0)
-                    in_group_log_likelihood = jnp.log(in_group_likelihood)
-                    return in_group_log_likelihood.sum()
-                else:
-                    return jnp.log(likelihood.mean(0)).sum()
-                # logpr = jnp.log(jnp.where(
-                #     av[..., :n_alts],
-                #     jnp.clip(pr, 1e-35),
-                #     1.0
-                # ))
-                #return (logpr[:,:n_alts] * ch[:,:n_alts]).sum()
-        return loglike
+                # collapse likelihood over all alternatives
+                likelihood = likelihood.prod([0, 1])
+                # average over all draws
+                likelihood = likelihood.mean(0)
+                return jnp.log(likelihood)
+            else:
+                # vmap over draws
+                likelihood = jax.vmap(
+                    self._jax_likelihood, in_axes=(0, None), out_axes=-1,
+                )(rand_params, databundle)
+                # collapse likelihood over all alternatives
+                likelihood = likelihood.prod(0)
+                # average over all draws
+                likelihood = likelihood.mean(0)
+                return jnp.log(likelihood)
 
-    @compiledmethod
-    def jax_d_loglike(self):
-        return jax.grad(self.jax_loglike)
+    @jitmethod
+    def jax_loglike_casewise(self, params):
+        ca = _get_jnp_array(self.dataset, "ca")
+        co = _get_jnp_array(self.dataset, "co")
+        av = _get_jnp_array(self.dataset, "av")
+        ch = _get_jnp_array(self.dataset, "ch")
+        n_draws = self.n_draws
+        seed = getattr(self, "seed", 42)
+        if av is not None:
+            depth = av.ndim - 1
+            shape = av.shape[:-1]
+        elif co is not None:
+            depth = co.ndim - 1
+            shape = co.shape[:-1]
+        elif ca is not None:
+            depth = ca.ndim - 2
+            shape = ca.shape[:-2]
+        elif ch is not None:
+            depth = ch.ndim - 1
+            shape = ch.shape[:-1]
+        else:
+            raise ValueError("missing data")
+        random_key = jax.random.PRNGKey(seed)
+        if self.groupid is not None:
+            depth = depth - 1
+            shape = shape[:-1]
+        f = (
+            self._jax_loglike_casewise
+        )  # params, databundle, groupbundle=None, n_draws=100
+        from .random import keysplit
+
+        commons = None if self.common_draws else 0
+        for i in range(depth):
+            f = jax.vmap(f, in_axes=(None, 0, commons, None))
+            if not self.prerolled_draws:
+                random_key, shape = keysplit(random_key, shape)
+        if self.prerolled_draws:
+            return f(
+                params,
+                {"ca": ca, "co": co, "av": av, "ch": ch},
+                {"draws": self._draws},
+                n_draws,
+            )
+        else:
+            return f(
+                params,
+                {"ca": ca, "co": co, "av": av, "ch": ch},
+                {"rk": random_key},
+                n_draws,
+            )
+
+    @jitmethod
+    def jax_loglike(self, params):
+        return self.jax_loglike_casewise(params).sum()

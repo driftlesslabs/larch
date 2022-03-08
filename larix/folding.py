@@ -50,11 +50,14 @@ def fold(arr, groupid, fill_value=0, group_dim='groupid', ingroup_dim='ingroup',
             padded_arr,
             dims=[group_dim, ingroup_dim, *arr.dims[1:]],
             coords={group_dim: np.asarray(gids)} if gids is not None else {},
+            name=arr.name,
         )
     return padded_arr
 
 
-def fold_dataset(d, groupid='groupid', group_dim='groupid', ingroup_dim='ingroup'):
+def fold_dataset(d, groupid='groupid', group_dim='groupid', ingroup_dim='ingroup', vars=('ca', 'co', 'ch', 'av', 'caseid')):
+    if group_dim in d.dims and ingroup_dim in d.dims:
+        return d # already folded!
     if isinstance(groupid, str):
         if groupid not in d:
             return d
@@ -63,7 +66,9 @@ def fold_dataset(d, groupid='groupid', group_dim='groupid', ingroup_dim='ingroup
         g = groupid
     out = Dataset()
     lens, where_to_pad, gids = _group_breaks(g)
-    for i in ['ca', 'co', 'ch', 'av', 'caseid']:
+    if vars is None:
+        vars = d.variables
+    for i in vars:
         if i in d:
             temp = fold(d[i], g, group_dim=group_dim, ingroup_dim=ingroup_dim, lens=lens, where_to_pad=where_to_pad, gids=gids)
             out = out.assign({i:temp})

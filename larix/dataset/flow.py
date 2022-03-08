@@ -345,6 +345,18 @@ class _GenericFlow:
             logging.getLogger().error(f"missing {self.CASEID!r} among dims {self.dims}")
             raise
 
+    @property
+    def n_panels(self):
+        try:
+            return self.dims[self.GROUPID]
+        except KeyError:
+            try:
+                return self.dims[self.CASEID]
+            except KeyError:
+                pass
+            logging.getLogger().error(f"missing {self.GROUPID!r} and {self.CASEID!r} among dims {self.dims}")
+            raise
+
     def transfer_dimension_attrs(self, target):
         if not isinstance(target, (xr.DataArray, xr.Dataset)):
             return target

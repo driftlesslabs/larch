@@ -55,7 +55,7 @@ class jitmethod:
     Decorator for a class method that returns a compiled function.
     """
 
-    def __init__(self, wrapped_method):
+    def __init__(self, wrapped_method=None, **kwargs):
         """
         Initialize a jit compile wrapper.
 
@@ -64,10 +64,17 @@ class jitmethod:
         wrapped_method : Callable
             The class method being decorated.
         """
-        # self : compiledmethod
-        # compiler : the class method being decorated
+        if wrapped_method is None:
+            self.jit_kwargs = kwargs
+        else:
+            self.jit_kwargs = {}
+            self.wrapped_method = wrapped_method
+            self.docstring = wrapped_method.__doc__
+
+    def __call__(self, wrapped_method):
         self.wrapped_method = wrapped_method
         self.docstring = wrapped_method.__doc__
+        return self
 
     def __set_name__(self, owner, name):
         """
@@ -100,11 +107,10 @@ class jitmethod:
         result = getattr(obj, self.private_name, None)
         if result is None:
 
-            @jax.jit
             def func(*args, **kwargs):
                 return self.wrapped_method(obj, *args, **kwargs)
 
-            result = func
+            result = jax.jit(func, **self.jit_kwargs)
             result.__doc__ = self.docstring
             setattr(obj, self.private_name, result)
         return result
