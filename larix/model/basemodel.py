@@ -9,6 +9,7 @@ from .constraints import ParametricConstraintList
 from .single_parameter import SingleParameter
 from ..roles import ParameterRef
 from .param_core import ParameterBucket
+from .mixtures import MixtureList
 
 logger = logging.getLogger("larix.model")
 
@@ -93,6 +94,8 @@ class BaseModel:
 
     _availability_co_vars = DictOfAlts()
     _choice_co_vars = DictOfAlts()
+
+    mixtures = MixtureList()
 
     def __init__(self, *, title=None, datatree=None):
         self._mangled = True
@@ -584,6 +587,7 @@ class BaseModel:
         self._scan_utility_ensure_names()
         self._scan_quantity_ensure_names()
         self._scan_logsums_ensure_names()
+        self._scan_mixtures_ensure_names()
 
     def _scan_utility_ensure_names(self):
         """
@@ -627,6 +631,11 @@ class BaseModel:
         if self.logsum_parameter is not None:
             nameset.add(self.__p_rename(self.logsum_parameter))
         self._ensure_names(nameset, nullvalue=1, initvalue=1, minimum=0.001, maximum=1)
+
+    def _scan_mixtures_ensure_names(self):
+        for i in self.mixtures:
+            for name, default_value in i.param_names().items():
+                self._ensure_names([name], value=default_value, initvalue=default_value)
 
     def _ensure_names(self, names, **kwargs):
         if self._parameter_bucket is not None:

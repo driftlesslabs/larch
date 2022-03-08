@@ -39,7 +39,6 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
     def __init__(self, *args, **kwargs):
         PanelMixin.__init__(self, *args, **kwargs)
         super().__init__(*args, **kwargs)
-        self._mixtures = []
         self._n_draws = 100
         self._draws = None
         self.prerolled_draws = True
@@ -80,12 +79,10 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         try:
             setattr(self, marker, True)
             super().unmangle(force=force)
-            for mix in self._mixtures:
-                mix.mean = self.get_param_loc(mix.mean_)
-                mix.std = self.get_param_loc(mix.std_)
+            for mix in self.mixtures:
+                mix.prep(self._parameter_bucket)
             if self.groupid is not None:
                 self.dataset = fold_dataset(self.dataset, self.groupid)
-            # self._make_random_draws()
         finally:
             delattr(self, marker)
 
@@ -165,44 +162,73 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         else:
             raise TypeError(f"dataset must be Dataset not {type(dataset)}")
 
-    def mix_parameter(self, *args, distribution="normal", cap=50):
-        if distribution == "normal":
-            from .mixtures import Normal
-
-            if args[1] not in self.pnames:
-                self._parameter_bucket.add_parameters(
-                    [args[1]],
-                    fill_values=dict(
-                        value=0.001, minimum=-cap, maximum=cap, holdfast=0, note="",
-                    ),
-                )
-
-            m_ = self.get_param_loc(args[0])
-            s_ = self.get_param_loc(args[1])
-            self._mixtures.append(Normal(args[0], args[1], m_, s_))
-            self.mangle()
-        else:
-            raise ValueError(f"unknown distribution {distribution}")
-
-    def _make_random_draws(self):
-        if self.prerolled_draws:
-            seed = getattr(self, "seed", 0)
-            rk = jax.random.PRNGKey(seed)
-            n_panels = self.dataset.dc.n_panels
-            n_mixtures = len(self._mixtures)
-            n_draws = self.n_draws
-            if self.common_draws:
-                if n_draws > 0 and n_mixtures > 0:
-                    self._draws = self._make_random_draws_out(n_draws, n_mixtures, rk)[
-                        0
-                    ]
-            else:
-                if n_draws > 0 and n_mixtures > 0 and n_panels > 0:
-                    self._draws = self._make_random_draws_out_2(
-                        n_draws, n_mixtures, n_panels, rk
-                    )[0]
+    def make_random_draws(self, engine='numpy'):
+        self.unmangle()
+        for i in self.mixtures:
+            i.prep(self._parameter_bucket)
+        n_panels = self.dataset.dc.n_panels
+        n_mixtures = len(self.mixtures)
+        n_draws = self.n_draws
+        draws = None
+        if self._draws is not None:
+            if self.common_draws and self._draws.shape == (n_draws, n_mixtures):
+                draws = self._draws
+            if not self.common_draws and self._draws.shape == (n_panels, n_draws, n_mixtures):
+                draws = self._draws
+        if draws is None:
+            if engine == 'numpy':
+                seed = getattr(self, "seed", 0)
+                if self.common_draws:
+                    if n_draws > 0 and n_mixtures > 0:
+                        draws, seed = self._make_random_draws_numpy(n_draws, n_mixtures, seed)
                 else:
-                    self._draws = None
+                    if n_draws > 0 and n_mixtures > 0 and n_panels > 0:
+                        draws, seed = self._make_random_draws_numpy_2(
+                            n_draws, n_mixtures, n_panels, seed
+                        )
+                    else:
+                        draws = None
+            elif engine == 'jax':
+                seed = getattr(self, "seed", 0)
+                rk = jax.random.PRNGKey(seed)
+                if self.common_draws:
+                    if n_draws > 0 and n_mixtures > 0:
+                        draws = self._make_random_draws_out(n_draws, n_mixtures, rk)[
+                            0
+                        ]
+                else:
+                    if n_draws > 0 and n_mixtures > 0 and n_panels > 0:
+                        draws = self._make_random_draws_out_2(
+                            n_draws, n_mixtures, n_panels, rk
+                        )[0]
+                    else:
+                        draws = None
+            else:
+                raise ValueError(f"unknown random engine {engine!r}")
+            if self.prerolled_draws:
+                self._draws = draws
+        return draws
+
+    def _make_random_draws_numpy(self, n_draws, n_mixtures, seed):
+        if isinstance(seed, np.random.Generator):
+            rgen = seed
+        else:
+            rgen = np.random.default_rng(seed)
+        draws = rgen.random(size=[n_draws, n_mixtures], dtype=np.float32) + np.arange(n_draws, dtype=np.float32)[:, np.newaxis]
+        for i in range(n_mixtures):
+            rgen.shuffle(draws[:, i])
+        return np.clip(draws / n_draws, 0, np.float32(1-1e-7)), rgen
+
+    def _make_random_draws_numpy_2(self, n_draws, n_mixtures, n_panels, seed):
+        if isinstance(seed, np.random.Generator):
+            rgen = seed
+        else:
+            rgen = np.random.default_rng(seed)
+        draws = rgen.random(size=[n_panels, n_draws, n_mixtures], dtype=np.float32) + np.arange(n_draws, dtype=np.float32)[np.newaxis, :, np.newaxis]
+        for i in range(n_mixtures):
+            for p in range(n_panels):
+                rgen.shuffle(draws[p, :, i])
+        return np.clip(draws / n_draws, 0, np.float32(1-1e-7)), rgen
 
     # @jitmethod(static_argnums=(0,1), static_argnames=('n_draws', 'n_mixtures'))
     def _make_random_draws_out(self, n_draws, n_mixtures, random_key):
@@ -235,7 +261,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         parameters = jnp.broadcast_to(
             parameters, [*draws.shape[:-1], parameters.shape[0]]
         )
-        for mix_n, mix in enumerate(self._mixtures):
+        for mix_n, mix in enumerate(self.mixtures):
             u = draws[..., mix_n]
             parameters = mix.roll(u, parameters)
         return parameters
@@ -521,7 +547,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
 
     @jitmethod(static_argnums=(3,), static_argnames="n_draws")
     def _jax_loglike_casewise(self, params, databundle, groupbundle=None, n_draws=100):
-        if len(self._mixtures) == 0:
+        if len(self.mixtures) == 0:
             logpr = self._jax_log_probability(params, databundle)
             ch = databundle.get("ch", None)
             return (logpr[: ch.size] * ch).sum()
@@ -530,7 +556,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                 draws = groupbundle.get("draws", None)
             else:
                 rk = groupbundle.get("rk", None)
-                draws, _ = self._make_random_draws_out(n_draws, len(self._mixtures), rk)
+                draws, _ = self._make_random_draws_out(n_draws, len(self.mixtures), rk)
             ch = databundle.get("ch", None)
             rand_params = self.apply_random_draws(params, draws)
             if ch.ndim == 2:  # PANEL DATA
