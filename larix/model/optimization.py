@@ -317,7 +317,7 @@ def maximize_loglike(
                 raw_result = minimize(
                     model.neg_loglike,
                     model.pvals,
-                    args=args+(leave_out, keep_only, subsample), # start_case, stop_case, step_case, leave_out, keep_only, subsample
+                    args=args, #+(leave_out, keep_only, subsample), # start_case, stop_case, step_case, leave_out, keep_only, subsample
                     method=method,
                     jac=model.neg_d_loglike,
                     bounds=bounds,

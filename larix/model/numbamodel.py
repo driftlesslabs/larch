@@ -1679,6 +1679,14 @@ class NumbaModel(_BaseModel):
             subsample=subsample,
         )
 
+    def neg_d_loglike(self, x=None, start_case=0, stop_case=-1, step_case=1, **kwargs):
+        result = self.d_loglike(
+            x,
+            start_case=start_case, stop_case=stop_case, step_case=step_case,
+            **kwargs
+        )
+        return -np.asarray(result)
+
     def jumpstart_bhhh(
             self,
             steplen=0.5,

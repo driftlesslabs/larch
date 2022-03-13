@@ -45,6 +45,13 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         self.common_draws = False
 
     @property
+    def compute_engine(self):
+        engine = self._compute_engine
+        if engine is None:
+            engine = 'jax'
+        return engine
+
+    @property
     def n_draws(self):
         return self._n_draws
 
@@ -636,3 +643,56 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
     @jitmethod
     def jax_loglike(self, params):
         return self.jax_loglike_casewise(params).sum()
+
+    def loglike(
+            self,
+            x=None,
+            *,
+            start_case=None, stop_case=None, step_case=None,
+            **kwargs
+    ):
+        if self.compute_engine != 'jax':
+            return super().loglike(x=x, start_case=start_case, stop_case=stop_case, step_case=step_case, **kwargs)
+        if start_case is not None:
+            raise NotImplementedError('start_case with engine=jax')
+        if stop_case is not None:
+            raise NotImplementedError('stop_case with engine=jax')
+        if step_case is not None:
+            raise NotImplementedError('step_case with engine=jax')
+        # if kwargs:
+        #     raise NotImplementedError(f"{kwargs.popitem()[0]} with engine=jax")
+        if x is not None:
+            self.pvals = x
+        result = float(self.jax_loglike(self.pvals))
+        if start_case is None and stop_case is None and step_case is None:
+            self._check_if_best(result)
+        return result
+
+    def d_loglike(
+            self,
+            x=None,
+            *,
+            start_case=None, stop_case=None, step_case=None,
+            return_series=False,
+            **kwargs,
+    ):
+        if self.compute_engine != 'jax':
+            return super().d_loglike(x=x, start_case=start_case, stop_case=stop_case, step_case=step_case, return_series=return_series, **kwargs)
+        if start_case is not None:
+            raise NotImplementedError('start_case with engine=jax')
+        if stop_case is not None:
+            raise NotImplementedError('stop_case with engine=jax')
+        if step_case is not None:
+            raise NotImplementedError('step_case with engine=jax')
+        # if kwargs:
+        #     raise NotImplementedError(f"{kwargs.popitem()[0]} with engine=jax")
+        if x is not None:
+            self.pvals = x
+        result = self.jax_d_loglike(self.pvals)
+
+        print("converge?=", jnp.max(jnp.absolute(result)))
+
+        if return_series:
+            result = pd.Series(result, index=self.pnames)
+        return result
+

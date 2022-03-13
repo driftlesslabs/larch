@@ -97,7 +97,7 @@ class BaseModel:
 
     mixtures = MixtureList()
 
-    def __init__(self, *, title=None, datatree=None):
+    def __init__(self, *, title=None, datatree=None, compute_engine=None):
         self._mangled = True
         self._datatree = None
         self.title = title
@@ -116,6 +116,12 @@ class BaseModel:
         self._availability_var = None
         self._availability_co_vars = None
         self._availability_any = True
+
+        self._compute_engine = compute_engine
+
+    @property
+    def compute_engine(self):
+        return self._compute_engine
 
     @property
     def datatree(self):
@@ -185,6 +191,16 @@ class BaseModel:
     def pminimum(self):
         self.unmangle()
         return self._parameter_bucket.pminimum
+
+    @property
+    def pbounds(self):
+        """scipy.optimize.Bounds : A copy of the current min-max bounds of the parameters."""
+        self.unmangle()
+        from scipy.optimize import Bounds
+        return Bounds(
+            self._parameter_bucket.pminimum,
+            self._parameter_bucket.pmaximum,
+        )
 
     def get_param_loc(self, name):
         self.unmangle()
