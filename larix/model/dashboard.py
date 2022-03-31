@@ -23,11 +23,17 @@ class Dashboard:
     def set_loglike(self, x, best=None):
         if x is not None:
             if not np.isfinite(x):
-                self.loglike = f"Log Likelihood = [red]{x:20.6f}"
+                if best is not None:
+                    self.loglike = f"Log Likelihood [red]Current = {x:17.6f}"
+                else:
+                    self.loglike = f"Log Likelihood = [red]{x:24.6f}"
             else:
-                self.loglike = f"Log Likelihood = {x:20.6f}"
+                if best is not None:
+                    self.loglike = f"Log Likelihood [yellow]Current = {x:17.6f}"
+                else:
+                    self.loglike = f"Log Likelihood = {x:24.6f}"
         if best is not None:
-            self.loglike += f" [green]Best = {best:.6f}"
+            self.loglike += f" [green]Best = {best:17.6f}"
 
     def render(self):
         t = Table()
