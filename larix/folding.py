@@ -42,9 +42,17 @@ def fold(arr, groupid, fill_value=0, group_dim='groupid', ingroup_dim='ingroup',
     padding_value = np.full(arr.shape[1:], fill_value,)
     reshape_to = [-1, np.max(lens), *arr.shape[1:]]
     bigger = np.insert(np.asarray(arr), where_to_pad, padding_value, axis=0)
-    padded_arr = bigger.reshape(
-        reshape_to
-    )
+    try:
+        padded_arr = bigger.reshape(
+            reshape_to
+        )
+    except ValueError:
+        if bigger.size == 0:
+            padded_arr = bigger.reshape(
+                [int(bigger.shape[0]/np.max(lens)), np.max(lens), *arr.shape[1:]]
+            )
+        else:
+            raise
     if isinstance(arr, xr.DataArray):
         return arr.__class__(
             padded_arr,

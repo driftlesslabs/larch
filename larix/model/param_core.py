@@ -106,8 +106,14 @@ class ParameterBucket:
         return new_params
 
     def update_parameters(self, other):
+        if isinstance(other, xr.Dataset):
+            if len(other.dims) != 1:
+                raise ValueError("expected parameters to be a 1-d vector")
+            other_dim = iter(other.dims).__next__()
+            joint_names = set(self.pnames) | set(other.coords[other_dim].data)
+        else:
+            joint_names = set(self.pnames) | set(other.pnames)
         should_mangle = False
-        joint_names = set(self.pnames) | set(other.pnames)
         new_params = self._params.reindex(
             {self.index_name: sorted(joint_names)}
         ).fillna(other)
@@ -137,6 +143,16 @@ class ParameterBucket:
         self._params = new_params
         if should_mangle:
             self.mangle()
+
+    def add_array(self, name, values):
+        for j in range(values.ndim):
+            if values.shape[j] != self.n_params:
+                raise ValueError(f"cannot add array, unexpected shape {values.shape}")
+        dims = [self.index_name] * values.ndim
+        self._params = self._params.assign({name: xr.DataArray(np.asarray(values), dims=dims)})
+
+    def add_parameter_array(self, name, values):
+        return self.add_array(name, values)
 
     def mangle(self):
         for m in self._models.values():
@@ -316,4 +332,16 @@ class ParameterBucket:
             existing.detach_model(instance)
         setattr(instance, self.private_name, None)
         instance.mangle()
+
+    def pretty_table(self, name_width=25):
+        from rich.table import Table
+        params = self._params
+        rich_table = Table()
+        idx_name, n = next(iter(params.dims.items()))
+        for column in params.variables:
+            rich_table.add_column(str(column), width=name_width if column == self.index_name else None)
+        for i in range(n):
+            row = [str(params[j].data[i]) for j in params.variables]
+            rich_table.add_row(*row)
+        return rich_table
 

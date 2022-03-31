@@ -152,6 +152,13 @@ class BaseModel:
         self.unmangle()
         return self._parameter_bucket.parameters
 
+    def update_parameters(self, x):
+        self.unmangle()
+        return self._parameter_bucket.update_parameters(x)
+
+    def add_parameter_array(self, name, values):
+        return self._parameter_bucket.add_array(name, values)
+
     @property
     def n_params(self):
         self.unmangle()
@@ -202,6 +209,10 @@ class BaseModel:
             self._parameter_bucket.pmaximum,
         )
 
+    def plock(self, values=None, **kwargs):
+        self.unmangle()
+        self._parameter_bucket.lock(values, **kwargs)
+
     def get_param_loc(self, name):
         self.unmangle()
         return self._parameter_bucket.get_param_loc(name)
@@ -212,6 +223,10 @@ class BaseModel:
         cols = ['value', 'best', 'initvalue', 'minimum', 'maximum', 'nullvalue']
         cols = [i for i in cols if i in self._parameter_bucket._params]
         return self._parameter_bucket._params[cols].to_dataframe()
+
+    def pretty_table(self):
+        self.unmangle()
+        return self._parameter_bucket.pretty_table()
 
     def __p_rename(self, x):
         return str(self.rename_parameters.get(str(x), str(x)))

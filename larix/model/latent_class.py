@@ -7,8 +7,10 @@ import jax.numpy as jnp
 import jax
 from ..dataset import Dataset, DataTree
 import numpy as np
+import pandas as pd
 
 class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
+    compute_engine = 'jax'
 
     def __init__(self, classmodel, choicemodels, datatree=None, float_dtype=np.float32, **kwargs):
         PanelMixin.__init__(self, **kwargs)
@@ -22,6 +24,10 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
         if float_dtype is not None:
             for v in self._models.values():
                 v.float_dtype = float_dtype
+
+    @property
+    def pf(self):
+        return self.parameters.to_dataframe()
 
     @jitmethod
     def jax_probability(self, params):
@@ -68,9 +74,117 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
     def jax_loglike(self, params):
         return self.jax_loglike_casewise(params).sum()
 
+    def loglike(
+            self,
+            x=None,
+            *,
+            start_case=None, stop_case=None, step_case=None,
+            **kwargs
+    ):
+        if self.compute_engine != 'jax':
+            raise NotImplementedError(f'latent class with engine={self.compute_engine}')
+        if start_case is not None:
+            raise NotImplementedError('start_case with engine=jax')
+        if stop_case is not None:
+            raise NotImplementedError('stop_case with engine=jax')
+        if step_case is not None:
+            raise NotImplementedError('step_case with engine=jax')
+        if x is not None:
+            self.pvals = x
+        result = float(self.jax_loglike(self.pvals))
+        # if start_case is None and stop_case is None and step_case is None:
+        #     self._check_if_best(result)
+        return result
+
+    def neg_loglike(
+            self,
+            x=None,
+            start_case=None,
+            stop_case=None,
+            step_case=None,
+            leave_out=-1,
+            keep_only=-1,
+            subsample=-1,
+    ):
+        result = self.loglike(
+            x,
+            start_case=start_case, stop_case=stop_case, step_case=step_case,
+            leave_out=leave_out, keep_only=keep_only, subsample=subsample
+        )
+        return -result
+
     @jitmethod
     def jax_d_loglike(self, params):
         return jax.grad(self.jax_loglike)(params)
+
+    def d_loglike(
+            self,
+            x=None,
+            *,
+            start_case=None, stop_case=None, step_case=None,
+            return_series=False,
+            **kwargs,
+    ):
+        if self.compute_engine != 'jax':
+            raise NotImplementedError(f'latent class with engine={self.compute_engine}')
+        if start_case is not None:
+            raise NotImplementedError('start_case with engine=jax')
+        if stop_case is not None:
+            raise NotImplementedError('stop_case with engine=jax')
+        if step_case is not None:
+            raise NotImplementedError('step_case with engine=jax')
+        if x is not None:
+            self.pvals = x
+        result = self.jax_d_loglike(self.pvals)
+
+        print("converge?=", jnp.max(jnp.absolute(result)))
+
+        if return_series:
+            result = pd.Series(result, index=self.pnames)
+        return result
+
+    def neg_d_loglike(self, x=None, start_case=0, stop_case=-1, step_case=1, **kwargs):
+        result = self.d_loglike(
+            x,
+            start_case=start_case, stop_case=stop_case, step_case=step_case,
+            **kwargs
+        )
+        return -np.asarray(result)
+
+    def maximize_loglike(
+            self,
+            *args,
+            **kwargs,
+    ):
+        """
+        Maximize the log likelihood.
+
+        Parameters
+        ----------
+        method : str, optional
+            The optimization method to use.  See scipy.optimize for
+            most possibilities, or use 'BHHH'. Defaults to SLSQP if
+            there are any constraints or finite parameter bounds,
+            otherwise defaults to BHHH.
+        quiet : bool, default False
+            Whether to suppress the dashboard.
+        options : dict, optional
+            These options are passed through to the `scipy.optimize.minimize`
+            function.
+        maxiter : int, optional
+            Maximum number of iterations.  This argument is just added to
+            `options` for most methods.
+
+        Returns
+        -------
+        dictx
+            A dictionary of results, including final log likelihood,
+            elapsed time, and other statistics.  The exact items
+            included in output will vary by estimation method.
+
+        """
+        from .optimization import maximize_loglike
+        return maximize_loglike(self, *args, **kwargs)
 
     def reflow_data_arrays(self):
         """
@@ -82,6 +196,7 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
             raise ValueError("missing datatree")
 
         request = self._models['classmodel'].required_data()
+        request.pop('avail_any', None)
         for kname, kmodel in self._models.items():
             if kname == 'classmodel':
                 continue

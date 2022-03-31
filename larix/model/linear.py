@@ -5,6 +5,7 @@ import numpy as _numpy
 import sys
 import re
 from numbers import Number as _Number
+from collections.abc import MutableMapping
 
 from ..util.naming import parenthize, valid_identifier_or_parenthized_string
 
@@ -1331,7 +1332,7 @@ class LinearFunction:
 				x = ParameterAdd(x, i.as_pmath())
 			return x
 
-class DictOfAlts:
+class DictOfAlts(MutableMapping):
 
 	_instance = None
 
@@ -1442,14 +1443,14 @@ class DictOfAlts:
 	def __len__(self):
 		return len(self._map)
 
-	def keys(self):
-		return self._map.keys()
-
-	def items(self):
-		return self._map.items()
-
-	def values(self):
-		return self._map.values()
+	# def keys(self):
+	# 	return self._map.keys()
+	#
+	# def items(self):
+	# 	return self._map.items()
+	#
+	# def values(self):
+	# 	return self._map.values()
 
 	def copy(self):
 		return type(self)(self)

@@ -28,9 +28,10 @@ class SingleParameter:
             Value being set.
         """
         existing_value = self.__get__(instance)
-        value = str(value)
+        if value is not None:
+            value = str(value)
         if existing_value != value:
-            setattr(instance, self.private_name, str(value))
+            setattr(instance, self.private_name, value)
             try:
                 instance.mangle()
             except AttributeError:

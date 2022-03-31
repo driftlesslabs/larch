@@ -1740,24 +1740,61 @@ class NumbaModel(_BaseModel):
 
 
     def __getstate__(self):
-        raise NotImplementedError
-        # state = dict(
-        #     float_dtype=self.float_dtype,
-        #     constraint_intensity=self.constraint_intensity,
-        #     constraint_sharpness=self.constraint_sharpness,
-        #     _constraint_funcs=self._constraint_funcs,
-        #     _private__graph=self._private__graph,
-        # )
-        # return super().__getstate__(), state
+        attr = {}
+        port = [
+            'availability_any',
+            'availability_ca_var',
+            'availability_co_vars',
+            'availability_var',
+            'choice_any',
+            'choice_ca_var',
+            'choice_co_code',
+            'choice_co_vars',
+            'common_draws',
+            '_compute_engine',
+            'constraint_intensity',
+            'constraint_sharpness',
+            'constraints',
+            'dataflows',
+            # 'dataset',
+            # 'datatree',
+            'float_dtype',
+            'graph',
+            'groupid',
+            'logsum_parameter',
+            'mixtures',
+            'n_draws',
+            'parameters',
+            'prerolled_draws',
+            'quantity_ca',
+            'quantity_scale',
+            'rename_parameters',
+            'title',
+            'utility_ca',
+            'utility_co',
+            'weight_co_var',
+        ]
+        for k in port:
+            attr[k] = getattr(self, k)
+        return attr
 
     def __setstate__(self, state):
-        raise NotImplementedError
-        # self.float_dtype = state[1]['float_dtype']
-        # self.constraint_intensity = state[1]['constraint_intensity']
-        # self.constraint_sharpness = state[1]['constraint_sharpness']
-        # self._constraint_funcs = state[1]['_constraint_funcs']
-        # self._private__graph = state[1]["_private__graph"]
-        # super().__setstate__(state[0])
+        for k, v in state.items():
+            if k == 'parameters':
+                self._parameter_bucket.update_parameters(v)
+            else:
+                try:
+                    setattr(self, k, v)
+                except AttributeError as err:
+                    raise AttributeError(f"{k}: {err}")
+
+
+    def copy(self, datatree=True):
+        dupe = type(self)()
+        dupe.__setstate__(self.__getstate__())
+        if datatree:
+            dupe.datatree = self.datatree
+        return dupe
 
     @property
     def n_cases(self):
