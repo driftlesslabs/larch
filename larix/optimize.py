@@ -1,4 +1,4 @@
-from scipy.optimize import minimize
+from scipy.optimize import minimize, Bounds
 from .compiled import compiledmethod, jitmethod
 import jax
 import jax.numpy as jnp
@@ -32,6 +32,11 @@ class BucketAccess(ABC):
     @property
     @abstractmethod
     def pholdfast(self) -> np.ndarray:
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def pbounds(self) -> Bounds:
         raise NotImplementedError
 
     @property
@@ -90,11 +95,16 @@ class OptimizeMixin(BucketAccess):
         if std_errs is not None:
             rich_table.add_column("Estimate", width=14)
             rich_table.add_column("Std. Error", width=14)
+            rich_table.add_column("t-Stat", width=10)
+            rich_table.add_column("Null Val", width=8)
+            tstats = (self.pvals - self.pnullvals) / std_errs
             for i in range(params.size):
                 rich_table.add_row(
                     str(self.pnames[i]),
                     f"{params[i]: .8g}",
                     " locked" if self.pholdfast[i] else f"{std_errs[i]: .8g}",
+                    " locked" if self.pholdfast[i] else f"{tstats[i]: .4g}",
+                    f"{self.pnullvals[i]: .2g}",
                 )
         else:
             rich_table.add_column("Value", width=14)
@@ -151,6 +161,8 @@ class OptimizeMixin(BucketAccess):
             params=self.__rich_table(self.pvals),
         )
         try:
+            if method.lower() in {'nelder-mead', 'l-bfgs-b', 'tnc', 'slsqp', 'powell', 'trust-constr'}:
+                kwargs['bounds'] = self.pbounds
             self.__neg_loglike(self.pvals)
             self.dashboard.update_content(status="[yellow]compiling gradient function...")
             self.__neg_d_loglike(self.pvals)

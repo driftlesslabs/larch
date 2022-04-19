@@ -289,7 +289,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             params[self._fixed_arrays.uco_param_slot]
         )
         u = jnp.zeros([n_nodes])
-        if ca is not None:
+        if ca is not None and self._fixed_arrays.uca_param_slot.size:
             u = u.at[:n_alts].add(
                 jnp.dot(
                     ca[..., self._fixed_arrays.uca_data_slot],
@@ -300,7 +300,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             temp = jnp.dot(co, x[:, :-1].T)
             u = u.at[:n_alts].add(temp)
         u = u.at[:n_alts].add(x[:, -1].T)
-        if av is not None:
+        if av is not None and not self.availability_any:
             u = u.at[:n_alts].set(jnp.where(av[:n_alts], u[:n_alts], -jnp.inf))
         return u
 
@@ -489,7 +489,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         utility_array = self._jax_utility(params, databundle)
         # downshift to prevent over/underflow
         shifter = utility_array[:n_alts].max(axis=-1)
-        if av is not None:
+        if av is not None and not self.availability_any:
             utility_array = utility_array.at[:n_alts].add(
                 jnp.where(av[:n_alts], -shifter, 0)
             )

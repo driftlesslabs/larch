@@ -190,14 +190,29 @@ class BaseModel:
         self._parameter_bucket.pholdfast = x
 
     @property
+    def pnullvals(self):
+        self.unmangle()
+        return self._parameter_bucket.pnullvals
+
+    @property
     def pmaximum(self):
         self.unmangle()
         return self._parameter_bucket.pmaximum
+
+    @pmaximum.setter
+    def pmaximum(self, x):
+        self.unmangle()
+        self._parameter_bucket.pmaximum = x
 
     @property
     def pminimum(self):
         self.unmangle()
         return self._parameter_bucket.pminimum
+
+    @pminimum.setter
+    def pminimum(self, x):
+        self.unmangle()
+        self._parameter_bucket.pminimum = x
 
     @property
     def pbounds(self):
@@ -208,6 +223,20 @@ class BaseModel:
             self._parameter_bucket.pminimum,
             self._parameter_bucket.pmaximum,
         )
+
+    def set_cap(self, cap=25):
+        """
+        Set limiting values for one or more parameters.
+
+        Parameters
+        ----------
+        cap : numeric, default 25.0
+            Set a global limit on parameters.  The maximum has a ceiling
+            at this value, and the minimum a floor at the negative of this, unless
+            the existing bounds are entirely outside this range.
+        """
+        self.unmangle()
+        return self._parameter_bucket.set_cap(cap=cap)
 
     def plock(self, values=None, **kwargs):
         self.unmangle()

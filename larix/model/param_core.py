@@ -116,7 +116,13 @@ class ParameterBucket:
         should_mangle = False
         new_params = self._params.reindex(
             {self.index_name: sorted(joint_names)}
-        ).fillna(other)
+        )
+        filling = [i for i in new_params if i in other]
+        try:
+            new_params = new_params.fillna(other[filling])
+        except ValueError as err:
+            logging.getLogger(__name__).error(f"{other=}")
+            logging.getLogger(__name__).exception(f"{err=}")
         if new_params[self.index_name].size != self._params[
             self.index_name
         ].size or any(new_params[self.index_name] != self._params[self.index_name]):
@@ -212,6 +218,10 @@ class ParameterBucket:
     def pholdfast(self):
         return self._params["holdfast"].to_numpy()
 
+    @property
+    def pnullvals(self):
+        return self._params["nullvalue"].to_numpy()
+
     @pholdfast.setter
     def pholdfast(self, x):
         if isinstance(x, dict):
@@ -228,9 +238,100 @@ class ParameterBucket:
     def pmaximum(self):
         return self._params["maximum"].to_numpy()
 
+    @pmaximum.setter
+    def pmaximum(self, x):
+        if isinstance(x, dict):
+            candidates = xr.DataArray(
+                np.asarray(list(x.values())),
+                dims=self.index_name,
+                coords={self.index_name: np.asarray(list(x.keys()))}
+            ).reindex({self.index_name: self.pnames}).fillna(self.pmaximum)
+            x = np.where(
+                self._params["holdfast"].to_numpy(),
+                self._params["maximum"].to_numpy(),
+                candidates.to_numpy(),
+            )
+        if isinstance(x, Number):
+            candidates = xr.full_like(self._params["value"], x)
+            x = np.where(
+                self._params["holdfast"].to_numpy(),
+                self._params["maximum"].to_numpy(),
+                candidates.to_numpy(),
+            )
+        self._params = self._params.assign(
+            {"maximum": xr.DataArray(x, dims=self._params["maximum"].dims)}
+        )
+
     @property
     def pminimum(self):
         return self._params["minimum"].to_numpy()
+
+    @pminimum.setter
+    def pminimum(self, x):
+        if isinstance(x, dict):
+            candidates = xr.DataArray(
+                np.asarray(list(x.values())),
+                dims=self.index_name,
+                coords={self.index_name: np.asarray(list(x.keys()))}
+            ).reindex({self.index_name: self.pnames}).fillna(self.pminimum)
+            x = np.where(
+                self._params["holdfast"].to_numpy(),
+                self._params["minimum"].to_numpy(),
+                candidates.to_numpy(),
+            )
+        if isinstance(x, Number):
+            candidates = xr.full_like(self._params["value"], x)
+            x = np.where(
+                self._params["holdfast"].to_numpy(),
+                self._params["minimum"].to_numpy(),
+                candidates.to_numpy(),
+            )
+        self._params = self._params.assign(
+            {"minimum": xr.DataArray(x, dims=self._params["minimum"].dims)}
+        )
+
+    @property
+    def pbounds(self):
+        """scipy.optimize.Bounds : A copy of the current min-max bounds of the parameters."""
+        self.unmangle()
+        from scipy.optimize import Bounds
+        return Bounds(
+            self.pminimum,
+            self.pmaximum,
+        )
+
+    def set_cap(self, cap=25):
+        """
+        Set limiting values for one or more parameters.
+
+        Parameters
+        ----------
+        cap : numeric, default 25.0
+            Set a global limit on parameters.  The maximum has a ceiling
+            at this value, and the minimum a floor at the negative of this, unless
+            the existing bounds are entirely outside this range.
+        """
+        # propose capping all parameters
+        minimum_ = np.maximum(self.pminimum, -cap)
+        maximum_ = np.minimum(self.pmaximum, cap)
+
+        # anywhere the minmax range was fully collapsed, restore the originals
+        minimum_ = np.where(minimum_ <= maximum_, minimum_, self.pminimum)
+        maximum_ = np.where(minimum_ <= maximum_, maximum_, self.pmaximum)
+
+        # set any NaN bounds to the cap
+        minimum_ = np.where(np.isnan(minimum_), minimum_, -cap)
+        maximum_ = np.where(np.isnan(maximum_), maximum_, cap)
+
+        # restore the originals for holdfast parameters
+        minimum_ = np.where(self.pholdfast, self.pminimum, minimum_)
+        maximum_ = np.where(self.pholdfast, self.pmaximum, maximum_)
+
+        # write out new bounds
+        self._params = self._params.assign({
+            "minimum": xr.DataArray(minimum_, dims=self._params["value"].dims),
+            "maximum": xr.DataArray(maximum_, dims=self._params["value"].dims),
+        })
 
     @property
     def pnames(self):

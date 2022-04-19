@@ -1,5 +1,6 @@
 import jax
 import jax.scipy as js
+import jax.numpy as jnp
 from .param_core import ParameterBucket
 from collections.abc import MutableSequence
 
@@ -89,6 +90,7 @@ class MixtureList(MutableSequence):
         else:
             newself._mixtures.clear()
         newself.__init__(values)
+        newself.set_parent(instance)
         newself.__mangle()
 
     def __delete__(self, instance):
@@ -176,4 +178,24 @@ class Normal(Mixture):
         assert self.istd >= 0
         v = js.stats.norm.ppf(draw_vec, parameters[...,self.imean], parameters[..., self.istd])
         parameters = parameters.at[...,self.imean].set(v)
+        return parameters
+
+
+class LogNormal(Normal):
+
+    def roll(self, draw_vec, parameters):
+        assert self.imean >= 0
+        assert self.istd >= 0
+        v = js.stats.norm.ppf(draw_vec, parameters[...,self.imean], parameters[..., self.istd])
+        parameters = parameters.at[...,self.imean].set(jnp.exp(v))
+        return parameters
+
+
+class NegLogNormal(Normal):
+
+    def roll(self, draw_vec, parameters):
+        assert self.imean >= 0
+        assert self.istd >= 0
+        v = js.stats.norm.ppf(draw_vec, parameters[...,self.imean], parameters[..., self.istd])
+        parameters = parameters.at[...,self.imean].set(-jnp.exp(v))
         return parameters

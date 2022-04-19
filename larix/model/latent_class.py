@@ -2,10 +2,11 @@ from .param_core import ParameterBucket
 from ..compiled import compiledmethod, jitmethod, reset_compiled_methods
 from ..optimize import OptimizeMixin
 from ..folding import fold_dataset
-from .jaxmodel import PanelMixin
+from .jaxmodel import PanelMixin, _get_jnp_array
 import jax.numpy as jnp
 import jax
 from ..dataset import Dataset, DataTree
+from .mixtures import MixtureList
 import numpy as np
 import pandas as pd
 
@@ -305,3 +306,207 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
     @property
     def data_as_loaded(self):
         return self._dataset
+
+
+
+class MixedLatentClass(LatentClass):
+
+    mixtures = MixtureList()
+
+    def __init__(self, *args, n_draws=100, prerolled_draws=True, common_draws=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._n_draws = n_draws
+        self._draws = None
+        self.prerolled_draws = prerolled_draws
+        self.common_draws = common_draws
+
+    def apply_random_draws(self, parameters, draws=None):
+        # if draws is None:
+        #     draws = self._draws
+        parameters = jnp.broadcast_to(
+            parameters, [*draws.shape[:-1], parameters.shape[0]]
+        )
+        for mix_n, mix in enumerate(self.mixtures):
+            u = draws[..., mix_n]
+            parameters = mix.roll(u, parameters)
+        return parameters
+
+    def _make_random_draws_out(self, n_draws, n_mixtures, random_key):
+        draws = jax.random.uniform(random_key, [n_draws, n_mixtures],)
+
+        def body(i, carry):
+            draws, rnd_key = carry
+            rnd_key, subkey = jax.random.split(rnd_key)
+            draws = draws.at[:, i].add(jax.random.permutation(subkey, draws.shape[0]))
+            return draws, rnd_key
+
+        draws, random_key = jax.lax.fori_loop(
+            0, draws.shape[1], body, (draws, random_key)
+        )
+        return draws * (1 / n_draws), random_key
+
+    @jitmethod
+    def _jax_probability_by_class(self, params, databundle):
+        #classmodel = self['classmodel']
+        pr_parts = []
+        for n, k in enumerate(self['classmodel'].dataset.dc.altids()):
+            pr_parts.append(
+                self._models[k]._jax_probability(params, databundle)
+                #* jnp.expand_dims(classmodel._jax_probability(params, databundle)[..., n], -1)
+            )
+        return jnp.stack(pr_parts)
+
+    @jitmethod
+    def _jax_likelihood_by_class(self, params, databundle):
+        n_alts = self.dataset.dc.n_alts
+        ch = databundle.get("ch", None)[...,:n_alts]
+        pr_parts = self._jax_probability_by_class(params, databundle)[...,:n_alts]
+        likely = jnp.where(jnp.expand_dims(ch, 0), pr_parts, 1.0)  # TODO make power if needed
+        return likely
+
+    @jitmethod(static_argnums=(3,), static_argnames="n_draws")
+    def _jax_loglike_casewise_mixed(self, params, databundle, groupbundle=None, n_draws=100):
+        classmodel = self['classmodel']
+        if self.prerolled_draws:
+            draws = groupbundle.get("draws", None)
+        else:
+            rk = groupbundle.get("rk", None)
+            draws, _ = self._make_random_draws_out(n_draws, len(self.mixtures), rk)
+        ch = databundle.get("ch", None)
+        rand_params = self.apply_random_draws(params, draws)
+        if ch.ndim == 2:  # PANEL DATA
+            # vmap over ingroup
+            likelihood_f = jax.vmap(self._jax_likelihood_by_class, in_axes=(None, 0),)
+            # vmap over draws
+            likelihood = jax.vmap(likelihood_f, in_axes=(0, None), out_axes=-1,)(
+                rand_params, databundle
+            )
+            # collapse likelihood over all alternatives over all cases-within-panel
+            likelihood = likelihood.prod([0, 2])
+            # likelihood.shape is now (n_classes, n_draws)
+            ################
+            class_pr = jax.vmap(
+                classmodel._jax_probability, in_axes=(0, None), out_axes=-1,
+            )(rand_params, {'co':databundle['co'][0],})
+            # class_pr.shape = (nclasses, ndraws)
+            meta_likely = (likelihood * class_pr).sum(0).mean(0)
+            return jnp.log(meta_likely)
+        else:
+            # vmap over draws
+            likelihood = jax.vmap(
+                self._jax_likelihood_by_class, in_axes=(0, None), out_axes=-1,
+            )(rand_params, databundle)
+            # collapse likelihood over all alternatives
+            likelihood = likelihood.prod(0)
+            # average over all draws
+            likelihood = likelihood.mean(0)
+            return jnp.log(likelihood)
+
+    @jitmethod
+    def jax_loglike_casewise(self, params):
+        if len(self.mixtures) == 0:
+            return super().jax_loglike_casewise(params)
+        ca = _get_jnp_array(self.dataset, "ca")
+        co = _get_jnp_array(self.dataset, "co")
+        av = _get_jnp_array(self.dataset, "av")
+        ch = _get_jnp_array(self.dataset, "ch")
+        n_draws = self._n_draws
+        seed = getattr(self, "seed", 42)
+        if av is not None:
+            depth = av.ndim - 1
+            shape = av.shape[:-1]
+        elif co is not None:
+            depth = co.ndim - 1
+            shape = co.shape[:-1]
+        elif ca is not None:
+            depth = ca.ndim - 2
+            shape = ca.shape[:-2]
+        elif ch is not None:
+            depth = ch.ndim - 1
+            shape = ch.shape[:-1]
+        else:
+            raise ValueError("missing data")
+        random_key = jax.random.PRNGKey(seed)
+        if self.groupid is not None:
+            depth = depth - 1
+            shape = shape[:-1]
+        f = (
+            self._jax_loglike_casewise_mixed
+        )  # params, databundle, groupbundle=None, n_draws=100
+        from .random import keysplit
+        commons = None if self.common_draws else 0
+        for i in range(depth):
+            f = jax.vmap(f, in_axes=(None, 0, commons, None))
+            if not self.prerolled_draws:
+                random_key, shape = keysplit(random_key, shape)
+        if self.prerolled_draws:
+            return f(
+                params,
+                {"ca": ca, "co": co, "av": av, "ch": ch},
+                {"draws": self._draws},
+                n_draws,
+            )
+        else:
+            return f(
+                params,
+                {"ca": ca, "co": co, "av": av, "ch": ch},
+                {"rk": random_key},
+                n_draws,
+            )
+
+    def make_random_draws(self, engine='numpy'):
+        self.unmangle()
+        for i in self.mixtures:
+            i.prep(self)
+        n_panels = self.dataset.dc.n_panels
+        n_mixtures = len(self.mixtures)
+        n_draws = self._n_draws
+        draws = None
+        if self._draws is not None:
+            if self.common_draws and self._draws.shape == (n_draws, n_mixtures):
+                draws = self._draws
+            if not self.common_draws and self._draws.shape == (n_panels, n_draws, n_mixtures):
+                draws = self._draws
+        if draws is None:
+            if engine == 'numpy':
+                seed = getattr(self, "seed", 0)
+                if self.common_draws:
+                    if n_draws > 0 and n_mixtures > 0:
+                        draws, seed = self._make_random_draws_numpy(n_draws, n_mixtures, seed)
+                else:
+                    if n_draws > 0 and n_mixtures > 0 and n_panels > 0:
+                        draws, seed = self._make_random_draws_numpy_2(
+                            n_draws, n_mixtures, n_panels, seed
+                        )
+                    else:
+                        draws = None
+            elif engine == 'jax':
+                seed = getattr(self, "seed", 0)
+                rk = jax.random.PRNGKey(seed)
+                if self.common_draws:
+                    if n_draws > 0 and n_mixtures > 0:
+                        draws = self._make_random_draws_out(n_draws, n_mixtures, rk)[
+                            0
+                        ]
+                else:
+                    if n_draws > 0 and n_mixtures > 0 and n_panels > 0:
+                        draws = self._make_random_draws_out_2(
+                            n_draws, n_mixtures, n_panels, rk
+                        )[0]
+                    else:
+                        draws = None
+            else:
+                raise ValueError(f"unknown random engine {engine!r}")
+            if self.prerolled_draws:
+                self._draws = draws
+        return draws
+
+    # @jitmethod(static_argnums=(0,1,2), static_argnames=('n_draws', 'n_mixtures', 'n_cases'))
+    def _make_random_draws_out_2(self, n_draws, n_mixtures, n_cases, random_key):
+        def body(carry, x):
+            rkey = carry
+            draws, rkey = self._make_random_draws_out(n_draws, n_mixtures, rkey)
+            return rkey, draws
+
+        random_key, draws = jax.lax.scan(body, random_key, None, n_cases)
+        return draws, random_key
