@@ -1,3 +1,5 @@
+import logging
+
 from scipy.optimize import minimize, Bounds
 from .compiled import compiledmethod, jitmethod
 import jax
@@ -67,6 +69,7 @@ class BucketAccess(ABC):
 class OptimizeMixin(BucketAccess):
 
     _cached_loglike_best = None
+    log_nans = False
 
     @abstractmethod
     def jax_loglike(self, params):
@@ -129,6 +132,8 @@ class OptimizeMixin(BucketAccess):
     def __neg_loglike(self, params):
         result = -self.jax_loglike(params)
         self._check_if_best(-result, params)
+        if np.isnan(result):
+            result = np.inf
         if self.dashboard is not None:
             self.dashboard.update_content(
                 loglike=-result,
@@ -146,7 +151,19 @@ class OptimizeMixin(BucketAccess):
         return result
 
     def _check_if_best(self, computed_ll, pvalues=None):
-        if self._cached_loglike_best is None or computed_ll > self._cached_loglike_best:
+        if np.isnan(computed_ll):
+            if self.log_nans:
+                logging.error("<Detected NaN>")
+                if pvalues is None:
+                    logging.error(f"{self.pvals}")
+                    for z1, z2 in zip(self.pnames, self.pvals):
+                        logging.error(f"  {z1:20s} {z2}")
+                else:
+                    logging.error(f"{pvalues}")
+                    for z1, z2 in zip(self.pnames, pvalues):
+                        logging.error(f"  {z1:20s} {z2}")
+                logging.error("</NaN>")
+        elif self._cached_loglike_best is None or computed_ll > self._cached_loglike_best:
             self._cached_loglike_best = computed_ll
             if pvalues is None:
                 self.add_parameter_array('best', self.pvals)
