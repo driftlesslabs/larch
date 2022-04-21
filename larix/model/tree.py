@@ -5,6 +5,28 @@ import heapq
 from ..util.touch_notifier import TouchNotify
 from ..util.lazy import lazy
 
+
+def add_split_key(d,k,v):
+	if isinstance(k, (tuple, list)):
+		if len(k) == 0:
+			raise KeyError(f"empty {type(k)}")
+		elif len(k) == 1:
+			d[k[0]] = v
+		else:
+			if k[0] not in d:
+				d[k[0]] = {}
+			add_split_key(d[k[0]],k[1:],v)
+	else:
+		d[k] = v
+
+
+def split_keys(d):
+	out = {}
+	for k, v in d.items():
+		add_split_key(out, k, v)
+	return out
+
+
 class NestingTree(nx.DiGraph):
 
 	node_dict_factory = OrderedDict
@@ -857,6 +879,29 @@ class NestingTree(nx.DiGraph):
 		# 		first_visit_found.add(dn[n])
 
 		return mu, muslots, up, dn, num, start, val
+
+	def to_dict(self):
+		return {
+			'nodes': dict(self.nodes),
+			'edges': split_keys(self.edges),
+			'root_id': self.root_id,
+			'suggested_elemental_order': self._suggested_elemental_order,
+		}
+
+	@classmethod
+	def from_dict(cls, x):
+		self = cls(
+			root_id=x.get('root_id', None),
+			suggested_elemental_order=x.get('suggested_elemental_order', ())
+		)
+		nodes = x.get('nodes', {})
+		for k, v in nodes.items():
+			self.add_node(k, **v)
+		edges = x.get('edges', {})
+		for i, jv in edges.items():
+			for j, v in jv.items():
+				self.add_edge(i, j, **v)
+		return self
 
 def graph_to_figure(graph, output_format='svg', **format):
 

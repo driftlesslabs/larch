@@ -3,6 +3,7 @@ import time
 
 import numpy as np
 import pandas as pd
+import xarray as xr
 from numba import guvectorize, njit
 from numba import int8 as i8
 from numba import int32 as i32
@@ -870,6 +871,55 @@ class NumbaModel(_BaseModel):
         self._constraint_funcs = None
         self.datatree = datatree
 
+    @classmethod
+    def from_dict(cls, content):
+        self = cls()
+
+        def loadthis(attr, wrapper=None, injector=None):
+            i = content.get(attr, None)
+            if i is not None:
+                try:
+                    if wrapper is not None:
+                        i = wrapper(i)
+                except AttributeError:
+                    pass
+                else:
+                    if injector is None:
+                        setattr(self, attr, i)
+                    else:
+                        injector(i)
+
+        loadthis('float_dtype', lambda i: getattr(np, i))
+        loadthis('compute_engine')
+        loadthis('index_name')
+        loadthis('parameters', xr.Dataset.from_dict, self.update_parameters)
+        loadthis('availability_any')
+        loadthis('availability_ca_var')
+        loadthis('availability_co_vars')
+        loadthis('choice_any')
+        loadthis('choice_ca_var')
+        loadthis('choice_co_code')
+        loadthis('choice_co_vars')
+        loadthis('common_draws')
+        loadthis('constraint_intensity')
+        loadthis('constraint_sharpness')
+        loadthis('constraints')
+        from .tree import NestingTree
+        loadthis('graph', NestingTree.from_dict)
+        loadthis('groupid')
+        loadthis('logsum_parameter')
+        loadthis('mixtures', self.mixtures.from_list)
+        loadthis('n_draws')
+        loadthis('prerolled_draws')
+        loadthis('quantity_ca')
+        loadthis('quantity_scale')
+        loadthis('title')
+        loadthis('utility_ca')
+        loadthis('utility_co')
+        loadthis('weight_co_var')
+        loadthis('weight_normalization')
+        return self
+
     def mangle(self):
         super().mangle()
         self._dataset = None
@@ -1262,6 +1312,10 @@ class NumbaModel(_BaseModel):
         #     return self.dataframes.weight_normalization
         # except AttributeError:
         return 1.0
+
+    @weight_normalization.setter
+    def weight_normalization(self, x):
+        pass # TODO
 
     def loglike(
             self,

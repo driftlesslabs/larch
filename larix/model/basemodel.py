@@ -123,6 +123,12 @@ class BaseModel:
     def compute_engine(self):
         return self._compute_engine
 
+    @compute_engine.setter
+    def compute_engine(self, engine):
+        if engine not in {'numba', 'jax', None}:
+            raise ValueError('invalid compute engine')
+        self._compute_engine = engine
+
     @property
     def datatree(self):
         """DataTree : A source for data for the model"""

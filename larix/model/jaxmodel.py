@@ -51,6 +51,12 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             engine = 'jax'
         return engine
 
+    @compute_engine.setter
+    def compute_engine(self, engine):
+        if engine not in {'numba', 'jax', None}:
+            raise ValueError('invalid compute engine')
+        self._compute_engine = engine
+
     @property
     def n_draws(self):
         return self._n_draws

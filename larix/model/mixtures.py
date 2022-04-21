@@ -44,6 +44,8 @@ class Mixture:
         """
         raise NotImplementedError()
 
+    def to_dict(self):
+        raise NotImplementedError()
 
 
 class MixtureList(MutableSequence):
@@ -140,7 +142,17 @@ class MixtureList(MutableSequence):
                 return True
         return False
 
+    def to_list(self):
+        return [i.to_dict() for i in self._mixtures]
 
+    def from_list(self, j):
+        self._mixtures.clear()
+        for i in j:
+            kind = i.pop('type')
+            if kind is None:
+                raise ValueError('missing mixture type')
+            cls = globals()[kind]
+            self._mixtures.append(cls(**i))
 
 class Normal(Mixture):
 
@@ -180,6 +192,12 @@ class Normal(Mixture):
         parameters = parameters.at[...,self.imean].set(v)
         return parameters
 
+    def to_dict(self):
+        return dict(
+            type=self.__class__.__name__,
+            mean=self.mean_,
+            std=self.std_,
+        )
 
 class LogNormal(Normal):
 

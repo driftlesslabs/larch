@@ -430,6 +430,15 @@ class LinearComponent:
 	def scale(self):
 		return self._scale
 
+	def to_dict(self):
+		out = {
+			'param': str(self._param),
+			'data': str(self._data),
+		}
+		if self.scale != 1:
+			out['scale'] = self.scale
+		return out
+
 	def __pos__(self):
 		return self
 
