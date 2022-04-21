@@ -46,12 +46,18 @@ SafeDumper.add_representer(
 
 
 
-def save_model(m, filename, format='yaml'):
+def save_model(m, filename=None, format='yaml'):
 
-    if format not in {'yaml', }:
-        raise NotImplementedError(f"saving in {format} format")
     if format == 'yaml':
         return _save_model_yaml(m, filename)
+    elif format == 'raw':
+        return _save_model_yaml(m, None, raw=True)
+    else:
+        raise NotImplementedError(f"saving in {format} format")
+
+
+def load_model(filename_or_content):
+    return _load_model_yaml(filename_or_content)
 
 
 def _save_model_yaml(m, filename, skipping=(), raw=False):
@@ -107,7 +113,7 @@ def _save_model_yaml(m, filename, skipping=(), raw=False):
 
     _models = getattr(m, '_models', None)
     if _models is not None:
-        submodels = {}
+        submodels = Dict()
         for k, v in _models.items():
             submodels[k] = (
                 _save_model_yaml(v, None, skipping=('parameters'), raw=True)
@@ -118,7 +124,7 @@ def _save_model_yaml(m, filename, skipping=(), raw=False):
         return x
     return x.dump(filename)
 
-def _load_model_yaml(m, filename_or_content):
+def _load_model_yaml(filename_or_content):
     if isinstance(filename_or_content, str) and os.path.exists(filename_or_content):
         content = Dict.load(filename_or_content)
     elif isinstance(filename_or_content, Mapping):
@@ -126,7 +132,7 @@ def _load_model_yaml(m, filename_or_content):
     else:
         raise TypeError('filename_or_content must be an existing file or a Dict')
 
-    model_type = content.pop('model_type').split('.')
+    model_type = content.get('model_type').split('.')
     model_module = '.'.join(model_type[:-1])
     module = importlib.import_module(model_module)
     cls = getattr(module, model_type[-1])

@@ -871,6 +871,10 @@ class NumbaModel(_BaseModel):
         self._constraint_funcs = None
         self.datatree = datatree
 
+    def save(self, filename, format='yaml'):
+        from .saving import save_model
+        return save_model(self, filename, format=format)
+
     @classmethod
     def from_dict(cls, content):
         self = cls()

@@ -9,6 +9,7 @@ from ..dataset import Dataset, DataTree
 from .mixtures import MixtureList
 import numpy as np
 import pandas as pd
+import xarray as xr
 
 class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
     compute_engine = 'jax'
@@ -19,12 +20,72 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
         self._dataset = None
         super().__init__(choicemodels, classmodel=classmodel)
         self.datatree = datatree
-        assert sorted(classmodel.dataset.dc.altids()) == sorted(choicemodels.keys())
+        if classmodel.dataset is not None:
+            assert sorted(classmodel.dataset.dc.altids()) == sorted(choicemodels.keys())
         for choicemodel in choicemodels.values():
             self.dataset = choicemodel.dataset
         if float_dtype is not None:
             for v in self._models.values():
                 v.float_dtype = float_dtype
+
+    def save(self, filename, format='yaml'):
+        from .saving import save_model
+        return save_model(self, filename, format=format)
+
+    @classmethod
+    def from_dict(cls, content):
+        _models = content.get('_models')
+        from .saving import load_model
+
+        classmodel = None
+        choicemodels = {}
+        for k, v in _models.items():
+            if k == 'classmodel':
+                classmodel = load_model(v)
+            else:
+                choicemodels[k] = load_model(v)
+        self = cls(classmodel, choicemodels)
+
+        def loadthis(attr, wrapper=None, injector=None):
+            i = content.get(attr, None)
+            if i is not None:
+                try:
+                    if wrapper is not None:
+                        i = wrapper(i)
+                except AttributeError:
+                    pass
+                else:
+                    if injector is None:
+                        setattr(self, attr, i)
+                    else:
+                        injector(i)
+
+        loadthis('float_dtype', lambda i: getattr(np, i))
+        loadthis('compute_engine')
+        loadthis('index_name')
+        loadthis('parameters', xr.Dataset.from_dict, self.update_parameters)
+        loadthis('availability_any')
+        loadthis('availability_ca_var')
+        loadthis('availability_co_vars')
+        loadthis('choice_any')
+        loadthis('choice_ca_var')
+        loadthis('choice_co_code')
+        loadthis('choice_co_vars')
+        loadthis('constraint_intensity')
+        loadthis('constraint_sharpness')
+        loadthis('constraints')
+        from .tree import NestingTree
+        loadthis('graph', NestingTree.from_dict)
+        loadthis('groupid')
+        loadthis('logsum_parameter')
+        loadthis('quantity_ca')
+        loadthis('quantity_scale')
+        loadthis('title')
+        loadthis('utility_ca')
+        loadthis('utility_co')
+        loadthis('weight_co_var')
+        loadthis('weight_normalization')
+        return self
 
     @property
     def pf(self):
@@ -319,6 +380,27 @@ class MixedLatentClass(LatentClass):
         self._draws = None
         self.prerolled_draws = prerolled_draws
         self.common_draws = common_draws
+
+    @classmethod
+    def from_dict(cls, content):
+        self = super().from_dict(content)
+        def loadthis(attr, wrapper=None, injector=None):
+            i = content.get(attr, None)
+            if i is not None:
+                try:
+                    if wrapper is not None:
+                        i = wrapper(i)
+                except AttributeError:
+                    pass
+                else:
+                    if injector is None:
+                        setattr(self, attr, i)
+                    else:
+                        injector(i)
+        loadthis('mixtures', self.mixtures.from_list)
+        loadthis('n_draws')
+        loadthis('prerolled_draws')
+        loadthis('common_draws')
 
     def apply_random_draws(self, parameters, draws=None):
         # if draws is None:
