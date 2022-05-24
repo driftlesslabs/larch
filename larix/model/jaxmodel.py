@@ -702,3 +702,68 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             result = pd.Series(result, index=self.pnames)
         return result
 
+    def maximize_loglike(
+            self,
+            *args,
+            **kwargs,
+    ):
+        """
+        Maximize the log likelihood.
+
+        Parameters
+        ----------
+        method : str, optional
+            The optimization method to use.  See scipy.optimize for
+            most possibilities, or use 'BHHH'. Defaults to SLSQP if
+            there are any constraints or finite parameter bounds,
+            otherwise defaults to BHHH.
+        quiet : bool, default False
+            Whether to suppress the dashboard.
+        options : dict, optional
+            These options are passed through to the `scipy.optimize.minimize`
+            function.
+        maxiter : int, optional
+            Maximum number of iterations.  This argument is just added to
+            `options` for most methods.
+
+        Returns
+        -------
+        dictx
+            A dictionary of results, including final log likelihood,
+            elapsed time, and other statistics.  The exact items
+            included in output will vary by estimation method.
+
+        """
+        if self.compute_engine == 'jax':
+            return self.jax_maximize_loglike(*args, **kwargs)
+        else:
+            return super().maximize_loglike(*args, **kwargs)
+
+    def loglike_null(self, use_cache=True):
+        """
+        Compute the log likelihood at null values.
+
+        Set all parameter values to the value indicated in the
+        "nullvalue" column of the parameter frame, and compute
+        the log likelihood with the currently loaded data.  Note
+        that the null value for each parameter may not be zero
+        (for example, the default null value for logsum parameters
+        in a nested logit model is 1).
+
+        Parameters
+        ----------
+        use_cache : bool, default True
+            Use the cached value if available.  Set to -1 to
+            raise an exception if there is no cached value.
+
+        Returns
+        -------
+        float
+        """
+        if self._cached_loglike_null is not None and use_cache:
+            return self._cached_loglike_null
+        elif use_cache == -1:
+            raise ValueError("no cached value")
+        else:
+            self._cached_loglike_null = float(self.jax_loglike(self.pnullvals))
+            return self._cached_loglike_null

@@ -154,7 +154,10 @@ class ParameterBucket:
         for j in range(values.ndim):
             if values.shape[j] != self.n_params:
                 raise ValueError(f"cannot add array, unexpected shape {values.shape}")
-        dims = [self.index_name] * values.ndim
+        if values.ndim == 1:
+            dims = [self.index_name]
+        else:
+            dims = [self.index_name] + [f"{self.index_name}_{j+2}" for j in range(values.ndim-1)]
         self._params = self._params.assign({name: xr.DataArray(np.asarray(values), dims=dims)})
 
     def add_parameter_array(self, name, values):

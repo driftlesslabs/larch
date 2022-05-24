@@ -502,8 +502,8 @@ def fit_bhhh(
         direction, tolerance = find_direction(current_dll, current_bhhh)
 
     if abs(tolerance) <= ctol:
-        message = "Optimization terminated successfully."
+        message = "Optimization terminated successfully"
     else:
-        message = f"Optimization terminated after {iter} iterations."
+        message = f"Optimization terminated after {iter} iterations"
 
     return current_ll, tolerance, iter, np.asarray(steps), message

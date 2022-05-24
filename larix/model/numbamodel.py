@@ -1400,6 +1400,38 @@ class NumbaModel(_BaseModel):
         )
         return result_arrays.loglike * self.weight_normalization
 
+    def loglike_null(self, use_cache=True):
+        """
+        Compute the log likelihood at null values.
+
+        Set all parameter values to the value indicated in the
+        "nullvalue" column of the parameter frame, and compute
+        the log likelihood with the currently loaded data.  Note
+        that the null value for each parameter may not be zero
+        (for example, the default null value for logsum parameters
+        in a nested logit model is 1).
+
+        Parameters
+        ----------
+        use_cache : bool, default True
+            Use the cached value if available.  Set to -1 to
+            raise an exception if there is no cached value.
+
+        Returns
+        -------
+        float
+        """
+        if self._cached_loglike_null is not None and use_cache:
+            return self._cached_loglike_null
+        elif use_cache == -1:
+            raise ValueError("no cached value")
+        else:
+            current_parameters = self.pvals.copy()
+            self.pvals = 'null'
+            self._cached_loglike_null = self.loglike()
+            self.pvals = current_parameters
+            return self._cached_loglike_null
+
     def d_loglike_casewise(
             self,
             x=None,
@@ -1984,3 +2016,20 @@ class NumbaModel(_BaseModel):
         """
         from .optimization import maximize_loglike
         return maximize_loglike(self, *args, **kwargs)
+
+    def calculate_parameter_covariance(self, pvals=None):
+        if pvals is None:
+            pvals = self.pvals
+        if self.compute_engine == 'jax':
+            se, hess, ihess = self.jax_param_cov(pvals)
+            hess = np.asarray(hess).copy()
+            hess[self.pholdfast.astype(bool), :] = 0
+            hess[:, self.pholdfast.astype(bool)] = 0
+            ihess = np.asarray(ihess).copy()
+            ihess[self.pholdfast.astype(bool), :] = 0
+            ihess[:, self.pholdfast.astype(bool)] = 0
+            self.add_parameter_array('hess', hess)
+            self.add_parameter_array('ihess', ihess)
+            return se, hess, ihess
+        else:
+            raise NotImplementedError("calculate_parameter_covariance for numba")

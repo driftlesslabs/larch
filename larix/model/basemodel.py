@@ -10,6 +10,7 @@ from .single_parameter import SingleParameter
 from ..roles import ParameterRef
 from .param_core import ParameterBucket
 from .mixtures import MixtureList
+from ..exceptions import MissingDataError
 
 logger = logging.getLogger("larix.model")
 
@@ -105,6 +106,8 @@ class BaseModel:
         self._parameter_bucket = ParameterBucket()
         self.datatree = datatree
         self._cached_loglike_best = None
+        self._cached_loglike_null = None
+        self._most_recent_estimation_result = None
 
         self._choice_ca_var = None
         self._choice_co_code = None
@@ -118,6 +121,7 @@ class BaseModel:
         self._availability_any = True
 
         self._compute_engine = compute_engine
+        self.ordering = None
 
     @property
     def compute_engine(self):
@@ -872,7 +876,10 @@ class BaseModel:
         gives the name of an |idco| variable or some function of |idco| variables that
         indicates whether that alternative is available.
         """
-        return self._availability_co_vars
+        if self._availability_co_vars:
+            return self._availability_co_vars
+        else:
+            return None
 
     @availability_co_vars.setter
     def availability_co_vars(self, x):
@@ -900,3 +907,271 @@ class BaseModel:
         self._availability_co_vars = None
         self._availability_var = None
 
+    def parameter_summary(self):
+        """
+        Create a tabular summary of parameter values.
+
+        This will generate a small table of parameters statistics,
+        containing:
+
+        *	Parameter Name (and Category, if applicable)
+        *	Estimated Value
+        *	Standard Error of the Estimate (if known)
+        *	t Statistic (if known)
+        *	Null Value
+        *	Binding Constraints (if applicable)
+
+        Returns
+        -------
+        pandas.DataFrame
+
+        """
+        NBSP = " "  # non=breaking space
+
+        try:
+            pbucket = self._parameter_bucket
+        except AttributeError:
+            pbucket = self
+
+        tabledata = {}
+        tabledata['Value'] = pbucket.pvals
+        if "std_err" in pbucket._params:
+            se = pbucket.pstderr
+            tabledata['Std Err'] = se
+            tabledata['t Stat'] = (pbucket.pvals - pbucket.pnullvals) / se
+        tabledata['Null Value'] = pbucket.pnullvals
+
+        # TODO constrained
+        result = pd.DataFrame(tabledata, index=pbucket.pnames).rename_axis(index="Parameter")
+
+        # pf = self.pf
+        # columns = [i for i in ['value', 'std_err', 't_stat', 'likelihood_ratio', 'nullvalue', 'constrained'] if
+        #            i in pf.columns]
+        # result = pf[columns].rename(
+        #     columns={
+        #         'value': 'Value',
+        #         'std_err': 'Std Err',
+        #         't_stat': 't Stat',
+        #         'likelihood_ratio': 'Like Ratio',
+        #         'nullvalue': 'Null Value',
+        #         'constrained': 'Constrained'
+        #     }
+        # )
+        monospace_cols = []
+
+        def fixie(x):
+            if np.isfinite(x):
+                if x > 1000:
+                    return NBSP + "BIG"
+                elif x < -1000:
+                    return "-BIG"
+                else:
+                    return f"{x:0< 4.2f}".replace(" ", NBSP)
+            else:
+                return NBSP + "NA"
+
+        if 't Stat' in result.columns:
+            result.insert(result.columns.get_loc('t Stat') + 1, 'Signif', "")
+            result.loc[np.absolute(result['t Stat']) > 1.9600, 'Signif'] = "*"
+            result.loc[np.absolute(result['t Stat']) > 2.5758, 'Signif'] = "**"
+            result.loc[np.absolute(result['t Stat']) > 3.2905, 'Signif'] = "***"
+            result['t Stat'] = result['t Stat'].apply(fixie)
+            result.loc[result['t Stat'] == NBSP + "NA", 'Signif'] = ""
+            monospace_cols.append('t Stat')
+            monospace_cols.append('Signif')
+        if 'Like Ratio' in result.columns:
+            if 'Signif' not in result.columns:
+                result.insert(result.columns.get_loc('Like Ratio') + 1, 'Signif', "")
+            if 't Stat' in result.columns:
+                non_finite_t = ~np.isfinite(result['t Stat'])
+            else:
+                non_finite_t = True
+            result.loc[np.absolute((np.isfinite(result['Like Ratio'])) & non_finite_t), 'Signif'] = "[]"
+            result.loc[np.absolute(((result['Like Ratio']) > 1.9207) & non_finite_t), 'Signif'] = "[*]"
+            result.loc[np.absolute(((result['Like Ratio']) > 3.3174) & non_finite_t), 'Signif'] = "[**]"
+            result.loc[np.absolute(((result['Like Ratio']) > 5.4138) & non_finite_t), 'Signif'] = "[***]"
+            result['Like Ratio'] = result['Like Ratio'].apply(fixie)
+            monospace_cols.append('Like Ratio')
+            if 'Signif' not in monospace_cols:
+                monospace_cols.append('Signif')
+        if 'Std Err' in result.columns:
+            _fmt_s = lambda x: f"{x: #.3g}".replace(" ", NBSP) if np.isfinite(x) else NBSP + "NA"
+            result['Std Err'] = result['Std Err'].apply(_fmt_s)
+            monospace_cols.append('Std Err')
+        if 'Value' in result.columns:
+            result['Value'] = result['Value'].apply(lambda x: f"{x: #.3g}".replace(" ", NBSP))
+            monospace_cols.append('Value')
+        if 'Constrained' in result.columns:
+            result['Constrained'] = result['Constrained'].str.replace("\n", "<br/>")
+        if 'Null Value' in result.columns:
+            monospace_cols.append('Null Value')
+        if result.index.nlevels > 1:
+            pnames = result.index.get_level_values(-1)
+        else:
+            pnames = result.index
+        styles = [
+            dict(selector="th", props=[
+                ("vertical-align", "top"),
+                ("text-align", "left"),
+            ]),
+            dict(selector="td", props=[
+                ("vertical-align", "top"),
+                ("text-align", "left"),
+            ]),
+
+        ]
+
+        if self.ordering:
+            paramset = set(result.index)
+            out = []
+            import re
+            for category in self.ordering:
+                category_name = category[0]
+                category_params = []
+                for category_pattern in category[1:]:
+                    category_params.extend(sorted(i for i in paramset if re.match(category_pattern, i) is not None))
+                    paramset -= set(category_params)
+                out.append([category_name, category_params])
+            if len(paramset):
+                out.append(['Other', sorted(paramset)])
+
+            tuples = []
+            for c, pp in out:
+                for p in pp:
+                    tuples.append((c, p))
+
+            ix = pd.MultiIndex.from_tuples(tuples, names=['Category', 'Parameter'])
+
+            result = result.reindex(ix.get_level_values(1))
+            result.index = ix
+
+        return result.style.set_table_styles(styles).format({'Null Value': "{: .2f}"}).applymap(
+            lambda x: "font-family:monospace", subset=monospace_cols)
+
+
+    def estimation_statistics(self, compute_loglike_null=True):
+        """
+        Create an XHTML summary of estimation statistics.
+
+        This will generate a small table of estimation statistics,
+        containing:
+
+        *	Log Likelihood at Convergence
+        *	Log Likelihood at Null Parameters (if known)
+        *	Log Likelihood with No Model (if known)
+        *	Log Likelihood at Constants Only (if known)
+
+        Additionally, for each included reference value (i.e.
+        everything except log likelihood at convergence) the
+        rho squared with respect to that value is also given.
+
+        Each statistic is reported in aggregate, as well as
+        per case.
+
+        Parameters
+        ----------
+        compute_loglike_null : bool, default True
+            If the log likelihood at null values has not already
+            been computed (i.e., if it is not cached) then compute
+            it, cache its value, and include it in the output.
+
+        Returns
+        -------
+        xmle.Elem
+
+        """
+
+        from xmle import Elem
+        div = Elem('div')
+        table = div.put('table')
+
+        thead = table.put('thead')
+        tr = thead.put('tr')
+        tr.put('th', text='Statistic')
+        tr.put('th', text='Aggregate')
+        tr.put('th', text='Per Case')
+
+        tbody = table.put('tbody')
+
+        try:
+            ncases = self.n_cases
+        except (MissingDataError, AttributeError):
+            ncases = None
+
+        tr = thead.put('tr')
+        tr.put('td', text='Number of Cases')
+        if ncases:
+            tr.put('td', text=str(ncases), colspan='2')
+        else:
+            tr.put('td', text="not available", colspan='2')
+
+        mostrecent = self._most_recent_estimation_result
+        if mostrecent is not None:
+            tr = thead.put('tr')
+            tr.put('td', text='Log Likelihood at Convergence')
+            tr.put('td', text="{:.2f}".format(mostrecent.loglike))
+            if ncases:
+                tr.put('td', text="{:.2f}".format(mostrecent.loglike / ncases))
+            else:
+                tr.put('td', text="na")
+
+        ll_z = self._cached_loglike_null
+        if ll_z == 0:
+            if compute_loglike_null:
+                try:
+                    ll_z = self.loglike_null()
+                except (MissingDataError, AttributeError):
+                    ll_z = 0
+            else:
+                ll_z = 0
+        if ll_z:
+            tr = thead.put('tr')
+            tr.put('td', text='Log Likelihood at Null Parameters')
+            tr.put('td', text="{:.2f}".format(ll_z))
+            if ncases:
+                tr.put('td', text="{:.2f}".format(ll_z / ncases))
+            else:
+                tr.put('td', text="na")
+            if mostrecent is not None:
+                tr = thead.put('tr')
+                tr.put('td', text='Rho Squared w.r.t. Null Parameters')
+                rsz = 1.0 - (mostrecent.loglike / ll_z)
+                tr.put('td', text="{:.3f}".format(rsz), colspan='2')
+
+        try:
+            ll_nil = self._cached_loglike_nil
+        except (MissingDataError, AttributeError):
+            ll_nil = 0
+        if ll_nil:
+            tr = thead.put('tr')
+            tr.put('td', text='Log Likelihood with No Model')
+            tr.put('td', text="{:.2f}".format(ll_nil))
+            if ncases:
+                tr.put('td', text="{:.2f}".format(ll_nil / ncases))
+            else:
+                tr.put('td', text="na")
+            if mostrecent is not None:
+                tr = thead.put('tr')
+                tr.put('td', text='Rho Squared w.r.t. No Model')
+                rsz = 1.0 - (mostrecent.loglike / ll_nil)
+                tr.put('td', text="{:.3f}".format(rsz), colspan='2')
+
+        try:
+            ll_c = self._cached_loglike_constants_only
+        except (MissingDataError, AttributeError):
+            ll_c = 0
+        if ll_c:
+            tr = thead.put('tr')
+            tr.put('td', text='Log Likelihood at Constants Only')
+            tr.put('td', text="{:.2f}".format(ll_c))
+            if ncases:
+                tr.put('td', text="{:.2f}".format(ll_c / ncases))
+            else:
+                tr.put('td', text="na")
+            if mostrecent is not None:
+                tr = thead.put('tr')
+                tr.put('td', text='Rho Squared w.r.t. Constants Only')
+                rsc = 1.0 - (mostrecent.loglike / ll_c)
+                tr.put('td', text="{:.3f}".format(rsc), colspan='2')
+
+        return div

@@ -191,8 +191,16 @@ class OptimizeMixin(BucketAccess):
                 method=method,
                 **kwargs
             )
+            try:
+                result['n_cases'] = self.n_cases
+            except AttributeError:
+                pass
+            if hasattr(self, 'total_weight'):
+                result['total_weight'] = self.total_weight()
             self.pvals = result.x
             if 'fun' in result:
+                if hasattr(self, 'total_weight'):
+                    result['logloss'] = result['fun'] / self.total_weight()
                 result['loglike'] = -result['fun']
                 del result['fun']
             if 'jac' in result:
@@ -200,7 +208,7 @@ class OptimizeMixin(BucketAccess):
             if stderr:
                 self.dashboard.update_content(status="[yellow]computing standard errors...")
                 se, hess, ihess = self.jax_param_cov(result.x)
-                result['stderr'] = se
+                result['stderr'] = np.asarray(se)
                 hess = np.asarray(hess).copy()
                 hess[self.pholdfast.astype(bool),:] = 0
                 hess[:,self.pholdfast.astype(bool)] = 0
@@ -216,6 +224,7 @@ class OptimizeMixin(BucketAccess):
         except Exception as err:
             self.dashboard.update_content(status=f"[bright_red]ERROR [red]{err}")
             raise
+        self._most_recent_estimation_result = result
         return result
 
     def jax_param_cov(self, params):

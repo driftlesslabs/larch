@@ -108,17 +108,17 @@ def fit_bhhh(
         if current_constraint_violation:
             logger.debug(f"current constraint violation: {current_constraint_violation}")
         if abs(tolerance) <= ctol and not current_constraint_violation:
-            message = "Optimization terminated successfully."
+            message = "Optimization terminated successfully"
             break
         if iter >= maxiter:
             if current_constraint_violation:
-                message = f"Optimization terminated after {iter} iterations with {current_constraint_violation}."
+                message = f"Optimization terminated after {iter} iterations with {current_constraint_violation}"
             else:
-                message = f"Optimization terminated after {iter} iterations."
+                message = f"Optimization terminated after {iter} iterations"
             break
         if soft_maxiter is not None:
             if iter >= soft_maxiter and not current_constraint_violation:
-                message = f"Optimization terminated after {iter} iterations with no constraint violations."
+                message = f"Optimization terminated after {iter} iterations with no constraint violations"
                 break
 
         # no break, make a step

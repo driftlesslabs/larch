@@ -1442,7 +1442,7 @@ def choice_avail_summary(dataset, graph=None, availability_co_vars=None):
             ch_ = None
         av_ = np.asarray(dataset.get('av'))
     else:
-        from ..numba.cascading import array_av_cascade, array_ch_cascade
+        from ..model.cascading import array_av_cascade, array_ch_cascade
 
         ch_ = array_ch_cascade(dataset.get('ch'), graph)
         av_ = array_av_cascade(dataset.get('av'), graph)
@@ -1495,6 +1495,8 @@ def choice_avail_summary(dataset, graph=None, availability_co_vars=None):
         idx = dataset.dc.altids()
         if dataset.get('alt_names') is not None:
             od['name'] = pd.Series(dataset.get('alt_names'), index=idx)
+        elif dataset.get('altnames') is not None:
+            od['name'] = pd.Series(dataset.get('altnames'), index=idx)
 
     if show_wt:
         od['chosen weighted'] = pd.Series(ch_w, index=idx)
@@ -1515,6 +1517,7 @@ def choice_avail_summary(dataset, graph=None, availability_co_vars=None):
         od['availability condition'] = pd.Series(
             availability_co_vars.values(),
             index=availability_co_vars.keys(),
+            dtype=np.unicode,
         )
 
     result = pd.DataFrame.from_dict(od)
