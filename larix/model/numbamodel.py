@@ -1091,7 +1091,7 @@ class NumbaModel(_BaseModel):
                 nameset.add(str(self.quantity_scale))
         if self.logsum_parameter is not None:
             nameset.add(str(self.logsum_parameter))
-        self._ensure_names(nameset, nullvalue=1, initvalue=1, min=0.001, max=1)
+        self._ensure_names(nameset, value=1, nullvalue=1, initvalue=1, minimum=0.001, maximum=1)
 
 
     def __prepare_for_compute(

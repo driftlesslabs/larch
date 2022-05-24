@@ -700,7 +700,7 @@ class BaseModel:
                 nameset.add(self.__p_rename(self.quantity_scale))
         if self.logsum_parameter is not None:
             nameset.add(self.__p_rename(self.logsum_parameter))
-        self._ensure_names(nameset, nullvalue=1, initvalue=1, minimum=0.001, maximum=1)
+        self._ensure_names(nameset, value=1, nullvalue=1, initvalue=1, minimum=0.001, maximum=1)
 
     def _scan_mixtures_ensure_names(self):
         for i in self.mixtures:

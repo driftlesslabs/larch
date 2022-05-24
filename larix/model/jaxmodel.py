@@ -340,6 +340,8 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         # @jit
         def u_nest(params, utility_array, array_av):
             mu = params[mu_slot] if mu_slot >= 0 else 1.0
+
+            shifter = utility_array[jnp.asarray(child_slots)].max()
             carry = jnp.zeros(utility_array.shape[:-1])
             # num_av = jnp.sum(utility_array[..., child_slots] > -1e30, axis=-1)
             num_av = array_av[..., slot]
@@ -349,8 +351,8 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                     carry,
                     jnp.where(
                         num_av > 1,
-                        jnp.exp(jnp.clip(utility_array[..., child_slot], -1e37) / mu),
-                        jnp.exp(jnp.clip(utility_array[..., child_slot], -1e37)),
+                        jnp.exp(jnp.clip(utility_array[..., child_slot] - shifter, -1e37) / mu),
+                        jnp.exp(jnp.clip(utility_array[..., child_slot] - shifter, -1e37)),
                     ),
                 )
                 return carry, None
@@ -361,34 +363,13 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                     num_av > 1,
                     jnp.clip(jnp.log(carry), -1e38) * mu,
                     jnp.clip(jnp.log(carry), -1e39),
-                )
+                ) + shifter
             )
             return utility_array
 
         return u_nest
 
-    @compiledmethod
-    def utility_for_nests(self):
-        n_alts = self.graph.n_elementals()
-        n_nodes = len(self.graph)
-
-        def u_nesting_none(out, beta, array_av):
-            # TODO Maybe filter on av
-            return out.at[..., -1].set(jnp.log(jnp.exp(out[..., :-1]).sum(-1)))
-
-        if n_nodes - n_alts <= 1:
-            return u_nesting_none
-
-        # @jit
-        def u_nesting_few(out, beta, array_av):
-            for slot in range(n_alts, n_nodes):
-                out = self.__utility_for_nest(slot)(beta, out, array_av)
-            return out
-
-        if n_nodes - n_alts < 3:
-            return u_nesting_few
-
-        # many nests, use more efficient loop
+    def _mu_slots(self):
         n_params = self.n_params
         mu_names = [
             self.graph.nodes[i].get("parameter") for i in self.graph.standard_sort
@@ -399,8 +380,41 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                 for mu_name in mu_names
             ]
         )
+        return mu_slots
 
-        def add_u_to_parent(u, params, child_slot, parent_slot, avail):
+    @compiledmethod
+    def utility_for_nests(self):
+        n_alts = self.graph.n_elementals()
+        n_nodes = len(self.graph)
+
+        def u_nesting_none(out, beta, array_av, mu_slots):
+            # TODO Maybe filter on av
+            return out.at[..., -1].set(jnp.log(jnp.exp(out[..., :-1]).sum(-1)))
+
+        if n_nodes - n_alts <= 1:
+            return u_nesting_none
+
+        if n_nodes - n_alts < 3:
+            # @jit
+            def u_nesting_few(out, beta, array_av, mu_slots):
+                for slot in range(n_alts, n_nodes):
+                    out = self.__utility_for_nest(slot)(beta, out, array_av)
+                return out
+            return u_nesting_few
+
+        # many nests, use more efficient loop
+        # n_params = self.n_params
+        # mu_names = [
+        #     self.graph.nodes[i].get("parameter") for i in self.graph.standard_sort
+        # ]
+        # mu_slots = jnp.asarray(
+        #     [
+        #         (self.get_param_loc(mu_name) if mu_name is not None else n_params)
+        #         for mu_name in mu_names
+        #     ]
+        # )
+
+        def add_u_to_parent(u, params, child_slot, parent_slot, avail, mu_slots):
             mu = params[mu_slots[parent_slot]]
             u = u.at[..., parent_slot].add(
                 jnp.where(
@@ -411,7 +425,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             )
             return u
 
-        def log_self(u, params, self_slot, avail):
+        def log_self(u, params, self_slot, avail, mu_slots):
             mu = params[mu_slots[self_slot]]
             u = u.at[..., self_slot].set(
                 jnp.where(
@@ -424,8 +438,8 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
 
         slotarray = np.stack(self.graph.edge_slot_arrays()).T
 
-        @jax.jit
-        def u_rollup(utility_array, parameter_vector, avail_ca):
+        #@jax.jit
+        def u_rollup(utility_array, parameter_vector, avail_ca, mu_slots):
             n_params = parameter_vector.size
             params = jnp.ones(n_params + 1, dtype=parameter_vector.dtype)
             params = params.at[:n_params].set(parameter_vector)
@@ -437,11 +451,11 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                 #     u = log_self(u, params, dn_slot)
                 u = jax.lax.cond(
                     (firstvisit >= 0) & (dn_slot >= n_alts),
-                    lambda u: log_self(u, params, dn_slot, avail_ca),
+                    lambda u: log_self(u, params, dn_slot, avail_ca, mu_slots),
                     lambda u: u,
                     operand=u,
                 )
-                u = add_u_to_parent(u, params, dn_slot, up_slot, avail_ca)
+                u = add_u_to_parent(u, params, dn_slot, up_slot, avail_ca, mu_slots)
                 return (u, params), None
 
             (utility_array, _ignore_1), _ignore_2 = jax.lax.scan(
@@ -501,7 +515,8 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             )
         else:
             utility_array = utility_array.at[:n_alts].add(-shifter)
-        utility_array = self.utility_for_nests(utility_array, params, av)
+        mu_slots = self._mu_slots()
+        utility_array = self.utility_for_nests(utility_array, params, av, mu_slots)
         logprobability = jnp.zeros_like(utility_array)
         for slot in range(n_nodes, n_alts, -1):
             logprobability = self.__probability_for_nest(slot - 1)(
