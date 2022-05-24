@@ -1721,16 +1721,17 @@ class NumbaModel(_BaseModel):
             keep_only=-1,
             subsample=-1,
     ):
-        raise NotImplementedError
-        # return super().d2_loglike(
-        #     x=x,
-        #     start_case=start_case,
-        #     stop_case=stop_case,
-        #     step_case=step_case,
-        #     leave_out=leave_out,
-        #     keep_only=keep_only,
-        #     subsample=subsample,
-        # )
+        if x is None:
+            x = self.pvals.copy()
+        from ..util.math import approx_fprime
+        return approx_fprime(
+            x,
+            lambda y: self.d_loglike(
+                y,
+                start_case=start_case, stop_case=stop_case, step_case=step_case,
+                leave_out=leave_out, keep_only=keep_only, subsample=subsample
+            )
+        )
 
     def neg_loglike(
             self,
@@ -2022,14 +2023,21 @@ class NumbaModel(_BaseModel):
             pvals = self.pvals
         if self.compute_engine == 'jax':
             se, hess, ihess = self.jax_param_cov(pvals)
-            hess = np.asarray(hess).copy()
-            hess[self.pholdfast.astype(bool), :] = 0
-            hess[:, self.pholdfast.astype(bool)] = 0
-            ihess = np.asarray(ihess).copy()
-            ihess[self.pholdfast.astype(bool), :] = 0
-            ihess[:, self.pholdfast.astype(bool)] = 0
-            self.add_parameter_array('hess', hess)
-            self.add_parameter_array('ihess', ihess)
-            return se, hess, ihess
         else:
-            raise NotImplementedError("calculate_parameter_covariance for numba")
+            hess = -self.d2_loglike(pvals)
+            if self.parameters['holdfast'].sum():
+                ihess = np.linalg.pinv(hess)
+            else:
+                ihess = np.linalg.inv(hess)
+            se = np.sqrt(ihess.diagonal())
+            self.pstderr = se
+        hess = np.asarray(hess).copy()
+        hess[self.pholdfast.astype(bool), :] = 0
+        hess[:, self.pholdfast.astype(bool)] = 0
+        ihess = np.asarray(ihess).copy()
+        ihess[self.pholdfast.astype(bool), :] = 0
+        ihess[:, self.pholdfast.astype(bool)] = 0
+        self.add_parameter_array('hess', hess)
+        self.add_parameter_array('ihess', ihess)
+        return se, hess, ihess
+

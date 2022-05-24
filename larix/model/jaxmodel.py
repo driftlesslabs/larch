@@ -16,6 +16,10 @@ def _get_jnp_array(dataset, name):
         return None
     return jnp.asarray(dataset[name])
 
+def _as_jnp_array(obj):
+    if obj is None:
+        return None
+    return jnp.asarray(obj)
 
 class PanelMixin:
     def __init__(self, *args, **kwargs):
@@ -314,7 +318,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
     def jax_utility(self, params):
         ca = _get_jnp_array(self.dataset, "ca")
         co = _get_jnp_array(self.dataset, "co")
-        av = _get_jnp_array(self.dataset, "av")
+        av = _as_jnp_array(self._data_arrays.av)
         if av is not None:
             depth = av.ndim - 1
         elif co is not None:
@@ -403,17 +407,6 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             return u_nesting_few
 
         # many nests, use more efficient loop
-        # n_params = self.n_params
-        # mu_names = [
-        #     self.graph.nodes[i].get("parameter") for i in self.graph.standard_sort
-        # ]
-        # mu_slots = jnp.asarray(
-        #     [
-        #         (self.get_param_loc(mu_name) if mu_name is not None else n_params)
-        #         for mu_name in mu_names
-        #     ]
-        # )
-
         def add_u_to_parent(u, params, child_slot, parent_slot, avail, mu_slots):
             mu = params[mu_slots[parent_slot]]
             u = u.at[..., parent_slot].add(
@@ -502,6 +495,46 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         return self._jax_log_probability(params, ca, co, av)
 
     @jitmethod
+    def _jax_utility_include_nests(self, params, databundle):
+        av = databundle.get("av", None)
+        n_alts = self.dataset.dc.n_alts
+        n_nodes = len(self.graph)
+        utility_array = self._jax_utility(params, databundle)
+        # downshift to prevent over/underflow
+        shifter = utility_array[:n_alts].max(axis=-1)
+        if av is not None and not self.availability_any:
+            utility_array = utility_array.at[:n_alts].add(
+                jnp.where(av[:n_alts], -shifter, 0)
+            )
+        else:
+            utility_array = utility_array.at[:n_alts].add(-shifter)
+        mu_slots = self._mu_slots()
+        print(f"{mu_slots=}")
+        print(f"{params=}")
+        utility_array = self.utility_for_nests(utility_array, params, av, mu_slots)
+        return utility_array + shifter
+
+    @jitmethod
+    def jax_utility_include_nests(self, params):
+        ca = _get_jnp_array(self.dataset, "ca")
+        co = _get_jnp_array(self.dataset, "co")
+        av = _as_jnp_array(self._data_arrays.av)
+        if av is not None:
+            depth = av.ndim - 1
+        elif co is not None:
+            depth = co.ndim - 1
+        elif ca is not None:
+            depth = ca.ndim - 2
+        else:
+            raise ValueError("missing data")
+        f = self._jax_utility_include_nests
+        for level in range(depth):
+            f = jax.vmap(f, in_axes=(None, 0))
+        return f(params, {"ca": ca, "co": co, "av": av})
+
+
+
+    @jitmethod
     def _jax_log_probability(self, params, databundle):
         av = databundle.get("av", None)
         n_alts = self.dataset.dc.n_alts
@@ -522,13 +555,16 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             logprobability = self.__probability_for_nest(slot - 1)(
                 params, utility_array, logprobability
             )
+        # clipping log probability at 0, prevents underflow/overflow
+        # when one of the nests only includes very bad alternatives.
+        logprobability = jnp.clip(logprobability, None, 0)
         return logprobability
 
     @jitmethod
     def jax_log_probability(self, params):
         ca = _get_jnp_array(self.dataset, "ca")
         co = _get_jnp_array(self.dataset, "co")
-        av = _get_jnp_array(self.dataset, "av")
+        av = _as_jnp_array(self._data_arrays.av)
         if av is not None:
             depth = av.ndim - 1
         elif co is not None:
@@ -551,7 +587,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
     def jax_probability(self, params):
         ca = _get_jnp_array(self.dataset, "ca")
         co = _get_jnp_array(self.dataset, "co")
-        av = _get_jnp_array(self.dataset, "av")
+        av = _as_jnp_array(self._data_arrays.av)
         if av is not None:
             depth = av.ndim - 1
         elif co is not None:
@@ -578,7 +614,8 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         if len(self.mixtures) == 0:
             logpr = self._jax_log_probability(params, databundle)
             ch = databundle.get("ch", None)
-            return (logpr[: ch.size] * ch).sum()
+            n_alts = self.dataset.dc.n_alts
+            return (logpr[:n_alts] * ch[:n_alts]).sum()
         else:
             if self.prerolled_draws:
                 draws = groupbundle.get("draws", None)
@@ -614,8 +651,8 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
     def jax_loglike_casewise(self, params):
         ca = _get_jnp_array(self.dataset, "ca")
         co = _get_jnp_array(self.dataset, "co")
-        av = _get_jnp_array(self.dataset, "av")
-        ch = _get_jnp_array(self.dataset, "ch")
+        av = _as_jnp_array(self._data_arrays.av)
+        ch = _as_jnp_array(self._data_arrays.ch)
         n_draws = self.n_draws
         seed = getattr(self, "seed", 42)
         if av is not None:
@@ -710,8 +747,6 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         if x is not None:
             self.pvals = x
         result = self.jax_d_loglike(self.pvals)
-
-        print("converge?=", jnp.max(jnp.absolute(result)))
 
         if return_series:
             result = pd.Series(result, index=self.pnames)
