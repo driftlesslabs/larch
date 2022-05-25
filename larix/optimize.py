@@ -135,11 +135,12 @@ class OptimizeMixin(BucketAccess):
         if np.isnan(result):
             result = np.inf
         if self.dashboard is not None:
-            self.dashboard.update_content(
-                loglike=-result,
-                params=self.__rich_table(params),
-                bestloglike=self._cached_loglike_best,
-            )
+            if self.dashboard.throttle():
+                self.dashboard.update_content(
+                    loglike=-result,
+                    params=self.__rich_table(params),
+                    bestloglike=self._cached_loglike_best,
+                )
         return result
 
     def jax_neg_d_loglike(self, *args, **kwargs):
@@ -170,12 +171,14 @@ class OptimizeMixin(BucketAccess):
             else:
                 self.add_parameter_array('best', pvalues)
 
-    def jax_maximize_loglike(self, method='slsqp', stderr=False, **kwargs):
+    def jax_maximize_loglike(self, method='slsqp', stderr=False, dashboard=True, dashboard_update=1.0, **kwargs):
         from .model.dashboard import Dashboard
         self._latest_gradient = np.full_like(self.pvals, np.nan)
         self.dashboard = Dashboard(
             status="[yellow]compiling objective function...",
             params=self.__rich_table(self.pvals),
+            show=dashboard,
+            throttle=dashboard_update if dashboard else 9999,
         )
         try:
             if method.lower() in {'nelder-mead', 'l-bfgs-b', 'tnc', 'slsqp', 'powell', 'trust-constr'}:
@@ -191,6 +194,7 @@ class OptimizeMixin(BucketAccess):
                 method=method,
                 **kwargs
             )
+
             try:
                 result['n_cases'] = self.n_cases
             except AttributeError:
@@ -205,6 +209,11 @@ class OptimizeMixin(BucketAccess):
                 del result['fun']
             if 'jac' in result:
                 result['jac'] = -result['jac']
+            self.dashboard.update_content(
+                loglike=-result['loglike'],
+                params=self.__rich_table(result.x),
+                bestloglike=self._cached_loglike_best,
+            )
             if stderr:
                 self.dashboard.update_content(status="[yellow]computing standard errors...")
                 se, hess, ihess = self.jax_param_cov(result.x)

@@ -413,7 +413,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                 jnp.where(
                     avail[..., parent_slot] > 1,
                     jnp.exp(jnp.clip(u[..., child_slot], -1e37) / mu),
-                    jnp.exp(jnp.clip(u[..., child_slot], -1e37)),
+                    jnp.exp(jnp.clip(u[..., child_slot], -85)),
                 )
             )
             return u
@@ -423,8 +423,8 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             u = u.at[..., self_slot].set(
                 jnp.where(
                     avail[..., self_slot] > 1,
-                    jnp.clip(jnp.log(u[..., self_slot]), -1e38) * mu,
-                    jnp.clip(jnp.log(u[..., self_slot]), -1e38),
+                    jnp.log(u[..., self_slot]) * mu,
+                    jnp.log(u[..., self_slot]),
                 )
             )
             return u
@@ -477,10 +477,11 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             u_nest = utility_array[..., slot]
 
             def body(carry, child_slot):
-                add_me = (
+                diff = (
                     jnp.clip(utility_array[..., child_slot], -1e33)
                     - jnp.clip(u_nest, -1e33)
-                ) / mu
+                )
+                add_me = diff / mu
                 carry = carry.at[..., child_slot].set(add_me + carry[..., slot])
                 return carry, None
 
@@ -509,8 +510,6 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         else:
             utility_array = utility_array.at[:n_alts].add(-shifter)
         mu_slots = self._mu_slots()
-        print(f"{mu_slots=}")
-        print(f"{params=}")
         utility_array = self.utility_for_nests(utility_array, params, av, mu_slots)
         return utility_array + shifter
 
@@ -615,7 +614,8 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             logpr = self._jax_log_probability(params, databundle)
             ch = databundle.get("ch", None)
             n_alts = self.dataset.dc.n_alts
-            return (logpr[:n_alts] * ch[:n_alts]).sum()
+            #return (logpr[:n_alts] * ch[:n_alts]).sum()
+            return jnp.where(ch[:n_alts], logpr[:n_alts] * ch[:n_alts], 0).sum()
         else:
             if self.prerolled_draws:
                 draws = groupbundle.get("draws", None)
