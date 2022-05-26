@@ -24,7 +24,7 @@ def model7(mtc7):
     m.utility_co[5] = P("ASC_BIKE") + P("hhinc#5") * X("hhinc")
     m.utility_co[6] = P("ASC_WALK") + P("hhinc#6") * X("hhinc")
     m.utility_ca = PX("tottime") + PX("totcost")
-    m.availability_var = "avail"
+    m.availability_ca_var = "avail"
     m.choice_ca_var = "chose"
     m.title = "MTC Example 1 (Simple MNL)"
     return m
@@ -52,7 +52,8 @@ def test_mtc_data(mtc7):
                 "caseid": np.arange(1, 8),
                 "altid": np.arange(1, 7),
                 "altnames": xr.DataArray(
-                    ["DA", "SR2", "SR3+", "Transit", "Bike", "Walk"], dims="altid",
+                    ["DA", "SR2", "SR3+", "Transit", "Bike", "Walk"],
+                    dims="altid",
                 ),
             },
         ),
@@ -77,7 +78,8 @@ def test_mtc_data(mtc7):
                 "caseid": np.arange(1, 8),
                 "altid": np.arange(1, 7),
                 "altnames": xr.DataArray(
-                    ["DA", "SR2", "SR3+", "Transit", "Bike", "Walk"], dims="altid",
+                    ["DA", "SR2", "SR3+", "Transit", "Bike", "Walk"],
+                    dims="altid",
                 ),
             },
         ),

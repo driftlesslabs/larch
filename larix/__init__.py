@@ -1,5 +1,8 @@
 import os
 
+from xmle import NumberedCaption, Reporter
+from xmle import load_metadata as read_metadata
+
 from . import examples
 from ._version import version as _install_version
 from .dataset import DataArray, Dataset, DataTree

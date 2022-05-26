@@ -1,22 +1,30 @@
-
-import os
 import glob
 import json
+import os
 import textwrap
+
 
 def rip():
 
     targets = [
-        'docs/examples/mtc/*.ipynb',
+        "docs/examples/mtc/*.ipynb",
+        "docs/examples/exampville/*.ipynb",
+        "docs/examples/xlogit-artificial/*.ipynb",
     ]
 
-    generator_dest = os.path.normpath(os.path.join(
-        os.path.dirname(__file__), "..", "larix", "examples", "generated",
-    ))
+    generator_dest = os.path.normpath(
+        os.path.join(
+            os.path.dirname(__file__),
+            "..",
+            "larix",
+            "examples",
+            "generated",
+        )
+    )
     os.makedirs(generator_dest, exist_ok=True)
     print(f"{generator_dest=}")
 
-    with open(os.path.join(generator_dest, ".gitignore"), 'wt', encoding="utf8") as f:
+    with open(os.path.join(generator_dest, ".gitignore"), "wt", encoding="utf8") as f:
         f.write(".gitignore\n*.py")
 
     import_stmts = []
@@ -26,9 +34,11 @@ def rip():
         for examplefile in glob.glob(target):
             print(f"{examplefile=}")
             example = os.path.basename(examplefile).replace(".ipynb", "")
-            example = example.replace("-","_")
+            example = example.replace("-", "_")
             print(f"  {example=}")
-            with open(os.path.join(generator_dest, f"_{example}.py"), 'wt', encoding="utf8") as f:
+            with open(
+                os.path.join(generator_dest, f"_{example}.py"), "wt", encoding="utf8"
+            ) as f:
                 f.write("def example(extract='m', estimate=False):\n")
                 with open(examplefile, encoding="utf8") as s:
                     sourcefilecontent = s.read()
@@ -36,14 +46,14 @@ def rip():
                 source1 = []
                 source2 = []
                 trip = False
-                for i in y['cells']:
+                for i in y["cells"]:
                     if (
-                            i['cell_type'] == 'code'
-                            and not i['metadata'].get('doc_only', False)
-                            and not i['metadata'].get('remove_cell', False)
-                            and 'remove_cell' not in i.get('metadata', {}).get('tags', [])
+                        i["cell_type"] == "code"
+                        and not i["metadata"].get("doc_only", False)
+                        and not i["metadata"].get("remove_cell", False)
+                        and "remove_cell" not in i.get("metadata", {}).get("tags", [])
                     ):
-                        s = "".join(i['source'])
+                        s = "".join(i["source"])
                         if ".maximize_loglike(" in s:
                             trip = True
                         if trip:
@@ -80,11 +90,17 @@ def rip():
             import_stmts.append(f"from ._{example} import example as _{example}")
             assign_stmts.append(f"ex[{ex_n!r}] = _{example}")
 
-    with open(os.path.join(generator_dest, "__init__.py"), 'wt', encoding="utf8") as gen:
-        gen.write(textwrap.dedent("""
+    with open(
+        os.path.join(generator_dest, "__init__.py"), "wt", encoding="utf8"
+    ) as gen:
+        gen.write(
+            textwrap.dedent(
+                """
         # Example code extracted automatically from documentation.
         # Do not edit these files manually.
-        """))
+        """
+            )
+        )
         for s in import_stmts:
             gen.write(s)
             gen.write("\n")
@@ -94,5 +110,5 @@ def rip():
             gen.write("\n")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     rip()

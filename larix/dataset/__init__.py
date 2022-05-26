@@ -1,12 +1,7 @@
 import logging
-import warnings
-import numpy as np
-import pandas as pd
-import xarray as xr
-import numba as nb
 import pathlib
+import warnings
 from collections.abc import Mapping
-from xarray.core import dtypes
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -27,26 +22,42 @@ from typing import (
     cast,
     overload,
 )
-from . import construct, patch, flow
+
+import numba as nb
+import numpy as np
+import pandas as pd
+import xarray as xr
+from xarray.core import dtypes
+
+from . import construct, flow, patch
+from .dim_names import ALTID as _ALTID
+from .dim_names import ALTIDX as _ALTIDX
+from .dim_names import CASEALT as _CASEALT
+from .dim_names import CASEID as _CASEID
+from .dim_names import CASEPTR as _CASEPTR
+from .dim_names import GROUPID as _GROUPID
+from .dim_names import INGROUP as _INGROUP
 from .patch import register_dataarray_classmethod
 
 try:
-    from sharrow import Dataset as _sharrow_Dataset
     from sharrow import DataArray as _sharrow_DataArray
+    from sharrow import Dataset as _sharrow_Dataset
     from sharrow import DataTree as _sharrow_DataTree
     from sharrow.accessors import register_dataarray_method
 except ImportError:
     warnings.warn("larch.dataset requires the sharrow library")
+
     class _noclass:
         pass
+
     _sharrow_Dataset = xr.Dataset
     _sharrow_DataArray = xr.DataArray
     _sharrow_DataTree = _noclass
     register_dataarray_method = lambda x: x
 
-from .dim_names import CASEID as _CASEID, ALTID as _ALTID, CASEALT as _CASEALT, ALTIDX as _ALTIDX, CASEPTR as _CASEPTR, GROUPID as _GROUPID, INGROUP as _INGROUP
 
 DataArray = _sharrow_DataArray
+
 
 @register_dataarray_classmethod
 def zeros(cls, *coords, dtype=np.float64, name=None, attrs=None):
@@ -87,6 +98,7 @@ def zeros(cls, *coords, dtype=np.float64, name=None, attrs=None):
         attrs=attrs,
     )
 
+
 @register_dataarray_classmethod
 def ones(cls, *coords, dtype=np.float64, name=None, attrs=None):
     """
@@ -126,6 +138,7 @@ def ones(cls, *coords, dtype=np.float64, name=None, attrs=None):
         attrs=attrs,
     )
 
+
 @register_dataarray_method
 def to_zarr(self, store=None, *args, **kwargs):
     """
@@ -154,14 +167,16 @@ def to_zarr(self, store=None, *args, **kwargs):
         # No problems with the name - so we're fine!
         dataset = self.to_dataset()
 
-    if isinstance(store, (str, pathlib.Path)) and len(args)==0:
-        if str(store).endswith('.zip'):
+    if isinstance(store, (str, pathlib.Path)) and len(args) == 0:
+        if str(store).endswith(".zip"):
             import zarr
-            with zarr.ZipStore(store, mode='w') as zstore:
+
+            with zarr.ZipStore(store, mode="w") as zstore:
                 dataset.to_zarr(zstore, **kwargs)
             return
 
     return dataset.to_zarr(*args, **kwargs)
+
 
 @register_dataarray_classmethod
 def from_zarr(cls, *args, name=None, **kwargs):
@@ -176,7 +191,7 @@ def from_zarr(cls, *args, name=None, **kwargs):
 
 
 @register_dataarray_method
-def value_counts(self, index_name='index'):
+def value_counts(self, index_name="index"):
     """
     Count the number of times each unique value appears in the array.
 
@@ -190,7 +205,7 @@ def value_counts(self, index_name='index'):
     DataArray
     """
     values, freqs = np.unique(self, return_counts=True)
-    return self.__class__(freqs, dims=index_name, coords={index_name:values})
+    return self.__class__(freqs, dims=index_name, coords={index_name: values})
 
 
 Dataset = _sharrow_Dataset
@@ -1098,6 +1113,7 @@ Dataset = _sharrow_Dataset
 #     #     return self.indexes[self.ALTID]
 #
 
+
 class DataTree(_sharrow_DataTree):
 
     DatasetType = Dataset
@@ -1133,8 +1149,8 @@ class DataTree(_sharrow_DataTree):
         self.dim_order = tuple(dim_order)
 
     def idco_subtree(self):
-        if 'idcoVars' in self.subspaces:
-            return self.subspaces['idcoVars'].dc.as_tree()
+        if "idcoVars" in self.subspaces:
+            return self.subspaces["idcoVars"].dc.as_tree()
         return self.drop_dims(self.ALTID, ignore_missing_dims=True)
 
     @property
@@ -1321,21 +1337,21 @@ class DataTree(_sharrow_DataTree):
         -------
         Flow
         """
-        if 'dim_exclude' not in kwargs:
-            if '_exclude_dims_' in self.root_dataset.attrs:
-                kwargs['dim_exclude'] = self.root_dataset.attrs['_exclude_dims_']
+        if "dim_exclude" not in kwargs:
+            if "_exclude_dims_" in self.root_dataset.attrs:
+                kwargs["dim_exclude"] = self.root_dataset.attrs["_exclude_dims_"]
         return super().setup_flow(*args, **kwargs)
 
 
 def merge(
-        objects,
-        compat= "no_conflicts",
-        join= "outer",
-        fill_value = dtypes.NA,
-        combine_attrs = "override",
-        *,
-        caseid=None,
-        alts=None,
+    objects,
+    compat="no_conflicts",
+    join="outer",
+    fill_value=dtypes.NA,
+    combine_attrs="override",
+    *,
+    caseid=None,
+    alts=None,
 ):
     """
     Merge any number of xarray objects into a single larch.Dataset as variables.
@@ -1436,16 +1452,17 @@ def choice_avail_summary(dataset, graph=None, availability_co_vars=None):
     pandas.DataFrame
     """
     if graph is None:
-        if 'ch' in dataset:
-            ch_ = np.asarray(dataset['ch'].copy())
+        if "ch" in dataset:
+            ch_ = np.asarray(dataset["ch"].copy())
         else:
             ch_ = None
-        av_ = np.asarray(dataset.get('av'))
+        av_ = np.asarray(dataset.get("av"))
     else:
         from ..model.cascading import array_av_cascade, array_ch_cascade
 
-        ch_ = array_ch_cascade(dataset.get('ch'), graph)
-        av_ = array_av_cascade(dataset.get('av'), graph)
+        ch_ = array_ch_cascade(dataset.get("ch"), graph)
+        av_ = array_av_cascade(dataset.get("av"), graph)
+        av_[av_ > 1] = 1
 
     if ch_ is not None:
         ch = ch_.sum(0)
@@ -1457,7 +1474,7 @@ def choice_avail_summary(dataset, graph=None, availability_co_vars=None):
     else:
         av = None
 
-    arr_wt = dataset.get('wt')
+    arr_wt = dataset.get("wt")
     if arr_wt is not None:
         if ch_ is not None:
             ch_w = pd.Series((ch_ * arr_wt.values).sum(0))
@@ -1486,35 +1503,40 @@ def choice_avail_summary(dataset, graph=None, availability_co_vars=None):
         ch_but_not_av_w = None
 
     from collections import OrderedDict
+
     od = OrderedDict()
 
     if graph is not None:
         idx = graph.standard_sort
-        od['name'] = pd.Series(graph.standard_sort_names, index=idx)
+        od["name"] = pd.Series(graph.standard_sort_names, index=idx)
     else:
         idx = dataset.dc.altids()
-        if dataset.get('alt_names') is not None:
-            od['name'] = pd.Series(dataset.get('alt_names'), index=idx)
-        elif dataset.get('altnames') is not None:
-            od['name'] = pd.Series(dataset.get('altnames'), index=idx)
+        if dataset.get("alt_names") is not None:
+            od["name"] = pd.Series(dataset.get("alt_names"), index=idx)
+        elif dataset.get("altnames") is not None:
+            od["name"] = pd.Series(dataset.get("altnames"), index=idx)
 
     if show_wt:
-        od['chosen weighted'] = pd.Series(ch_w, index=idx)
-        od['chosen unweighted'] = pd.Series(ch, index=idx)
-        od['available weighted'] = pd.Series(av_w, index=idx)
-        od['available unweighted'] = pd.Series(av, index=idx)
+        od["chosen weighted"] = pd.Series(ch_w, index=idx)
+        od["chosen unweighted"] = pd.Series(ch, index=idx)
+        od["available weighted"] = pd.Series(av_w, index=idx)
+        od["available unweighted"] = pd.Series(av, index=idx)
     else:
-        od['chosen'] = pd.Series(ch, index=idx)
-        od['available'] = pd.Series(av, index=idx)
+        od["chosen"] = pd.Series(ch, index=idx)
+        od["available"] = pd.Series(av, index=idx)
     if ch_but_not_av is not None:
         if show_wt:
-            od['chosen but not available weighted'] = pd.Series(ch_but_not_av_w, index=idx)
-            od['chosen but not available unweighted'] = pd.Series(ch_but_not_av, index=idx)
+            od["chosen but not available weighted"] = pd.Series(
+                ch_but_not_av_w, index=idx
+            )
+            od["chosen but not available unweighted"] = pd.Series(
+                ch_but_not_av, index=idx
+            )
         else:
-            od['chosen but not available'] = pd.Series(ch_but_not_av, index=idx)
+            od["chosen but not available"] = pd.Series(ch_but_not_av, index=idx)
 
     if availability_co_vars is not None:
-        od['availability condition'] = pd.Series(
+        od["availability condition"] = pd.Series(
             availability_co_vars.values(),
             index=availability_co_vars.keys(),
             dtype=np.unicode,
@@ -1528,43 +1550,43 @@ def choice_avail_summary(dataset, graph=None, availability_co_vars=None):
         totals = result.sum()
 
     for tot in (
-            'chosen',
-            'chosen weighted',
-            'chosen unweighted',
-            'chosen but not available',
-            'chosen but not available weighted',
-            'chosen but not available unweighted',
-            'chosen thus available',
-            'not available so not chosen'
+        "chosen",
+        "chosen weighted",
+        "chosen unweighted",
+        "chosen but not available",
+        "chosen but not available weighted",
+        "chosen but not available unweighted",
+        "chosen thus available",
+        "not available so not chosen",
     ):
         if tot in totals:
-            result.loc['< Total All Alternatives >', tot] = totals[tot]
+            result.loc["< Total All Alternatives >", tot] = totals[tot]
 
-    result.loc['< Total All Alternatives >', pd.isnull(result.loc['< Total All Alternatives >', :])] = ""
-    result.drop('_root_', errors='ignore', inplace=True)
+    result.loc[
+        "< Total All Alternatives >",
+        pd.isnull(result.loc["< Total All Alternatives >", :]),
+    ] = ""
+    result.drop("_root_", errors="ignore", inplace=True)
 
-    if 'availability condition' in result:
-        result['availability condition'] = result['availability condition'].fillna('')
+    if "availability condition" in result:
+        result["availability condition"] = result["availability condition"].fillna("")
 
     for i in (
-            'chosen',
-            'chosen but not available',
-            'chosen thus available',
-            'not available so not chosen',
+        "chosen",
+        "chosen but not available",
+        "chosen thus available",
+        "not available so not chosen",
     ):
         if i in result.columns and all(result[i] == result[i].astype(int)):
             result[i] = result[i].astype(int)
 
-    for i in (
-            'available',
-    ):
+    for i in ("available",):
         if i in result.columns:
             j = result.columns.get_loc(i)
-            if all(result.iloc[:-1,j] == result.iloc[:-1,j].astype(int)):
-                result.iloc[:-1,j] = result.iloc[:-1,j].astype(int)
+            if all(result.iloc[:-1, j] == result.iloc[:-1, j].astype(int)):
+                result.iloc[:-1, j] = result.iloc[:-1, j].astype(int)
 
     return result
-
 
 
 # @nb.njit

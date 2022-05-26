@@ -16,10 +16,12 @@ def _get_jnp_array(dataset, name):
         return None
     return jnp.asarray(dataset[name])
 
+
 def _as_jnp_array(obj):
     if obj is None:
         return None
     return jnp.asarray(obj)
+
 
 class PanelMixin:
     def __init__(self, *args, **kwargs):
@@ -52,13 +54,13 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
     def compute_engine(self):
         engine = self._compute_engine
         if engine is None:
-            engine = 'jax'
+            engine = "jax"
         return engine
 
     @compute_engine.setter
     def compute_engine(self, engine):
-        if engine not in {'numba', 'jax', None}:
-            raise ValueError('invalid compute engine')
+        if engine not in {"numba", "jax", None}:
+            raise ValueError("invalid compute engine")
         self._compute_engine = engine
 
     @property
@@ -134,7 +136,8 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             self.dataset = dataset
             try:
                 self._data_arrays = self.dataset.dc.to_arrays(
-                    self.graph, float_dtype=self.float_dtype,
+                    self.graph,
+                    float_dtype=self.float_dtype,
                 )
             except KeyError:  # no defined caseid dimension, JAX only
                 self._data_arrays = None
@@ -179,7 +182,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         else:
             raise TypeError(f"dataset must be Dataset not {type(dataset)}")
 
-    def make_random_draws(self, engine='numpy'):
+    def make_random_draws(self, engine="numpy"):
         self.unmangle()
         for i in self.mixtures:
             i.prep(self._parameter_bucket)
@@ -190,14 +193,20 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         if self._draws is not None:
             if self.common_draws and self._draws.shape == (n_draws, n_mixtures):
                 draws = self._draws
-            if not self.common_draws and self._draws.shape == (n_panels, n_draws, n_mixtures):
+            if not self.common_draws and self._draws.shape == (
+                n_panels,
+                n_draws,
+                n_mixtures,
+            ):
                 draws = self._draws
         if draws is None:
-            if engine == 'numpy':
+            if engine == "numpy":
                 seed = getattr(self, "seed", 0)
                 if self.common_draws:
                     if n_draws > 0 and n_mixtures > 0:
-                        draws, seed = self._make_random_draws_numpy(n_draws, n_mixtures, seed)
+                        draws, seed = self._make_random_draws_numpy(
+                            n_draws, n_mixtures, seed
+                        )
                 else:
                     if n_draws > 0 and n_mixtures > 0 and n_panels > 0:
                         draws, seed = self._make_random_draws_numpy_2(
@@ -205,14 +214,12 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                         )
                     else:
                         draws = None
-            elif engine == 'jax':
+            elif engine == "jax":
                 seed = getattr(self, "seed", 0)
                 rk = jax.random.PRNGKey(seed)
                 if self.common_draws:
                     if n_draws > 0 and n_mixtures > 0:
-                        draws = self._make_random_draws_out(n_draws, n_mixtures, rk)[
-                            0
-                        ]
+                        draws = self._make_random_draws_out(n_draws, n_mixtures, rk)[0]
                 else:
                     if n_draws > 0 and n_mixtures > 0 and n_panels > 0:
                         draws = self._make_random_draws_out_2(
@@ -231,25 +238,34 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             rgen = seed
         else:
             rgen = np.random.default_rng(seed)
-        draws = rgen.random(size=[n_draws, n_mixtures], dtype=np.float32) + np.arange(n_draws, dtype=np.float32)[:, np.newaxis]
+        draws = (
+            rgen.random(size=[n_draws, n_mixtures], dtype=np.float32)
+            + np.arange(n_draws, dtype=np.float32)[:, np.newaxis]
+        )
         for i in range(n_mixtures):
             rgen.shuffle(draws[:, i])
-        return np.clip(draws / n_draws, 0, np.float32(1-1e-7)), rgen
+        return np.clip(draws / n_draws, 0, np.float32(1 - 1e-7)), rgen
 
     def _make_random_draws_numpy_2(self, n_draws, n_mixtures, n_panels, seed):
         if isinstance(seed, np.random.Generator):
             rgen = seed
         else:
             rgen = np.random.default_rng(seed)
-        draws = rgen.random(size=[n_panels, n_draws, n_mixtures], dtype=np.float32) + np.arange(n_draws, dtype=np.float32)[np.newaxis, :, np.newaxis]
+        draws = (
+            rgen.random(size=[n_panels, n_draws, n_mixtures], dtype=np.float32)
+            + np.arange(n_draws, dtype=np.float32)[np.newaxis, :, np.newaxis]
+        )
         for i in range(n_mixtures):
             for p in range(n_panels):
                 rgen.shuffle(draws[p, :, i])
-        return np.clip(draws / n_draws, 0, np.float32(1-1e-7)), rgen
+        return np.clip(draws / n_draws, 0, np.float32(1 - 1e-7)), rgen
 
     # @jitmethod(static_argnums=(0,1), static_argnames=('n_draws', 'n_mixtures'))
     def _make_random_draws_out(self, n_draws, n_mixtures, random_key):
-        draws = jax.random.uniform(random_key, [n_draws, n_mixtures],)
+        draws = jax.random.uniform(
+            random_key,
+            [n_draws, n_mixtures],
+        )
 
         def body(i, carry):
             draws, rnd_key = carry
@@ -296,14 +312,15 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         n_nodes = len(self.graph)
         x = jnp.zeros([self.dataset.dc.n_alts, n_vars_co + 1])
         x = x.at[self._fixed_arrays.uco_alt_slot, self._fixed_arrays.uco_data_slot].add(
-            params[self._fixed_arrays.uco_param_slot]
+            params[self._fixed_arrays.uco_param_slot] * self._fixed_arrays.uco_scale
         )
         u = jnp.zeros([n_nodes])
         if ca is not None and self._fixed_arrays.uca_param_slot.size:
             u = u.at[:n_alts].add(
                 jnp.dot(
                     ca[..., self._fixed_arrays.uca_data_slot],
-                    params[self._fixed_arrays.uca_param_slot],
+                    params[self._fixed_arrays.uca_param_slot]
+                    * self._fixed_arrays.uca_scale,
                 )
             )
         if co is not None:
@@ -355,8 +372,13 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                     carry,
                     jnp.where(
                         num_av > 1,
-                        jnp.exp(jnp.clip(utility_array[..., child_slot] - shifter, -1e37) / mu),
-                        jnp.exp(jnp.clip(utility_array[..., child_slot] - shifter, -1e37)),
+                        jnp.exp(
+                            jnp.clip(utility_array[..., child_slot] - shifter, -1e37)
+                            / mu
+                        ),
+                        jnp.exp(
+                            jnp.clip(utility_array[..., child_slot] - shifter, -1e37)
+                        ),
                     ),
                 )
                 return carry, None
@@ -367,7 +389,8 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                     num_av > 1,
                     jnp.clip(jnp.log(carry), -1e38) * mu,
                     jnp.clip(jnp.log(carry), -1e39),
-                ) + shifter
+                )
+                + shifter
             )
             return utility_array
 
@@ -404,6 +427,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                 for slot in range(n_alts, n_nodes):
                     out = self.__utility_for_nest(slot)(beta, out, array_av)
                 return out
+
             return u_nesting_few
 
         # many nests, use more efficient loop
@@ -431,7 +455,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
 
         slotarray = np.stack(self.graph.edge_slot_arrays()).T
 
-        #@jax.jit
+        # @jax.jit
         def u_rollup(utility_array, parameter_vector, avail_ca, mu_slots):
             n_params = parameter_vector.size
             params = jnp.ones(n_params + 1, dtype=parameter_vector.dtype)
@@ -477,9 +501,8 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             u_nest = utility_array[..., slot]
 
             def body(carry, child_slot):
-                diff = (
-                    jnp.clip(utility_array[..., child_slot], -1e33)
-                    - jnp.clip(u_nest, -1e33)
+                diff = jnp.clip(utility_array[..., child_slot], -1e33) - jnp.clip(
+                    u_nest, -1e33
                 )
                 add_me = diff / mu
                 carry = carry.at[..., child_slot].set(add_me + carry[..., slot])
@@ -530,8 +553,6 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         for level in range(depth):
             f = jax.vmap(f, in_axes=(None, 0))
         return f(params, {"ca": ca, "co": co, "av": av})
-
-
 
     @jitmethod
     def _jax_log_probability(self, params, databundle):
@@ -614,7 +635,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             logpr = self._jax_log_probability(params, databundle)
             ch = databundle.get("ch", None)
             n_alts = self.dataset.dc.n_alts
-            #return (logpr[:n_alts] * ch[:n_alts]).sum()
+            # return (logpr[:n_alts] * ch[:n_alts]).sum()
             return jnp.where(ch[:n_alts], logpr[:n_alts] * ch[:n_alts], 0).sum()
         else:
             if self.prerolled_draws:
@@ -626,11 +647,16 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             rand_params = self.apply_random_draws(params, draws)
             if ch.ndim == 2:  # PANEL DATA
                 # vmap over ingroup
-                likelihood_f = jax.vmap(self._jax_likelihood, in_axes=(None, 0),)
-                # vmap over draws
-                likelihood = jax.vmap(likelihood_f, in_axes=(0, None), out_axes=-1,)(
-                    rand_params, databundle
+                likelihood_f = jax.vmap(
+                    self._jax_likelihood,
+                    in_axes=(None, 0),
                 )
+                # vmap over draws
+                likelihood = jax.vmap(
+                    likelihood_f,
+                    in_axes=(0, None),
+                    out_axes=-1,
+                )(rand_params, databundle)
                 # collapse likelihood over all alternatives
                 likelihood = likelihood.prod([0, 1])
                 # average over all draws
@@ -639,7 +665,9 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             else:
                 # vmap over draws
                 likelihood = jax.vmap(
-                    self._jax_likelihood, in_axes=(0, None), out_axes=-1,
+                    self._jax_likelihood,
+                    in_axes=(0, None),
+                    out_axes=-1,
                 )(rand_params, databundle)
                 # collapse likelihood over all alternatives
                 likelihood = likelihood.prod(0)
@@ -703,20 +731,22 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         return self.jax_loglike_casewise(params).sum()
 
     def loglike(
-            self,
-            x=None,
-            *,
-            start_case=None, stop_case=None, step_case=None,
-            **kwargs
+        self, x=None, *, start_case=None, stop_case=None, step_case=None, **kwargs
     ):
-        if self.compute_engine != 'jax':
-            return super().loglike(x=x, start_case=start_case, stop_case=stop_case, step_case=step_case, **kwargs)
+        if self.compute_engine != "jax":
+            return super().loglike(
+                x=x,
+                start_case=start_case,
+                stop_case=stop_case,
+                step_case=step_case,
+                **kwargs,
+            )
         if start_case is not None:
-            raise NotImplementedError('start_case with engine=jax')
+            raise NotImplementedError("start_case with engine=jax")
         if stop_case is not None:
-            raise NotImplementedError('stop_case with engine=jax')
+            raise NotImplementedError("stop_case with engine=jax")
         if step_case is not None:
-            raise NotImplementedError('step_case with engine=jax')
+            raise NotImplementedError("step_case with engine=jax")
         # if kwargs:
         #     raise NotImplementedError(f"{kwargs.popitem()[0]} with engine=jax")
         if x is not None:
@@ -727,21 +757,30 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         return result
 
     def d_loglike(
-            self,
-            x=None,
-            *,
-            start_case=None, stop_case=None, step_case=None,
-            return_series=False,
-            **kwargs,
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        return_series=False,
+        **kwargs,
     ):
-        if self.compute_engine != 'jax':
-            return super().d_loglike(x=x, start_case=start_case, stop_case=stop_case, step_case=step_case, return_series=return_series, **kwargs)
+        if self.compute_engine != "jax":
+            return super().d_loglike(
+                x=x,
+                start_case=start_case,
+                stop_case=stop_case,
+                step_case=step_case,
+                return_series=return_series,
+                **kwargs,
+            )
         if start_case is not None:
-            raise NotImplementedError('start_case with engine=jax')
+            raise NotImplementedError("start_case with engine=jax")
         if stop_case is not None:
-            raise NotImplementedError('stop_case with engine=jax')
+            raise NotImplementedError("stop_case with engine=jax")
         if step_case is not None:
-            raise NotImplementedError('step_case with engine=jax')
+            raise NotImplementedError("step_case with engine=jax")
         # if kwargs:
         #     raise NotImplementedError(f"{kwargs.popitem()[0]} with engine=jax")
         if x is not None:
@@ -752,10 +791,40 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             result = pd.Series(result, index=self.pnames)
         return result
 
+    def loglike_casewise(
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        **kwargs,
+    ):
+        if self.compute_engine != "jax":
+            return super().loglike_casewise(
+                x=x,
+                start_case=start_case,
+                stop_case=stop_case,
+                step_case=step_case,
+                **kwargs,
+            )
+        if start_case is not None:
+            raise NotImplementedError("start_case with engine=jax")
+        if stop_case is not None:
+            raise NotImplementedError("stop_case with engine=jax")
+        if step_case is not None:
+            raise NotImplementedError("step_case with engine=jax")
+        # if kwargs:
+        #     raise NotImplementedError(f"{kwargs.popitem()[0]} with engine=jax")
+        if x is not None:
+            self.pvals = x
+        result = np.asarray(self.jax_loglike_casewise(self.pvals))
+        return result
+
     def maximize_loglike(
-            self,
-            *args,
-            **kwargs,
+        self,
+        *args,
+        **kwargs,
     ):
         """
         Maximize the log likelihood.
@@ -784,7 +853,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             included in output will vary by estimation method.
 
         """
-        if self.compute_engine == 'jax':
+        if self.compute_engine == "jax":
             return self.jax_maximize_loglike(*args, **kwargs)
         else:
             return super().maximize_loglike(*args, **kwargs)

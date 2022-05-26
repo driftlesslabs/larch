@@ -117,7 +117,7 @@ class BaseModel:
 
         self._weight_co_var = None
 
-        self._availability_var = None
+        self._availability_ca_var = None
         self._availability_co_vars = None
         self._availability_any = True
 
@@ -671,8 +671,8 @@ class BaseModel:
             if self.weight_co_var:
                 req_data.weight_co = self.weight_co_var
 
-            if self.availability_var:
-                req_data.avail_ca = self.availability_var
+            if self.availability_ca_var:
+                req_data.avail_ca = self.availability_ca_var
             elif self.availability_co_vars:
                 req_data.avail_co = self.availability_co_vars
             elif self.availability_any:
@@ -896,35 +896,17 @@ class BaseModel:
     @property
     def availability_ca_var(self):
         """str : An |idca| variable or expression indicating if alternatives are available."""
-        return self._availability_var
+        return self._availability_ca_var
 
     @availability_ca_var.setter
     def availability_ca_var(self, x):
         if x is not None:
             x = str(x)
-        if self._availability_var != x:
+        if self._availability_ca_var != x:
             self.mangle()
-        self._availability_var = x
-        self._availability_co_vars = None
-        self._availability_any = False
-
-    @property
-    def availability_var(self):
-        """str : An |idca| variable or expression indicating if alternatives are available.
-
-        Deprecated, prefer `availability_ca_var` for clarity.
-        """
-        return self._availability_var
-
-    @availability_var.setter
-    def availability_var(self, x):
-        if x is not None:
-            x = str(x)
-        if self._availability_var != x:
-            self.mangle()
-        self._availability_var = x
-        self._availability_co_vars = None
-        self._availability_any = False
+            self._availability_ca_var = x
+            self._availability_co_vars = None
+            self._availability_any = False
 
     @property
     def availability_co_vars(self):
@@ -953,7 +935,7 @@ class BaseModel:
             if self._availability_co_vars != x:
                 self.mangle()
             self._availability_co_vars = x
-            self._availability_var = None
+            self._availability_ca_var = None
             self._availability_any = False
 
     @property
@@ -967,9 +949,11 @@ class BaseModel:
 
     @availability_any.setter
     def availability_any(self, x):
-        self._availability_any = True
-        self._availability_co_vars = None
-        self._availability_var = None
+        x = bool(x)
+        if x != self._availability_any:
+            self._availability_any = x
+            self._availability_co_vars = None
+            self._availability_ca_var = None
 
     def parameter_summary(self):
         """
