@@ -41,6 +41,36 @@ class PanelMixin:
         self._groupid = g
 
 
+class MangleOnChange:
+    def __init__(self, *req_type):
+        self.req_type = req_type
+
+    def __set_name__(self, owner, name):
+        self.name = name
+        self.private_name = "_" + name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.private_name)
+
+    def __set__(self, instance, value):
+        if self.req_type == (bool,):
+            value = bool(value)
+        elif self.req_type:
+            if not isinstance(value, self.req_type):
+                raise TypeError(
+                    f"attribute `{self.name}` must be of type {self.req_type} not {type(value)}"
+                )
+        old_value = getattr(instance, self.private_name, "<--missing-->")
+        if old_value == value:
+            return
+        else:
+            setattr(instance, self.private_name, value)
+            try:
+                instance.mangle()
+            except AttributeError:
+                pass
+
+
 class Model(NumbaModel, OptimizeMixin, PanelMixin):
     def __init__(self, *args, **kwargs):
         PanelMixin.__init__(self, *args, **kwargs)
@@ -63,17 +93,22 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             raise ValueError("invalid compute engine")
         self._compute_engine = engine
 
-    @property
-    def n_draws(self):
-        return self._n_draws
+    prerolled_draws = MangleOnChange(bool)
+    common_draws = MangleOnChange(bool)
+    n_draws = MangleOnChange(int)
+    seed = MangleOnChange()
 
-    @n_draws.setter
-    def n_draws(self, n):
-        if n == self._n_draws:
-            return
-        else:
-            self._n_draws = n
-            self.mangle()
+    # @property
+    # def n_draws(self):
+    #     return self._n_draws
+    #
+    # @n_draws.setter
+    # def n_draws(self, n):
+    #     if n == self._n_draws:
+    #         return
+    #     else:
+    #         self._n_draws = n
+    #         self.mangle()
 
     @property
     def pstderr(self):
@@ -287,6 +322,12 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
 
         random_key, draws = jax.lax.scan(body, random_key, None, n_cases)
         return draws, random_key
+
+    def check_random_draws(self, engine="numpy"):
+        if self.mixtures:
+            if self.prerolled_draws:
+                if self._draws is None:
+                    self.make_random_draws(engine=engine)
 
     def apply_random_draws(self, parameters, draws=None):
         # if draws is None:
@@ -630,6 +671,65 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         return likely
 
     @jitmethod(static_argnums=(3,), static_argnames="n_draws")
+    def _jax_random_params(self, params, databundle, groupbundle=None, n_draws=100):
+        if self.prerolled_draws:
+            draws = groupbundle.get("draws", None)
+        else:
+            rk = groupbundle.get("rk", None)
+            draws, _ = self._make_random_draws_out(n_draws, len(self.mixtures), rk)
+        rand_params = self.apply_random_draws(params, draws)
+        return rand_params
+
+    @jitmethod
+    def jax_random_params(self, params):
+        ca = _get_jnp_array(self.dataset, "ca")
+        co = _get_jnp_array(self.dataset, "co")
+        av = _as_jnp_array(self._data_arrays.av)
+        ch = _as_jnp_array(self._data_arrays.ch)
+        n_draws = self.n_draws
+        seed = getattr(self, "seed", 42)
+        if av is not None:
+            depth = av.ndim - 1
+            shape = av.shape[:-1]
+        elif co is not None:
+            depth = co.ndim - 1
+            shape = co.shape[:-1]
+        elif ca is not None:
+            depth = ca.ndim - 2
+            shape = ca.shape[:-2]
+        elif ch is not None:
+            depth = ch.ndim - 1
+            shape = ch.shape[:-1]
+        else:
+            raise ValueError("missing data")
+        random_key = jax.random.PRNGKey(seed)
+        if self.groupid is not None:
+            depth = depth - 1
+            shape = shape[:-1]
+        f = self._jax_random_params  # params, databundle, groupbundle=None, n_draws=100
+        from .random import keysplit
+
+        commons = None if self.common_draws else 0
+        for i in range(depth):
+            f = jax.vmap(f, in_axes=(None, 0, commons, None))
+            if not self.prerolled_draws:
+                random_key, shape = keysplit(random_key, shape)
+        if self.prerolled_draws:
+            return f(
+                params,
+                {"ca": ca, "co": co, "av": av, "ch": ch},
+                {"draws": self._draws},
+                n_draws,
+            )
+        else:
+            return f(
+                params,
+                {"ca": ca, "co": co, "av": av, "ch": ch},
+                {"rk": random_key},
+                n_draws,
+            )
+
+    @jitmethod(static_argnums=(3,), static_argnames="n_draws")
     def _jax_loglike_casewise(self, params, databundle, groupbundle=None, n_draws=100):
         if len(self.mixtures) == 0:
             logpr = self._jax_log_probability(params, databundle)
@@ -751,6 +851,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         #     raise NotImplementedError(f"{kwargs.popitem()[0]} with engine=jax")
         if x is not None:
             self.pvals = x
+        self.check_random_draws()
         result = float(self.jax_loglike(self.pvals))
         if start_case is None and stop_case is None and step_case is None:
             self._check_if_best(result)
@@ -785,6 +886,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         #     raise NotImplementedError(f"{kwargs.popitem()[0]} with engine=jax")
         if x is not None:
             self.pvals = x
+        self.check_random_draws()
         result = self.jax_d_loglike(self.pvals)
 
         if return_series:
@@ -818,6 +920,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         #     raise NotImplementedError(f"{kwargs.popitem()[0]} with engine=jax")
         if x is not None:
             self.pvals = x
+        self.check_random_draws()
         result = np.asarray(self.jax_loglike_casewise(self.pvals))
         return result
 
@@ -854,6 +957,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
 
         """
         if self.compute_engine == "jax":
+            self.check_random_draws()
             return self.jax_maximize_loglike(*args, **kwargs)
         else:
             return super().maximize_loglike(*args, **kwargs)
@@ -884,5 +988,6 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         elif use_cache == -1:
             raise ValueError("no cached value")
         else:
+            self.check_random_draws()
             self._cached_loglike_null = float(self.jax_loglike(self.pnullvals))
             return self._cached_loglike_null
