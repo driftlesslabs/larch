@@ -1,8 +1,13 @@
+import altair as alt
 import numpy
+import numpy as np
 import pandas
+import pandas as pd
 from matplotlib import pyplot as plt
+from xarray import Dataset
 
-from .. import Model
+from ..dataset import DataTree
+from ..model.basemodel import BaseModel
 from .plotting import plot_as_svg_xhtml
 
 
@@ -338,6 +343,128 @@ def distribution_figure(
     return result
 
 
+def histogram_on_idca_variable(
+    x,
+    pr,  # array-like
+    *,
+    ds: Dataset = None,
+    dt: DataTree = None,
+    bins=10,
+    x_label=None,
+    y_label="Relative Frequency",
+    prob_label="Modeled",
+    obs_label="Observed",
+    span=None,
+):
+    """
+
+    Parameters
+    ----------
+    x : str or array-like
+    pr
+    ds : Dataset
+    dt : DataTree
+    bins : int, optional
+    x_label : str, optional
+    y_label : str, default "Relative Frequency"
+    prob_label : str, default "Modeled"
+    obs_label : str, default "Observed"
+    span : tuple, optional
+
+    Returns
+    -------
+    altair.Chart
+    """
+    ch = None
+    av = None
+
+    if isinstance(x, str):
+        x_label = x_label or x
+        if ds is not None and "ca" in ds and x in ds["var_ca"]:
+            x = ds["ca"].sel(var_ca=x).values.reshape(-1)
+        if isinstance(x, str) and dt is not None:
+            x = dt.get_expr(x, allow_native=False).values.reshape(-1)
+
+    if isinstance(x, str):
+        raise ValueError("x not decoded")
+
+    n_cases = pr.shape[0]
+    n_alts = pr.shape[1]
+
+    if ds is not None:
+        if "ch" in ds:
+            ch = ds["ch"].values[:, :n_alts].reshape(-1)
+        if "av" in ds:
+            av = (ds["av"].values[:, :n_alts] != 0).reshape(-1)
+    else:
+        raise NotImplementedError
+
+    if isinstance(bins, int):
+        # Equal width bin generation using only available alternatives
+        x_ = x[av]
+        if span is not None:
+            range_low, range_high = span
+            if range_low is None:
+                range_low = x_.min()
+            if range_high is None:
+                range_high = x_.max()
+        else:
+            range_low = x_.min()
+            range_high = x_.max()
+        bins = numpy.linspace(range_low, range_high, bins + 1)
+
+    y_points_1, x1 = numpy.histogram(
+        x,
+        weights=pr.reshape(x.shape),
+        bins=bins,
+        density=True,
+    )
+
+    y_points_2, x2 = numpy.histogram(
+        x,
+        weights=ch.reshape(x.shape),
+        bins=x1,
+        density=True,
+    )
+
+    d1 = {
+        x_label: x1,
+        y_label: np.append(y_points_1, 0),
+        "source": prob_label,
+        "strokeOpacity": 1,
+        "fillOpacity": 0,
+    }
+    d2 = {
+        x_label: x1,
+        y_label: np.append(y_points_2, 0),
+        "source": obs_label,
+        "strokeOpacity": 0,
+        "fillOpacity": 1,
+    }
+
+    fig_data = pd.concat(
+        [
+            pd.DataFrame(d1),
+            pd.DataFrame(d2),
+        ]
+    )
+
+    return (
+        alt.Chart(fig_data)
+        .mark_area(
+            interpolate="step-after",
+            line=True,
+        )
+        .encode(
+            x=x_label,
+            y=alt.Y(y_label, axis=alt.Axis(labels=False)),
+            color="source",
+            fillOpacity=alt.FillOpacity("fillOpacity", scale=None),
+            strokeOpacity=alt.StrokeOpacity("strokeOpacity", scale=None),
+        )
+    )
+
+
 def distribution_on_idca_variable(
     model,
     x,
@@ -363,11 +490,11 @@ def distribution_on_idca_variable(
 
     Parameters
     ----------
-    model : Model
+    model : BaseModel
             The discrete choice model to analyze.
     x : str or array-like
             The name of an `idca` variable, or an array giving its values.  If this name exactly
-            matches that of an `idca` column in the model's loaded `dataframes`, then
+            matches that of an `idca` column in the model's loaded `dataset`, then
             those values are used, otherwise the variable is loaded from the model's
             `dataservice`.
     xlabel : str, optional
@@ -441,20 +568,16 @@ def distribution_on_idca_variable(
 
     if isinstance(x, str):
         x_label = x
-        if (
-            model.dataframes
-            and model.dataframes.data_ca_or_ce is not None
-            and x in model.dataframes.data_ca_or_ce
-        ):
-            x = model.dataframes.data_ca_or_ce[x].values.reshape(-1)
-        elif model.dataservice is not None:
-            x = (
-                model.dataservice.make_dataframes({"ca": [x]}, explicit=True)
-                .array_ca()
-                .reshape(-1)
-            )
-        elif getattr(model, "datatree", None) is not None:
-            x = model.datatree.get_expr(x).values
+        if model.dataset and "ca" in model.dataset and x in model.dataset["var_ca"]:
+            x = model.dataset["ca"][x].values.reshape(-1)
+        # elif model.dataservice is not None:
+        #     x = (
+        #         model.dataservice.make_dataframes({"ca": [x]}, explicit=True)
+        #         .array_ca()
+        #         .reshape(-1)
+        #     )
+        # elif getattr(model, "datatree", None) is not None:
+        #     x = model.datatree.get_expr(x).values
         else:
             raise ValueError("model is missing data source")
     else:
@@ -493,12 +616,9 @@ def distribution_on_idca_variable(
             x = x.cat.codes
         else:
             x_ = x
-            if model.dataframes is not None:
-                if (
-                    model.dataframes.data_av is not None
-                    and model.dataframes.data_ca is not None
-                ):
-                    x_ = x[model.dataframes.data_av.values.reshape(-1) != 0]
+            if model.dataset is not None:
+                if "av" in model.dataset and model.dataframes.data_ca is not None:
+                    x_ = x[model.dataset["av"].values.reshape(-1) != 0]
             elif getattr(model, "datatree", None) is not None:
                 if model.availability_ca_var or model.availability_co_vars:
                     raise NotImplementedError
@@ -519,12 +639,12 @@ def distribution_on_idca_variable(
                 bins = numpy.percentile(x_, pct_bins)
     elif (
         isinstance(bins, int)
-        and model.dataframes is not None
-        and model.dataframes.data_av is not None
-        and model.dataframes.data_ca is not None
+        and model.dataset is not None
+        and "av" in model.dataset
+        and "ca" in model.dataset
     ):
         # Equal width bin generation using only available alternatives
-        x_ = x[model.dataframes.data_av.values.reshape(-1) != 0]
+        x_ = x[model.dataset["av"].values.reshape(-1) != 0]
         if range is not None:
             range_low, range_high = range
             if range_low is None:
@@ -539,16 +659,19 @@ def distribution_on_idca_variable(
     if probability is None:
         probability = model.probability()
 
-    if model.dataframes is not None:
-        n_alts = model.dataframes.n_alts
+    if model.dataset is not None:
+        n_alts = model.dataset.dc.n_alts
     elif getattr(model, "datatree", None) is not None:
         n_alts = model.datatree.n_alts
     else:
         raise ValueError("model is missing data source")
     model_result = probability[:, :n_alts]
-    if model.dataframes is not None:
-        model_choice = model.dataframes.data_ch.values
-        model_wt = model.dataframes.data_wt
+    if model.dataset is not None:
+        model_choice = model.dataset["ch"].values
+        if "wt" in model.dataset:
+            model_wt = model.dataset["wt"]
+        else:
+            model_wt = None
     else:
         model_choice = model.data_as_loaded["ch"].values
         if "wt" in model.data_as_loaded:
@@ -564,15 +687,7 @@ def distribution_on_idca_variable(
 
     if subselector is not None:
         if isinstance(subselector, str):
-            if model.dataservice is not None:
-                subselector = (
-                    model.dataservice.make_dataframes(
-                        {"co": [subselector]}, explicit=True
-                    )
-                    .array_co(dtype=bool)
-                    .reshape(-1)
-                )
-            elif getattr(model, "datatree", None) is not None:
+            if getattr(model, "datatree", None) is not None:
                 subselector = model.datatree.get_expr(subselector).values.astype(bool)
         x = numpy.asarray(x).reshape(*model_result.shape)[subselector].reshape(-1)
         model_result = model_result[subselector]
@@ -684,7 +799,7 @@ def distribution_on_idca_variable(
     return result
 
 
-Model.distribution_on_idca_variable = distribution_on_idca_variable
+BaseModel.distribution_on_idca_variable = distribution_on_idca_variable
 
 
 def share_figure(
@@ -1097,7 +1212,7 @@ def distribution_on_idco_variable(
 
     Parameters
     ----------
-    model : Model
+    model : BaseModel
             The discrete choice model to analyze.
     x : str or array-like
             The name of an `idco` variable, or an array giving its values.  If this name exactly
@@ -1420,4 +1535,4 @@ def distribution_on_idco_variable(
     return result
 
 
-Model.distribution_on_idco_variable = distribution_on_idco_variable
+BaseModel.distribution_on_idco_variable = distribution_on_idco_variable

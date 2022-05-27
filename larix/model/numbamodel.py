@@ -2137,6 +2137,21 @@ class NumbaModel(_BaseModel):
         self.add_parameter_array("ihess", ihess)
         return se, hess, ihess
 
+    def histogram_on_idca_variable(
+        self,
+        x,
+        **kwargs,
+    ):
+        from ..util.figures import histogram_on_idca_variable
+
+        return histogram_on_idca_variable(
+            x,
+            pr=self.probability(),  # array-like
+            ds=self.dataset,
+            dt=self.datatree,
+            **kwargs,
+        )
+
 
 @njit(cache=True)
 def _arr_inflate(arr, locks):
