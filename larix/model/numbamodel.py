@@ -910,6 +910,9 @@ class NumbaModel(_BaseModel):
 
         return save_model(self, filename, format=format, overwrite=overwrite)
 
+    def dumps(self):
+        return repr(self.save(None, format="raw"))
+
     @classmethod
     def from_dict(cls, content):
         self = cls()

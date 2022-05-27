@@ -12,6 +12,7 @@ from .model.basemodel import BaseModel
 from .model.jaxmodel import Model
 from .model.latent_class import LatentClass, MixedLatentClass
 from .model.param_core import ParameterBucket
+from .model.saving import load_model
 from .shorts import PX, P, X
 
 # Get decorated version when in development

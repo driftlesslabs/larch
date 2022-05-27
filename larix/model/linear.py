@@ -2,7 +2,7 @@ import keyword as _keyword
 import re
 import re as _re
 import sys
-from collections.abc import MutableMapping
+from collections.abc import Mapping, MutableMapping
 from numbers import Number as _Number
 
 import numpy as _numpy
@@ -925,12 +925,13 @@ class LinearFunction:
     _instance = None
 
     def __init__(self, init=None):
+        self._func = list()
         if init is not None and init != 0:
             # Copy contents of init, stabilizes functionality of iadd
             init_ = list(init)
-        self._func = list()
-        if init is not None and init != 0:
             for i in init_:
+                if isinstance(i, Mapping):
+                    i = LinearComponent(**i)
                 if isinstance(i, LinearComponent):
                     self._func.append(i)
                 else:

@@ -67,6 +67,21 @@ def save_model(m, filename=None, format="yaml", overwrite=False):
 
 
 def load_model(filename_or_content):
+    if isinstance(filename_or_content, str) and os.path.exists(filename_or_content):
+        if filename_or_content.endswith(".html") or filename_or_content.endswith(
+            ".xhtml"
+        ):
+            from .. import read_metadata
+
+            try:
+                y = read_metadata(filename_or_content)
+            except:
+                raise
+            else:
+                if isinstance(y, str) and "\n" in y:
+                    y = Dict.load(y)
+                if y is not None:
+                    filename_or_content = y
     return _load_model_yaml(filename_or_content)
 
 
