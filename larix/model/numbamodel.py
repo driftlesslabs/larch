@@ -2113,22 +2113,42 @@ class NumbaModel(_BaseModel):
     def calculate_parameter_covariance(self, pvals=None):
         if pvals is None:
             pvals = self.pvals
+        locks = np.asarray(self.pholdfast.astype(bool))
         if self.compute_engine == "jax":
             se, hess, ihess = self.jax_param_cov(pvals)
         else:
             hess = -self.d2_loglike(pvals)
             if self.parameters["holdfast"].sum():
-                ihess = np.linalg.pinv(hess)
+                free = self.pholdfast == 0
+                hess_ = hess[free][:, free]
+                ihess_ = np.linalg.inv(hess_)
+                ihess = _arr_inflate(ihess_, locks)
             else:
                 ihess = np.linalg.inv(hess)
             se = np.sqrt(ihess.diagonal())
             self.pstderr = se
         hess = np.asarray(hess).copy()
-        hess[self.pholdfast.astype(bool), :] = 0
-        hess[:, self.pholdfast.astype(bool)] = 0
+        hess[locks, :] = 0
+        hess[:, locks] = 0
         ihess = np.asarray(ihess).copy()
-        ihess[self.pholdfast.astype(bool), :] = 0
-        ihess[:, self.pholdfast.astype(bool)] = 0
+        ihess[locks, :] = 0
+        ihess[:, locks] = 0
         self.add_parameter_array("hess", hess)
         self.add_parameter_array("ihess", ihess)
         return se, hess, ihess
+
+
+@njit(cache=True)
+def _arr_inflate(arr, locks):
+    s = locks.size
+    z = np.zeros((s, s), dtype=arr.dtype)
+    i_ = 0
+    for i in range(s):
+        if not locks[i]:
+            j_ = 0
+            for j in range(s):
+                if not locks[j]:
+                    z[i, j] = arr[i_, j_]
+                    j_ += 1
+            i_ += 1
+    return z
