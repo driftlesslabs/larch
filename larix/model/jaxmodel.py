@@ -341,6 +341,38 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         return parameters
 
     @jitmethod
+    def _jax_quantity(self, params, databundle):
+        ca = databundle.get("ca", None)
+        av = databundle.get("av", None)
+        n_alts = self.dataset.dc.n_alts
+        n_nodes = len(self.graph)
+        u = jnp.zeros([n_nodes])
+        if ca is not None and self._fixed_arrays.qca_param_slot.size:
+            u = u.at[:n_alts].add(
+                jnp.dot(
+                    ca[..., self._fixed_arrays.qca_data_slot],
+                    jnp.exp(params[self._fixed_arrays.qca_param_slot])
+                    * self._fixed_arrays.qca_scale,
+                )
+            )
+        return u
+
+    @jitmethod
+    def jax_quantity(self, params):
+        ca = _get_jnp_array(self.dataset, "ca")
+        av = _as_jnp_array(self._data_arrays.av)
+        if av is not None:
+            depth = av.ndim - 1
+        elif ca is not None:
+            depth = ca.ndim - 2
+        else:
+            raise ValueError("missing data")
+        f = self._jax_quantity
+        for level in range(depth):
+            f = jax.vmap(f, in_axes=(None, 0))
+        return f(params, {"ca": ca, "av": av})
+
+    @jitmethod
     def _jax_utility(self, params, databundle):
         ca = databundle.get("ca", None)
         co = databundle.get("co", None)
@@ -355,7 +387,13 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         x = x.at[self._fixed_arrays.uco_alt_slot, self._fixed_arrays.uco_data_slot].add(
             params[self._fixed_arrays.uco_param_slot] * self._fixed_arrays.uco_scale
         )
-        u = jnp.zeros([n_nodes])
+        if self._fixed_arrays.qca_param_slot.size:
+            theta = params[self._fixed_arrays.qscale_param_slot]
+            q = self._jax_quantity(params, databundle)
+            log_q = jnp.log(jnp.clip(q, 1e-15, 1e15))
+            u = jnp.clip(log_q, -1e15) * theta
+        else:
+            u = jnp.zeros([n_nodes])
         if ca is not None and self._fixed_arrays.uca_param_slot.size:
             u = u.at[:n_alts].add(
                 jnp.dot(
@@ -594,6 +632,27 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         for level in range(depth):
             f = jax.vmap(f, in_axes=(None, 0))
         return f(params, {"ca": ca, "co": co, "av": av})
+
+    def utility(
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        return_format=None,
+    ):
+        if self.compute_engine != "jax":
+            return super().utility(
+                x=x,
+                start_case=start_case,
+                stop_case=stop_case,
+                step_case=step_case,
+                return_format=return_format,
+            )
+        if x is not None:
+            self.pvals = x
+        return self.jax_utility(self.pvals)
 
     @jitmethod
     def _jax_log_probability(self, params, databundle):
@@ -888,7 +947,6 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             self.pvals = x
         self.check_random_draws()
         result = self.jax_d_loglike(self.pvals)
-
         if return_series:
             result = pd.Series(result, index=self.pnames)
         return result
