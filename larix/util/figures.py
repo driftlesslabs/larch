@@ -368,6 +368,7 @@ def histogram_on_idca_variable(
     prob_label="Modeled",
     obs_label="Observed",
     span=None,
+    filter_co=None,
 ):
     """
 
@@ -383,6 +384,7 @@ def histogram_on_idca_variable(
     prob_label : str, default "Modeled"
     obs_label : str, default "Observed"
     span : tuple, optional
+    filter_co : str or array-like, optional
 
     Returns
     -------
@@ -425,6 +427,20 @@ def histogram_on_idca_variable(
             range_low = x_.min()
             range_high = x_.max()
         bins = numpy.linspace(range_low, range_high, bins + 1)
+
+    if filter_co is not None:
+        if isinstance(filter_co, str):
+            if ds is not None and "co" in ds and filter_co in ds["var_co"]:
+                filter_co = ds["co"].sel(var_co=filter_co).values.astype(bool)
+            if isinstance(filter_co, str) and dt is not None:
+                datatree_co = dt.idco_subtree()
+                filter_co = datatree_co.get_expr(
+                    filter_co, allow_native=False
+                ).values.astype(bool)
+        filter_shape = tuple(filter_co.shape) + (-1,)
+        x = numpy.asarray(x).reshape(*filter_shape)[filter_co].reshape(-1)
+        pr = pr.reshape(*filter_shape)[filter_co].reshape(-1)
+        ch = ch.reshape(*filter_shape)[filter_co].reshape(-1)
 
     y_points_1, x1 = numpy.histogram(
         x,
