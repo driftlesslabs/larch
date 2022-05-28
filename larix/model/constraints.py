@@ -369,8 +369,8 @@ class FixedBound(ParametricConstraint):
         return f"larch.FixedBound({self.p},{self.minimum},{self.maximum})"
 
     def link_model(self, model, scale=None):
-        self.i = model.parameters.indexes["param_name"].get_loc(self.p)
-        self.len = model.parameters.dims["param_name"]
+        self.i = model.get_param_loc(self.p)
+        self.len = model.n_params
         if scale is not None:
             self.scale = scale
 

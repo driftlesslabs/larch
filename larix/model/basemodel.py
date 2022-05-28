@@ -259,6 +259,26 @@ class BaseModel:
         self.unmangle()
         return self._parameter_bucket.get_param_loc(name)
 
+    def get_value(self, name, *, default=None):
+        if name is None and default is not None:
+            return default
+        if isinstance(name, dict):
+            return {k: self.get_value(v) for k, v in name.items()}
+        try:
+            from .linear import LinearComponent, ParameterRef
+            from .linear_math import ParameterOp
+
+            if isinstance(name, (ParameterRef, ParameterOp)):
+                return name.value(self)
+            if isinstance(name, (LinearComponent, LinearFunction)):
+                return name.as_pmath().value(self)
+            return self.pvals[self.get_param_loc(name)]
+        except KeyError:
+            if default is not None:
+                return default
+            else:
+                raise
+
     @property
     def pf(self):
         self.unmangle()
