@@ -2192,8 +2192,6 @@ class NumbaModel(_BaseModel):
         except:
             pass
 
-        print(f"{constraints=}")
-
         if constraints:
             binding_constraints = list()
             self.add_parameter_array("unconstrained_std_err", self.pstderr)

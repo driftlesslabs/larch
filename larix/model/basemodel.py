@@ -986,11 +986,12 @@ class BaseModel:
         if "std_err" in pbucket._params:
             se = pbucket.pstderr
             tabledata["Std Err"] = se
-            tabledata["t Stat"] = (pbucket.pvals - pbucket.pnullvals) / se
+            tstat = (pbucket.pvals - pbucket.pnullvals) / np.where(se, se, 1.0)
+            tabledata["t Stat"] = np.where(se, tstat, np.nan)
         tabledata["Null Value"] = pbucket.pnullvals
 
-        # TODO constrained
-        tabledata["Constrained"] = pbucket.parameters["constrained"]
+        if "constrained" in pbucket.parameters:
+            tabledata["Constrained"] = pbucket.parameters["constrained"]
 
         result = pd.DataFrame(tabledata, index=pbucket.pnames).rename_axis(
             index="Parameter"
