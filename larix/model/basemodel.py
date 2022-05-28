@@ -990,6 +990,8 @@ class BaseModel:
         tabledata["Null Value"] = pbucket.pnullvals
 
         # TODO constrained
+        tabledata["Constrained"] = pbucket.parameters["constrained"]
+
         result = pd.DataFrame(tabledata, index=pbucket.pnames).rename_axis(
             index="Parameter"
         )

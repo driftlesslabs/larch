@@ -2110,6 +2110,52 @@ class NumbaModel(_BaseModel):
 
         return maximize_loglike(self, *args, **kwargs)
 
+    def _get_bounds_constraints(self, binding_tol=1e-4):
+        """
+        Convert bounds to parametric constraints on the model.
+
+        Parameters
+        ----------
+        binding_tol : Number or Mapping
+            The binding tolerance to use, which determines
+            whether a constraint is considered active or not.
+
+        Returns
+        -------
+        list
+            A list of constraints.
+        """
+        from numbers import Number
+        from typing import Mapping
+
+        from .constraints import FixedBound
+
+        if isinstance(binding_tol, Number):
+            default_binding_tol = binding_tol
+        else:
+            default_binding_tol = 1e-4
+        if not isinstance(binding_tol, Mapping):
+            binding_tol = {}
+        get_bind_tol = lambda x: binding_tol.get(x, default_binding_tol)
+        bounds = []
+        self.unmangle()
+        for pname, phold, pmin, pmax in zip(
+            self.pnames,
+            self.pholdfast,
+            self.pminimum,
+            self.pmaximum,
+        ):
+            if phold:
+                # don't create bounds constraints on holdfast parameters
+                continue
+            if pmin != -np.inf or pmax != np.inf:
+                bounds.append(
+                    FixedBound(
+                        pname, pmin, pmax, model=self, binding_tol=get_bind_tol(pname)
+                    )
+                )
+        return bounds
+
     def calculate_parameter_covariance(self, pvals=None):
         if pvals is None:
             pvals = self.pvals
@@ -2135,6 +2181,59 @@ class NumbaModel(_BaseModel):
         ihess[:, locks] = 0
         self.add_parameter_array("hess", hess)
         self.add_parameter_array("ihess", ihess)
+
+        # constrained covariance
+        if self.constraints:
+            constraints = list(self.constraints)
+        else:
+            constraints = []
+        try:
+            constraints.extend(self._get_bounds_constraints())
+        except:
+            pass
+
+        print(f"{constraints=}")
+
+        if constraints:
+            binding_constraints = list()
+            self.add_parameter_array("unconstrained_std_err", self.pstderr)
+            self.add_parameter_array("unconstrained_covariance_matrix", ihess)
+
+            s = np.asarray(ihess)
+            pvals = self.pvals
+            for c in constraints:
+                if np.absolute(c.fun(pvals)) < c.binding_tol:
+                    binding_constraints.append(c)
+                    b = c.jac(self.pf.value)
+                    den = b @ s @ b
+                    if den != 0:
+                        s = s - (1 / den) * s @ b.reshape(-1, 1) @ b.reshape(1, -1) @ s
+            self.add_parameter_array("covariance_matrix", s)
+            self.pstderr = np.sqrt(s.diagonal())
+
+            # Fix numerical issues on some constraints, add constrained notes
+            if binding_constraints or any(self.pholdfast != 0):
+                notes = {}
+                for c in binding_constraints:
+                    pa = c.get_parameters()
+                    for p in pa:
+                        # if self.pf.loc[p, 't_stat'] > 1e5:
+                        #     self.pf.loc[p, 't_stat'] = np.inf
+                        #     self.pf.loc[p, 'std_err'] = np.nan
+                        # if self.pf.loc[p, 't_stat'] < -1e5:
+                        #     self.pf.loc[p, 't_stat'] = -np.inf
+                        #     self.pf.loc[p, 'std_err'] = np.nan
+                        n = notes.get(p, [])
+                        n.append(c.get_binding_note(pvals))
+                        notes[p] = n
+                constrained_note = (
+                    pd.Series({k: "\n".join(v) for k, v in notes.items()}, dtype=object)
+                    .reindex(self.pnames)
+                    .fillna("")
+                )
+                constrained_note[self.pholdfast != 0] = "fixed value"
+                self.add_parameter_array("constrained", constrained_note)
+
         return se, hess, ihess
 
     def histogram_on_idca_variable(

@@ -1,16 +1,17 @@
+import re
+from abc import ABC, abstractmethod
+from collections.abc import MutableSequence
 
 import numpy as np
 from scipy.optimize import LinearConstraint
-from abc import ABC, abstractmethod
-import re
+
 
 class ParametricConstraint(ABC):
-
     def __init__(self, binding_tol=1e-4):
         self.binding_tol = binding_tol
 
     def is_binding(self, x):
-        return (np.absolute(self.fun(x)) < self.binding_tol)
+        return np.absolute(self.fun(x)) < self.binding_tol
 
     @abstractmethod
     def get_parameters(self):
@@ -33,12 +34,22 @@ class ParametricConstraint(ABC):
         raise NotImplementedError("abstract base class, use a derived class instead")
 
     def as_constraint_dicts(self):
-        return [dict(type='ineq', fun=self.fun, jac=self.jac),]
+        return [
+            dict(type="ineq", fun=self.fun, jac=self.jac),
+        ]
 
 
 class RatioBound(ParametricConstraint):
-
-    def __init__(self, p_num, p_den, min_ratio=None, max_ratio=None, model=None, scale=10, binding_tol=1e-4):
+    def __init__(
+        self,
+        p_num,
+        p_den,
+        min_ratio=None,
+        max_ratio=None,
+        model=None,
+        scale=10,
+        binding_tol=1e-4,
+    ):
         self.i_num = 0
         self.i_den = 0
         self.cmin_num = 0.0
@@ -66,32 +77,36 @@ class RatioBound(ParametricConstraint):
             self.i_den = model._frame.index.get_loc(self.p_den)
             self.len = len(model._frame)
             if self.min_ratio is not None:
-                scaling = max(self.min_ratio, 1/self.min_ratio) * self.scale
-                if model._frame.loc[self.p_den, 'minimum'] >= 0:
+                scaling = max(self.min_ratio, 1 / self.min_ratio) * self.scale
+                if model._frame.loc[self.p_den, "minimum"] >= 0:
                     # positive denominator
                     self.cmin_num = 1 * scaling
                     self.cmin_den = -self.min_ratio * scaling
-                elif model._frame.loc[self.p_den, 'maximum'] <= 0:
+                elif model._frame.loc[self.p_den, "maximum"] <= 0:
                     # negative denominator
                     self.cmin_num = -1 * scaling
                     self.cmin_den = self.min_ratio * scaling
                 else:
-                    raise ValueError('denominator must be bounded to be non-positive or non-negative')
+                    raise ValueError(
+                        "denominator must be bounded to be non-positive or non-negative"
+                    )
             else:
                 self.cmin_num = 0
                 self.cmin_den = 0
             if self.max_ratio is not None:
-                scaling = max(self.max_ratio, 1/self.max_ratio) * self.scale
-                if model._frame.loc[self.p_den, 'minimum'] >= 0:
+                scaling = max(self.max_ratio, 1 / self.max_ratio) * self.scale
+                if model._frame.loc[self.p_den, "minimum"] >= 0:
                     # positive denominator
                     self.cmax_num = -1 * scaling
                     self.cmax_den = self.max_ratio * scaling
-                elif model._frame.loc[self.p_den, 'maximum'] <= 0:
+                elif model._frame.loc[self.p_den, "maximum"] <= 0:
                     # negative denominator
                     self.cmax_num = 1 * scaling
                     self.cmax_den = -self.max_ratio * scaling
                 else:
-                    raise ValueError('denominator must be bounded to be non-positive or non-negative')
+                    raise ValueError(
+                        "denominator must be bounded to be non-positive or non-negative"
+                    )
             else:
                 self.cmax_num = 0
                 self.cmax_den = 0
@@ -128,16 +143,18 @@ class RatioBound(ParametricConstraint):
             return f"{self.p_num!s} / {self.p_den!s} ≤ {self.max_ratio}"
 
     def as_linear_constraints(self):
-        a = np.zeros([2,self.len], dtype='float64')
-        a[0,self.i_num] = self.cmin_num
-        a[0,self.i_den] = self.cmin_den
-        a[1,self.i_num] = self.cmax_num
-        a[1,self.i_den] = self.cmax_den
+        a = np.zeros([2, self.len], dtype="float64")
+        a[0, self.i_num] = self.cmin_num
+        a[0, self.i_den] = self.cmin_den
+        a[1, self.i_num] = self.cmax_num
+        a[1, self.i_den] = self.cmax_den
         return [LinearConstraint(a, 0, np.inf)]
 
     def as_soft_penalty(self):
-        from numba import njit, float32, float64
-        from ..numba.model import softplus, d_softplus
+        from numba import float32, float64, njit
+
+        from ..numba.model import d_softplus, softplus
+
         i_num = self.i_num
         i_den = self.i_den
         cmin_num = self.cmin_num
@@ -145,23 +162,33 @@ class RatioBound(ParametricConstraint):
         cmax_num = self.cmax_num
         cmax_den = self.cmax_den
         scale = self.scale
-        @njit([
-            float32(float32[:], float32, float32),
-            float64(float64[:], float64, float64),
-        ])
+
+        @njit(
+            [
+                float32(float32[:], float32, float32),
+                float64(float64[:], float64, float64),
+            ]
+        )
         def penalty(x, intensity, sharpness=1.0):
             _min = x[i_num] * cmin_num + x[i_den] * cmin_den
             _max = x[i_num] * cmax_num + x[i_den] * cmax_den
             return -softplus(-np.minimum(_min, _max) * scale * intensity, sharpness)
-        @njit([
-            float32[:](float32[:], float32, float32),
-            float64[:](float64[:], float64, float64),
-        ])
+
+        @njit(
+            [
+                float32[:](float32[:], float32, float32),
+                float64[:](float64[:], float64, float64),
+            ]
+        )
         def dpenalty(x, intensity, sharpness=1.0):
             j = np.zeros_like(x)
             _min = x[i_num] * cmin_num + x[i_den] * cmin_den
             _max = x[i_num] * cmax_num + x[i_den] * cmax_den
-            partial = d_softplus(-np.minimum(_min, _max), sharpness * scale * intensity) * scale * intensity
+            partial = (
+                d_softplus(-np.minimum(_min, _max), sharpness * scale * intensity)
+                * scale
+                * intensity
+            )
             if _min < _max:
                 j[i_num] = cmin_num * partial
                 j[i_den] = cmin_den * partial
@@ -169,10 +196,13 @@ class RatioBound(ParametricConstraint):
                 j[i_num] = cmax_num * partial
                 j[i_den] = cmax_den * partial
             return j
-        @njit([
-            float32[:](float32[:], float32),
-            float64[:](float64[:], float64),
-        ])
+
+        @njit(
+            [
+                float32[:](float32[:], float32),
+                float64[:](float64[:], float64),
+            ]
+        )
         def dpenalty_money(x, intensity):
             j = np.zeros_like(x)
             _min = x[i_num] * cmin_num + x[i_den] * cmin_den
@@ -186,31 +216,30 @@ class RatioBound(ParametricConstraint):
                 j[i_num] = cmax_num * partial
                 j[i_den] = cmax_den * partial
             return j
-        return penalty, dpenalty, dpenalty_money
 
+        return penalty, dpenalty, dpenalty_money
 
     def __eq__(self, other):
         if not isinstance(other, RatioBound):
             return False
         if (
-                (self.p_num == other.p_num)
-                and (self.p_den == other.p_den)
-                and (self.min_ratio == other.min_ratio)
-                and (self.max_ratio == other.max_ratio)
+            (self.p_num == other.p_num)
+            and (self.p_den == other.p_den)
+            and (self.min_ratio == other.min_ratio)
+            and (self.max_ratio == other.max_ratio)
         ):
             return True
         return False
 
 
 class OrderingBound(ParametricConstraint):
-
     def __init__(self, p_less, p_more=None, model=None, scale=10, binding_tol=1e-4):
         # default initializers
         self.i_less = 0
         self.i_more = 0
         if p_more is None:
             if "<=" in p_less:
-                p_less, p_more = [_.strip() for _ in p_less.split("<=",1)]
+                p_less, p_more = [_.strip() for _ in p_less.split("<=", 1)]
             elif "<" in p_less:
                 p_less, p_more = [_.strip() for _ in p_less.split("<", 1)]
             elif ">=" in p_less:
@@ -240,7 +269,7 @@ class OrderingBound(ParametricConstraint):
             self.scale = scale
 
     def fun(self, x):
-        return (x[self.i_more] - x[self.i_less])*self.scale
+        return (x[self.i_more] - x[self.i_less]) * self.scale
 
     def jac(self, x):
         j = np.zeros_like(x)
@@ -255,65 +284,79 @@ class OrderingBound(ParametricConstraint):
         return f"{self.p_less!s} ≤ {self.p_more!s}"
 
     def as_linear_constraints(self):
-        a = np.zeros([1,self.len], dtype='float64')
-        a[0,self.i_more] = self.scale
-        a[0,self.i_less] = -self.scale
+        a = np.zeros([1, self.len], dtype="float64")
+        a[0, self.i_more] = self.scale
+        a[0, self.i_less] = -self.scale
         return [LinearConstraint(a, 0, np.inf)]
 
     def as_soft_penalty(self):
-        from numba import njit, float32, float64
-        from ..numba.model import softplus, d_softplus
+        from numba import float32, float64, njit
+
+        from ..numba.model import d_softplus, softplus
+
         i_more = self.i_more
         i_less = self.i_less
         scale = self.scale
-        @njit([
-            float32(float32[:], float32, float32),
-            float64(float64[:], float64, float64),
-        ])
+
+        @njit(
+            [
+                float32(float32[:], float32, float32),
+                float64(float64[:], float64, float64),
+            ]
+        )
         def penalty(x, intensity, sharpness=1.0):
             return -softplus(-(x[i_more] - x[i_less]) * scale * intensity, sharpness)
-        @njit([
-            float32[:](float32[:], float32, float32),
-            float64[:](float64[:], float64, float64),
-        ])
+
+        @njit(
+            [
+                float32[:](float32[:], float32, float32),
+                float64[:](float64[:], float64, float64),
+            ]
+        )
         def dpenalty(x, intensity, sharpness=1.0):
             j = np.zeros_like(x)
-            partial = d_softplus(-(x[i_more] - x[i_less]), sharpness * scale * intensity) * scale * intensity
+            partial = (
+                d_softplus(-(x[i_more] - x[i_less]), sharpness * scale * intensity)
+                * scale
+                * intensity
+            )
             j[i_more] = partial
             j[i_less] = -partial
             return j
-        @njit([
-            float32[:](float32[:], float32),
-            float64[:](float64[:], float64),
-        ])
+
+        @njit(
+            [
+                float32[:](float32[:], float32),
+                float64[:](float64[:], float64),
+            ]
+        )
         def dpenalty_bind(x, intensity):
             j = np.zeros_like(x)
             diff = x[i_more] - x[i_less]
             if (
-                    (x[i_more] + x[i_less]) == 0
-                    or np.absolute(diff / (x[i_more] + x[i_less])) < 5e-3
-                    or np.absolute(diff) < 1e-6
+                (x[i_more] + x[i_less]) == 0
+                or np.absolute(diff / (x[i_more] + x[i_less])) < 5e-3
+                or np.absolute(diff) < 1e-6
             ):
                 partial = 0.5 * scale * intensity
                 j[i_more] = partial
                 j[i_less] = -partial
             return j
+
         return penalty, dpenalty, dpenalty_bind
 
     def __eq__(self, other):
         if not isinstance(other, OrderingBound):
             return False
-        if (
-                (self.p_less == other.p_less)
-                and (self.p_more == other.p_more)
-        ):
+        if (self.p_less == other.p_less) and (self.p_more == other.p_more):
             return True
         return False
 
 
 class FixedBound(ParametricConstraint):
-
-    def __init__(self, p, minimum=None, maximum=None, model=None, scale=10, binding_tol=1e-4):
+    def __init__(
+        self, p, minimum=None, maximum=None, model=None, scale=10, binding_tol=1e-4
+    ):
         super().__init__(binding_tol=binding_tol)
         self.p = p
         self.minimum = minimum
@@ -326,8 +369,8 @@ class FixedBound(ParametricConstraint):
         return f"larch.FixedBound({self.p},{self.minimum},{self.maximum})"
 
     def link_model(self, model, scale=None):
-        self.i = model._frame.index.get_loc(self.p)
-        self.len = len(model._frame)
+        self.i = model.parameters.indexes["param_name"].get_loc(self.p)
+        self.len = model.parameters.dims["param_name"]
         if scale is not None:
             self.scale = scale
 
@@ -367,33 +410,32 @@ class FixedBound(ParametricConstraint):
             return f"{self.p!s} ≤ {self.maximum}"
 
     def as_linear_constraints(self):
-        a = np.zeros([1,self.len], dtype='float64')
-        a[0,self.i] = 1
-        return [LinearConstraint(
-            a,
-            self.minimum if self.minimum is not None else -np.inf,
-            self.maximum if self.maximum is not None else np.inf,
-        )]
+        a = np.zeros([1, self.len], dtype="float64")
+        a[0, self.i] = 1
+        return [
+            LinearConstraint(
+                a,
+                self.minimum if self.minimum is not None else -np.inf,
+                self.maximum if self.maximum is not None else np.inf,
+            )
+        ]
 
     def __eq__(self, other):
         if not isinstance(other, FixedBound):
             return False
         if (
-                (self.p == other.p)
-                and (self.minimum == other.minimum)
-                and (self.maximum == other.maximum)
+            (self.p == other.p)
+            and (self.minimum == other.minimum)
+            and (self.maximum == other.maximum)
         ):
             return True
         return False
 
 
-
 #######
 
-from collections.abc import MutableSequence
 
 class ParametricConstraintList(MutableSequence):
-
     def __init__(self, init=None):
         self._cx = list()
         self.allow_dupes = False
@@ -402,7 +444,9 @@ class ParametricConstraintList(MutableSequence):
                 if isinstance(i, ParametricConstraint):
                     self._cx.append(i)
                 else:
-                    raise TypeError(f'members of {self.__class__.__name__} must be ParametricConstraint')
+                    raise TypeError(
+                        f"members of {self.__class__.__name__} must be ParametricConstraint"
+                    )
 
     def set_instance(self, instance):
         self._instance = instance
@@ -458,16 +502,16 @@ class ParametricConstraintList(MutableSequence):
 
     def __set_name__(self, owner, name):
         self.name = name
-        self.private_name = "_"+name
+        self.private_name = "_" + name
 
     def __getitem__(self, item):
         return self._cx[item]
 
-    def __setitem__(self, key:int, value):
+    def __setitem__(self, key: int, value):
         if isinstance(value, str):
             value = interpret_contraint(value)
         if not isinstance(value, ParametricConstraint):
-            raise TypeError('items must be of type ParametricConstraint')
+            raise TypeError("items must be of type ParametricConstraint")
         if self.allow_dupes or not self._is_duplicate(value):
             self._cx[key] = value
             try:
@@ -490,7 +534,7 @@ class ParametricConstraintList(MutableSequence):
         if isinstance(value, str):
             value = interpret_contraint(value)
         if not isinstance(value, ParametricConstraint):
-            raise TypeError('items must be of type ParametricConstraint')
+            raise TypeError("items must be of type ParametricConstraint")
         if self.allow_dupes or not self._is_duplicate(value):
             self._cx.insert(index, value)
             try:
@@ -517,7 +561,9 @@ class ParametricConstraintList(MutableSequence):
                     i.link_model(self._instance, scale)
         else:
             if scale is None:
-                self._cx[index].link_model(self._instance, np.exp(np.random.uniform(-3, 3)))
+                self._cx[index].link_model(
+                    self._instance, np.exp(np.random.uniform(-3, 3))
+                )
             else:
                 self._cx[index].link_model(self._instance, scale)
 
@@ -525,8 +571,9 @@ class ParametricConstraintList(MutableSequence):
 def asfloat(x):
     if "/" in x:
         x_ = x.split("/")
-        return float(x_[0])/float(x_[1])
+        return float(x_[0]) / float(x_[1])
     return float(x)
+
 
 def interpret_contraint(c):
     numbr = r"\s*([-+]?\d*\.?\d*[eE]?[-+]?\d*|\d+\/\d+)\s*"
@@ -535,7 +582,9 @@ def interpret_contraint(c):
     n_2w = f"^{numbr}(<=|<){token}(<=|<){numbr}$"
     rx = re.match(n_2w, c)
     if rx:
-        return FixedBound(rx.group(3), minimum=asfloat(rx.group(1)), maximum=asfloat(rx.group(5)))
+        return FixedBound(
+            rx.group(3), minimum=asfloat(rx.group(1)), maximum=asfloat(rx.group(5))
+        )
 
     le_n = f"^{token}(<=|<){numbr}$"
     rx = re.match(le_n, c)
@@ -580,6 +629,11 @@ def interpret_contraint(c):
     r_2w = f"^{numbr}(<=|<){token}/{token}(<=|<){numbr}$"
     rx = re.match(r_2w, c)
     if rx:
-        return RatioBound(rx.group(3), rx.group(4), min_ratio=asfloat(rx.group(1)), max_ratio=asfloat(rx.group(6)))
+        return RatioBound(
+            rx.group(3),
+            rx.group(4),
+            min_ratio=asfloat(rx.group(1)),
+            max_ratio=asfloat(rx.group(6)),
+        )
 
     raise ValueError(f"cannot interpret '{c}' as a constraint")
