@@ -262,8 +262,14 @@ class OptimizeMixin(BucketAccess):
 
     def jax_param_cov(self, params):
         hess = self.jax_d2_loglike(params)
-        if self.parameters["holdfast"].sum():
+        holds = self.parameters["holdfast"] != 0
+        frees = (self.parameters["holdfast"] == 0).astype(jnp.float32).values
+        if holds.any():
+            hess = hess * frees.reshape(-1, 1)
+            hess = hess * frees.reshape(1, -1)
             ihess = jnp.linalg.pinv(hess)
+            ihess = ihess * frees.reshape(-1, 1)
+            ihess = ihess * frees.reshape(1, -1)
         else:
             ihess = jnp.linalg.inv(hess)
         se = jnp.sqrt(ihess.diagonal())
