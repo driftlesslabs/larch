@@ -1845,7 +1845,7 @@ class NumbaModel(_BaseModel):
         )
         return -result
 
-    def neg_loglike2(
+    def logloss(
         self,
         x=None,
         start_case=None,
@@ -1855,8 +1855,8 @@ class NumbaModel(_BaseModel):
         keep_only=-1,
         subsample=-1,
     ):
-        return -self.neg_loglike2(
-            x=x,
+        result = self.loglike(
+            x,
             start_case=start_case,
             stop_case=stop_case,
             step_case=step_case,
@@ -1864,12 +1864,19 @@ class NumbaModel(_BaseModel):
             keep_only=keep_only,
             subsample=subsample,
         )
+        return -result / self.total_weight()
 
     def neg_d_loglike(self, x=None, start_case=0, stop_case=-1, step_case=1, **kwargs):
         result = self.d_loglike(
             x, start_case=start_case, stop_case=stop_case, step_case=step_case, **kwargs
         )
         return -np.asarray(result)
+
+    def d_logloss(self, x=None, start_case=0, stop_case=-1, step_case=1, **kwargs):
+        result = self.d_loglike(
+            x, start_case=start_case, stop_case=stop_case, step_case=step_case, **kwargs
+        )
+        return -np.asarray(result) / self.total_weight()
 
     def jumpstart_bhhh(
         self,
@@ -1962,14 +1969,20 @@ class NumbaModel(_BaseModel):
         return attr
 
     def __setstate__(self, state):
-        for k, v in state.items():
-            if k == "parameters":
-                self._parameter_bucket.update_parameters(v)
-            else:
-                try:
-                    setattr(self, k, v)
-                except AttributeError as err:
-                    raise AttributeError(f"{k}: {err}")
+        defer = {
+            "constraints",
+        }
+        for check in [lambda i: i in defer, lambda i: i not in defer]:
+            for k, v in state.items():
+                if check(k):
+                    continue
+                if k == "parameters":
+                    self._parameter_bucket.update_parameters(v)
+                else:
+                    try:
+                        setattr(self, k, v)
+                    except AttributeError as err:
+                        raise AttributeError(f"{k}: {err}")
 
     def copy(self, datatree=True):
         dupe = type(self)()
@@ -1977,6 +1990,39 @@ class NumbaModel(_BaseModel):
         if datatree:
             dupe.datatree = self.datatree
         return dupe
+
+    def remove_unused_parameters(self, verbose=True):
+        """
+        Remove parameters that are not used in the model.
+
+        Parameters
+        ----------
+        verbose : bool, default True
+            Generate log messages about how many parameters were dropped.
+        """
+        old_param_names = self.pnames
+        old_parameters = self.parameters
+        # clear existing parameters
+        self._parameter_bucket._params = old_parameters.reindex(
+            {self._parameter_bucket.index_name: []}
+        )
+        self.unmangle(True)
+        new_param_names = self.pnames
+        self._parameter_bucket._params = old_parameters.reindex(
+            {self._parameter_bucket.index_name: new_param_names}
+        )
+        if verbose:
+            dropped_params = [p for p in old_param_names if p not in new_param_names]
+            if len(dropped_params) == 0:
+                pass
+            elif len(dropped_params) < 4:
+                logging.getLogger("Larch").warning(
+                    f"dropped {len(dropped_params)} parameters: {', '.join(dropped_params)}"
+                )
+            else:
+                logging.getLogger("Larch").warning(
+                    f"dropped {len(dropped_params)} parameters including: {', '.join(dropped_params[:3])}"
+                )
 
     @property
     def n_cases(self):
@@ -2155,6 +2201,19 @@ class NumbaModel(_BaseModel):
                     )
                 )
         return bounds
+
+    def _get_constraints(self, method):
+        if method.lower() in ("slsqp", "cobyla"):
+            constraint_dicts = []
+            for c in self.constraints:
+                constraint_dicts.extend(c.as_constraint_dicts())
+            return constraint_dicts
+        if method.lower() in ("trust-constr"):
+            constraints = []
+            for c in self.constraints:
+                constraints.extend(c.as_linear_constraints())
+            return constraints
+        return ()
 
     def calculate_parameter_covariance(self, pvals=None):
         if pvals is None:

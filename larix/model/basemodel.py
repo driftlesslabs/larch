@@ -259,7 +259,7 @@ class BaseModel:
         self.unmangle()
         return self._parameter_bucket.get_param_loc(name)
 
-    def get_value(self, name, *, default=None):
+    def get_value(self, name, *, default=None, kind="value"):
         if name is None and default is not None:
             return default
         if isinstance(name, dict):
@@ -272,7 +272,9 @@ class BaseModel:
                 return name.value(self)
             if isinstance(name, (LinearComponent, LinearFunction)):
                 return name.as_pmath().value(self)
-            return self.pvals[self.get_param_loc(name)]
+            if kind == "value":
+                return self.pvals[self.get_param_loc(name)]
+            return self.parameters[kind].values[self.get_param_loc(name)]
         except KeyError:
             if default is not None:
                 return default

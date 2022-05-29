@@ -355,11 +355,11 @@ def maximize_loglike(
 
                 args = getattr(model, "_null_slice", (0, -1, 1))
                 raw_result = minimize(
-                    model.neg_loglike,
+                    model.logloss,
                     model.pvals,
                     args=args,  # +(leave_out, keep_only, subsample), # start_case, stop_case, step_case, leave_out, keep_only, subsample
                     method=method,
-                    jac=model.neg_d_loglike,
+                    jac=model.d_logloss,
                     bounds=bounds,
                     callback=callback,
                     options=options,
@@ -403,10 +403,10 @@ def maximize_loglike(
         result = dictx()
         for k, v in raw_result.items():
             if k == "fun":
-                result["loglike"] = -v
+                result["logloss"] = v
             elif k == "jac":
                 try:
-                    result["d_loglike"] = pd.Series(-v, index=model.pnames)
+                    result["d_logloss"] = pd.Series(-v, index=model.pnames)
                 except TypeError:
                     result[k] = v
             elif k == "x":
@@ -421,8 +421,8 @@ def maximize_loglike(
             pass
         result["iteration_number"] = iteration_number
 
-        if "loglike" in result:
-            result["logloss"] = -result["loglike"] / model.total_weight()
+        if "logloss" in result:
+            result["loglike"] = -result["logloss"] * model.total_weight()
 
         if _doctest_mode_:
             result["__verbose_repr__"] = True

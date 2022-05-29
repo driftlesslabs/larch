@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from collections.abc import MutableSequence
 
 import numpy as np
+from numba import float32, float64, njit
 from scipy.optimize import LinearConstraint
 
 
@@ -73,16 +74,16 @@ class RatioBound(ParametricConstraint):
         if scale is not None:
             self.scale = scale
         if model is not None:
-            self.i_num = model._frame.index.get_loc(self.p_num)
-            self.i_den = model._frame.index.get_loc(self.p_den)
-            self.len = len(model._frame)
+            self.i_num = model.get_param_loc(self.p_num)
+            self.i_den = model.get_param_loc(self.p_den)
+            self.len = model.n_params
             if self.min_ratio is not None:
                 scaling = max(self.min_ratio, 1 / self.min_ratio) * self.scale
-                if model._frame.loc[self.p_den, "minimum"] >= 0:
+                if model.get_value(self.p_den, kind="minimum") >= 0:
                     # positive denominator
                     self.cmin_num = 1 * scaling
                     self.cmin_den = -self.min_ratio * scaling
-                elif model._frame.loc[self.p_den, "maximum"] <= 0:
+                elif model.get_value(self.p_den, kind="maximum") <= 0:
                     # negative denominator
                     self.cmin_num = -1 * scaling
                     self.cmin_den = self.min_ratio * scaling
@@ -95,11 +96,11 @@ class RatioBound(ParametricConstraint):
                 self.cmin_den = 0
             if self.max_ratio is not None:
                 scaling = max(self.max_ratio, 1 / self.max_ratio) * self.scale
-                if model._frame.loc[self.p_den, "minimum"] >= 0:
+                if model.get_value(self.p_den, kind="minimum") >= 0:
                     # positive denominator
                     self.cmax_num = -1 * scaling
                     self.cmax_den = self.max_ratio * scaling
-                elif model._frame.loc[self.p_den, "maximum"] <= 0:
+                elif model.get_value(self.p_den, kind="maximum") <= 0:
                     # negative denominator
                     self.cmax_num = 1 * scaling
                     self.cmax_den = -self.max_ratio * scaling
@@ -151,9 +152,7 @@ class RatioBound(ParametricConstraint):
         return [LinearConstraint(a, 0, np.inf)]
 
     def as_soft_penalty(self):
-        from numba import float32, float64, njit
-
-        from ..numba.model import d_softplus, softplus
+        from .numbamodel import d_softplus, softplus  # here to avoid circular imports
 
         i_num = self.i_num
         i_den = self.i_den
@@ -253,7 +252,7 @@ class OrderingBound(ParametricConstraint):
         self.p_more = p_more
         self.scale = 1
         if model is not None:
-            self.len = len(model._frame)
+            self.len = model.n_params
             self.link_model(model, scale)
         else:
             self.len = 0
@@ -262,9 +261,9 @@ class OrderingBound(ParametricConstraint):
         return f"larch.OrderingBound({self.p_less},{self.p_more})"
 
     def link_model(self, model, scale=None):
-        self.i_less = model._frame.index.get_loc(self.p_less)
-        self.i_more = model._frame.index.get_loc(self.p_more)
-        self.len = len(model._frame)
+        self.i_less = model.get_param_loc(self.p_less)
+        self.i_more = model.get_param_loc(self.p_more)
+        self.len = model.n_params
         if scale is not None:
             self.scale = scale
 
@@ -290,9 +289,7 @@ class OrderingBound(ParametricConstraint):
         return [LinearConstraint(a, 0, np.inf)]
 
     def as_soft_penalty(self):
-        from numba import float32, float64, njit
-
-        from ..numba.model import d_softplus, softplus
+        from .numbamodel import d_softplus, softplus  # here to avoid circular imports
 
         i_more = self.i_more
         i_less = self.i_less
