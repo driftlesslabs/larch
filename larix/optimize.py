@@ -232,7 +232,7 @@ class OptimizeMixin(BucketAccess):
             if "jac" in result:
                 result["jac"] = -result["jac"]
             self.dashboard.update_content(
-                loglike=-result["loglike"],
+                loglike=result["loglike"],
                 params=self.__rich_table(result.x),
                 bestloglike=self._cached_loglike_best,
             )
