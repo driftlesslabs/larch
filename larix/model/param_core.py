@@ -124,8 +124,8 @@ class ParameterBucket:
         try:
             new_params = new_params.fillna(other[filling])
         except ValueError as err:
-            logging.getLogger(__name__).error(f"{other=}")
-            logging.getLogger(__name__).exception(f"{err=}")
+            logging.getLogger(__name__).error(f"other={other}")
+            logging.getLogger(__name__).exception(f"err={err}")
         if new_params[self.index_name].size != self._params[
             self.index_name
         ].size or any(new_params[self.index_name] != self._params[self.index_name]):
