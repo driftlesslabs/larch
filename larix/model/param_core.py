@@ -348,8 +348,8 @@ class ParameterBucket:
         maximum_ = np.where(minimum_ <= maximum_, maximum_, self.pmaximum)
 
         # set any NaN bounds to the cap
-        minimum_ = np.where(np.isnan(minimum_), minimum_, -cap)
-        maximum_ = np.where(np.isnan(maximum_), maximum_, cap)
+        minimum_ = np.where(np.isnan(minimum_), -cap, minimum_)
+        maximum_ = np.where(np.isnan(maximum_), cap, maximum_)
 
         # restore the originals for holdfast parameters
         minimum_ = np.where(self.pholdfast, self.pminimum, minimum_)
