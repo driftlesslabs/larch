@@ -22,7 +22,7 @@ def rip():
         )
     )
     os.makedirs(generator_dest, exist_ok=True)
-    print(f"{generator_dest=}")
+    print(f"generator_dest={generator_dest}")
 
     with open(os.path.join(generator_dest, ".gitignore"), "wt", encoding="utf8") as f:
         f.write(".gitignore\n*.py")
@@ -32,10 +32,10 @@ def rip():
 
     for target in targets:
         for examplefile in glob.glob(target):
-            print(f"{examplefile=}")
+            print(f"examplefile={examplefile}")
             example = os.path.basename(examplefile).replace(".ipynb", "")
             example = example.replace("-", "_")
-            print(f"  {example=}")
+            print(f"  example={example}")
             with open(
                 os.path.join(generator_dest, f"_{example}.py"), "wt", encoding="utf8"
             ) as f:
