@@ -1,4 +1,3 @@
-import altair as alt
 import numpy
 import numpy as np
 import pandas
@@ -390,6 +389,8 @@ def histogram_on_idca_variable(
     -------
     altair.Chart
     """
+    import altair as alt
+
     ch = None
     av = None
 
