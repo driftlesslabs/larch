@@ -1141,6 +1141,9 @@ class DataTree(_sharrow_DataTree):
         )
         dim_order = []
         c = self.root_dataset.dc.CASEID
+        if c is None and len(self.root_dataset.dims) == 1:
+            self.root_dataset.dc.CASEID = list(self.root_dataset.dims.keys())[0]
+        c = self.root_dataset.dc.CASEID
         if c is not None:
             dim_order.append(c)
         a = self.root_dataset.dc.ALTID
@@ -1272,6 +1275,25 @@ class DataTree(_sharrow_DataTree):
                 if self.ALTID in v.indexes:
                     return v.indexes[self.ALTID]
             raise
+
+    def set_altnames(self, alt_names):
+        """
+        Set the alternative names for this DataTree.
+
+        Parameters
+        ----------
+        altnames : Mapping or array-like
+            A mapping of (integer) codes to names, or an array or names
+            of the same length and order as the alternatives already
+            defined in this Dataset.
+        """
+        self.root_dataset = self.root_dataset.dc.set_altnames(alt_names)
+
+    def alts_mapping(self):
+        return self.root_dataset.dc.alts_mapping
+
+    def alts_name_to_id(self):
+        return dict((j, i) for (i, j) in self.alts_mapping().items())
 
     def setup_flow(self, *args, **kwargs):
         """

@@ -51,7 +51,7 @@ def test_mtc_data(mtc7):
             coords={
                 "caseid": np.arange(1, 8),
                 "altid": np.arange(1, 7),
-                "altnames": xr.DataArray(
+                "alt_names": xr.DataArray(
                     ["DA", "SR2", "SR3+", "Transit", "Bike", "Walk"],
                     dims="altid",
                 ),
@@ -77,7 +77,7 @@ def test_mtc_data(mtc7):
             coords={
                 "caseid": np.arange(1, 8),
                 "altid": np.arange(1, 7),
-                "altnames": xr.DataArray(
+                "alt_names": xr.DataArray(
                     ["DA", "SR2", "SR3+", "Transit", "Bike", "Walk"],
                     dims="altid",
                 ),

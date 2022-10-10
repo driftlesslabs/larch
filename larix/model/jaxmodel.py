@@ -148,7 +148,16 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             self._data_arrays = None
             return
 
-        datatree = self.datatree
+        if self._should_preload_data:
+            datatree = self.datatree
+        else:
+            datatree = self.datatree.replace_datasets(
+                {
+                    self.datatree.root_node_name: self.datatree.root_dataset.isel(
+                        {self.datatree.CASEID: slice(0, 1)}
+                    )
+                }
+            )
         if datatree is not None:
 
             request = self.required_data()

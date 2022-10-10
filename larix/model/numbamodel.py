@@ -904,6 +904,7 @@ class NumbaModel(_BaseModel):
         self.constraint_sharpness = 0.0
         self._constraint_funcs = None
         self.datatree = datatree
+        self._should_preload_data = True
 
     def save(self, filename, format="yaml", overwrite=False):
         from .saving import save_model
@@ -912,6 +913,13 @@ class NumbaModel(_BaseModel):
 
     def dumps(self):
         return repr(self.save(None, format="raw"))
+
+    def should_preload_data(self, should=True):
+        should = bool(should)
+        if should and not self._should_preload_data:
+            # not currently, but want to, mangle to prevent inconsistency
+            self.mangle()
+        self._should_preload_data = should
 
     @classmethod
     def from_dict(cls, content):
@@ -995,7 +1003,16 @@ class NumbaModel(_BaseModel):
             self._data_arrays = None
             return
 
-        datatree = self.datatree
+        if self._should_preload_data:
+            datatree = self.datatree
+        else:
+            datatree = self.datatree.replace_datasets(
+                {
+                    self.datatree.root_node_name: self.datatree.root_dataset.isel(
+                        {self.datatree.CASEID: slice(0, 1)}
+                    )
+                }
+            )
         if datatree is not None:
             from .data_arrays import prepare_data
 
