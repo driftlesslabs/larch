@@ -12,6 +12,11 @@ def rip():
         "docs/examples/xlogit-artificial/*.ipynb",
     ]
 
+    targets = [
+        os.path.normpath(os.path.join(os.path.dirname(__file__), "..", t))
+        for t in targets
+    ]
+
     generator_dest = os.path.normpath(
         os.path.join(
             os.path.dirname(__file__),
