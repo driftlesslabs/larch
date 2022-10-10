@@ -530,13 +530,25 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             )
             return u
 
-        def log_self(u, params, self_slot, avail, mu_slots):
+        def max_u_to_parent(u, bs, child_slot, parent_slot):
+            bs = bs.at[..., parent_slot].set(
+                jnp.maximum(
+                    u[..., child_slot],
+                    bs[..., parent_slot],
+                )
+            )
+            return bs
+
+        def log_self(u, bs, params, self_slot, avail, mu_slots):
             mu = params[mu_slots[self_slot]]
             u = u.at[..., self_slot].set(
-                jnp.where(
-                    avail[..., self_slot] > 1,
-                    jnp.log(u[..., self_slot]) * mu,
-                    jnp.log(u[..., self_slot]),
+                jnp.maximum(
+                    jnp.where(
+                        avail[..., self_slot] > 1,
+                        jnp.log(u[..., self_slot]) * mu,
+                        jnp.log(u[..., self_slot]),
+                    ),
+                    bs[..., self_slot],
                 )
             )
             return u
@@ -548,23 +560,26 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             n_params = parameter_vector.size
             params = jnp.ones(n_params + 1, dtype=parameter_vector.dtype)
             params = params.at[:n_params].set(parameter_vector)
+            # the backstop prevents underflow when mu is too small
+            backstop = jnp.full_like(utility_array, -jnp.inf)
 
             def body(carry, xs):
-                u, params = carry
+                u, bs, params = carry
                 up_slot, dn_slot, firstvisit, allocslot = xs
                 # if firstvisit >= 0 and dn_slot>=n_alts:
                 #     u = log_self(u, params, dn_slot)
                 u = jax.lax.cond(
                     (firstvisit >= 0) & (dn_slot >= n_alts),
-                    lambda u: log_self(u, params, dn_slot, avail_ca, mu_slots),
+                    lambda u: log_self(u, bs, params, dn_slot, avail_ca, mu_slots),
                     lambda u: u,
                     operand=u,
                 )
                 u = add_u_to_parent(u, params, dn_slot, up_slot, avail_ca, mu_slots)
-                return (u, params), None
+                bs = max_u_to_parent(u, bs, dn_slot, up_slot)
+                return (u, bs, params), None
 
-            (utility_array, _ignore_1), _ignore_2 = jax.lax.scan(
-                body, (utility_array, params), slotarray
+            (utility_array, backstop, _ignore_1), _ignore_2 = jax.lax.scan(
+                body, (utility_array, backstop, params), slotarray
             )
             # log utility at root
             utility_array = utility_array.at[..., -1].set(
