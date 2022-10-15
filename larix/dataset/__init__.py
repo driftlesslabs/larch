@@ -1244,6 +1244,13 @@ class DataTree(_sharrow_DataTree):
         obj.root_dataset = obj.root_dataset.dc.query_cases(*args, **kwargs)
         return obj
 
+    def slice_cases(self, *case_slice):
+        if len(case_slice) != 1 or not isinstance(case_slice[0], slice):
+            case_slice = slice(*case_slice)
+        return self.replace_datasets(
+            {self.root_node_name: self.root_dataset.isel({self.CASEID: case_slice})}
+        )
+
     def caseids(self):
         """
         Access the caseids coordinates as an index.

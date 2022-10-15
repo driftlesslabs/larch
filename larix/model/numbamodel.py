@@ -971,15 +971,17 @@ class NumbaModel(_BaseModel):
         loadthis("weight_normalization")
         return self
 
-    def mangle(self):
-        super().mangle()
-        self._dataset = None
-        self._fixed_arrays = None
-        self._data_arrays = None
-        self.work_arrays = None
-        self._array_ch_cascade = None
-        self._array_av_cascade = None
-        self._constraint_funcs = None
+    def mangle(self, data=True, structure=True):
+        super().mangle(data, structure)
+        if data:
+            self._dataset = None
+            self._data_arrays = None
+            self.work_arrays = None
+            self._array_ch_cascade = None
+            self._array_av_cascade = None
+        if structure:
+            self._constraint_funcs = None
+            self._fixed_arrays = None
 
     def is_mnl(self):
         """

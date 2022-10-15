@@ -119,8 +119,8 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
     def pstderr(self, x):
         self._parameter_bucket.pstderr = x
 
-    def mangle(self):
-        super().mangle()
+    def mangle(self, data=True, structure=True):
+        super().mangle(data, structure)
         self._draws = None
         reset_compiled_methods(self)
 

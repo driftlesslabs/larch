@@ -100,7 +100,7 @@ class BaseModel:
     mixtures = MixtureList()
 
     def __init__(self, *, title=None, datatree=None, compute_engine=None):
-        self._mangled = True
+        self._mangled = 0x3
         self._datatree = None
         self.title = title
         self.rename_parameters = {}
@@ -147,17 +147,17 @@ class BaseModel:
             return
         if isinstance(tree, DataTree) or tree is None:
             self._datatree = tree
-            self.mangle()
+            self.mangle(structure=False)
         elif isinstance(tree, xr.Dataset):
             self._datatree = tree.dc.as_tree()
-            self.mangle()
+            self.mangle(structure=False)
         else:
             try:
                 self._datatree = DataTree(main=xr.Dataset.construct(tree))
             except Exception as err:
                 raise TypeError(f"datatree must be DataTree not {type(tree)}") from err
             else:
-                self.mangle()
+                self.mangle(structure=False)
 
     @property
     def parameters(self):
@@ -711,8 +711,8 @@ class BaseModel:
     def is_mangled(self):
         return self._mangled
 
-    def mangle(self):
-        self._mangled = True
+    def mangle(self, data=True, structure=True):
+        self._mangled = (0x1 if data else 0) | (0x2 if structure else 0)
 
     def unmangle(self, force=False):
         if not self._mangled and not force:
@@ -724,9 +724,9 @@ class BaseModel:
             setattr(self, marker, True)
             if force:
                 self.mangle()
-            if self._mangled or force:
+            if (self._mangled & 0x2) or force:
                 self._scan_all_ensure_names()
-                self._mangled = False
+                self._mangled = 0
         finally:
             delattr(self, marker)
 
