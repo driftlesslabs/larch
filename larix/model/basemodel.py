@@ -1221,7 +1221,7 @@ class BaseModel:
                 tr.put("td", text="na")
 
         ll_z = self._cached_loglike_null
-        if ll_z == 0:
+        if ll_z == 0 or ll_z is None:
             if compute_loglike_null:
                 try:
                     ll_z = self.loglike_null()
