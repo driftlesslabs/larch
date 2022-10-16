@@ -6,7 +6,7 @@
 
 🏆︁ Winner of the [AGIFORS 56th Annual Symposium Best Innovation award](http://agifors.org/Symposium).
 
-This is the in-development documentation for Larch v6 (temporarily implemented as "larix").
+This is the in-development documentation for Larch v6.
 
 :::{note}
 This project is very much under development.  There are plenty of undocumented functions

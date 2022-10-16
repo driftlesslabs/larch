@@ -15,7 +15,7 @@ sys.path.insert(0, "/Users/jeffnewman/LocalGit/airtaxi-airport")
 import pandas as pd
 import numpy as np
 import xarray as xr
-import larix as lx
+import larch as lx
 import airtaxi_airport as aa
 
 # In[2]:

@@ -21,7 +21,7 @@ def rip():
         os.path.join(
             os.path.dirname(__file__),
             "..",
-            "larix",
+            "larch",
             "examples",
             "generated",
         )
