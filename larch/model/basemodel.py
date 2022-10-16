@@ -1,19 +1,17 @@
-import logging
-
 import numpy as np
 import pandas as pd
 import xarray as xr
+import logging
 
-from ..exceptions import MissingDataError
-from .constraints import ParametricConstraintList
-from .linear import DictOfAlts, DictOfLinearFunction, LinearFunction
-from .mixtures import MixtureList
-from .param_core import ParameterBucket
-from .single_parameter import SingleParameter
+from .linear import DictOfLinearFunction, LinearFunction, DictOfAlts
 from .tree import NestingTree
+from .constraints import ParametricConstraintList
+from .single_parameter import SingleParameter
+from ..roles import ParameterRef
+from .param_core import ParameterBucket
+from .mixtures import MixtureList
 
-logger = logging.getLogger("larix.model")
-
+logger = logging.getLogger("larch.model")
 
 class BaseModel:
 
@@ -100,15 +98,13 @@ class BaseModel:
     mixtures = MixtureList()
 
     def __init__(self, *, title=None, datatree=None, compute_engine=None):
-        self._mangled = 0x3
+        self._mangled = True
         self._datatree = None
         self.title = title
         self.rename_parameters = {}
         self._parameter_bucket = ParameterBucket()
         self.datatree = datatree
         self._cached_loglike_best = None
-        self._cached_loglike_null = None
-        self._most_recent_estimation_result = None
 
         self._choice_ca_var = None
         self._choice_co_code = None
@@ -117,12 +113,11 @@ class BaseModel:
 
         self._weight_co_var = None
 
-        self._availability_ca_var = None
+        self._availability_var = None
         self._availability_co_vars = None
         self._availability_any = True
 
         self._compute_engine = compute_engine
-        self.ordering = None
 
     @property
     def compute_engine(self):
@@ -130,8 +125,8 @@ class BaseModel:
 
     @compute_engine.setter
     def compute_engine(self, engine):
-        if engine not in {"numba", "jax", None}:
-            raise ValueError("invalid compute engine")
+        if engine not in {'numba', 'jax', None}:
+            raise ValueError('invalid compute engine')
         self._compute_engine = engine
 
     @property
@@ -142,22 +137,21 @@ class BaseModel:
     @datatree.setter
     def datatree(self, tree):
         from ..dataset import DataTree
-
         if tree is self.datatree:
             return
         if isinstance(tree, DataTree) or tree is None:
             self._datatree = tree
-            self.mangle(structure=False)
+            self.mangle()
         elif isinstance(tree, xr.Dataset):
             self._datatree = tree.dc.as_tree()
-            self.mangle(structure=False)
+            self.mangle()
         else:
             try:
                 self._datatree = DataTree(main=xr.Dataset.construct(tree))
             except Exception as err:
                 raise TypeError(f"datatree must be DataTree not {type(tree)}") from err
             else:
-                self.mangle(structure=False)
+                self.mangle()
 
     @property
     def parameters(self):
@@ -231,7 +225,6 @@ class BaseModel:
         """scipy.optimize.Bounds : A copy of the current min-max bounds of the parameters."""
         self.unmangle()
         from scipy.optimize import Bounds
-
         return Bounds(
             self._parameter_bucket.pminimum,
             self._parameter_bucket.pmaximum,
@@ -259,32 +252,10 @@ class BaseModel:
         self.unmangle()
         return self._parameter_bucket.get_param_loc(name)
 
-    def get_value(self, name, *, default=None, kind="value"):
-        if name is None and default is not None:
-            return default
-        if isinstance(name, dict):
-            return {k: self.get_value(v) for k, v in name.items()}
-        try:
-            from .linear import LinearComponent, ParameterRef
-            from .linear_math import ParameterOp
-
-            if isinstance(name, (ParameterRef, ParameterOp)):
-                return name.value(self)
-            if isinstance(name, (LinearComponent, LinearFunction)):
-                return name.as_pmath().value(self)
-            if kind == "value":
-                return self.pvals[self.get_param_loc(name)]
-            return self.parameters[kind].values[self.get_param_loc(name)]
-        except KeyError:
-            if default is not None:
-                return default
-            else:
-                raise
-
     @property
     def pf(self):
         self.unmangle()
-        cols = ["value", "best", "initvalue", "minimum", "maximum", "nullvalue"]
+        cols = ['value', 'best', 'initvalue', 'minimum', 'maximum', 'nullvalue']
         cols = [i for i in cols if i in self._parameter_bucket._params]
         return self._parameter_bucket._params[cols].to_dataframe()
 
@@ -307,9 +278,8 @@ class BaseModel:
         s += ">"
         return s
 
-    def initialize_graph(
-        self, alternative_codes=None, alternative_names=None, root_id=0
-    ):
+
+    def initialize_graph(self, alternative_codes=None, alternative_names=None, root_id=0):
         """
         Write a nesting tree graph for a MNL model.
 
@@ -341,28 +311,19 @@ class BaseModel:
             if alternative_codes is None:
                 alternative_codes = get_coords_array(
                     self.datatree.ALTID,
-                    "_altid_",
-                    "altid",
-                    "alt_id",
-                    "alt_ids",
-                    "alternative_id",
-                    "alternative_ids",
+                    '_altid_', 'altid', 'alt_id', 'alt_ids',
+                    'alternative_id', 'alternative_ids',
                 )
             if alternative_names is None:
                 alternative_names = get_coords_array(
-                    "altname",
-                    "altnames",
-                    "alt_name",
-                    "alt_names",
-                    "alternative_name",
-                    "alternative_names",
+                    'altname', 'altnames', 'alt_name', 'alt_names',
+                    'alternative_name', 'alternative_names',
                 )
 
         if alternative_codes is None:
             return
 
         from .tree import NestingTree
-
         g = NestingTree(root_id=root_id)
         if alternative_names is None:
             for a in alternative_codes:
@@ -379,18 +340,14 @@ class BaseModel:
                 self.initialize_graph()
             except ValueError:
                 import warnings
-
-                warnings.warn(
-                    "cannot initialize graph, must define alternatives somehow"
-                )
-                raise RuntimeError(
-                    "cannot initialize graph, must define alternatives somehow"
-                )
+                warnings.warn('cannot initialize graph, must define alternatives somehow')
+                raise RuntimeError('cannot initialize graph, must define alternatives somehow')
         return self._graph
 
     @graph.setter
     def graph(self, x):
         self._graph = x
+
 
     def utility_functions(self, subset=None, resolve_parameters=False):
         """
@@ -414,9 +371,8 @@ class BaseModel:
         """
         self.unmangle()
         from xmle import Elem
-
-        x = Elem("div")
-        t = x.elem("table", style="margin-top:1px;", attrib={"class": "floatinghead"})
+        x = Elem('div')
+        t = x.elem('table', style="margin-top:1px;", attrib={'class': 'floatinghead'})
         if len(self.utility_co):
             # t.elem('caption', text=f"Utility Functions",
             # 	   style="caption-side:top;text-align:left;font-family:Roboto;font-weight:700;"
@@ -432,116 +388,79 @@ class BaseModel:
                     alts = self.utility_co.keys()
             except:
                 alts = self.utility_co.keys()
-            t_head = t.elem("thead")
-            tr = t_head.elem("tr")
-            tr.elem("th", text="alt")
-            tr.elem("th", text="formula", attrib={"style": "text-align:left;"})
-            t_body = t.elem("tbody")
+            t_head = t.elem('thead')
+            tr = t_head.elem('tr')
+            tr.elem('th', text="alt")
+            tr.elem('th', text='formula', attrib={'style': 'text-align:left;'})
+            t_body = t.elem('tbody')
             for j in alts:
                 if subset is None or j in subset:
-                    tr = t_body.elem("tr")
-                    tr.elem("td", text=str(j))
-                    utilitycell = tr.elem("td", attrib={"style": "text-align:left;"})
-                    utilitycell.elem("div")
+                    tr = t_body.elem('tr')
+                    tr.elem('td', text=str(j))
+                    utilitycell = tr.elem('td', attrib={'style': 'text-align:left;'})
+                    utilitycell.elem('div')
                     anything = False
                     if len(self.utility_ca):
                         utilitycell[-1].tail = (utilitycell[-1].tail or "") + " + "
-                        utilitycell << list(
-                            self.utility_ca.__xml__(
-                                linebreaks=True,
-                                resolve_parameters=self,
-                                value_in_tooltips=not resolve_parameters,
-                            )
-                        )
+                        utilitycell << list(self.utility_ca.__xml__(linebreaks=True, resolve_parameters=self,
+                                                                    value_in_tooltips=not resolve_parameters))
                         anything = True
                     if j in self.utility_co:
                         v = self.utility_co[j]
                         if len(v):
                             if anything:
-                                utilitycell << Elem("br")
+                                utilitycell << Elem('br')
                             utilitycell[-1].tail = (utilitycell[-1].tail or "") + " + "
-                            utilitycell << list(
-                                v.__xml__(
-                                    linebreaks=True,
-                                    resolve_parameters=self,
-                                    value_in_tooltips=not resolve_parameters,
-                                )
-                            )
+                            utilitycell << list(v.__xml__(linebreaks=True, resolve_parameters=self,
+                                                          value_in_tooltips=not resolve_parameters))
                             anything = True
                     if len(self.quantity_ca):
                         if anything:
-                            utilitycell << Elem("br")
+                            utilitycell << Elem('br')
                         if self.quantity_scale:
                             utilitycell[-1].tail = (utilitycell[-1].tail or "") + " + "
-                            from .linear import ParameterRef
-
-                            utilitycell << list(
-                                ParameterRef(self.quantity_scale).__xml__(
-                                    resolve_parameters=self,
-                                    value_in_tooltips=not resolve_parameters,
-                                )
-                            )
-                            utilitycell[-1].tail = (
-                                utilitycell[-1].tail or ""
-                            ) + " * log("
+                            from .linear import ParameterRef_C
+                            utilitycell << list(ParameterRef_C(self.quantity_scale).__xml__(resolve_parameters=self,
+                                                                                            value_in_tooltips=not resolve_parameters))
+                            utilitycell[-1].tail = (utilitycell[-1].tail or "") + " * log("
                         else:
-                            utilitycell[-1].tail = (
-                                utilitycell[-1].tail or ""
-                            ) + " + log("
-                        content = self.quantity_ca.__xml__(
-                            linebreaks=True,
-                            lineprefix="  ",
-                            exponentiate_parameters=True,
-                            resolve_parameters=self,
-                            value_in_tooltips=not resolve_parameters,
-                        )
+                            utilitycell[-1].tail = (utilitycell[-1].tail or "") + " + log("
+                        content = self.quantity_ca.__xml__(linebreaks=True, lineprefix="  ",
+                                                           exponentiate_parameters=True, resolve_parameters=self,
+                                                           value_in_tooltips=not resolve_parameters)
                         utilitycell << list(content)
-                        utilitycell.elem("br", tail=")")
+                        utilitycell.elem('br', tail=")")
         else:
             # there is no differentiation by alternatives, just give one formula
             # t.elem('caption', text=f"Utility Function",
             # 	   style="caption-side:top;text-align:left;font-family:Roboto;font-weight:700;"
             # 			 "font-style:normal;font-size:100%;padding:0px;color:black;")
-            tr = t.elem("tr")
-            utilitycell = tr.elem("td", attrib={"style": "text-align:left;"})
-            utilitycell.elem("div")
+            tr = t.elem('tr')
+            utilitycell = tr.elem('td', attrib={'style': 'text-align:left;'})
+            utilitycell.elem('div')
             anything = False
             if len(self.utility_ca):
                 utilitycell[-1].tail = (utilitycell[-1].tail or "") + " + "
-                utilitycell << list(
-                    self.utility_ca.__xml__(
-                        linebreaks=True,
-                        resolve_parameters=self,
-                        value_in_tooltips=not resolve_parameters,
-                    )
-                )
+                utilitycell << list(self.utility_ca.__xml__(linebreaks=True, resolve_parameters=self,
+                                                            value_in_tooltips=not resolve_parameters))
                 anything = True
             if len(self.quantity_ca):
                 if anything:
-                    utilitycell << Elem("br")
+                    utilitycell << Elem('br')
                 if self.quantity_scale:
                     utilitycell[-1].tail = (utilitycell[-1].tail or "") + " + "
-                    from .linear import ParameterRef
-
-                    utilitycell << list(
-                        ParameterRef(self.quantity_scale).__xml__(
-                            resolve_parameters=self,
-                            value_in_tooltips=not resolve_parameters,
-                        )
-                    )
+                    from .linear import ParameterRef_C
+                    utilitycell << list(ParameterRef_C(self.quantity_scale).__xml__(resolve_parameters=self,
+                                                                                    value_in_tooltips=not resolve_parameters))
                     utilitycell[-1].tail = (utilitycell[-1].tail or "") + " * log("
                 else:
                     utilitycell[-1].tail = (utilitycell[-1].tail or "") + " + log("
-                content = self.quantity_ca.__xml__(
-                    linebreaks=True,
-                    lineprefix="  ",
-                    exponentiate_parameters=True,
-                    resolve_parameters=self,
-                    value_in_tooltips=not resolve_parameters,
-                )
+                content = self.quantity_ca.__xml__(linebreaks=True, lineprefix="  ", exponentiate_parameters=True,
+                                                   resolve_parameters=self, value_in_tooltips=not resolve_parameters)
                 utilitycell << list(content)
-                utilitycell.elem("br", tail=")")
+                utilitycell.elem('br', tail=")")
         return x
+
 
     def _utility_functions_as_frame(self, subset=None, resolve_parameters=False):
         """
@@ -566,8 +485,8 @@ class BaseModel:
         self.unmangle()
 
         tf = pd.DataFrame(
-            index=pd.MultiIndex.from_tuples([], names=["Alt", "Line"]),
-            columns=["Formula"],
+            index=pd.MultiIndex.from_tuples([], names=['Alt', 'Line']),
+            columns=['Formula'],
         )
 
         if len(self.utility_co):
@@ -586,62 +505,61 @@ class BaseModel:
                 if not (subset is None or a in subset):
                     continue
                 line = 1
-                op = " "
+                op = ' '
                 for i in self.utility_ca:
                     tf.loc[(a, line), :] = f"{op} {str(i)}"
-                    op = "+"
+                    op = '+'
                     line += 1
                 if a in self.utility_co:
                     for i in self.utility_co[a]:
                         tf.loc[(a, line), :] = f"{op} {str(i)}"
-                        op = "+"
+                        op = '+'
                         line += 1
                 if len(self.quantity_ca):
                     if self.quantity_scale:
-                        from .linear import ParameterRef
-
-                        q = ParameterRef(self.quantity_scale)
+                        from .linear import ParameterRef_C
+                        q = ParameterRef_C(self.quantity_scale)
                         tf.loc[(a, line), :] = f"{op} {str(q)} * log("
                     else:
                         tf.loc[(a, line), :] = f"{op} log("
-                    op = " "
+                    op = ' '
                     line += 1
                     for i in self.quantity_ca:
                         tf.loc[(a, line), :] = f"    {op} {i._str_exponentiate()}"
-                        op = "+"
+                        op = '+'
                         line += 1
                     tf.loc[(a, line), :] = f")"
-                    op = "+"
+                    op = '+'
                     line += 1
 
         else:
             # there is no differentiation by alternatives, just give one formula
-            a = "*"
+            a = '*'
             line = 1
-            op = " "
+            op = ' '
             for i in self.utility_ca:
                 tf.loc[(a, line), :] = f"{op} {str(i)}"
-                op = "+"
+                op = '+'
                 line += 1
             if len(self.quantity_ca):
                 if self.quantity_scale:
-                    from .linear import ParameterRef
-
-                    q = ParameterRef(self.quantity_scale)
+                    from .linear import ParameterRef_C
+                    q = ParameterRef_C(self.quantity_scale)
                     tf.loc[(a, line), :] = f"{op} {str(q)} * log("
                 else:
                     tf.loc[(a, line), :] = f"{op} log("
-                op = " "
+                op = ' '
                 line += 1
                 for i in self.quantity_ca:
                     tf.loc[(a, line), :] = f"    {op} {i._str_exponentiate()}"
-                    op = "+"
+                    op = '+'
                     line += 1
                 tf.loc[(a, line), :] = f")"
-                op = "+"
+                op = '+'
                 line += 1
 
         return tf
+
 
     def required_data(self):
         """
@@ -653,32 +571,31 @@ class BaseModel:
         """
         try:
             from ..util import dictx
-
             req_data = dictx()
 
             if self.utility_ca is not None and len(self.utility_ca):
-                if "ca" not in req_data:
+                if 'ca' not in req_data:
                     req_data.ca = set()
                 for i in self.utility_ca:
                     req_data.ca.add(str(i.data))
 
             if self.quantity_ca is not None and len(self.quantity_ca):
-                if "ca" not in req_data:
+                if 'ca' not in req_data:
                     req_data.ca = set()
                 for i in self.quantity_ca:
                     req_data.ca.add(str(i.data))
 
             if self.utility_co is not None and len(self.utility_co):
-                if "co" not in req_data:
+                if 'co' not in req_data:
                     req_data.co = set()
                 for alt, func in self.utility_co.items():
                     for i in func:
-                        if str(i.data) != "1":
+                        if str(i.data) != '1':
                             req_data.co.add(str(i.data))
 
-            if "ca" in req_data:
+            if 'ca' in req_data:
                 req_data.ca = list(sorted(req_data.ca))
-            if "co" in req_data:
+            if 'co' in req_data:
                 req_data.co = list(sorted(req_data.co))
 
             if self.choice_ca_var:
@@ -693,8 +610,8 @@ class BaseModel:
             if self.weight_co_var:
                 req_data.weight_co = self.weight_co_var
 
-            if self.availability_ca_var:
-                req_data.avail_ca = self.availability_ca_var
+            if self.availability_var:
+                req_data.avail_ca = self.availability_var
             elif self.availability_co_vars:
                 req_data.avail_co = self.availability_co_vars
             elif self.availability_any:
@@ -704,15 +621,16 @@ class BaseModel:
         except:
             logger.exception("error in required_data")
 
+
     def __contains__(self, item):
-        return item in self.pf.index  # or (item in self.rename_parameters)
+        return (item in self.pf.index)  # or (item in self.rename_parameters)
 
     @property
     def is_mangled(self):
         return self._mangled
 
-    def mangle(self, data=True, structure=True):
-        self._mangled = (0x1 if data else 0) | (0x2 if structure else 0)
+    def mangle(self):
+        self._mangled = True
 
     def unmangle(self, force=False):
         if not self._mangled and not force:
@@ -724,11 +642,12 @@ class BaseModel:
             setattr(self, marker, True)
             if force:
                 self.mangle()
-            if (self._mangled & 0x2) or force:
+            if self._mangled or force:
                 self._scan_all_ensure_names()
-                self._mangled = 0
+                self._mangled = False
         finally:
             delattr(self, marker)
+
 
     def _scan_all_ensure_names(self):
         self._scan_utility_ensure_names()
@@ -751,8 +670,7 @@ class BaseModel:
                     u_co_dataset.add(str(component.data))
                 except:
                     import warnings
-
-                    warnings.warn(f"bad data in altcode {altcode}")
+                    warnings.warn(f'bad data in altcode {altcode}')
                     raise
         linear_function_ca = self.utility_ca
         for component in linear_function_ca:
@@ -771,16 +689,14 @@ class BaseModel:
         if self._graph is not None:
             for nodecode in self._graph.topological_sorted_no_elementals:
                 if nodecode != self._graph._root_id:
-                    param_name = str(self._graph.nodes[nodecode]["parameter"])
+                    param_name = str(self._graph.nodes[nodecode]['parameter'])
                     nameset.add(self.__p_rename(param_name))
         if self.quantity_ca is not None and len(self.quantity_ca) > 0:
             if self.quantity_scale is not None:
                 nameset.add(self.__p_rename(self.quantity_scale))
         if self.logsum_parameter is not None:
             nameset.add(self.__p_rename(self.logsum_parameter))
-        self._ensure_names(
-            nameset, value=1, nullvalue=1, initvalue=1, minimum=0.001, maximum=1
-        )
+        self._ensure_names(nameset, nullvalue=1, initvalue=1, minimum=0.001, maximum=1)
 
     def _scan_mixtures_ensure_names(self):
         for i in self.mixtures:
@@ -799,7 +715,7 @@ class BaseModel:
             self._cached_loglike_best = computed_ll
             if pvalues is None:
                 self._parameter_bucket._params = self._parameter_bucket._params.assign(
-                    best=self._parameter_bucket._params["value"]
+                    best=self._parameter_bucket._params['value']
                 )
             else:
                 self._parameter_bucket._params = self._parameter_bucket._params.assign(
@@ -850,7 +766,7 @@ class BaseModel:
                 self.mangle()
             self._choice_co_vars = x
         else:
-            raise TypeError("choice_co_vars must be a dictionary")
+            raise TypeError('choice_co_vars must be a dictionary')
 
     @choice_co_vars.deleter
     def choice_co_vars(self):
@@ -878,7 +794,7 @@ class BaseModel:
                 self.mangle()
             self._choice_co_code = x
         else:
-            raise TypeError("choice_co_vars must be a str")
+            raise TypeError('choice_co_vars must be a str')
 
     @choice_co_code.deleter
     def choice_co_code(self):
@@ -918,17 +834,35 @@ class BaseModel:
     @property
     def availability_ca_var(self):
         """str : An |idca| variable or expression indicating if alternatives are available."""
-        return self._availability_ca_var
+        return self._availability_var
 
     @availability_ca_var.setter
     def availability_ca_var(self, x):
         if x is not None:
             x = str(x)
-        if self._availability_ca_var != x:
+        if self._availability_var != x:
             self.mangle()
-            self._availability_ca_var = x
-            self._availability_co_vars = None
-            self._availability_any = False
+        self._availability_var = x
+        self._availability_co_vars = None
+        self._availability_any = False
+
+    @property
+    def availability_var(self):
+        """str : An |idca| variable or expression indicating if alternatives are available.
+
+        Deprecated, prefer `availability_ca_var` for clarity.
+        """
+        return self._availability_var
+
+    @availability_var.setter
+    def availability_var(self, x):
+        if x is not None:
+            x = str(x)
+        if self._availability_var != x:
+            self.mangle()
+        self._availability_var = x
+        self._availability_co_vars = None
+        self._availability_any = False
 
     @property
     def availability_co_vars(self):
@@ -938,27 +872,18 @@ class BaseModel:
         gives the name of an |idco| variable or some function of |idco| variables that
         indicates whether that alternative is available.
         """
-        if self._availability_co_vars:
-            return self._availability_co_vars
-        else:
-            return None
+        return self._availability_co_vars
 
     @availability_co_vars.setter
     def availability_co_vars(self, x):
         from typing import Mapping
-
-        if x is None:
-            if self._availability_co_vars:
-                self.mangle()
-                self._availability_co_vars = {}
-        else:
-            if not isinstance(x, Mapping):
-                raise TypeError(f"availability_co_vars must be dict not {type(x)}")
-            if self._availability_co_vars != x:
-                self.mangle()
-            self._availability_co_vars = x
-            self._availability_ca_var = None
-            self._availability_any = False
+        if not isinstance(x, Mapping):
+            raise TypeError(f'availability_co_vars must be dict not {type(x)}')
+        if self._availability_co_vars != x:
+            self.mangle()
+        self._availability_co_vars = x
+        self._availability_var = None
+        self._availability_any = False
 
     @property
     def availability_any(self):
@@ -971,312 +896,7 @@ class BaseModel:
 
     @availability_any.setter
     def availability_any(self, x):
-        x = bool(x)
-        if x != self._availability_any:
-            self._availability_any = x
-            self._availability_co_vars = None
-            self._availability_ca_var = None
+        self._availability_any = True
+        self._availability_co_vars = None
+        self._availability_var = None
 
-    def parameter_summary(self):
-        """
-        Create a tabular summary of parameter values.
-
-        This will generate a small table of parameters statistics,
-        containing:
-
-        *	Parameter Name (and Category, if applicable)
-        *	Estimated Value
-        *	Standard Error of the Estimate (if known)
-        *	t Statistic (if known)
-        *	Null Value
-        *	Binding Constraints (if applicable)
-
-        Returns
-        -------
-        pandas.DataFrame
-
-        """
-        NBSP = " "  # non=breaking space
-
-        try:
-            pbucket = self._parameter_bucket
-        except AttributeError:
-            pbucket = self
-
-        tabledata = {}
-        tabledata["Value"] = pbucket.pvals
-        if "std_err" in pbucket._params:
-            se = pbucket.pstderr
-            tabledata["Std Err"] = se
-            tstat = (pbucket.pvals - pbucket.pnullvals) / np.where(se, se, 1.0)
-            tabledata["t Stat"] = np.where(se, tstat, np.nan)
-        tabledata["Null Value"] = pbucket.pnullvals
-
-        if "constrained" in pbucket.parameters:
-            tabledata["Constrained"] = pbucket.parameters["constrained"]
-
-        result = pd.DataFrame(tabledata, index=pbucket.pnames).rename_axis(
-            index="Parameter"
-        )
-
-        # pf = self.pf
-        # columns = [i for i in ['value', 'std_err', 't_stat', 'likelihood_ratio', 'nullvalue', 'constrained'] if
-        #            i in pf.columns]
-        # result = pf[columns].rename(
-        #     columns={
-        #         'value': 'Value',
-        #         'std_err': 'Std Err',
-        #         't_stat': 't Stat',
-        #         'likelihood_ratio': 'Like Ratio',
-        #         'nullvalue': 'Null Value',
-        #         'constrained': 'Constrained'
-        #     }
-        # )
-        monospace_cols = []
-
-        def fixie(x):
-            if np.isfinite(x):
-                if x > 1000:
-                    return NBSP + "BIG"
-                elif x < -1000:
-                    return "-BIG"
-                else:
-                    return f"{x:0< 4.2f}".replace(" ", NBSP)
-            else:
-                return NBSP + "NA"
-
-        if "t Stat" in result.columns:
-            result.insert(result.columns.get_loc("t Stat") + 1, "Signif", "")
-            result.loc[np.absolute(result["t Stat"]) > 1.9600, "Signif"] = "*"
-            result.loc[np.absolute(result["t Stat"]) > 2.5758, "Signif"] = "**"
-            result.loc[np.absolute(result["t Stat"]) > 3.2905, "Signif"] = "***"
-            result["t Stat"] = result["t Stat"].apply(fixie)
-            result.loc[result["t Stat"] == NBSP + "NA", "Signif"] = ""
-            monospace_cols.append("t Stat")
-            monospace_cols.append("Signif")
-        if "Like Ratio" in result.columns:
-            if "Signif" not in result.columns:
-                result.insert(result.columns.get_loc("Like Ratio") + 1, "Signif", "")
-            if "t Stat" in result.columns:
-                non_finite_t = ~np.isfinite(result["t Stat"])
-            else:
-                non_finite_t = True
-            result.loc[
-                np.absolute((np.isfinite(result["Like Ratio"])) & non_finite_t),
-                "Signif",
-            ] = "[]"
-            result.loc[
-                np.absolute(((result["Like Ratio"]) > 1.9207) & non_finite_t), "Signif"
-            ] = "[*]"
-            result.loc[
-                np.absolute(((result["Like Ratio"]) > 3.3174) & non_finite_t), "Signif"
-            ] = "[**]"
-            result.loc[
-                np.absolute(((result["Like Ratio"]) > 5.4138) & non_finite_t), "Signif"
-            ] = "[***]"
-            result["Like Ratio"] = result["Like Ratio"].apply(fixie)
-            monospace_cols.append("Like Ratio")
-            if "Signif" not in monospace_cols:
-                monospace_cols.append("Signif")
-        if "Std Err" in result.columns:
-            _fmt_s = (
-                lambda x: f"{x: #.3g}".replace(" ", NBSP)
-                if np.isfinite(x)
-                else NBSP + "NA"
-            )
-            result["Std Err"] = result["Std Err"].apply(_fmt_s)
-            monospace_cols.append("Std Err")
-        if "Value" in result.columns:
-            result["Value"] = result["Value"].apply(
-                lambda x: f"{x: #.3g}".replace(" ", NBSP)
-            )
-            monospace_cols.append("Value")
-        if "Constrained" in result.columns:
-            result["Constrained"] = result["Constrained"].str.replace("\n", "<br/>")
-        if "Null Value" in result.columns:
-            monospace_cols.append("Null Value")
-        # if result.index.nlevels > 1:
-        #     pnames = result.index.get_level_values(-1)
-        # else:
-        #     pnames = result.index
-        styles = [
-            dict(
-                selector="th",
-                props=[
-                    ("vertical-align", "top"),
-                    ("text-align", "left"),
-                ],
-            ),
-            dict(
-                selector="td",
-                props=[
-                    ("vertical-align", "top"),
-                    ("text-align", "left"),
-                ],
-            ),
-        ]
-
-        if self.ordering:
-            paramset = set(result.index)
-            out = []
-            import re
-
-            for category in self.ordering:
-                category_name = category[0]
-                category_params = []
-                for category_pattern in category[1:]:
-                    category_params.extend(
-                        sorted(
-                            i
-                            for i in paramset
-                            if re.match(category_pattern, i) is not None
-                        )
-                    )
-                    paramset -= set(category_params)
-                out.append([category_name, category_params])
-            if len(paramset):
-                out.append(["Other", sorted(paramset)])
-
-            tuples = []
-            for c, pp in out:
-                for p in pp:
-                    tuples.append((c, p))
-
-            ix = pd.MultiIndex.from_tuples(tuples, names=["Category", "Parameter"])
-
-            result = result.reindex(ix.get_level_values(1))
-            result.index = ix
-
-        return (
-            result.style.set_table_styles(styles)
-            .format({"Null Value": "{: .2f}"})
-            .applymap(lambda x: "font-family:monospace", subset=monospace_cols)
-        )
-
-    def estimation_statistics(self, compute_loglike_null=True):
-        """
-        Create an XHTML summary of estimation statistics.
-
-        This will generate a small table of estimation statistics,
-        containing:
-
-        *	Log Likelihood at Convergence
-        *	Log Likelihood at Null Parameters (if known)
-        *	Log Likelihood with No Model (if known)
-        *	Log Likelihood at Constants Only (if known)
-
-        Additionally, for each included reference value (i.e.
-        everything except log likelihood at convergence) the
-        rho squared with respect to that value is also given.
-
-        Each statistic is reported in aggregate, as well as
-        per case.
-
-        Parameters
-        ----------
-        compute_loglike_null : bool, default True
-            If the log likelihood at null values has not already
-            been computed (i.e., if it is not cached) then compute
-            it, cache its value, and include it in the output.
-
-        Returns
-        -------
-        xmle.Elem
-
-        """
-
-        from xmle import Elem
-
-        div = Elem("div")
-        table = div.put("table")
-
-        thead = table.put("thead")
-        tr = thead.put("tr")
-        tr.put("th", text="Statistic")
-        tr.put("th", text="Aggregate")
-        tr.put("th", text="Per Case")
-
-        tbody = table.put("tbody")
-
-        try:
-            ncases = self.n_cases
-        except (MissingDataError, AttributeError):
-            ncases = None
-
-        tr = tbody.put("tr")
-        tr.put("td", text="Number of Cases")
-        if ncases:
-            tr.put("td", text=str(ncases), colspan="2")
-        else:
-            tr.put("td", text="not available", colspan="2")
-
-        mostrecent = self._most_recent_estimation_result
-        if mostrecent is not None:
-            tr = tbody.put("tr")
-            tr.put("td", text="Log Likelihood at Convergence")
-            tr.put("td", text="{:.2f}".format(mostrecent.loglike))
-            if ncases:
-                tr.put("td", text="{:.2f}".format(mostrecent.loglike / ncases))
-            else:
-                tr.put("td", text="na")
-
-        ll_z = self._cached_loglike_null
-        if ll_z == 0 or ll_z is None:
-            if compute_loglike_null:
-                try:
-                    ll_z = self.loglike_null()
-                except (MissingDataError, AttributeError):
-                    ll_z = 0
-            else:
-                ll_z = 0
-        if ll_z:
-            tr = tbody.put("tr")
-            tr.put("td", text="Log Likelihood at Null Parameters")
-            tr.put("td", text="{:.2f}".format(ll_z))
-            if ncases:
-                tr.put("td", text="{:.2f}".format(ll_z / ncases))
-            else:
-                tr.put("td", text="na")
-            if mostrecent is not None:
-                tr = tbody.put("tr")
-                tr.put("td", text="Rho Squared w.r.t. Null Parameters")
-                rsz = 1.0 - (mostrecent.loglike / ll_z)
-                tr.put("td", text="{:.3f}".format(rsz), colspan="2")
-
-        try:
-            ll_nil = self._cached_loglike_nil
-        except (MissingDataError, AttributeError):
-            ll_nil = 0
-        if ll_nil:
-            tr = tbody.put("tr")
-            tr.put("td", text="Log Likelihood with No Model")
-            tr.put("td", text="{:.2f}".format(ll_nil))
-            if ncases:
-                tr.put("td", text="{:.2f}".format(ll_nil / ncases))
-            else:
-                tr.put("td", text="na")
-            if mostrecent is not None:
-                tr = tbody.put("tr")
-                tr.put("td", text="Rho Squared w.r.t. No Model")
-                rsz = 1.0 - (mostrecent.loglike / ll_nil)
-                tr.put("td", text="{:.3f}".format(rsz), colspan="2")
-
-        try:
-            ll_c = self._cached_loglike_constants_only
-        except (MissingDataError, AttributeError):
-            ll_c = 0
-        if ll_c:
-            tr = tbody.put("tr")
-            tr.put("td", text="Log Likelihood at Constants Only")
-            tr.put("td", text="{:.2f}".format(ll_c))
-            if ncases:
-                tr.put("td", text="{:.2f}".format(ll_c / ncases))
-            else:
-                tr.put("td", text="na")
-            if mostrecent is not None:
-                tr = tbody.put("tr")
-                tr.put("td", text="Rho Squared w.r.t. Constants Only")
-                rsc = 1.0 - (mostrecent.loglike / ll_c)
-                tr.put("td", text="{:.3f}".format(rsc), colspan="2")
-
-        return div

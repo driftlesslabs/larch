@@ -1,2 +1,2 @@
-# larix
-Discrete choice models using Numba and/or JAX
+# larch
+Discrete choice models using numba and JAX

@@ -9,14 +9,10 @@ def cascade_or(arr, dn_slots, up_slots):
             arr[i,up_slots[j]] |= arr[i,dn_slots[j]]
 
 @njit(parallel=True, nogil=True)
-def cascade_sum(arr, dn_slots, up_slots, max_val=None):
+def cascade_sum(arr, dn_slots, up_slots):
     for i in prange(arr.shape[0]):
         for j in range(dn_slots.size):
-            if max_val is None:
-                arr[i,up_slots[j]] += arr[i,dn_slots[j]]
-            else:
-                k = arr[i,up_slots[j]] + arr[i,dn_slots[j]]
-                arr[i, up_slots[j]] = min(k, max_val)
+            arr[i,up_slots[j]] += arr[i,dn_slots[j]]
 
 def data_av_cascade(dataframes, graph):
     """
@@ -93,7 +89,7 @@ def array_av_cascade(arr_av, graph):
     result = np.zeros((*arr_av.shape[:-1], len(graph)), dtype=np.int8)
     result[... ,:graph.n_elementals()] = arr_av
     ups, dns, _1, _2 = graph.edge_slot_arrays()
-    cascade_sum(result.reshape(-1,len(graph)), dns, ups, 127)
+    cascade_or(result.reshape(-1,len(graph)), dns, ups)
     return result
 
 def array_ch_cascade(arr_ch, graph, dtype=None):

@@ -1,20 +1,19 @@
-import logging
-import warnings
-from typing import Mapping
-
-import numba as nb
 import numpy as np
 import pandas as pd
 import xarray as xr
+import numba as nb
+from typing import Mapping
+import logging
+import warnings
 
-from .dim_names import ALTID, ALTIDX, CASEALT, CASEID, CASEPTR, GROUPID, INGROUP
+from .dim_names import CASEID, ALTID, CASEALT, ALTIDX, CASEPTR, GROUPID, INGROUP
 
 
 @nb.njit
 def case_ptr_to_indexes(n_casealts, case_ptrs):
     case_index = np.zeros(n_casealts, dtype=np.int64)
-    for c in range(case_ptrs.shape[0] - 1):
-        case_index[case_ptrs[c] : case_ptrs[c + 1]] = c
+    for c in range(case_ptrs.shape[0]-1):
+        case_index[case_ptrs[c]:case_ptrs[c + 1]] = c
     return case_index
 
 
@@ -38,10 +37,10 @@ def ce_dissolve_zero_variance(ce_data, ce_caseptr):
     """
     failed = 0
     if ce_caseptr.ndim == 2:
-        ce_caseptr1 = ce_caseptr[:, -1]
+        ce_caseptr1 = ce_caseptr[:,-1]
     else:
         ce_caseptr1 = ce_caseptr[1:]
-    shape = (ce_caseptr1.shape[0],)
+    shape = (ce_caseptr1.shape[0], )
     out = np.zeros(shape, dtype=ce_data.dtype)
     c = 0
     out[0] = ce_data[0]
@@ -57,6 +56,7 @@ def ce_dissolve_zero_variance(ce_data, ce_caseptr):
 
 
 class _GenericFlow:
+
     def __init__(self, x=None):
         self._obj = x
         self._flow_library = {}
@@ -190,9 +190,7 @@ class _GenericFlow:
             obj = self._obj
         else:
             obj = self._obj.copy()
-        dim_name = (
-            dim_name or getattr(altids, "name", None) or obj.attrs.get(ALTID, ALTID)
-        )
+        dim_name = dim_name or getattr(altids, 'name', None) or obj.attrs.get(ALTID, ALTID)
         if not isinstance(altids, xr.DataArray):
             altids = xr.DataArray(
                 np.asarray(altids),
@@ -235,16 +233,14 @@ class _GenericFlow:
         elif isinstance(altnames, xr.DataArray):
             names = altnames
         else:
-            if obj.dc.ALTID is None:
-                obj = obj.dc.set_altids(np.arange(1, len(altnames) + 1))
             names = xr.DataArray(
                 np.asarray(altnames),
                 dims=obj.dc.ALTID,
             )
-        obj.coords["alt_names"] = names
+        obj.coords['altnames'] = names
         return obj
 
-    def as_tree(self, label="main", exclude_dims=()):
+    def as_tree(self, label='main', exclude_dims=()):
         """
         Convert this Dataset to a DataTree.
 
@@ -264,24 +260,21 @@ class _GenericFlow:
         DataTree
         """
         from ..dataset import DataTree
-
         if self.CASEPTR is not None:
-            case_index = case_ptr_to_indexes(
-                self._obj.dims[self.CASEALT], self[self.CASEPTR].values
-            )
-            obj = self._obj.assign(
-                {"_case_index_": xr.DataArray(case_index, dims=(self.CASEALT))}
-            )
+            case_index = case_ptr_to_indexes(self._obj.dims[self.CASEALT], self[self.CASEPTR].values)
+            obj = self._obj.assign({'_case_index_': xr.DataArray(case_index, dims=(self.CASEALT))})
             tree = DataTree(**{label: obj.drop_dims(self.CASEID)})
             ds = obj.keep_dims(self.CASEID)
-            ds.attrs.pop("_exclude_dims_", None)
-            ds.attrs.pop("_caseptr_", None)
-            ds.attrs.pop("_casealt_", None)
-            ds.attrs.pop("_alt_idx_", None)
+            ds.attrs.pop('_exclude_dims_', None)
+            ds.attrs.pop('_caseptr_', None)
+            ds.attrs.pop('_casealt_', None)
+            ds.attrs.pop('_alt_idx_', None)
             tree.add_dataset(
-                "idcoVars",
+                'idcoVars',
                 ds,
-                relationships=(f"{label}._case_index_ -> idcoVars.{self.CASEID}"),
+                relationships=(
+                    f"{label}._case_index_ -> idcoVars.{self.CASEID}"
+                )
             )
         else:
             tree = DataTree(**{label: self._obj})
@@ -335,8 +328,8 @@ class _GenericFlow:
     def alts_mapping(self):
         """Dict[int,str] : Mapping of alternative codes to names"""
         a = self._obj.coords[self.ALTID]
-        if "alt_names" in a.coords:
-            return dict(zip(a.values, a.coords["alt_names"].values))
+        if 'alt_names' in a.coords:
+            return dict(zip(a.values, a.coords['alt_names'].values))
         else:
             return dict(zip(a.values, a.values))
 
@@ -361,9 +354,7 @@ class _GenericFlow:
                 return self.dims[self.CASEID]
             except KeyError:
                 pass
-            logging.getLogger().error(
-                f"missing {self.GROUPID!r} and {self.CASEID!r} among dims {self.dims}"
-            )
+            logging.getLogger().error(f"missing {self.GROUPID!r} and {self.CASEID!r} among dims {self.dims}")
             raise
 
     def transfer_dimension_attrs(self, target):
@@ -402,7 +393,8 @@ class _GenericFlow:
         result = self.transfer_dimension_attrs(result)
         return result
 
-    def dissolve_zero_variance(self, dim="<ALTID>", inplace=False):
+
+    def dissolve_zero_variance(self, dim='<ALTID>', inplace=False):
         """
         Dissolve dimension on variables where it has no variance.
 
@@ -421,27 +413,25 @@ class _GenericFlow:
         -------
         Dataset
         """
-        if dim == "<ALTID>":
+        if dim == '<ALTID>':
             dim = self.ALTID
         if inplace:
             obj = self
         else:
             obj = self.copy()
         for k in obj.variables:
-            if obj[k].dtype.kind in {"U", "S", "O"}:
+            if obj[k].dtype.kind in {'U', 'S', 'O'}:
                 continue
             if dim in obj[k].dims:
                 try:
-                    dissolve = obj[k].std(dim=dim).max() < 1e-10
+                    dissolve = (obj[k].std(dim=dim).max() < 1e-10)
                 except TypeError:
                     pass
                 else:
                     if dissolve:
                         obj[k] = obj[k].min(dim=dim)
             elif obj[k].dims == (self.CASEALT,):
-                proposal, flag = ce_dissolve_zero_variance(
-                    obj[k].values, obj[self.CASEPTR].values
-                )
+                proposal, flag = ce_dissolve_zero_variance(obj[k].values, obj[self.CASEPTR].values)
                 if flag == 0:
                     obj = obj.assign({k: xr.DataArray(proposal, dims=(self.CASEID))})
         return obj
@@ -469,9 +459,9 @@ class _DataArrayDC(_GenericFlow):
     def n_alts(self):
         if self.ALTID in self._obj.dims:
             return self._obj.shape[self.dims.index(self.ALTID)]
-        if "n_alts" in self._obj.attrs:
-            return self._obj.attrs["n_alts"]
-        raise ValueError("no n_alts set")
+        if 'n_alts' in self._obj.attrs:
+            return self._obj.attrs['n_alts']
+        raise ValueError('no n_alts set')
 
     def __getitem__(self, name):
         # pass dimension attrs to DataArray
@@ -495,9 +485,9 @@ class _DatasetDC(_GenericFlow):
     def n_alts(self):
         if self.ALTID in self._obj.dims:
             return self._obj.dims[self.ALTID]
-        if "n_alts" in self._obj.attrs:
-            return self._obj.attrs["n_alts"]
-        raise ValueError("no n_alts set")
+        if 'n_alts' in self._obj.attrs:
+            return self._obj.attrs['n_alts']
+        raise ValueError('no n_alts set')
 
     def __getitem__(self, name):
         # pass dimension attrs to DataArray
@@ -556,52 +546,54 @@ class _DatasetDC(_GenericFlow):
         return result
 
     def to_arrays(self, graph, float_dtype=np.float64):
-        from ..model.cascading import array_av_cascade, array_ch_cascade
         from ..model.data_arrays import DataArrays
+        from ..model.cascading import array_av_cascade, array_ch_cascade
 
-        if "co" in self:
-            co = self["co"].values.astype(float_dtype)
+        if 'co' in self:
+            co = self['co'].values.astype(float_dtype)
         else:
-            co = np.empty((self.n_cases, 0), dtype=float_dtype)
+            co = np.empty( (self.n_cases, 0), dtype=float_dtype)
 
-        if "ca" in self:
-            ca = self["ca"].values.astype(float_dtype)
+        if 'ca' in self:
+            ca = self['ca'].values.astype(float_dtype)
         else:
-            ca = np.empty((self.n_cases, self.n_alts, 0), dtype=float_dtype)
+            ca = np.empty( (self.n_cases, self.n_alts, 0), dtype=float_dtype)
 
-        if "ce_data" in self:
-            ce_data = self["ce_data"].values.astype(float_dtype)
+        if 'ce_data' in self:
+            ce_data = self['ce_data'].values.astype(float_dtype)
         else:
-            ce_data = np.empty((0, 0), dtype=float_dtype)
+            ce_data = np.empty( (0, 0), dtype=float_dtype)
 
         if self.ALTIDX is not None:
             ce_altidx = self[self.ALTIDX].values
         else:
-            ce_altidx = np.empty((0), dtype=np.int16)
+            ce_altidx = np.empty( (0), dtype=np.int16)
 
         if self.CASEPTR is not None:
             ce_caseptr = np.lib.stride_tricks.sliding_window_view(
                 self[self.CASEPTR].values, 2
             )
         else:
-            ce_caseptr = np.empty((self.n_cases, 0), dtype=np.int16)
+            ce_caseptr = np.empty( (self.n_cases, 0), dtype=np.int16)
 
-        if "wt" in self:
-            wt = self["wt"].values.astype(float_dtype)
+        if 'wt' in self:
+            wt = self['wt'].values.astype(float_dtype)
         else:
             wt = np.ones(self.n_cases, dtype=float_dtype)
 
-        if "ch" in self:
-            ch = array_ch_cascade(self["ch"].values, graph, dtype=float_dtype)
+        if 'ch' in self:
+            ch = array_ch_cascade(self['ch'].values, graph, dtype=float_dtype)
         else:
             ch = np.zeros([self.n_cases, len(graph)], dtype=float_dtype)
 
-        if "av" in self:
-            av = array_av_cascade(self["av"].values, graph)
+        if 'av' in self:
+            av = array_av_cascade(self['av'].values, graph)
         else:
             av = np.ones([self.n_cases, len(graph)], dtype=np.int8)
 
-        return DataArrays(ch, av, wt, co, ca, ce_data, ce_altidx, ce_caseptr)
+        return DataArrays(
+            ch, av, wt, co, ca, ce_data, ce_altidx, ce_caseptr
+        )
 
 
 @xr.register_dataset_accessor("icase")
@@ -613,3 +605,4 @@ class _DatasetCaseIslice(_GenericFlow):
             return self._obj.isel({self.GROUPID: item})
         else:
             raise ValueError("neither CASEID nor GROUPID is defined")
+

@@ -1,3 +1,4 @@
+import altair as alt
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -83,12 +84,7 @@ def idca_statistics_data(
         bandwidth = bw_method
     else:
         raise ValueError("`bw_method` should be 'scott', 'silverman', or a scalar")
-    stats = Dataset(
-        {
-            "mean": var.mean(var.CASEID),
-            "std": var.std(var.CASEID),
-        }
-    )
+    stats = Dataset({"mean": var.mean(var.CASEID), "std": var.std(var.CASEID),})
     data = {}
     data_ch = {}
     data_av = {}
@@ -198,8 +194,6 @@ def idca_statistics(
     bins=10,
     resolution=100,
 ):
-    import altair as alt
-
     stats, plot_data = idca_statistics_data(
         var,
         bw_method=bw_method,
@@ -223,9 +217,7 @@ def idca_statistics(
     # options_select = alt.selection_single(fields=['Alternative'], bind=options_dropdown, name="Alternative", empty="all")
 
     frequency = (
-        ax.mark_line(
-            interpolate="step",
-        )
+        ax.mark_line(interpolate="step",)
         .transform_filter(
             {"not": alt.FieldEqualPredicate(field="Alternative", equal=_GENERIC)}
         )
@@ -259,9 +251,7 @@ def idca_statistics(
     generic_density = (
         ax.mark_line()
         .encode(
-            x=name,
-            y=alt.Y("Density", title="Density"),
-            color=alt.ColorValue("black"),
+            x=name, y=alt.Y("Density", title="Density"), color=alt.ColorValue("black"),
         )
         .transform_filter(
             {
@@ -299,9 +289,7 @@ def idca_statistics(
 
     if choice is not None:
         f_areas = (
-            ax.mark_area(
-                interpolate="step",
-            )
+            ax.mark_area(interpolate="step",)
             .encode(
                 x=name,
                 y=alt.Y("FrequencyChosen", title="Frequency"),
@@ -359,14 +347,8 @@ def idca_statistics(
     def make_col(colname, title):
         return (
             tab.mark_text()
-            .encode(
-                y=alt.Y("index:O", axis=None),
-                text=colname,
-                size=alt.value(10),
-            )
-            .properties(
-                title=alt.TitleParams(text=title, align="center", fontSize=10),
-            )
+            .encode(y=alt.Y("index:O", axis=None), text=colname, size=alt.value(10),)
+            .properties(title=alt.TitleParams(text=title, align="center", fontSize=10),)
         )
 
     col1 = make_col("alt_names", "Alternative")

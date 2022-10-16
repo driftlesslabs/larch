@@ -1,17 +1,17 @@
 import logging
-from abc import ABC, abstractmethod
 
+from scipy.optimize import minimize, Bounds
+from .compiled import compiledmethod, jitmethod
 import jax
 import jax.numpy as jnp
+from abc import abstractmethod, ABC
+from xarray import Dataset
 import numpy as np
 from rich.table import Table
-from scipy.optimize import Bounds, minimize
-from xarray import Dataset
-
-from .compiled import compiledmethod, jitmethod
 
 
 class BucketAccess(ABC):
+
     @abstractmethod
     def jax_loglike(self, params):
         raise NotImplementedError
@@ -121,9 +121,7 @@ class OptimizeMixin(BucketAccess):
                 rich_table.add_row(
                     str(self.pnames[i]),
                     f"{params[i]: .8g}",
-                    " locked"
-                    if self.pholdfast[i]
-                    else f"{self._latest_gradient[i]: .8g}",
+                    " locked" if self.pholdfast[i] else f"{self._latest_gradient[i]: .8g}",
                     f"{best[i]: .8g}",
                 )
         return rich_table
@@ -137,12 +135,11 @@ class OptimizeMixin(BucketAccess):
         if np.isnan(result):
             result = np.inf
         if self.dashboard is not None:
-            if self.dashboard.throttle():
-                self.dashboard.update_content(
-                    loglike=-result,
-                    params=self.__rich_table(params),
-                    bestloglike=self._cached_loglike_best,
-                )
+            self.dashboard.update_content(
+                loglike=-result,
+                params=self.__rich_table(params),
+                bestloglike=self._cached_loglike_best,
+            )
         return result
 
     def jax_neg_d_loglike(self, *args, **kwargs):
@@ -150,7 +147,6 @@ class OptimizeMixin(BucketAccess):
 
     def __neg_d_loglike(self, *args, **kwargs):
         result = self.jax_neg_d_loglike(*args, **kwargs)
-        result = result.at[self.pholdfast != 0].set(0)  # zero out holdfast parameters
         self._latest_gradient = -result
         return result
 
@@ -167,46 +163,25 @@ class OptimizeMixin(BucketAccess):
                     for z1, z2 in zip(self.pnames, pvalues):
                         logging.error(f"  {z1:20s} {z2}")
                 logging.error("</NaN>")
-        elif (
-            self._cached_loglike_best is None or computed_ll > self._cached_loglike_best
-        ):
+        elif self._cached_loglike_best is None or computed_ll > self._cached_loglike_best:
             self._cached_loglike_best = computed_ll
             if pvalues is None:
-                self.add_parameter_array("best", self.pvals)
+                self.add_parameter_array('best', self.pvals)
             else:
-                self.add_parameter_array("best", pvalues)
+                self.add_parameter_array('best', pvalues)
 
-    def jax_maximize_loglike(
-        self,
-        method="slsqp",
-        stderr=False,
-        dashboard=True,
-        dashboard_update=1.0,
-        **kwargs,
-    ):
+    def jax_maximize_loglike(self, method='slsqp', stderr=False, **kwargs):
         from .model.dashboard import Dashboard
-
         self._latest_gradient = np.full_like(self.pvals, np.nan)
         self.dashboard = Dashboard(
             status="[yellow]compiling objective function...",
             params=self.__rich_table(self.pvals),
-            show=dashboard,
-            throttle=dashboard_update if dashboard else 9999,
         )
         try:
-            if method.lower() in {
-                "nelder-mead",
-                "l-bfgs-b",
-                "tnc",
-                "slsqp",
-                "powell",
-                "trust-constr",
-            }:
-                kwargs["bounds"] = self.pbounds
+            if method.lower() in {'nelder-mead', 'l-bfgs-b', 'tnc', 'slsqp', 'powell', 'trust-constr'}:
+                kwargs['bounds'] = self.pbounds
             self.__neg_loglike(self.pvals)
-            self.dashboard.update_content(
-                status="[yellow]compiling gradient function..."
-            )
+            self.dashboard.update_content(status="[yellow]compiling gradient function...")
             self.__neg_d_loglike(self.pvals)
             self.dashboard.update_content(status="[yellow]optimizing parameters...")
             result = minimize(
@@ -214,42 +189,26 @@ class OptimizeMixin(BucketAccess):
                 self.pvals,
                 jac=self.__neg_d_loglike,
                 method=method,
-                **kwargs,
+                **kwargs
             )
-
-            try:
-                result["n_cases"] = self.n_cases
-            except AttributeError:
-                pass
-            if hasattr(self, "total_weight"):
-                result["total_weight"] = self.total_weight()
             self.pvals = result.x
-            if "fun" in result:
-                if hasattr(self, "total_weight"):
-                    result["logloss"] = result["fun"] / self.total_weight()
-                result["loglike"] = -result["fun"]
-                del result["fun"]
-            if "jac" in result:
-                result["jac"] = -result["jac"]
-            self.dashboard.update_content(
-                loglike=result["loglike"],
-                params=self.__rich_table(result.x),
-                bestloglike=self._cached_loglike_best,
-            )
+            if 'fun' in result:
+                result['loglike'] = -result['fun']
+                del result['fun']
+            if 'jac' in result:
+                result['jac'] = -result['jac']
             if stderr:
-                self.dashboard.update_content(
-                    status="[yellow]computing standard errors..."
-                )
+                self.dashboard.update_content(status="[yellow]computing standard errors...")
                 se, hess, ihess = self.jax_param_cov(result.x)
-                result["stderr"] = np.asarray(se)
+                result['stderr'] = se
                 hess = np.asarray(hess).copy()
-                hess[self.pholdfast.astype(bool), :] = 0
-                hess[:, self.pholdfast.astype(bool)] = 0
+                hess[self.pholdfast.astype(bool),:] = 0
+                hess[:,self.pholdfast.astype(bool)] = 0
                 ihess = np.asarray(ihess).copy()
-                ihess[self.pholdfast.astype(bool), :] = 0
-                ihess[:, self.pholdfast.astype(bool)] = 0
-                self.add_parameter_array("hess", hess)
-                self.add_parameter_array("ihess", ihess)
+                ihess[self.pholdfast.astype(bool),:] = 0
+                ihess[:,self.pholdfast.astype(bool)] = 0
+                self.add_parameter_array('hess', hess)
+                self.add_parameter_array('ihess', ihess)
                 self.dashboard.update_content(
                     params=self.__rich_table(result.x, se),
                 )
@@ -257,19 +216,12 @@ class OptimizeMixin(BucketAccess):
         except Exception as err:
             self.dashboard.update_content(status=f"[bright_red]ERROR [red]{err}")
             raise
-        self._most_recent_estimation_result = result
         return result
 
     def jax_param_cov(self, params):
         hess = self.jax_d2_loglike(params)
-        holds = self.parameters["holdfast"] != 0
-        frees = (self.parameters["holdfast"] == 0).astype(jnp.float32).values
-        if holds.any():
-            hess = hess * frees.reshape(-1, 1)
-            hess = hess * frees.reshape(1, -1)
+        if self.parameters['holdfast'].sum():
             ihess = jnp.linalg.pinv(hess)
-            ihess = ihess * frees.reshape(-1, 1)
-            ihess = ihess * frees.reshape(1, -1)
         else:
             ihess = jnp.linalg.inv(hess)
         se = jnp.sqrt(ihess.diagonal())

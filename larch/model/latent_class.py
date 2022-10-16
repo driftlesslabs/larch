@@ -1,24 +1,20 @@
-import jax
+from .param_core import ParameterBucket
+from ..compiled import compiledmethod, jitmethod, reset_compiled_methods
+from ..optimize import OptimizeMixin
+from ..folding import fold_dataset
+from .jaxmodel import PanelMixin, _get_jnp_array
 import jax.numpy as jnp
+import jax
+from ..dataset import Dataset, DataTree
+from .mixtures import MixtureList
 import numpy as np
 import pandas as pd
 import xarray as xr
 
-from ..compiled import compiledmethod, jitmethod, reset_compiled_methods
-from ..dataset import Dataset, DataTree
-from ..folding import fold_dataset
-from ..optimize import OptimizeMixin
-from .jaxmodel import PanelMixin, _get_jnp_array
-from .mixtures import MixtureList
-from .param_core import ParameterBucket
-
-
 class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
-    compute_engine = "jax"
+    compute_engine = 'jax'
 
-    def __init__(
-        self, classmodel, choicemodels, datatree=None, float_dtype=np.float32, **kwargs
-    ):
+    def __init__(self, classmodel, choicemodels, datatree=None, float_dtype=np.float32, **kwargs):
         PanelMixin.__init__(self, **kwargs)
         self._is_mangled = True
         self._dataset = None
@@ -32,20 +28,19 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
             for v in self._models.values():
                 v.float_dtype = float_dtype
 
-    def save(self, filename, format="yaml", overwrite=False):
+    def save(self, filename, format='yaml'):
         from .saving import save_model
-
-        return save_model(self, filename, format=format, overwrite=overwrite)
+        return save_model(self, filename, format=format)
 
     @classmethod
     def from_dict(cls, content):
-        _models = content.get("_models")
+        _models = content.get('_models')
         from .saving import load_model
 
         classmodel = None
         choicemodels = {}
         for k, v in _models.items():
-            if k == "classmodel":
+            if k == 'classmodel':
                 classmodel = load_model(v)
             else:
                 choicemodels[k] = load_model(v)
@@ -65,32 +60,31 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
                     else:
                         injector(i)
 
-        loadthis("float_dtype", lambda i: getattr(np, i))
-        loadthis("compute_engine")
-        loadthis("index_name")
-        loadthis("parameters", xr.Dataset.from_dict, self.update_parameters)
-        loadthis("availability_any")
-        loadthis("availability_ca_var")
-        loadthis("availability_co_vars")
-        loadthis("choice_any")
-        loadthis("choice_ca_var")
-        loadthis("choice_co_code")
-        loadthis("choice_co_vars")
-        loadthis("constraint_intensity")
-        loadthis("constraint_sharpness")
-        loadthis("constraints")
+        loadthis('float_dtype', lambda i: getattr(np, i))
+        loadthis('compute_engine')
+        loadthis('index_name')
+        loadthis('parameters', xr.Dataset.from_dict, self.update_parameters)
+        loadthis('availability_any')
+        loadthis('availability_ca_var')
+        loadthis('availability_co_vars')
+        loadthis('choice_any')
+        loadthis('choice_ca_var')
+        loadthis('choice_co_code')
+        loadthis('choice_co_vars')
+        loadthis('constraint_intensity')
+        loadthis('constraint_sharpness')
+        loadthis('constraints')
         from .tree import NestingTree
-
-        loadthis("graph", NestingTree.from_dict)
-        loadthis("groupid")
-        loadthis("logsum_parameter")
-        loadthis("quantity_ca")
-        loadthis("quantity_scale")
-        loadthis("title")
-        loadthis("utility_ca")
-        loadthis("utility_co")
-        loadthis("weight_co_var")
-        loadthis("weight_normalization")
+        loadthis('graph', NestingTree.from_dict)
+        loadthis('groupid')
+        loadthis('logsum_parameter')
+        loadthis('quantity_ca')
+        loadthis('quantity_scale')
+        loadthis('title')
+        loadthis('utility_ca')
+        loadthis('utility_co')
+        loadthis('weight_co_var')
+        loadthis('weight_normalization')
         return self
 
     @property
@@ -99,9 +93,9 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
 
     @jitmethod
     def jax_probability(self, params):
-        classmodel = self["classmodel"]
+        classmodel = self['classmodel']
         pr_parts = []
-        for n, k in enumerate(self["classmodel"].dataset.dc.altids()):
+        for n, k in enumerate(self['classmodel'].dataset.dc.altids()):
             pr_parts.append(
                 self._models[k].jax_probability(params)
                 * jnp.expand_dims(classmodel.jax_probability(params)[..., n], -1)
@@ -111,21 +105,30 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
     @jitmethod
     def jax_loglike_casewise(self, params):
         n_alts = self.dataset.dc.n_alts
-        ch = jnp.asarray(self.dataset["ch"])
+        ch = jnp.asarray(self.dataset['ch'])
         if ch.ndim == 2:
             pr = self.jax_probability(params)
-            masked_pr = jnp.where(ch[..., :n_alts] > 0, pr[..., :n_alts], 1.0)
+            masked_pr = jnp.where(
+                ch[..., :n_alts]>0,
+                pr[..., :n_alts],
+                1.0
+            )
             log_pr = jnp.log(masked_pr)
-            return (log_pr[..., :n_alts] * ch[..., :n_alts]).sum()
+            return (log_pr[...,:n_alts] * ch[...,:n_alts]).sum()
         elif ch.ndim >= 3:
-            classmodel = self["classmodel"]
+            classmodel = self['classmodel']
             likely_parts = []
-            for n, k in enumerate(self["classmodel"].dataset.dc.altids()):
+            for n, k in enumerate(self['classmodel'].dataset.dc.altids()):
                 k_pr = self._models[k].jax_probability(params)
-                masked_k_pr = jnp.where(ch[..., :n_alts] > 0, k_pr[..., :n_alts], 1.0)
-                k_likely = jnp.power(masked_k_pr, ch[..., :n_alts]).prod([-2, -1])
+                masked_k_pr = jnp.where(
+                    ch[..., :n_alts] > 0,
+                    k_pr[..., :n_alts],
+                    1.0
+                )
+                k_likely = jnp.power(masked_k_pr, ch[..., :n_alts]).prod([-2,-1])
                 likely_parts.append(
-                    k_likely * classmodel.jax_probability(params)[..., 0, n]
+                    k_likely
+                    * classmodel.jax_probability(params)[..., 0, n]
                 )
             return jnp.log(sum(likely_parts))
 
@@ -134,16 +137,20 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
         return self.jax_loglike_casewise(params).sum()
 
     def loglike(
-        self, x=None, *, start_case=None, stop_case=None, step_case=None, **kwargs
+            self,
+            x=None,
+            *,
+            start_case=None, stop_case=None, step_case=None,
+            **kwargs
     ):
-        if self.compute_engine != "jax":
-            raise NotImplementedError(f"latent class with engine={self.compute_engine}")
+        if self.compute_engine != 'jax':
+            raise NotImplementedError(f'latent class with engine={self.compute_engine}')
         if start_case is not None:
-            raise NotImplementedError("start_case with engine=jax")
+            raise NotImplementedError('start_case with engine=jax')
         if stop_case is not None:
-            raise NotImplementedError("stop_case with engine=jax")
+            raise NotImplementedError('stop_case with engine=jax')
         if step_case is not None:
-            raise NotImplementedError("step_case with engine=jax")
+            raise NotImplementedError('step_case with engine=jax')
         if x is not None:
             self.pvals = x
         result = float(self.jax_loglike(self.pvals))
@@ -152,23 +159,19 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
         return result
 
     def neg_loglike(
-        self,
-        x=None,
-        start_case=None,
-        stop_case=None,
-        step_case=None,
-        leave_out=-1,
-        keep_only=-1,
-        subsample=-1,
+            self,
+            x=None,
+            start_case=None,
+            stop_case=None,
+            step_case=None,
+            leave_out=-1,
+            keep_only=-1,
+            subsample=-1,
     ):
         result = self.loglike(
             x,
-            start_case=start_case,
-            stop_case=stop_case,
-            step_case=step_case,
-            leave_out=leave_out,
-            keep_only=keep_only,
-            subsample=subsample,
+            start_case=start_case, stop_case=stop_case, step_case=step_case,
+            leave_out=leave_out, keep_only=keep_only, subsample=subsample
         )
         return -result
 
@@ -177,23 +180,21 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
         return jax.grad(self.jax_loglike)(params)
 
     def d_loglike(
-        self,
-        x=None,
-        *,
-        start_case=None,
-        stop_case=None,
-        step_case=None,
-        return_series=False,
-        **kwargs,
+            self,
+            x=None,
+            *,
+            start_case=None, stop_case=None, step_case=None,
+            return_series=False,
+            **kwargs,
     ):
-        if self.compute_engine != "jax":
-            raise NotImplementedError(f"latent class with engine={self.compute_engine}")
+        if self.compute_engine != 'jax':
+            raise NotImplementedError(f'latent class with engine={self.compute_engine}')
         if start_case is not None:
-            raise NotImplementedError("start_case with engine=jax")
+            raise NotImplementedError('start_case with engine=jax')
         if stop_case is not None:
-            raise NotImplementedError("stop_case with engine=jax")
+            raise NotImplementedError('stop_case with engine=jax')
         if step_case is not None:
-            raise NotImplementedError("step_case with engine=jax")
+            raise NotImplementedError('step_case with engine=jax')
         if x is not None:
             self.pvals = x
         result = self.jax_d_loglike(self.pvals)
@@ -206,14 +207,16 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
 
     def neg_d_loglike(self, x=None, start_case=0, stop_case=-1, step_case=1, **kwargs):
         result = self.d_loglike(
-            x, start_case=start_case, stop_case=stop_case, step_case=step_case, **kwargs
+            x,
+            start_case=start_case, stop_case=stop_case, step_case=step_case,
+            **kwargs
         )
         return -np.asarray(result)
 
     def maximize_loglike(
-        self,
-        *args,
-        **kwargs,
+            self,
+            *args,
+            **kwargs,
     ):
         """
         Maximize the log likelihood.
@@ -243,7 +246,6 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
 
         """
         from .optimization import maximize_loglike
-
         return maximize_loglike(self, *args, **kwargs)
 
     def reflow_data_arrays(self):
@@ -255,10 +257,10 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
         if datatree is None:
             raise ValueError("missing datatree")
 
-        request = self._models["classmodel"].required_data()
-        request.pop("avail_any", None)
+        request = self._models['classmodel'].required_data()
+        request.pop('avail_any', None)
         for kname, kmodel in self._models.items():
-            if kname == "classmodel":
+            if kname == 'classmodel':
                 continue
             kreq = kmodel.required_data()
             for k, v in kreq.items():
@@ -274,30 +276,29 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
                             raise ValueError("incompatible requests")
 
         if isinstance(self.groupid, str):
-            request["group_co"] = self.groupid
+            request['group_co'] = self.groupid
 
         from .data_arrays import prepare_data
-
         dataset, self.dataflows = prepare_data(
             datasource=datatree,
             request=request,
             float_dtype=np.float32,
             cache_dir=datatree.cache_dir,
-            flows=getattr(self, "dataflows", None),
+            flows=getattr(self, 'dataflows', None),
         )
         if isinstance(self.groupid, str):
-            dataset = fold_dataset(dataset, "group")
+            dataset = fold_dataset(dataset, 'group')
         elif self.groupid is not None:
             dataset = fold_dataset(dataset, self.groupid)
         self.dataset = dataset
 
         for kname, kmodel in self._models.items():
-            if kname == "classmodel":
+            if kname == 'classmodel':
                 continue
             kmodel.dataset = self.dataset
-        self._models["classmodel"].dataset = self.dataset.drop_dims(
+        self._models['classmodel'].dataset = self.dataset.drop_dims(
             self.dataset.dc.ALTID
-        ).dc.set_altids(self._models["classmodel"].dataset.dc.altids())
+        ).dc.set_altids(self._models['classmodel'].dataset.dc.altids())
 
     def mangle(self):
         super().mangle()
@@ -326,7 +327,6 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
         if dataset is self._dataset:
             return
         from xarray import Dataset as _Dataset
-
         if isinstance(dataset, Dataset):
             self._dataset = dataset
             self._data_arrays = None
@@ -369,13 +369,12 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
         return self._dataset
 
 
+
 class MixedLatentClass(LatentClass):
 
     mixtures = MixtureList()
 
-    def __init__(
-        self, *args, n_draws=100, prerolled_draws=True, common_draws=False, **kwargs
-    ):
+    def __init__(self, *args, n_draws=100, prerolled_draws=True, common_draws=False, **kwargs):
         super().__init__(*args, **kwargs)
         self._n_draws = n_draws
         self._draws = None
@@ -385,7 +384,6 @@ class MixedLatentClass(LatentClass):
     @classmethod
     def from_dict(cls, content):
         self = super().from_dict(content)
-
         def loadthis(attr, wrapper=None, injector=None):
             i = content.get(attr, None)
             if i is not None:
@@ -399,11 +397,10 @@ class MixedLatentClass(LatentClass):
                         setattr(self, attr, i)
                     else:
                         injector(i)
-
-        loadthis("mixtures", self.mixtures.from_list)
-        loadthis("n_draws")
-        loadthis("prerolled_draws")
-        loadthis("common_draws")
+        loadthis('mixtures', self.mixtures.from_list)
+        loadthis('n_draws')
+        loadthis('prerolled_draws')
+        loadthis('common_draws')
 
     def apply_random_draws(self, parameters, draws=None):
         # if draws is None:
@@ -417,10 +414,7 @@ class MixedLatentClass(LatentClass):
         return parameters
 
     def _make_random_draws_out(self, n_draws, n_mixtures, random_key):
-        draws = jax.random.uniform(
-            random_key,
-            [n_draws, n_mixtures],
-        )
+        draws = jax.random.uniform(random_key, [n_draws, n_mixtures],)
 
         def body(i, carry):
             draws, rnd_key = carry
@@ -435,30 +429,26 @@ class MixedLatentClass(LatentClass):
 
     @jitmethod
     def _jax_probability_by_class(self, params, databundle):
-        # classmodel = self['classmodel']
+        #classmodel = self['classmodel']
         pr_parts = []
-        for n, k in enumerate(self["classmodel"].dataset.dc.altids()):
+        for n, k in enumerate(self['classmodel'].dataset.dc.altids()):
             pr_parts.append(
                 self._models[k]._jax_probability(params, databundle)
-                # * jnp.expand_dims(classmodel._jax_probability(params, databundle)[..., n], -1)
+                #* jnp.expand_dims(classmodel._jax_probability(params, databundle)[..., n], -1)
             )
         return jnp.stack(pr_parts)
 
     @jitmethod
     def _jax_likelihood_by_class(self, params, databundle):
         n_alts = self.dataset.dc.n_alts
-        ch = databundle.get("ch", None)[..., :n_alts]
-        pr_parts = self._jax_probability_by_class(params, databundle)[..., :n_alts]
-        likely = jnp.where(
-            jnp.expand_dims(ch, 0), pr_parts, 1.0
-        )  # TODO make power if needed
+        ch = databundle.get("ch", None)[...,:n_alts]
+        pr_parts = self._jax_probability_by_class(params, databundle)[...,:n_alts]
+        likely = jnp.where(jnp.expand_dims(ch, 0), pr_parts, 1.0)  # TODO make power if needed
         return likely
 
     @jitmethod(static_argnums=(3,), static_argnames="n_draws")
-    def _jax_loglike_casewise_mixed(
-        self, params, databundle, groupbundle=None, n_draws=100
-    ):
-        classmodel = self["classmodel"]
+    def _jax_loglike_casewise_mixed(self, params, databundle, groupbundle=None, n_draws=100):
+        classmodel = self['classmodel']
         if self.prerolled_draws:
             draws = groupbundle.get("draws", None)
         else:
@@ -468,39 +458,25 @@ class MixedLatentClass(LatentClass):
         rand_params = self.apply_random_draws(params, draws)
         if ch.ndim == 2:  # PANEL DATA
             # vmap over ingroup
-            likelihood_f = jax.vmap(
-                self._jax_likelihood_by_class,
-                in_axes=(None, 0),
-            )
+            likelihood_f = jax.vmap(self._jax_likelihood_by_class, in_axes=(None, 0),)
             # vmap over draws
-            likelihood = jax.vmap(
-                likelihood_f,
-                in_axes=(0, None),
-                out_axes=-1,
-            )(rand_params, databundle)
+            likelihood = jax.vmap(likelihood_f, in_axes=(0, None), out_axes=-1,)(
+                rand_params, databundle
+            )
             # collapse likelihood over all alternatives over all cases-within-panel
             likelihood = likelihood.prod([0, 2])
             # likelihood.shape is now (n_classes, n_draws)
             ################
             class_pr = jax.vmap(
-                classmodel._jax_probability,
-                in_axes=(0, None),
-                out_axes=-1,
-            )(
-                rand_params,
-                {
-                    "co": databundle["co"][0],
-                },
-            )
+                classmodel._jax_probability, in_axes=(0, None), out_axes=-1,
+            )(rand_params, {'co':databundle['co'][0],})
             # class_pr.shape = (nclasses, ndraws)
             meta_likely = (likelihood * class_pr).sum(0).mean(0)
             return jnp.log(meta_likely)
         else:
             # vmap over draws
             likelihood = jax.vmap(
-                self._jax_likelihood_by_class,
-                in_axes=(0, None),
-                out_axes=-1,
+                self._jax_likelihood_by_class, in_axes=(0, None), out_axes=-1,
             )(rand_params, databundle)
             # collapse likelihood over all alternatives
             likelihood = likelihood.prod(0)
@@ -540,7 +516,6 @@ class MixedLatentClass(LatentClass):
             self._jax_loglike_casewise_mixed
         )  # params, databundle, groupbundle=None, n_draws=100
         from .random import keysplit
-
         commons = None if self.common_draws else 0
         for i in range(depth):
             f = jax.vmap(f, in_axes=(None, 0, commons, None))
@@ -561,7 +536,7 @@ class MixedLatentClass(LatentClass):
                 n_draws,
             )
 
-    def make_random_draws(self, engine="numpy"):
+    def make_random_draws(self, engine='numpy'):
         self.unmangle()
         for i in self.mixtures:
             i.prep(self)
@@ -572,20 +547,14 @@ class MixedLatentClass(LatentClass):
         if self._draws is not None:
             if self.common_draws and self._draws.shape == (n_draws, n_mixtures):
                 draws = self._draws
-            if not self.common_draws and self._draws.shape == (
-                n_panels,
-                n_draws,
-                n_mixtures,
-            ):
+            if not self.common_draws and self._draws.shape == (n_panels, n_draws, n_mixtures):
                 draws = self._draws
         if draws is None:
-            if engine == "numpy":
+            if engine == 'numpy':
                 seed = getattr(self, "seed", 0)
                 if self.common_draws:
                     if n_draws > 0 and n_mixtures > 0:
-                        draws, seed = self._make_random_draws_numpy(
-                            n_draws, n_mixtures, seed
-                        )
+                        draws, seed = self._make_random_draws_numpy(n_draws, n_mixtures, seed)
                 else:
                     if n_draws > 0 and n_mixtures > 0 and n_panels > 0:
                         draws, seed = self._make_random_draws_numpy_2(
@@ -593,12 +562,14 @@ class MixedLatentClass(LatentClass):
                         )
                     else:
                         draws = None
-            elif engine == "jax":
+            elif engine == 'jax':
                 seed = getattr(self, "seed", 0)
                 rk = jax.random.PRNGKey(seed)
                 if self.common_draws:
                     if n_draws > 0 and n_mixtures > 0:
-                        draws = self._make_random_draws_out(n_draws, n_mixtures, rk)[0]
+                        draws = self._make_random_draws_out(n_draws, n_mixtures, rk)[
+                            0
+                        ]
                 else:
                     if n_draws > 0 and n_mixtures > 0 and n_panels > 0:
                         draws = self._make_random_draws_out_2(

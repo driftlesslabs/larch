@@ -3,7 +3,7 @@ import numpy as np
 import xarray as xr
 from pytest import approx, fixture
 
-import larix as lx
+import larch as lx
 
 inf = np.inf
 
