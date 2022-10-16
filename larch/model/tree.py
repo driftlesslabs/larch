@@ -2,10 +2,9 @@ import heapq
 from collections import OrderedDict
 
 import networkx as nx
-import numpy
+import numpy as np
 
 from ..util.lazy import lazy
-from ..util.touch_notifier import TouchNotify
 
 
 def add_split_key(d, k, v):
@@ -403,7 +402,7 @@ class NestingTree(nx.DiGraph):
     def predecessor_slots(self, code):
         if code in self._predecessor_slots:
             return self._predecessor_slots[code]
-        s = numpy.empty(self.in_degree(code), dtype=numpy.int32)
+        s = np.empty(self.in_degree(code), dtype=np.int32)
         for n, i in enumerate(self.predecessors(code)):
             s[n] = self.standard_slot_map[i]
         self._predecessor_slots[code] = s
@@ -412,7 +411,7 @@ class NestingTree(nx.DiGraph):
     def successor_slots(self, code):
         if code in self._successor_slots:
             return self._successor_slots[code]
-        s = numpy.empty(self.out_degree(code), dtype=numpy.int32)
+        s = np.empty(self.out_degree(code), dtype=np.int32)
         for n, i in enumerate(self.successors(code)):
             s[n] = self.standard_slot_map[i]
         self._successor_slots[code] = s
@@ -461,10 +460,10 @@ class NestingTree(nx.DiGraph):
 
     def edge_slot_arrays(self, alpha_locator=None):
         s = self.n_edges
-        up = numpy.zeros(s, dtype=numpy.int32)
-        dn = numpy.zeros(s, dtype=numpy.int32)
-        first_visit = numpy.zeros(s, dtype=numpy.int32)
-        alloc_slot = numpy.full_like(first_visit, -1)
+        up = np.zeros(s, dtype=np.int32)
+        dn = np.zeros(s, dtype=np.int32)
+        first_visit = np.zeros(s, dtype=np.int32)
+        alloc_slot = np.full_like(first_visit, -1)
         n = s
         first_visit_found = set()
         for upcode in reversed(self.standard_sort):
@@ -624,7 +623,7 @@ class NestingTree(nx.DiGraph):
             # 	if self.is_provisioned():
             # 		try:
             # 			for n, ncode in enumerate(self.alternative_codes()):
-            # 				if numpy.sum(self.Data('Avail'),axis=0)[n,0]==0: unavailable_nodes.add(ncode)
+            # 				if np.sum(self.Data('Avail'),axis=0)[n,0]==0: unavailable_nodes.add(ncode)
             # 		except: raise
             # 	try:
             # 		legible_avail = not isinstance(self.df.queries.avail, str)
@@ -838,7 +837,7 @@ class NestingTree(nx.DiGraph):
         shows = set()
 
         if including_nodes is None and n is not None:
-            including_nodes = sorted(numpy.random.choice(self.nodes, n, replace=False))
+            including_nodes = sorted(np.random.choice(self.nodes, n, replace=False))
 
         if including_nodes is None and n_at_level is not None:
             import itertools
@@ -896,24 +895,50 @@ class NestingTree(nx.DiGraph):
             for i in tier:
                 next_tier.extend(self.successors(i))
 
-    def node_slot_arrays(self, model):
-        muslots = numpy.full(
-            [
-                len(self),
-            ],
-            -1,
-            dtype=numpy.int32,
-        )
-        for child, childcode in enumerate(self.standard_sort):
-            # for parent in self.predecessor_slots(childcode):
-            # 	alpha[parent, child] = 1
-            pname = self.nodes[childcode].get("parameter", None)
-            if pname is None:
-                muslots[child] = -1
-            else:
-                muslots[child] = model.get_param_loc(pname)
-        num = numpy.zeros(len(self.nodes), dtype=numpy.int32)
-        start = numpy.full(len(self.nodes), -1, dtype=numpy.int32)
+    def node_slot_arrays(self, model, parameter_dict=None):
+        """
+
+        Parameters
+        ----------
+        model : Model or dtype
+
+        Returns
+        -------
+        muslots, start, num
+        """
+        if hasattr(model, "get_param_loc"):
+            muslots = np.full(
+                [
+                    len(self),
+                ],
+                -1,
+                dtype=np.int32,
+            )
+            for child, childcode in enumerate(self.standard_sort):
+                # for parent in self.predecessor_slots(childcode):
+                # 	alpha[parent, child] = 1
+                pname = self.nodes[childcode].get("parameter", None)
+                if pname is None:
+                    muslots[child] = -1
+                else:
+                    muslots[child] = model.get_param_loc(pname)
+        else:
+            muslots = np.ones(
+                [
+                    len(self),
+                ],
+                dtype=model,
+            )
+            for child, childcode in enumerate(self.standard_sort):
+                # for parent in self.predecessor_slots(childcode):
+                # 	alpha[parent, child] = 1
+                pname = self.nodes[childcode].get("parameter", None)
+                if parameter_dict is not None and isinstance(pname, str):
+                    pname = parameter_dict.get(pname, pname)
+                if pname is not None:
+                    muslots[child] = model(pname)
+        num = np.zeros(len(self.nodes), dtype=np.int32)
+        start = np.full(len(self.nodes), -1, dtype=np.int32)
         n = self.n_edges
         for upcode in reversed(self.standard_sort):
             upslot = self.standard_slot_map[upcode]
@@ -928,19 +953,19 @@ class NestingTree(nx.DiGraph):
         )
 
     def _get_simple_mu_and_alpha(self, model, holdfast_invalidates=True):
-        # alpha = numpy.zeros([len(self), len(self)], dtype=numpy.float64)
-        mu = numpy.ones(
+        # alpha = np.zeros([len(self), len(self)], dtype=np.float64)
+        mu = np.ones(
             [
                 len(self),
             ],
-            dtype=numpy.float64,
+            dtype=np.float64,
         )
-        muslots = numpy.full(
+        muslots = np.full(
             [
                 len(self),
             ],
             -1,
-            dtype=numpy.int32,
+            dtype=np.int32,
         )
         for child, childcode in enumerate(self.standard_sort):
             # for parent in self.predecessor_slots(childcode):
@@ -953,12 +978,12 @@ class NestingTree(nx.DiGraph):
                     muslots[child] = -1
 
         s = self.n_edges
-        up = numpy.zeros(s, dtype=numpy.int32)
-        dn = numpy.zeros(s, dtype=numpy.int32)
-        val = numpy.zeros(s, dtype=numpy.float64)
-        num = numpy.zeros(len(self.nodes), dtype=numpy.int32)
-        start = numpy.full(len(self.nodes), -1, dtype=numpy.int32)
-        # first_visit = numpy.zeros(s, dtype=numpy.int32)
+        up = np.zeros(s, dtype=np.int32)
+        dn = np.zeros(s, dtype=np.int32)
+        val = np.zeros(s, dtype=np.float64)
+        num = np.zeros(len(self.nodes), dtype=np.int32)
+        start = np.full(len(self.nodes), -1, dtype=np.int32)
+        # first_visit = np.zeros(s, dtype=np.int32)
         n = s
         # first_visit_found = set()
         for upcode in reversed(self.standard_sort):
@@ -1001,6 +1026,27 @@ class NestingTree(nx.DiGraph):
             for j, v in jv.items():
                 self.add_edge(i, j, **v)
         return self
+
+    def as_arrays(self, model=np.float32, trim=True, parameter_dict=None):
+        result = {}
+        result["n_nodes"] = len(self)
+        result["n_alts"] = n_alts = self.n_elementals()
+        up, dn, first_visit, alloc_slot = self.edge_slot_arrays()
+        result["edges_up"] = up
+        result["edges_dn"] = dn
+        result["edges_1st"] = first_visit
+        result["edges_alloc"] = alloc_slot
+        muslots, start, num = self.node_slot_arrays(
+            model=model, parameter_dict=parameter_dict
+        )
+        if trim:
+            muslots = muslots[n_alts:]
+            start = start[n_alts:]
+            num = num[n_alts:]
+        result["mu_params"] = muslots
+        result["start_slots"] = start
+        result["len_slots"] = num
+        return result
 
 
 def graph_to_figure(graph, output_format="svg", **format):
@@ -1069,7 +1115,7 @@ def graph_to_figure(graph, output_format="svg", **format):
     # 	if self.is_provisioned():
     # 		try:
     # 			for n, ncode in enumerate(self.alternative_codes()):
-    # 				if numpy.sum(self.Data('Avail'),axis=0)[n,0]==0: unavailable_nodes.add(ncode)
+    # 				if np.sum(self.Data('Avail'),axis=0)[n,0]==0: unavailable_nodes.add(ncode)
     # 		except: raise
     # 	try:
     # 		legible_avail = not isinstance(self.df.queries.avail, str)

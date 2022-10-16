@@ -6,7 +6,9 @@ import numpy as np
 from addicty import Dict
 from yaml import SafeDumper
 
-from .linear import DictOfLinearFunction, LinearComponent, LinearFunction
+from .constraints import ParametricConstraintList
+from .linear import DictOfAlts, DictOfLinearFunction, LinearComponent, LinearFunction
+from .tree import NestingTree
 
 SafeDumper.add_representer(
     np.float64, lambda dumper, data: dumper.represent_float(float(data))
@@ -24,6 +26,9 @@ SafeDumper.add_representer(
     np.bool_, lambda dumper, data: dumper.represent_bool(bool(data))
 )
 SafeDumper.add_representer(
+    np.str_, lambda dumper, data: dumper.represent_str(str(data))
+)
+SafeDumper.add_representer(
     np.ndarray, lambda dumper, data: dumper.represent_list(list(data))
 )
 SafeDumper.add_representer(
@@ -35,11 +40,25 @@ SafeDumper.add_representer(
 SafeDumper.add_representer(
     DictOfLinearFunction, lambda dumper, data: dumper.represent_dict(dict(data))
 )
+SafeDumper.add_representer(
+    DictOfAlts, lambda dumper, data: dumper.represent_dict(dict(data))
+)
+SafeDumper.add_representer(
+    ParametricConstraintList, lambda dumper, data: dumper.represent_list(list(data))
+)
+SafeDumper.add_representer(
+    ParametricConstraintList, lambda dumper, data: dumper.represent_list(list(data))
+)
+SafeDumper.add_representer(
+    NestingTree, lambda dumper, data: dumper.represent_dict(data.to_dict())
+)
 
 
-def save_model(m, filename=None, format="yaml"):
+def save_model(m, filename=None, format="yaml", overwrite=False):
 
     if format == "yaml":
+        if overwrite and os.path.isfile(filename):
+            os.unlink(filename)
         return _save_model_yaml(m, filename)
     elif format == "raw":
         return _save_model_yaml(m, None, raw=True)
@@ -48,6 +67,21 @@ def save_model(m, filename=None, format="yaml"):
 
 
 def load_model(filename_or_content):
+    if isinstance(filename_or_content, str) and os.path.exists(filename_or_content):
+        if filename_or_content.endswith(".html") or filename_or_content.endswith(
+            ".xhtml"
+        ):
+            from .. import read_metadata
+
+            try:
+                y = read_metadata(filename_or_content)
+            except:
+                raise
+            else:
+                if isinstance(y, str) and "\n" in y:
+                    y = Dict.load(y)
+                if y is not None:
+                    filename_or_content = y
     return _load_model_yaml(filename_or_content)
 
 
@@ -75,11 +109,11 @@ def _save_model_yaml(m, filename, skipping=(), raw=False):
     x.model_type = f"{m.__class__.__module__}.{m.__class__.__name__}"
     savethis("availability_any")
     savethis("availability_ca_var")
-    savethis("availability_co_vars")
+    savethis("availability_co_vars", "to_dict")
     savethis("choice_any")
     savethis("choice_ca_var")
     savethis("choice_co_code")
-    savethis("choice_co_vars")
+    savethis("choice_co_vars", "to_dict")
     savethis("common_draws")
     savethis("compute_engine")
     savethis("constraint_intensity")
