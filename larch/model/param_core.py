@@ -1,8 +1,9 @@
 import logging
+from numbers import Number
 
 import numpy as np
 import xarray as xr
-from numbers import Number
+
 
 def new_name(existing_names):
     n = 1
@@ -69,7 +70,7 @@ class ParameterBucket:
             self._aggregate_parameters()
 
     def detach_model(self, model):
-        name = getattr(model, '_name_in_parameter_bucket', None)
+        name = getattr(model, "_name_in_parameter_bucket", None)
         if name is None:
             return
         elif self._models[name] is model:
@@ -102,11 +103,15 @@ class ParameterBucket:
 
     def _clean_dtypes(self, new_params):
         for k in new_params:
-            new_params = new_params.assign({k: new_params[k].astype(self._preferred_data_type(k))})
+            new_params = new_params.assign(
+                {k: new_params[k].astype(self._preferred_data_type(k))}
+            )
         return new_params
 
     def update_parameters(self, other):
         if isinstance(other, xr.Dataset):
+            if "param_name_2" in other.dims:
+                other = other.drop_dims("param_name_2")  # TODO, keep 2nd dim
             if len(other.dims) != 1:
                 raise ValueError("expected parameters to be a 1-d vector")
             other_dim = iter(other.dims).__next__()
@@ -114,15 +119,13 @@ class ParameterBucket:
         else:
             joint_names = set(self.pnames) | set(other.pnames)
         should_mangle = False
-        new_params = self._params.reindex(
-            {self.index_name: sorted(joint_names)}
-        )
+        new_params = self._params.reindex({self.index_name: sorted(joint_names)})
         filling = [i for i in new_params if i in other]
         try:
             new_params = new_params.fillna(other[filling])
         except ValueError as err:
-            logging.getLogger(__name__).error(f"{other=}")
-            logging.getLogger(__name__).exception(f"{err=}")
+            logging.getLogger(__name__).error(f"other={other}")
+            logging.getLogger(__name__).exception(f"err={err}")
         if new_params[self.index_name].size != self._params[
             self.index_name
         ].size or any(new_params[self.index_name] != self._params[self.index_name]):
@@ -154,8 +157,15 @@ class ParameterBucket:
         for j in range(values.ndim):
             if values.shape[j] != self.n_params:
                 raise ValueError(f"cannot add array, unexpected shape {values.shape}")
-        dims = [self.index_name] * values.ndim
-        self._params = self._params.assign({name: xr.DataArray(np.asarray(values), dims=dims)})
+        if values.ndim == 1:
+            dims = [self.index_name]
+        else:
+            dims = [self.index_name] + [
+                f"{self.index_name}_{j+2}" for j in range(values.ndim - 1)
+            ]
+        self._params = self._params.assign(
+            {name: xr.DataArray(np.asarray(values), dims=dims)}
+        )
 
     def add_parameter_array(self, name, values):
         return self.add_array(name, values)
@@ -193,11 +203,15 @@ class ParameterBucket:
             else:
                 raise ValueError(f"unknown value set {x}")
         if isinstance(x, dict):
-            candidates = xr.DataArray(
-                np.asarray(list(x.values())),
-                dims=self.index_name,
-                coords={self.index_name: np.asarray(list(x.keys()))}
-            ).reindex({self.index_name: self.pnames}).fillna(self.pvals)
+            candidates = (
+                xr.DataArray(
+                    np.asarray(list(x.values())),
+                    dims=self.index_name,
+                    coords={self.index_name: np.asarray(list(x.keys()))},
+                )
+                .reindex({self.index_name: self.pnames})
+                .fillna(self.pvals)
+            )
             x = np.where(
                 self._params["holdfast"].to_numpy(),
                 self._params["value"].to_numpy(),
@@ -225,11 +239,16 @@ class ParameterBucket:
     @pholdfast.setter
     def pholdfast(self, x):
         if isinstance(x, dict):
-            x = xr.DataArray(
-                np.asarray(list(x.values())),
-                dims=self.index_name,
-                coords={self.index_name: np.asarray(list(x.keys()))}
-            ).reindex({self.index_name: self.pnames}).fillna(self.pholdfast).astype(np.int8)
+            x = (
+                xr.DataArray(
+                    np.asarray(list(x.values())),
+                    dims=self.index_name,
+                    coords={self.index_name: np.asarray(list(x.keys()))},
+                )
+                .reindex({self.index_name: self.pnames})
+                .fillna(self.pholdfast)
+                .astype(np.int8)
+            )
         self._params = self._params.assign(
             {"holdfast": xr.DataArray(x, dims=self._params["holdfast"].dims)}
         )
@@ -241,11 +260,15 @@ class ParameterBucket:
     @pmaximum.setter
     def pmaximum(self, x):
         if isinstance(x, dict):
-            candidates = xr.DataArray(
-                np.asarray(list(x.values())),
-                dims=self.index_name,
-                coords={self.index_name: np.asarray(list(x.keys()))}
-            ).reindex({self.index_name: self.pnames}).fillna(self.pmaximum)
+            candidates = (
+                xr.DataArray(
+                    np.asarray(list(x.values())),
+                    dims=self.index_name,
+                    coords={self.index_name: np.asarray(list(x.keys()))},
+                )
+                .reindex({self.index_name: self.pnames})
+                .fillna(self.pmaximum)
+            )
             x = np.where(
                 self._params["holdfast"].to_numpy(),
                 self._params["maximum"].to_numpy(),
@@ -269,11 +292,15 @@ class ParameterBucket:
     @pminimum.setter
     def pminimum(self, x):
         if isinstance(x, dict):
-            candidates = xr.DataArray(
-                np.asarray(list(x.values())),
-                dims=self.index_name,
-                coords={self.index_name: np.asarray(list(x.keys()))}
-            ).reindex({self.index_name: self.pnames}).fillna(self.pminimum)
+            candidates = (
+                xr.DataArray(
+                    np.asarray(list(x.values())),
+                    dims=self.index_name,
+                    coords={self.index_name: np.asarray(list(x.keys()))},
+                )
+                .reindex({self.index_name: self.pnames})
+                .fillna(self.pminimum)
+            )
             x = np.where(
                 self._params["holdfast"].to_numpy(),
                 self._params["minimum"].to_numpy(),
@@ -295,6 +322,7 @@ class ParameterBucket:
         """scipy.optimize.Bounds : A copy of the current min-max bounds of the parameters."""
         self.unmangle()
         from scipy.optimize import Bounds
+
         return Bounds(
             self.pminimum,
             self.pmaximum,
@@ -320,18 +348,20 @@ class ParameterBucket:
         maximum_ = np.where(minimum_ <= maximum_, maximum_, self.pmaximum)
 
         # set any NaN bounds to the cap
-        minimum_ = np.where(np.isnan(minimum_), minimum_, -cap)
-        maximum_ = np.where(np.isnan(maximum_), maximum_, cap)
+        minimum_ = np.where(np.isnan(minimum_), -cap, minimum_)
+        maximum_ = np.where(np.isnan(maximum_), cap, maximum_)
 
         # restore the originals for holdfast parameters
         minimum_ = np.where(self.pholdfast, self.pminimum, minimum_)
         maximum_ = np.where(self.pholdfast, self.pmaximum, maximum_)
 
         # write out new bounds
-        self._params = self._params.assign({
-            "minimum": xr.DataArray(minimum_, dims=self._params["value"].dims),
-            "maximum": xr.DataArray(maximum_, dims=self._params["value"].dims),
-        })
+        self._params = self._params.assign(
+            {
+                "minimum": xr.DataArray(minimum_, dims=self._params["value"].dims),
+                "maximum": xr.DataArray(maximum_, dims=self._params["value"].dims),
+            }
+        )
 
     @property
     def pnames(self):
@@ -378,12 +408,13 @@ class ParameterBucket:
         raise KeyError
 
     def _assign(self, key, param_name, value):
-        self._params = self._params.assign({
-            key: self._params[key].where(
-                self._params[self.index_name] != param_name,
-                value
-            )
-        })
+        self._params = self._params.assign(
+            {
+                key: self._params[key].where(
+                    self._params[self.index_name] != param_name, value
+                )
+            }
+        )
 
     def lock(self, values=None, **kwargs):
         if values is None:
@@ -420,8 +451,10 @@ class ParameterBucket:
             return
         if existing is not None:
             existing.detach_model(instance)
-        _name_in_parameter_bucket = getattr(instance, '_name_in_parameter_bucket', None)
-        value.attach_model(instance, _name_in_parameter_bucket, agg=False, unmangle=False)
+        _name_in_parameter_bucket = getattr(instance, "_name_in_parameter_bucket", None)
+        value.attach_model(
+            instance, _name_in_parameter_bucket, agg=False, unmangle=False
+        )
         if existing is not None:
             value.update_parameters(existing)
         setattr(instance, self.private_name, value)
@@ -436,13 +469,15 @@ class ParameterBucket:
 
     def pretty_table(self, name_width=25):
         from rich.table import Table
+
         params = self._params
         rich_table = Table()
         idx_name, n = next(iter(params.dims.items()))
         for column in params.variables:
-            rich_table.add_column(str(column), width=name_width if column == self.index_name else None)
+            rich_table.add_column(
+                str(column), width=name_width if column == self.index_name else None
+            )
         for i in range(n):
             row = [str(params[j].data[i]) for j in params.variables]
             rich_table.add_row(*row)
         return rich_table
-

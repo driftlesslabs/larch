@@ -1,12 +1,13 @@
-import numpy as np
-from rich.table import Table
-from rich.live import Live
+import time
 
-from IPython.display import display, HTML
+import numpy as np
+from IPython.display import HTML, display
+from rich.live import Live
+from rich.table import Table
+
 
 class Dashboard:
-
-    def __init__(self, status="", params=None):
+    def __init__(self, status="", params=None, show=True, throttle=0.1):
         self.title = "[bold blue]Larch Model Dashboard"
         self.status = status
         self.loglike = "Log Likelihood = [red italic]pending"
@@ -14,7 +15,16 @@ class Dashboard:
             params = "[red]No parameters"
         self.params = params
         self._live = None
-        self.tag = display(self.render(), display_id=True)
+        self.display(show)
+        self.tick = time.time()
+        self._throttle = throttle
+
+    def display(self, show=True):
+        if show:
+            self.tag = display(self.render(), display_id=True)
+        else:
+            self.clear()
+            self.tag = None
 
     def set_title(self, x):
         if x is not None:
@@ -53,14 +63,30 @@ class Dashboard:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._live.__exit__(exc_type, exc_val, exc_tb)
 
-    def update_content(self, title=None, loglike=None, params=None, status=None, bestloglike=None):
+    def update_content(
+        self, title=None, loglike=None, params=None, status=None, bestloglike=None
+    ):
         self.set_title(title)
         self.set_loglike(loglike, bestloglike)
         if params is not None:
             self.params = params
         if status is not None:
             self.status = status
-        self.tag.update(self.render())
+        if self.tag is not None:
+            self.tag.update(self.render())
 
     def clear(self):
-        self.tag.update(HTML(""))
+        try:
+            tag = self.tag
+        except AttributeError:
+            tag = None
+        if tag is not None:
+            self.tag.update(HTML(""))
+
+    def throttle(self):
+        now = time.time()
+        if now < self.tick + self._throttle:
+            return False
+        else:
+            self.tick = now
+            return True

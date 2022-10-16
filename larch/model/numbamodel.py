@@ -1,33 +1,35 @@
 import logging
 import time
+import warnings
+from collections import namedtuple
 
 import numpy as np
 import pandas as pd
 import xarray as xr
-from numba import guvectorize, njit
+from numba import boolean
+from numba import float32 as f32
+from numba import float64 as f64
+from numba import guvectorize
 from numba import int8 as i8
 from numba import int32 as i32
 from numba import int64 as i64
-from numba import float32 as f32
-from numba import float64 as f64
-from numba import boolean
-from .basemodel import BaseModel as _BaseModel
+from numba import njit
+
+from ..dataset import DataArray, Dataset, DataTree
 from ..exceptions import MissingDataError
 from ..util import dictx
+from .basemodel import BaseModel as _BaseModel
 from .cascading import data_av_cascade, data_ch_cascade
-from ..dataset import Dataset, DataTree, DataArray
-from collections import namedtuple
 from .data_arrays import DataArrays
 
-
-import warnings
-warnings.warn( ### EXPERIMENTAL ### )
+warnings.warn(  ### EXPERIMENTAL ### )
     "\n\n"
-    "##### larch v6 is experimental & not feature-complete  #####\n"
+    "##### larix is experimental, and not feature-complete  #####\n"
     "the first time you import on a new system, this package will\n"
     "compile optimized binaries for your machine, which may take \n"
     "a little while, please be patient \n"
 )
+
 
 @njit(cache=True)
 def minmax(x):
@@ -39,6 +41,7 @@ def minmax(x):
         elif i < minimum:
             minimum = i
     return (minimum, maximum)
+
 
 @njit(cache=True)
 def outside_range(x, bottom, top):
@@ -52,18 +55,18 @@ def outside_range(x, bottom, top):
     return False
 
 
-@njit(error_model='numpy', fastmath=True, cache=True)
+@njit(error_model="numpy", fastmath=True, cache=True)
 def utility_from_data_co(
-        model_utility_co_alt,          # int input shape=[n_co_features]
-        model_utility_co_param_scale,  # float input shape=[n_co_features]
-        model_utility_co_param,        # int input shape=[n_co_features]
-        model_utility_co_data,         # int input shape=[n_co_features]
-        parameter_arr,                 # float input shape=[n_params]
-        holdfast_arr,                  # float input shape=[n_params]
-        array_av,                      # int8 input shape=[n_alts]
-        data_co,                       # float input shape=[n_co_vars]
-        utility_elem,                  # float output shape=[n_alts]
-        dutility_elem,                 # float output shape=[n_alts, n_params]
+    model_utility_co_alt,  # int input shape=[n_co_features]
+    model_utility_co_param_scale,  # float input shape=[n_co_features]
+    model_utility_co_param,  # int input shape=[n_co_features]
+    model_utility_co_data,  # int input shape=[n_co_features]
+    parameter_arr,  # float input shape=[n_params]
+    holdfast_arr,  # float input shape=[n_params]
+    array_av,  # int8 input shape=[n_alts]
+    data_co,  # float input shape=[n_co_vars]
+    utility_elem,  # float output shape=[n_alts]
+    dutility_elem,  # float output shape=[n_alts, n_params]
 ):
     for i in range(model_utility_co_alt.shape[0]):
         altindex = model_utility_co_alt[i]
@@ -73,27 +76,30 @@ def utility_from_data_co(
             if model_utility_co_data[i] == -1:
                 utility_elem[altindex] += param_value * model_utility_co_param_scale[i]
                 if not param_holdfast:
-                    dutility_elem[altindex, model_utility_co_param[i]] += model_utility_co_param_scale[i]
+                    dutility_elem[
+                        altindex, model_utility_co_param[i]
+                    ] += model_utility_co_param_scale[i]
             else:
-                _temp = data_co[model_utility_co_data[i]] * model_utility_co_param_scale[i]
+                _temp = (
+                    data_co[model_utility_co_data[i]] * model_utility_co_param_scale[i]
+                )
                 utility_elem[altindex] += _temp * param_value
                 if not param_holdfast:
                     dutility_elem[altindex, model_utility_co_param[i]] += _temp
 
 
-
-@njit(error_model='numpy', fastmath=True, cache=True)
+@njit(error_model="numpy", fastmath=True, cache=True)
 def quantity_from_data_ca(
-        model_q_ca_param_scale,         # float input shape=[n_q_ca_features]
-        model_q_ca_param,               # int input shape=[n_q_ca_features]
-        model_q_ca_data,                # int input shape=[n_q_ca_features]
-        model_q_scale_param,            # int input scalar
-        parameter_arr,                  # float input shape=[n_params]
-        holdfast_arr,                   # float input shape=[n_params]
-        array_av,                       # int8 input shape=[n_alts]
-        array_ca,                       # float input shape=[n_alts, n_ca_vars]
-        utility_elem,                   # float output shape=[n_alts]
-        dutility_elem,                  # float output shape=[n_alts, n_params]
+    model_q_ca_param_scale,  # float input shape=[n_q_ca_features]
+    model_q_ca_param,  # int input shape=[n_q_ca_features]
+    model_q_ca_data,  # int input shape=[n_q_ca_features]
+    model_q_scale_param,  # int input scalar
+    parameter_arr,  # float input shape=[n_params]
+    holdfast_arr,  # float input shape=[n_params]
+    array_av,  # int8 input shape=[n_alts]
+    array_ca,  # float input shape=[n_alts, n_ca_vars]
+    utility_elem,  # float output shape=[n_alts]
+    dutility_elem,  # float output shape=[n_alts, n_params]
 ):
     n_alts = array_ca.shape[0]
 
@@ -113,7 +119,7 @@ def quantity_from_data_ca(
         #         row = self._array_ce_reversemap[c, j]
         row = -1
 
-        if array_av[j]: # and row != -1:
+        if array_av[j]:  # and row != -1:
 
             if model_q_ca_param.shape[0]:
                 for i in range(model_q_ca_param.shape[0]):
@@ -127,7 +133,9 @@ def quantity_from_data_ca(
                     )
                     utility_elem[j] += _temp
                     if not holdfast_arr[model_q_ca_param[i]]:
-                        dutility_elem[j, model_q_ca_param[i]] += _temp * scale_param_value
+                        dutility_elem[j, model_q_ca_param[i]] += (
+                            _temp * scale_param_value
+                        )
 
                 for i in range(model_q_ca_param.shape[0]):
                     if not holdfast_arr[model_q_ca_param[i]]:
@@ -142,20 +150,20 @@ def quantity_from_data_ca(
             utility_elem[j] = -np.inf
 
 
-@njit(error_model='numpy', fastmath=True, cache=True)
+@njit(error_model="numpy", fastmath=True, cache=True)
 def utility_from_data_ca(
-        model_utility_ca_param_scale,   # int input shape=[n_u_ca_features]
-        model_utility_ca_param,         # int input shape=[n_u_ca_features]
-        model_utility_ca_data,          # int input shape=[n_u_ca_features]
-        parameter_arr,                  # float input shape=[n_params]
-        holdfast_arr,                   # float input shape=[n_params]
-        array_av,                       # int8 input shape=[n_alts]
-        array_ca,                       # float input shape=[n_alts, n_ca_vars]
-        array_ce_data,                  # float input shape=[n_casealts, n_ca_vars]
-        array_ce_indices,               # int input shape=[n_casealts]
-        array_ce_ptr,                   # int input shape=[2]
-        utility_elem,                   # float output shape=[n_alts]
-        dutility_elem,                  # float output shape=[n_alts, n_params]
+    model_utility_ca_param_scale,  # int input shape=[n_u_ca_features]
+    model_utility_ca_param,  # int input shape=[n_u_ca_features]
+    model_utility_ca_data,  # int input shape=[n_u_ca_features]
+    parameter_arr,  # float input shape=[n_params]
+    holdfast_arr,  # float input shape=[n_params]
+    array_av,  # int8 input shape=[n_alts]
+    array_ca,  # float input shape=[n_alts, n_ca_vars]
+    array_ce_data,  # float input shape=[n_casealts, n_ca_vars]
+    array_ce_indices,  # int input shape=[n_casealts]
+    array_ce_ptr,  # int input shape=[2]
+    utility_elem,  # float output shape=[n_alts]
+    dutility_elem,  # float output shape=[n_alts, n_params]
 ):
     n_alts = array_ca.shape[0]
 
@@ -188,7 +196,7 @@ def utility_from_data_ca(
 
                 for i in range(model_utility_ca_param.shape[0]):
                     if row >= 0:
-                        _temp = 0.0 #_temp = self._array_ce[row, self.model_utility_ca_data[i]]
+                        _temp = 0.0  # _temp = self._array_ce[row, self.model_utility_ca_data[i]]
                     else:
                         _temp = array_ca[j, model_utility_ca_data[i]]
                     _temp *= model_utility_ca_param_scale[i]
@@ -203,9 +211,9 @@ def _type_signature(sig, precision=32):
     result = ()
     for s in sig:
         if s == "f":
-            result += (f32[:],) if precision==32 else (f64[:],)
+            result += (f32[:],) if precision == 32 else (f64[:],)
         elif s == "F":
-            result += (f32[:,:],) if precision == 32 else (f64[:,:],)
+            result += (f32[:, :],) if precision == 32 else (f64[:, :],)
         elif s == "r":
             result += (f32,) if precision == 32 else (f64,)
         elif s == "i":
@@ -213,13 +221,13 @@ def _type_signature(sig, precision=32):
         elif s == "j":
             result += (i64[:],)
         elif s == "I":
-            result += (i32[:,:],)
+            result += (i32[:, :],)
         elif s == "b":
             result += (i8[:],)
         elif s == "S":
             result += (i8,)
-        elif s == 'B':
-            result += (boolean, )
+        elif s == "B":
+            result += (boolean,)
     return result
 
 
@@ -229,45 +237,46 @@ def _type_signatures(sig):
         _type_signature(sig, precision=64),
     ]
 
-@njit(error_model='numpy', fastmath=True, cache=True)
+
+@njit(error_model="numpy", fastmath=True, cache=True)
 def _numba_utility_to_loglike(
-        n_alts,
-        edgeslots,     # int input shape=[edges, 4]
-        mu_slots,      # int input shape=[nests]
-        start_slots,   # int input shape=[nests]
-        len_slots,     # int input shape=[nests]
-        holdfast_arr,  # int8 input shape=[n_params]
-        parameter_arr, # float input shape=[n_params]
-        array_ch,      # float input shape=[nodes]
-        array_av,      # int8 input shape=[nodes]
-        array_wt,      # float input shape=[]
-        return_flags,  #
-        dutility,      #
-        utility,       # float output shape=[nodes]
-        logprob,       # float output shape=[nodes]
-        probability,   # float output shape=[nodes]
-        bhhh,          # float output shape=[n_params, n_params]
-        d_loglike,     # float output shape=[n_params]
-        loglike,       # float output shape=[]
+    n_alts,
+    edgeslots,  # int input shape=[edges, 4]
+    mu_slots,  # int input shape=[nests]
+    start_slots,  # int input shape=[nests]
+    len_slots,  # int input shape=[nests]
+    holdfast_arr,  # int8 input shape=[n_params]
+    parameter_arr,  # float input shape=[n_params]
+    array_ch,  # float input shape=[nodes]
+    array_av,  # int8 input shape=[nodes]
+    array_wt,  # float input shape=[]
+    return_flags,  #
+    dutility,  #
+    utility,  # float output shape=[nodes]
+    logprob,  # float output shape=[nodes]
+    probability,  # float output shape=[nodes]
+    bhhh,  # float output shape=[n_params, n_params]
+    d_loglike,  # float output shape=[n_params]
+    loglike,  # float output shape=[]
 ):
 
     assert edgeslots.shape[1] == 4
-    upslots   = edgeslots[:,0]  # int input shape=[edges]
-    dnslots   = edgeslots[:,1]  # int input shape=[edges]
-    visit1    = edgeslots[:,2]  # int input shape=[edges]
-    allocslot = edgeslots[:,3]  # int input shape=[edges]
+    upslots = edgeslots[:, 0]  # int input shape=[edges]
+    dnslots = edgeslots[:, 1]  # int input shape=[edges]
+    visit1 = edgeslots[:, 2]  # int input shape=[edges]
+    allocslot = edgeslots[:, 3]  # int input shape=[edges]
 
     assert return_flags.size == 4
-    only_utility = return_flags[0]          # [19] int8 input
-    return_probability = return_flags[1]    # [20] bool input
-    return_grad = return_flags[2]           # [21] bool input
-    return_bhhh = return_flags[3]           # [22] bool input
+    only_utility = return_flags[0]  # [19] int8 input
+    return_probability = return_flags[1]  # [20] bool input
+    return_grad = return_flags[2]  # [21] bool input
+    return_bhhh = return_flags[3]  # [22] bool input
 
-    #util_nx = np.zeros_like(utility)
-    #mu_extra = np.zeros_like(util_nx)
+    # util_nx = np.zeros_like(utility)
+    # mu_extra = np.zeros_like(util_nx)
     loglike[0] = 0.0
 
-    if True: # outside_range(utility[:n_alts], -0.0, 0.0):
+    if True:  # outside_range(utility[:n_alts], -0.0, 0.0):
         for up in range(n_alts, utility.size):
             up_nest = up - n_alts
             n_children_for_parent = len_slots[up_nest]
@@ -307,7 +316,7 @@ def _numba_utility_to_loglike(
                         #         z = ((logalpha[edge] + utility[child]) / mu[parent]) - shifter
                         #         utility[parent] += exp(z)
                 utility[up] = (np.log(utility[up]) + shifter) * mu_up
-            else: # mu_up is zero
+            else:  # mu_up is zero
                 for n in range(n_children_for_parent):
                     edge = start_slots[up_nest] + n
                     dn = dnslots[edge]
@@ -323,9 +332,9 @@ def _numba_utility_to_loglike(
                 mu_up = 1.0
             else:
                 mu_up = parameter_arr[mu_slots[up_nest]]
-            if visit1[s]>0 and dn>=n_alts:
+            if visit1[s] > 0 and dn >= n_alts:
                 log_dn = np.log(utility[dn])
-                #mu_extra[dn] += log_dn + util_nx[dn]/utility[dn]
+                # mu_extra[dn] += log_dn + util_nx[dn]/utility[dn]
                 if mu_slots[dn_nest] < 0:
                     mu_dn = 1.0
                 else:
@@ -334,10 +343,10 @@ def _numba_utility_to_loglike(
             util_dn = utility[dn]
             exp_util_dn_mu_up = np.exp(util_dn / mu_up)
             utility[up] += exp_util_dn_mu_up
-            #util_nx[up] -= util_dn * exp_util_dn_mu_up / mu_up
+            # util_nx[up] -= util_dn * exp_util_dn_mu_up / mu_up
 
-        #mu_extra[mu_extra.size-1] += np.log(utility[utility.size-1]) + util_nx[-1]/utility[utility.size-1]
-        utility[utility.size-1] = np.log(utility[utility.size-1])
+        # mu_extra[mu_extra.size-1] += np.log(utility[utility.size-1]) + util_nx[-1]/utility[utility.size-1]
+        utility[utility.size - 1] = np.log(utility[utility.size - 1])
 
     if only_utility == 2:
         return
@@ -366,7 +375,7 @@ def _numba_utility_to_loglike(
 
         # probability
         probability[-1] = 1.0
-        for s in range(upslots.size-1, -1, -1):
+        for s in range(upslots.size - 1, -1, -1):
             dn = dnslots[s]
             if array_av[dn]:
                 up = upslots[s]
@@ -385,7 +394,7 @@ def _numba_utility_to_loglike(
                 if array_av[dn]:
                     cond_prob = conditional_probability[dn]
                     if dn >= n_alts:
-                        dn_mu_slot = mu_slots[dn-n_alts]
+                        dn_mu_slot = mu_slots[dn - n_alts]
                         if dn_mu_slot >= 0:
                             dutility[dn, dn_mu_slot] += utility[dn]
                             dutility[dn, dn_mu_slot] /= parameter_arr[dn_mu_slot]
@@ -422,7 +431,7 @@ def _numba_utility_to_loglike(
 
             # d probability alternate path slightly lower memory usage and some faster
             d_probability = np.zeros_like(dutility)
-            for s in range(upslots.size-1, -1, -1):
+            for s in range(upslots.size - 1, -1, -1):
                 dn = dnslots[s]
                 if array_ch[dn]:
                     up = upslots[s]
@@ -441,7 +450,9 @@ def _numba_utility_to_loglike(
                         else:
                             scratch_ = 0
                         scratch_ += d_probability[up, p]
-                        d_probability[dn, p] += scratch_ * conditional_probability[dn] # FIXME: for CNL, use edge not dn
+                        d_probability[dn, p] += (
+                            scratch_ * conditional_probability[dn]
+                        )  # FIXME: for CNL, use edge not dn
 
             if return_bhhh:
                 bhhh[:] = 0.0
@@ -465,69 +476,60 @@ def _numba_utility_to_loglike(
                     dLL_temp = tempvalue / this_ch
                     d_loglike += tempvalue * array_wt[0]
                     if return_bhhh:
-                        bhhh += np.outer(dLL_temp,dLL_temp) * this_ch * array_wt[0]
+                        bhhh += np.outer(dLL_temp, dLL_temp) * this_ch * array_wt[0]
 
 
 _master_shape_signature = (
-    '(qca),(qca),(qca),(), '
-    '(uca),(uca),(uca), '
-    '(uco),(uco),(uco),(uco), '
-    '(edges,four), '
-    '(nests),(nests),(nests), '
-    '(params),(params), '
-    '(nodes),(nodes),(),(vco),(alts,vca), '
-    '(ces,vce),(ces),(two),  '
-    '(four)->'
-    '(nodes),(nodes),(nodes),(params,params),(params),()'
+    "(qca),(qca),(qca),(), "
+    "(uca),(uca),(uca), "
+    "(uco),(uco),(uco),(uco), "
+    "(edges,four), "
+    "(nests),(nests),(nests), "
+    "(params),(params), "
+    "(nodes),(nodes),(),(vco),(alts,vca), "
+    "(ces,vce),(ces),(two),  "
+    "(four)->"
+    "(nodes),(nodes),(nodes),(params,params),(params),()"
 )
 
 
 def _numba_master(
-        model_q_ca_param_scale,  # [0] float input shape=[n_q_ca_features]
-        model_q_ca_param,        # [1] int input shape=[n_q_ca_features]
-        model_q_ca_data,         # [2] int input shape=[n_q_ca_features]
-        model_q_scale_param,     # [3] int input scalar
-
-        model_utility_ca_param_scale,  # [4] float input shape=[n_u_ca_features]
-        model_utility_ca_param,        # [5] int input shape=[n_u_ca_features]
-        model_utility_ca_data,         # [6] int input shape=[n_u_ca_features]
-
-        model_utility_co_alt,          # [ 7] int input shape=[n_co_features]
-        model_utility_co_param_scale,  # [ 8] float input shape=[n_co_features]
-        model_utility_co_param,        # [ 9] int input shape=[n_co_features]
-        model_utility_co_data,         # [10] int input shape=[n_co_features]
-
-        edgeslots,     # [11] int input shape=[edges, 4]
-
-        mu_slots,      # [12] int input shape=[nests]
-        start_slots,   # [13] int input shape=[nests]
-        len_slots,     # [14] int input shape=[nests]
-
-        holdfast_arr,  # [15] int8 input shape=[n_params]
-        parameter_arr, # [16] float input shape=[n_params]
-
-        array_ch,      # [17] float input shape=[nodes]
-        array_av,      # [18] int8 input shape=[nodes]
-        array_wt,      # [19] float input shape=[]
-        array_co,      # [20] float input shape=[n_co_vars]
-        array_ca,      # [21] float input shape=[n_alts, n_ca_vars]
-
-        array_ce_data,     # [22] float input shape=[n_casealts, n_ca_vars]
-        array_ce_indices,  # [23] int input shape=[n_casealts]
-        array_ce_ptr,      # [24] int input shape=[2]
-
-        return_flags,
-        # only_utility,        # [19] int8 input
-        # return_probability,  # [20] bool input
-        # return_grad,         # [21] bool input
-        # return_bhhh,         # [22] bool input
-
-        utility,       # [23] float output shape=[nodes]
-        logprob,       # [24] float output shape=[nodes]
-        probability,   # [25] float output shape=[nodes]
-        bhhh,          # [26] float output shape=[n_params, n_params]
-        d_loglike,     # [27] float output shape=[n_params]
-        loglike,       # [28] float output shape=[]
+    model_q_ca_param_scale,  # [0] float input shape=[n_q_ca_features]
+    model_q_ca_param,  # [1] int input shape=[n_q_ca_features]
+    model_q_ca_data,  # [2] int input shape=[n_q_ca_features]
+    model_q_scale_param,  # [3] int input scalar
+    model_utility_ca_param_scale,  # [4] float input shape=[n_u_ca_features]
+    model_utility_ca_param,  # [5] int input shape=[n_u_ca_features]
+    model_utility_ca_data,  # [6] int input shape=[n_u_ca_features]
+    model_utility_co_alt,  # [ 7] int input shape=[n_co_features]
+    model_utility_co_param_scale,  # [ 8] float input shape=[n_co_features]
+    model_utility_co_param,  # [ 9] int input shape=[n_co_features]
+    model_utility_co_data,  # [10] int input shape=[n_co_features]
+    edgeslots,  # [11] int input shape=[edges, 4]
+    mu_slots,  # [12] int input shape=[nests]
+    start_slots,  # [13] int input shape=[nests]
+    len_slots,  # [14] int input shape=[nests]
+    holdfast_arr,  # [15] int8 input shape=[n_params]
+    parameter_arr,  # [16] float input shape=[n_params]
+    array_ch,  # [17] float input shape=[nodes]
+    array_av,  # [18] int8 input shape=[nodes]
+    array_wt,  # [19] float input shape=[]
+    array_co,  # [20] float input shape=[n_co_vars]
+    array_ca,  # [21] float input shape=[n_alts, n_ca_vars]
+    array_ce_data,  # [22] float input shape=[n_casealts, n_ca_vars]
+    array_ce_indices,  # [23] int input shape=[n_casealts]
+    array_ce_ptr,  # [24] int input shape=[2]
+    return_flags,
+    # only_utility,        # [19] int8 input
+    # return_probability,  # [20] bool input
+    # return_grad,         # [21] bool input
+    # return_bhhh,         # [22] bool input
+    utility,  # [23] float output shape=[nodes]
+    logprob,  # [24] float output shape=[nodes]
+    probability,  # [25] float output shape=[nodes]
+    bhhh,  # [26] float output shape=[n_params, n_params]
+    d_loglike,  # [27] float output shape=[n_params]
+    loglike,  # [28] float output shape=[]
 ):
     n_alts = array_ca.shape[0]
 
@@ -538,7 +540,7 @@ def _numba_master(
     # allocslot = edgeslots[:,3]  # int input shape=[edges]
 
     assert return_flags.size == 4
-    only_utility = return_flags[0]            # int8 input
+    only_utility = return_flags[0]  # int8 input
     # return_probability = return_flags[1]    # bool input
     # return_grad = return_flags[2]           # bool input
     # return_bhhh = return_flags[3]           # bool input
@@ -548,14 +550,14 @@ def _numba_master(
 
     quantity_from_data_ca(
         model_q_ca_param_scale,  # float input shape=[n_q_ca_features]
-        model_q_ca_param,        # int input shape=[n_q_ca_features]
-        model_q_ca_data,         # int input shape=[n_q_ca_features]
-        model_q_scale_param,     # int input scalar
-        parameter_arr,           # float input shape=[n_params]
-        holdfast_arr,            # float input shape=[n_params]
-        array_av,                # int8 input shape=[n_nodes]
-        array_ca,                # float input shape=[n_alts, n_ca_vars]
-        utility[:n_alts],        # float output shape=[n_alts]
+        model_q_ca_param,  # int input shape=[n_q_ca_features]
+        model_q_ca_data,  # int input shape=[n_q_ca_features]
+        model_q_scale_param,  # int input scalar
+        parameter_arr,  # float input shape=[n_params]
+        holdfast_arr,  # float input shape=[n_params]
+        array_av,  # int8 input shape=[n_nodes]
+        array_ca,  # float input shape=[n_alts, n_ca_vars]
+        utility[:n_alts],  # float output shape=[n_alts]
         dutility[:n_alts],
     )
 
@@ -569,55 +571,55 @@ def _numba_master(
 
     utility_from_data_ca(
         model_utility_ca_param_scale,  # int input shape=[n_u_ca_features]
-        model_utility_ca_param,        # int input shape=[n_u_ca_features]
-        model_utility_ca_data,         # int input shape=[n_u_ca_features]
-        parameter_arr,                 # float input shape=[n_params]
-        holdfast_arr,                  # float input shape=[n_params]
-        array_av,                      # int8 input shape=[n_nodes]
-        array_ca,                      # float input shape=[n_alts, n_ca_vars]
-        array_ce_data,                 # float input shape=[n_casealts, n_ca_vars]
-        array_ce_indices,              # int input shape=[n_casealts]
-        array_ce_ptr,                  # int input shape=[2]
-        utility[:n_alts],              # float output shape=[n_alts]
+        model_utility_ca_param,  # int input shape=[n_u_ca_features]
+        model_utility_ca_data,  # int input shape=[n_u_ca_features]
+        parameter_arr,  # float input shape=[n_params]
+        holdfast_arr,  # float input shape=[n_params]
+        array_av,  # int8 input shape=[n_nodes]
+        array_ca,  # float input shape=[n_alts, n_ca_vars]
+        array_ce_data,  # float input shape=[n_casealts, n_ca_vars]
+        array_ce_indices,  # int input shape=[n_casealts]
+        array_ce_ptr,  # int input shape=[2]
+        utility[:n_alts],  # float output shape=[n_alts]
         dutility[:n_alts],
     )
 
     utility_from_data_co(
-        model_utility_co_alt,          # int input shape=[n_co_features]
+        model_utility_co_alt,  # int input shape=[n_co_features]
         model_utility_co_param_scale,  # float input shape=[n_co_features]
-        model_utility_co_param,        # int input shape=[n_co_features]
-        model_utility_co_data,         # int input shape=[n_co_features]
-        parameter_arr,                 # float input shape=[n_params]
-        holdfast_arr,                  # float input shape=[n_params]
-        array_av,                      # int8 input shape=[n_nodes]
-        array_co,                      # float input shape=[n_co_vars]
-        utility[:n_alts],              # float output shape=[n_alts]
+        model_utility_co_param,  # int input shape=[n_co_features]
+        model_utility_co_data,  # int input shape=[n_co_features]
+        parameter_arr,  # float input shape=[n_params]
+        holdfast_arr,  # float input shape=[n_params]
+        array_av,  # int8 input shape=[n_nodes]
+        array_co,  # float input shape=[n_co_vars]
+        utility[:n_alts],  # float output shape=[n_alts]
         dutility[:n_alts],
     )
 
-    if only_utility == 1: return
+    if only_utility == 1:
+        return
 
     _numba_utility_to_loglike(
         n_alts,
-        edgeslots,      # int input shape=[edges, 4]
-        mu_slots,       # int input shape=[nests]
-        start_slots,    # int input shape=[nests]
-        len_slots,      # int input shape=[nests]
-        holdfast_arr,   # int8 input shape=[n_params]
+        edgeslots,  # int input shape=[edges, 4]
+        mu_slots,  # int input shape=[nests]
+        start_slots,  # int input shape=[nests]
+        len_slots,  # int input shape=[nests]
+        holdfast_arr,  # int8 input shape=[n_params]
         parameter_arr,  # float input shape=[n_params]
-        array_ch,       # float input shape=[nodes]
-        array_av,       # int8 input shape=[nodes]
-        array_wt,       # float input shape=[]
+        array_ch,  # float input shape=[nodes]
+        array_av,  # int8 input shape=[nodes]
+        array_wt,  # float input shape=[]
         return_flags,
         dutility,
-        utility,        # float output shape=[nodes]
-        logprob,        # float output shape=[nodes]
-        probability,    # float output shape=[nodes]
-        bhhh,           # float output shape=[n_params, n_params]
-        d_loglike,      # float output shape=[n_params]
-        loglike,        # float output shape=[]
+        utility,  # float output shape=[nodes]
+        logprob,  # float output shape=[nodes]
+        probability,  # float output shape=[nodes]
+        bhhh,  # float output shape=[n_params, n_params]
+        d_loglike,  # float output shape=[n_params]
+        loglike,  # float output shape=[]
     )
-
 
 
 _numba_master_vectorized = guvectorize(
@@ -625,7 +627,7 @@ _numba_master_vectorized = guvectorize(
     _master_shape_signature,
     nopython=True,
     fastmath=True,
-    target='parallel',
+    target="parallel",
     cache=True,
 )(
     _numba_master,
@@ -659,21 +661,19 @@ def d_softplus(i, sharpness=10):
         _type_signature("ffffffff", precision=32),
         _type_signature("ffffffff", precision=64),
     ],
-    (
-        '(params),(params),(params),(),()->(),(params),(params)'
-    ),
+    ("(params),(params),(params),(),()->(),(params),(params)"),
     cache=True,
     nopython=True,
 )
 def bounds_penalty(
-        param_array,           # [] float input shape=[n_params]
-        lower_bounds,          # [] float input shape=[n_params]
-        upper_bounds,          # [] float input shape=[n_params]
-        constraint_intensity,  # [] float input shape=[]
-        constraint_sharpness,  # [] float input shape=[]
-        penalty,               # [] float output shape=[]
-        d_penalty,             # [] float output shape=[n_params]
-        d_penalty_binding,     # [] float output shape=[n_params]
+    param_array,  # [] float input shape=[n_params]
+    lower_bounds,  # [] float input shape=[n_params]
+    upper_bounds,  # [] float input shape=[n_params]
+    constraint_intensity,  # [] float input shape=[]
+    constraint_sharpness,  # [] float input shape=[]
+    penalty,  # [] float output shape=[]
+    d_penalty,  # [] float output shape=[n_params]
+    d_penalty_binding,  # [] float output shape=[n_params]
 ):
     # penalty = 0.0
     # d_penalty = np.zeros_like(param_array)
@@ -689,36 +689,52 @@ def bounds_penalty(
         high_penalty = -softplus(high_diff, constraint_sharpness[0])
         penalty[0] += (low_penalty + high_penalty) * constraint_intensity[0]
         if low_penalty:
-            d_penalty[i] += d_softplus(lower_bounds[i] - param_array[i], constraint_sharpness[0]) * constraint_intensity[0]
+            d_penalty[i] += (
+                d_softplus(lower_bounds[i] - param_array[i], constraint_sharpness[0])
+                * constraint_intensity[0]
+            )
         if high_penalty:
-            d_penalty[i] -= d_softplus(param_array[i] - upper_bounds[i], constraint_sharpness[0]) * constraint_intensity[0]
+            d_penalty[i] -= (
+                d_softplus(param_array[i] - upper_bounds[i], constraint_sharpness[0])
+                * constraint_intensity[0]
+            )
         if np.absolute(high_diff) < diff_threshold:
             d_penalty_binding[i] -= 0.5 * constraint_intensity[0]
         elif np.absolute(low_diff) < diff_threshold:
             d_penalty_binding[i] += 0.5 * constraint_intensity[0]
-    #return penalty, d_penalty, d_penalty_binding
+    # return penalty, d_penalty, d_penalty_binding
 
 
 def _numba_penalty(
-        param_array,           # [] float input shape=[n_params]
-        lower_bounds,          # [] float input shape=[n_params]
-        upper_bounds,          # [] float input shape=[n_params]
-        constraint_intensity,  # [] float input shape=[]
-        constraint_sharpness,  # [] float input shape=[]
-        bhhh,                  # [] float output shape=[n_params, n_params]
-        d_loglike,             # [] float output shape=[n_params]
-        loglike,               # [] float output shape=[]
+    param_array,  # [] float input shape=[n_params]
+    lower_bounds,  # [] float input shape=[n_params]
+    upper_bounds,  # [] float input shape=[n_params]
+    constraint_intensity,  # [] float input shape=[]
+    constraint_sharpness,  # [] float input shape=[]
+    bhhh,  # [] float output shape=[n_params, n_params]
+    d_loglike,  # [] float output shape=[n_params]
+    loglike,  # [] float output shape=[]
 ):
     penalty = 0.0
     d_penalty = np.zeros_like(d_loglike)
     for i in range(param_array.size):
-        low_penalty = -softplus(lower_bounds[i] - param_array[i], constraint_sharpness[0])
-        high_penalty = -softplus(param_array[i] - upper_bounds[i], constraint_sharpness[0])
+        low_penalty = -softplus(
+            lower_bounds[i] - param_array[i], constraint_sharpness[0]
+        )
+        high_penalty = -softplus(
+            param_array[i] - upper_bounds[i], constraint_sharpness[0]
+        )
         penalty += (low_penalty + high_penalty) * constraint_intensity[0]
         if low_penalty:
-            d_penalty[i] += d_softplus(lower_bounds[i] - param_array[i], constraint_sharpness[0]) * constraint_intensity[0]
+            d_penalty[i] += (
+                d_softplus(lower_bounds[i] - param_array[i], constraint_sharpness[0])
+                * constraint_intensity[0]
+            )
         if high_penalty:
-            d_penalty[i] -= d_softplus(param_array[i] - upper_bounds[i], constraint_sharpness[0]) * constraint_intensity[0]
+            d_penalty[i] -= (
+                d_softplus(param_array[i] - upper_bounds[i], constraint_sharpness[0])
+                * constraint_intensity[0]
+            )
     loglike[0] += penalty
     d_loglike[:] += d_penalty
     bhhh[:] += np.outer(d_penalty, d_penalty)
@@ -726,20 +742,17 @@ def _numba_penalty(
 
 _numba_penalty_vectorized = guvectorize(
     _type_signatures("fffffFff"),
-    (
-        '(params),(params),(params),(),()->(params,params),(params),()'
-    ),
+    ("(params),(params),(params),(),()->(params,params),(params),()"),
     nopython=True,
     fastmath=True,
-    target='parallel',
+    target="parallel",
     cache=True,
 )(
     _numba_penalty,
 )
 
 
-
-def model_co_slots(data_provider:Dataset, model:_BaseModel, dtype=np.float64):
+def model_co_slots(data_provider: Dataset, model: _BaseModel, dtype=np.float64):
     len_co = sum(len(_) for _ in model.utility_co.values())
     model_utility_co_alt = np.zeros([len_co], dtype=np.int32)
     model_utility_co_param_scale = np.ones([len_co], dtype=dtype)
@@ -753,12 +766,14 @@ def model_co_slots(data_provider:Dataset, model:_BaseModel, dtype=np.float64):
         param_loc[_pname] = _n
     data_loc = {}
     if isinstance(data_provider, Dataset):
-        if 'var_co' in data_provider.indexes:
-            for _n, _dname in enumerate(data_provider.indexes['var_co']):
+        if "var_co" in data_provider.indexes:
+            for _n, _dname in enumerate(data_provider.indexes["var_co"]):
                 data_loc[_dname] = _n
         alternative_codes = data_provider.indexes[data_provider.dc.ALTID]
     else:
-        raise TypeError(f"data_provider must be DataFrames or Dataset not {type(data_provider)}")
+        raise TypeError(
+            f"data_provider must be DataFrames or Dataset not {type(data_provider)}"
+        )
 
     for alt, func in model.utility_co.items():
         altindex = alternative_codes.get_loc(alt)
@@ -766,10 +781,12 @@ def model_co_slots(data_provider:Dataset, model:_BaseModel, dtype=np.float64):
             model_utility_co_alt[j] = altindex
             model_utility_co_param[j] = param_loc[str(i.param)]
             model_utility_co_param_scale[j] = i.scale
-            if i.data == '1':
+            if i.data == "1":
                 model_utility_co_data[j] = -1
             else:
-                model_utility_co_data[j] = data_loc[str(i.data)]  # self._data_co.columns.get_loc(str(i.data))
+                model_utility_co_data[j] = data_loc[
+                    str(i.data)
+                ]  # self._data_co.columns.get_loc(str(i.data))
             j += 1
 
     return (
@@ -780,11 +797,13 @@ def model_co_slots(data_provider:Dataset, model:_BaseModel, dtype=np.float64):
     )
 
 
-def model_u_ca_slots(data_provider:Dataset, model:_BaseModel, dtype=np.float64):
+def model_u_ca_slots(data_provider: Dataset, model: _BaseModel, dtype=np.float64):
     if isinstance(data_provider, Dataset):
-        looker = lambda tag: data_provider.indexes['var_ca'].get_loc(str(tag))
+        looker = lambda tag: data_provider.indexes["var_ca"].get_loc(str(tag))
     else:
-        raise TypeError(f"data_provider must be DataFrames or Dataset not {type(data_provider)}")
+        raise TypeError(
+            f"data_provider must be DataFrames or Dataset not {type(data_provider)}"
+        )
     len_model_utility_ca = len(model.utility_ca)
     model_utility_ca_param_scale = np.ones([len_model_utility_ca], dtype=dtype)
     model_utility_ca_param = np.zeros([len_model_utility_ca], dtype=np.int32)
@@ -799,11 +818,14 @@ def model_u_ca_slots(data_provider:Dataset, model:_BaseModel, dtype=np.float64):
         model_utility_ca_data,
     )
 
-def model_q_ca_slots(data_provider:Dataset, model:_BaseModel, dtype=np.float64):
+
+def model_q_ca_slots(data_provider: Dataset, model: _BaseModel, dtype=np.float64):
     if isinstance(data_provider, Dataset):
-        looker = lambda tag: data_provider.indexes['var_ca'].get_loc(str(tag))
+        looker = lambda tag: data_provider.indexes["var_ca"].get_loc(str(tag))
     else:
-        raise TypeError(f"data_provider must be DataFrames or Dataset not {type(data_provider)}")
+        raise TypeError(
+            f"data_provider must be DataFrames or Dataset not {type(data_provider)}"
+        )
     len_model_q_ca = len(model.quantity_ca)
     model_q_ca_param_scale = np.ones([len_model_q_ca], dtype=dtype)
     model_q_ca_param = np.zeros([len_model_q_ca], dtype=np.int32)
@@ -811,7 +833,7 @@ def model_q_ca_slots(data_provider:Dataset, model:_BaseModel, dtype=np.float64):
     if model.quantity_scale:
         model_q_scale_param = model.get_param_loc(model.quantity_scale)
     else:
-        model_q_scale_param = np.zeros([1], dtype=np.int32)-1
+        model_q_scale_param = np.zeros([1], dtype=np.int32) - 1
     for n, i in enumerate(model.quantity_ca):
         model_q_ca_param[n] = model.get_param_loc(i.param)
         model_q_ca_data[n] = looker(i.data)
@@ -828,27 +850,39 @@ class _case_slice:
     def __get__(self, obj, objtype=None):
         self.parent = obj
         return self
+
     def __getitem__(self, idx):
-        return type(self.parent)(**{k: getattr(self.parent, k)[idx] for k in self.parent._fields})
+        return type(self.parent)(
+            **{k: getattr(self.parent, k)[idx] for k in self.parent._fields}
+        )
 
 
 WorkArrays = namedtuple(
-    'WorkArrays',
-    ['utility', 'logprob', 'probability', 'bhhh', 'd_loglike', 'loglike'],
+    "WorkArrays",
+    ["utility", "logprob", "probability", "bhhh", "d_loglike", "loglike"],
 )
 WorkArrays.cs = _case_slice()
 
 
 FixedArrays = namedtuple(
-    'FixedArrays',
+    "FixedArrays",
     [
-        'qca_scale', 'qca_param_slot', 'qca_data_slot',
-        'qscale_param_slot',
-        'uca_scale', 'uca_param_slot', 'uca_data_slot',
-        'uco_alt_slot', 'uco_scale', 'uco_param_slot', 'uco_data_slot',
-        'edge_slots',
-        'mu_slot', 'start_edges', 'len_edges',
-    ]
+        "qca_scale",
+        "qca_param_slot",
+        "qca_data_slot",
+        "qscale_param_slot",
+        "uca_scale",
+        "uca_param_slot",
+        "uca_data_slot",
+        "uco_alt_slot",
+        "uco_scale",
+        "uco_param_slot",
+        "uco_data_slot",
+        "edge_slots",
+        "mu_slot",
+        "start_edges",
+        "len_edges",
+    ],
 )
 
 
@@ -870,10 +904,22 @@ class NumbaModel(_BaseModel):
         self.constraint_sharpness = 0.0
         self._constraint_funcs = None
         self.datatree = datatree
+        self._should_preload_data = True
 
-    def save(self, filename, format='yaml'):
+    def save(self, filename, format="yaml", overwrite=False):
         from .saving import save_model
-        return save_model(self, filename, format=format)
+
+        return save_model(self, filename, format=format, overwrite=overwrite)
+
+    def dumps(self):
+        return repr(self.save(None, format="raw"))
+
+    def should_preload_data(self, should=True):
+        should = bool(should)
+        if should and not self._should_preload_data:
+            # not currently, but want to, mangle to prevent inconsistency
+            self.mangle()
+        self._should_preload_data = should
 
     @classmethod
     def from_dict(cls, content):
@@ -893,46 +939,49 @@ class NumbaModel(_BaseModel):
                     else:
                         injector(i)
 
-        loadthis('float_dtype', lambda i: getattr(np, i))
-        loadthis('compute_engine')
-        loadthis('index_name')
-        loadthis('parameters', xr.Dataset.from_dict, self.update_parameters)
-        loadthis('availability_any')
-        loadthis('availability_ca_var')
-        loadthis('availability_co_vars')
-        loadthis('choice_any')
-        loadthis('choice_ca_var')
-        loadthis('choice_co_code')
-        loadthis('choice_co_vars')
-        loadthis('common_draws')
-        loadthis('constraint_intensity')
-        loadthis('constraint_sharpness')
-        loadthis('constraints')
+        loadthis("float_dtype", lambda i: getattr(np, i))
+        loadthis("compute_engine")
+        loadthis("index_name")
+        loadthis("parameters", xr.Dataset.from_dict, self.update_parameters)
+        loadthis("availability_any")
+        loadthis("availability_ca_var")
+        loadthis("availability_co_vars")
+        loadthis("choice_any")
+        loadthis("choice_ca_var")
+        loadthis("choice_co_code")
+        loadthis("choice_co_vars")
+        loadthis("common_draws")
+        loadthis("constraint_intensity")
+        loadthis("constraint_sharpness")
+        loadthis("constraints")
         from .tree import NestingTree
-        loadthis('graph', NestingTree.from_dict)
-        loadthis('groupid')
-        loadthis('logsum_parameter')
-        loadthis('mixtures', self.mixtures.from_list)
-        loadthis('n_draws')
-        loadthis('prerolled_draws')
-        loadthis('quantity_ca')
-        loadthis('quantity_scale')
-        loadthis('title')
-        loadthis('utility_ca')
-        loadthis('utility_co')
-        loadthis('weight_co_var')
-        loadthis('weight_normalization')
+
+        loadthis("graph", NestingTree.from_dict)
+        loadthis("groupid")
+        loadthis("logsum_parameter")
+        loadthis("mixtures", self.mixtures.from_list)
+        loadthis("n_draws")
+        loadthis("prerolled_draws")
+        loadthis("quantity_ca")
+        loadthis("quantity_scale")
+        loadthis("title")
+        loadthis("utility_ca")
+        loadthis("utility_co")
+        loadthis("weight_co_var")
+        loadthis("weight_normalization")
         return self
 
-    def mangle(self):
-        super().mangle()
-        self._dataset = None
-        self._fixed_arrays = None
-        self._data_arrays = None
-        self.work_arrays = None
-        self._array_ch_cascade = None
-        self._array_av_cascade = None
-        self._constraint_funcs = None
+    def mangle(self, data=True, structure=True):
+        super().mangle(data, structure)
+        if data:
+            self._dataset = None
+            self._data_arrays = None
+            self.work_arrays = None
+            self._array_ch_cascade = None
+            self._array_av_cascade = None
+        if structure:
+            self._constraint_funcs = None
+            self._fixed_arrays = None
 
     def is_mnl(self):
         """
@@ -956,15 +1005,25 @@ class NumbaModel(_BaseModel):
             self._data_arrays = None
             return
 
-        datatree = self.datatree
+        if self._should_preload_data:
+            datatree = self.datatree
+        else:
+            datatree = self.datatree.replace_datasets(
+                {
+                    self.datatree.root_node_name: self.datatree.root_dataset.isel(
+                        {self.datatree.CASEID: slice(0, 1)}
+                    )
+                }
+            )
         if datatree is not None:
             from .data_arrays import prepare_data
+
             self.dataset, self.dataflows = prepare_data(
                 datasource=datatree,
                 request=self,
                 float_dtype=self.float_dtype,
                 cache_dir=datatree.cache_dir,
-                flows=getattr(self, 'dataflows', None),
+                flows=getattr(self, "dataflows", None),
             )
             self._data_arrays = self.dataset.dc.to_arrays(
                 self.graph,
@@ -973,16 +1032,18 @@ class NumbaModel(_BaseModel):
             if self.work_arrays is not None:
                 self._rebuild_work_arrays()
 
-    def _rebuild_work_arrays(self, n_cases=None, n_nodes=None, n_params=None, on_missing_data='silent'):
+    def _rebuild_work_arrays(
+        self, n_cases=None, n_nodes=None, n_params=None, on_missing_data="silent"
+    ):
         log = logging.getLogger("Larch")
         if n_cases is None:
             try:
                 n_cases = self.n_cases
             except MissingDataError as err:
-                if on_missing_data != 'silent':
+                if on_missing_data != "silent":
                     log.error("MissingDataError, cannot rebuild work arrays")
                 self.work_arrays = None
-                if on_missing_data == 'raise':
+                if on_missing_data == "raise":
                     raise
                 return
         if n_nodes is None:
@@ -992,10 +1053,10 @@ class NumbaModel(_BaseModel):
         _need_to_rebuild_work_arrays = True
         if self.work_arrays is not None:
             if (
-                    (self.work_arrays.utility.shape[0] == n_cases)
-                    and (self.work_arrays.utility.shape[1] == n_nodes)
-                    and (self.work_arrays.d_loglike.shape[1] == n_params)
-                    and (self.work_arrays.utility.dtype == self.float_dtype)
+                (self.work_arrays.utility.shape[0] == n_cases)
+                and (self.work_arrays.utility.shape[1] == n_nodes)
+                and (self.work_arrays.d_loglike.shape[1] == n_params)
+                and (self.work_arrays.utility.dtype == self.float_dtype)
             ):
                 _need_to_rebuild_work_arrays = False
         if _need_to_rebuild_work_arrays:
@@ -1036,16 +1097,13 @@ class NumbaModel(_BaseModel):
                 model_q_ca_param,
                 model_q_ca_data,
                 model_q_scale_param,
-
                 model_utility_ca_param_scale,
                 model_utility_ca_param,
                 model_utility_ca_data,
-
                 model_utility_co_alt,
                 model_utility_co_param_scale,
                 model_utility_co_param,
                 model_utility_co_data,
-
                 np.stack(self.graph.edge_slot_arrays()).T,
                 node_slot_arrays[0][n_alts:],
                 node_slot_arrays[1][n_alts:],
@@ -1053,7 +1111,6 @@ class NumbaModel(_BaseModel):
             )
         else:
             self._fixed_arrays = None
-
 
     def unmangle(self, force=False):
         if not self._mangled and not force:
@@ -1084,47 +1141,48 @@ class NumbaModel(_BaseModel):
             if g is not None:
                 for nodecode in g.topological_sorted_no_elementals:
                     if nodecode != g._root_id:
-                        param_name = str(g.nodes[nodecode]['parameter'])
+                        param_name = str(g.nodes[nodecode]["parameter"])
                         nameset.add(str(param_name))
         if self.quantity_ca is not None and len(self.quantity_ca) > 0:
             if self.quantity_scale is not None:
                 nameset.add(str(self.quantity_scale))
         if self.logsum_parameter is not None:
             nameset.add(str(self.logsum_parameter))
-        self._ensure_names(nameset, nullvalue=1, initvalue=1, min=0.001, max=1)
-
+        self._ensure_names(
+            nameset, value=1, nullvalue=1, initvalue=1, minimum=0.001, maximum=1
+        )
 
     def __prepare_for_compute(
-            self,
-            x=None,
-            allow_missing_ch=False,
-            allow_missing_av=False,
-            caseslice=None,
+        self,
+        x=None,
+        allow_missing_ch=False,
+        allow_missing_av=False,
+        caseslice=None,
     ):
         if caseslice is None:
             caseslice = slice(caseslice)
         missing_ch, missing_av = False, False
         if self.datatree is None and self.dataset is None:
-            raise MissingDataError('dataset and datatree are both not set')
+            raise MissingDataError("dataset and datatree are both not set")
         self.unmangle()
         if x is not None:
             self.pvals = x
         if self.dataset is not None:
-            if 'ch' not in self.dataset and not allow_missing_ch:
-                raise MissingDataError('model.dataset does not include `ch`')
+            if "ch" not in self.dataset and not allow_missing_ch:
+                raise MissingDataError("model.dataset does not include `ch`")
         if self.work_arrays is None:
-            self._rebuild_work_arrays(on_missing_data='raise')
+            self._rebuild_work_arrays(on_missing_data="raise")
         return (
             *self._fixed_arrays,
             self.pholdfast,
-            self.pvals.astype(self.float_dtype), # float input shape=[n_params]
-            *self._data_arrays.cs[caseslice], # TODO fix when not using named tuple
+            self.pvals.astype(self.float_dtype),  # float input shape=[n_params]
+            *self._data_arrays.cs[caseslice],  # TODO fix when not using named tuple
         )
 
     def constraint_violation(
-            self,
-            on_violation='raise',
-            intensity_check=False,
+        self,
+        on_violation="raise",
+        intensity_check=False,
     ):
         """
         Check if constraints are currently violated.
@@ -1157,7 +1215,7 @@ class NumbaModel(_BaseModel):
                 f"{self.pnames[failure]} over maximum "
                 f"({self.pvals[failure]} > {self.pmaximum[failure]})"
             )
-            if on_violation != 'raise':
+            if on_violation != "raise":
                 return failure_message
             raise ValueError(failure_message)
         under_min = self.pvals < self.pminimum
@@ -1167,19 +1225,20 @@ class NumbaModel(_BaseModel):
                 f"{self.pnames[failure]} under minimum "
                 f"({self.pvals[failure]} < {self.pminimum[failure]})"
             )
-            if on_violation != 'raise':
+            if on_violation != "raise":
                 return failure_message
             raise ValueError(failure_message)
         for c in self.constraints:
             if c.fun(self.pvals) < 0:
                 failure_message = str(c)
-                if on_violation != 'raise':
+                if on_violation != "raise":
                     return failure_message
                 raise ValueError(failure_message)
         return OK
 
     def fit_bhhh(self, *args, **kwargs):
         from .numba_optimization import fit_bhhh
+
         return fit_bhhh(self, *args, **kwargs)
 
     def constraint_penalty(self, x=None):
@@ -1215,13 +1274,21 @@ class NumbaModel(_BaseModel):
             x,
             allow_missing_ch=False,
         )
-        args_flags = args + (np.asarray([
-            0,     # only_utility
-            False, # return_probability
-            True,  # return_gradient
-            True,  # return_bhhh
-        ], dtype=np.int8),)
-        with np.errstate(divide='ignore', over='ignore', ):
+        args_flags = args + (
+            np.asarray(
+                [
+                    0,  # only_utility
+                    False,  # return_probability
+                    True,  # return_gradient
+                    True,  # return_bhhh
+                ],
+                dtype=np.int8,
+            ),
+        )
+        with np.errstate(
+            divide="ignore",
+            over="ignore",
+        ):
             _numba_master_vectorized(
                 *args_flags,
                 out=tuple(self.work_arrays),
@@ -1230,57 +1297,72 @@ class NumbaModel(_BaseModel):
                 penalty, dpenalty, dpenalty_binding = self.constraint_penalty()
                 self.work_arrays.loglike[:] += penalty
                 self.work_arrays.d_loglike[:] += np.expand_dims(dpenalty_binding, 0)
-                self.work_arrays.bhhh[:] = np.einsum('ij,ik->ijk', self.work_arrays.d_loglike, self.work_arrays.d_loglike)
+                self.work_arrays.bhhh[:] = np.einsum(
+                    "ij,ik->ijk", self.work_arrays.d_loglike, self.work_arrays.d_loglike
+                )
         bhhh = self.work_arrays.bhhh.sum(0)
         dloglike = self.work_arrays.d_loglike.sum(0)
-        freedoms = (self.pholdfast == 0)
+        freedoms = self.pholdfast == 0
         from .numba_optimization import propose_direction
+
         direction = propose_direction(bhhh, dloglike, freedoms)
         tolerance = np.dot(direction, dloglike) - self.n_cases
         return tolerance
 
     def _loglike_runner(
-            self,
-            x=None,
-            only_utility=0,
-            return_gradient=False,
-            return_probability=False,
-            return_bhhh=False,
-            start_case=None,
-            stop_case=None,
-            step_case=None,
+        self,
+        x=None,
+        only_utility=0,
+        return_gradient=False,
+        return_probability=False,
+        return_bhhh=False,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
     ):
         caseslice = slice(start_case, stop_case, step_case)
         args = self.__prepare_for_compute(
             x,
-            allow_missing_ch=return_probability or (only_utility>0),
+            allow_missing_ch=return_probability or (only_utility > 0),
             caseslice=caseslice,
         )
-        args_flags = args + (np.asarray([
-            only_utility,
-            return_probability,
-            return_gradient,
-            return_bhhh,
-        ], dtype=np.int8),)
+        args_flags = args + (
+            np.asarray(
+                [
+                    only_utility,
+                    return_probability,
+                    return_gradient,
+                    return_bhhh,
+                ],
+                dtype=np.int8,
+            ),
+        )
         try:
-            with np.errstate(divide='ignore', over='ignore', ):
+            with np.errstate(
+                divide="ignore",
+                over="ignore",
+            ):
                 try:
-                    result_arrays = WorkArrays(*_numba_master_vectorized(
-                        *args_flags,
-                        out=tuple(self.work_arrays.cs[caseslice]),
-                    ))
+                    result_arrays = WorkArrays(
+                        *_numba_master_vectorized(
+                            *args_flags,
+                            out=tuple(self.work_arrays.cs[caseslice]),
+                        )
+                    )
                 except ValueError:
-                    result_arrays = WorkArrays(*_numba_master_vectorized(
-                        *args_flags,
-                        #out=tuple(self.work_arrays.cs[caseslice]),
-                    ))
+                    result_arrays = WorkArrays(
+                        *_numba_master_vectorized(
+                            *args_flags,
+                            # out=tuple(self.work_arrays.cs[caseslice]),
+                        )
+                    )
 
                 if self.constraint_intensity:
                     penalty, dpenalty, dpenalty_binding = self.constraint_penalty()
                     self.work_arrays.loglike[caseslice] += penalty
                     self.work_arrays.d_loglike[caseslice] += np.expand_dims(dpenalty, 0)
                     self.work_arrays.bhhh[caseslice] = np.einsum(
-                        'ij,ik->ijk',
+                        "ij,ik->ijk",
                         self.work_arrays.d_loglike[caseslice],
                         self.work_arrays.d_loglike[caseslice],
                     )
@@ -1288,9 +1370,10 @@ class NumbaModel(_BaseModel):
                     penalty = 0.0
 
         except:
-            shp = lambda y: getattr(y, 'shape', 'scalar')
-            dtp = lambda y: getattr(y, 'dtype', f'{type(y)} ')
+            shp = lambda y: getattr(y, "shape", "scalar")
+            dtp = lambda y: getattr(y, "dtype", f"{type(y)} ")
             import inspect
+
             arg_names = list(inspect.signature(_numba_master).parameters)
             arg_name_width = max(len(j) for j in arg_names)
 
@@ -1302,11 +1385,17 @@ class NumbaModel(_BaseModel):
             print("# Input Arrays")
             for n, (a, s) in enumerate(zip(args_flags, in_sig_shapes)):
                 s = s.rstrip(" ),")
-                print(f" {arg_names[n]:{arg_name_width}} [{n:2}] {s.strip():9}: {dtp(a)}{shp(a)}")
+                print(
+                    f" {arg_names[n]:{arg_name_width}} [{n:2}] {s.strip():9}: {dtp(a)}{shp(a)}"
+                )
             print("# Output Arrays")
-            for n, (a, s) in enumerate(zip(self.work_arrays, out_sig_shapes), start=n+1):
+            for n, (a, s) in enumerate(
+                zip(self.work_arrays, out_sig_shapes), start=n + 1
+            ):
                 s = s.rstrip(" ),")
-                print(f" {arg_names[n]:{arg_name_width}} [{n:2}] {s.strip():9}: {dtp(a)}{shp(a)}")
+                print(
+                    f" {arg_names[n]:{arg_name_width}} [{n:2}] {s.strip():9}: {dtp(a)}{shp(a)}"
+                )
             raise
         return result_arrays, penalty
 
@@ -1319,14 +1408,10 @@ class NumbaModel(_BaseModel):
 
     @weight_normalization.setter
     def weight_normalization(self, x):
-        pass # TODO
+        pass  # TODO
 
     def loglike(
-            self,
-            x=None,
-            *,
-            start_case=None, stop_case=None, step_case=None,
-            **kwargs
+        self, x=None, *, start_case=None, stop_case=None, step_case=None, **kwargs
     ):
         """
         Compute the log likelihood of the model.
@@ -1366,12 +1451,14 @@ class NumbaModel(_BaseModel):
         return result
 
     def d_loglike(
-            self,
-            x=None,
-            *,
-            start_case=None, stop_case=None, step_case=None,
-            return_series=False,
-            **kwargs,
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        return_series=False,
+        **kwargs,
     ):
         result_arrays, penalty = self._loglike_runner(
             x,
@@ -1386,11 +1473,13 @@ class NumbaModel(_BaseModel):
         return result
 
     def loglike_casewise(
-            self,
-            x=None,
-            *,
-            start_case=None, stop_case=None, step_case=None,
-            **kwargs,
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        **kwargs,
     ):
         result_arrays, penalty = self._loglike_runner(
             x,
@@ -1400,12 +1489,46 @@ class NumbaModel(_BaseModel):
         )
         return result_arrays.loglike * self.weight_normalization
 
+    def loglike_null(self, use_cache=True):
+        """
+        Compute the log likelihood at null values.
+
+        Set all parameter values to the value indicated in the
+        "nullvalue" column of the parameter frame, and compute
+        the log likelihood with the currently loaded data.  Note
+        that the null value for each parameter may not be zero
+        (for example, the default null value for logsum parameters
+        in a nested logit model is 1).
+
+        Parameters
+        ----------
+        use_cache : bool, default True
+            Use the cached value if available.  Set to -1 to
+            raise an exception if there is no cached value.
+
+        Returns
+        -------
+        float
+        """
+        if self._cached_loglike_null is not None and use_cache:
+            return self._cached_loglike_null
+        elif use_cache == -1:
+            raise ValueError("no cached value")
+        else:
+            current_parameters = self.pvals.copy()
+            self.pvals = "null"
+            self._cached_loglike_null = self.loglike()
+            self.pvals = current_parameters
+            return self._cached_loglike_null
+
     def d_loglike_casewise(
-            self,
-            x=None,
-            *,
-            start_case=None, stop_case=None, step_case=None,
-            **kwargs,
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        **kwargs,
     ):
         result_arrays, penalty = self._loglike_runner(
             x,
@@ -1417,12 +1540,14 @@ class NumbaModel(_BaseModel):
         return result_arrays.d_loglike * self.weight_normalization
 
     def bhhh(
-            self,
-            x=None,
-            *,
-            start_case=None, stop_case=None, step_case=None,
-            return_dataframe=False,
-            **kwargs,
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        return_dataframe=False,
+        **kwargs,
     ):
         result_arrays, penalty = self._loglike_runner(
             x,
@@ -1433,61 +1558,61 @@ class NumbaModel(_BaseModel):
         )
         result = result_arrays.bhhh.sum(0) * self.weight_normalization
         if return_dataframe:
-            result = pd.DataFrame(
-                result, columns=self.pnames, index=self.pnames
-            )
+            result = pd.DataFrame(result, columns=self.pnames, index=self.pnames)
         return result
 
     def _wrap_as_dataframe(
-            self,
-            arr,
-            return_dataframe,
-            start_case=None,
-            stop_case=None,
-            step_case=None,
+        self,
+        arr,
+        return_dataframe,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
     ):
         if return_dataframe:
             idx = self.datatree.caseids()
             if idx is not None:
                 idx = idx[start_case:stop_case:step_case]
-            if return_dataframe == 'names':
+            if return_dataframe == "names":
                 return pd.DataFrame(
                     data=arr,
-                    columns=self.graph.standard_sort_names[:arr.shape[1]],
+                    columns=self.graph.standard_sort_names[: arr.shape[1]],
                     index=idx,
                 )
-            if return_dataframe == 'dataarray':
+            if return_dataframe == "dataarray":
                 return DataArray(
                     arr,
                     coords={
                         self.datatree.CASEID: idx,
-                        'nodeid': np.asarray(self.graph.standard_sort),
-                        'node_name': DataArray(np.asarray(self.graph.standard_sort_names), dims='nodeid'),
+                        "nodeid": np.asarray(self.graph.standard_sort),
+                        "node_name": DataArray(
+                            np.asarray(self.graph.standard_sort_names), dims="nodeid"
+                        ),
                     },
-                    dims=(self.datatree.CASEID, 'nodeid'),
+                    dims=(self.datatree.CASEID, "nodeid"),
                 )
             result = pd.DataFrame(
                 data=arr,
-                columns=self.graph.standard_sort[:arr.shape[1]],
+                columns=self.graph.standard_sort[: arr.shape[1]],
                 index=idx,
             )
-            if return_dataframe == 'idce':
+            if return_dataframe == "idce":
                 raise NotImplementedError
-            elif return_dataframe == 'idca':
+            elif return_dataframe == "idca":
                 return result.stack()
             else:
                 return result
         return arr
 
     def probability(
-            self,
-            x=None,
-            *,
-            start_case=None,
-            stop_case=None,
-            step_case=None,
-            return_dataframe=False,
-            include_nests=False,
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        return_dataframe=False,
+        include_nests=False,
     ):
         result_arrays, penalty = self._loglike_runner(
             x,
@@ -1498,7 +1623,7 @@ class NumbaModel(_BaseModel):
         )
         pr = result_arrays.probability
         if not include_nests:
-            pr = pr[:, :self.graph.n_elementals()]
+            pr = pr[:, : self.graph.n_elementals()]
         return self._wrap_as_dataframe(
             pr,
             return_dataframe,
@@ -1508,13 +1633,13 @@ class NumbaModel(_BaseModel):
         )
 
     def utility(
-            self,
-            x=None,
-            *,
-            start_case=None,
-            stop_case=None,
-            step_case=None,
-            return_format=None,
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        return_format=None,
     ):
         """
         Compute values for the utility function contained in the model.
@@ -1567,13 +1692,13 @@ class NumbaModel(_BaseModel):
         )
 
     def quantity(
-            self,
-            x=None,
-            *,
-            start_case=None,
-            stop_case=None,
-            step_case=None,
-            return_dataframe=None,
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        return_dataframe=None,
     ):
         result_arrays, penalty = self._loglike_runner(
             x,
@@ -1588,13 +1713,13 @@ class NumbaModel(_BaseModel):
         )
 
     def logsums(
-            self,
-            x=None,
-            *,
-            start_case=None,
-            stop_case=None,
-            step_case=None,
-            arr=None,
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        arr=None,
     ):
         result_arrays, penalty = self._loglike_runner(
             x,
@@ -1604,23 +1729,23 @@ class NumbaModel(_BaseModel):
             only_utility=2,
         )
         if arr is not None:
-            arr[start_case:stop_case:step_case] = result_arrays.utility[:,-1]
+            arr[start_case:stop_case:step_case] = result_arrays.utility[:, -1]
             return arr
-        return result_arrays.utility[:,-1]
+        return result_arrays.utility[:, -1]
 
     def loglike2(
-            self,
-            x=None,
-            *,
-            start_case=None,
-            stop_case=None,
-            step_case=None,
-            persist=0,
-            leave_out=-1,
-            keep_only=-1,
-            subsample=-1,
-            return_series=True,
-            probability_only=False,
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        persist=0,
+        leave_out=-1,
+        keep_only=-1,
+        subsample=-1,
+        return_series=True,
+        probability_only=False,
     ):
         result_arrays, penalty = self._loglike_runner(
             x,
@@ -1636,19 +1761,24 @@ class NumbaModel(_BaseModel):
         if start_case is None and stop_case is None and step_case is None:
             self._check_if_best(result.ll)
         if return_series:
-            result['dll'] = pd.Series(result['dll'], index=self.pnames, )
+            result["dll"] = pd.Series(
+                result["dll"],
+                index=self.pnames,
+            )
         return result
 
     def loglike2_bhhh(
-            self,
-            x=None,
-            *,
-            return_series=False,
-            start_case=None,
-            stop_case=None,
-            step_case=None,
-            persist=0,
-            leave_out=-1, keep_only=-1, subsample=-1,
+        self,
+        x=None,
+        *,
+        return_series=False,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        persist=0,
+        leave_out=-1,
+        keep_only=-1,
+        subsample=-1,
     ):
         result_arrays, penalty = self._loglike_runner(
             x,
@@ -1663,72 +1793,68 @@ class NumbaModel(_BaseModel):
             dll=result_arrays.d_loglike.sum(0) * self.weight_normalization,
             bhhh=result_arrays.bhhh.sum(0) * self.weight_normalization,
         )
-        from ..model.persist_flags import PERSIST_LOGLIKE_CASEWISE, PERSIST_D_LOGLIKE_CASEWISE
+        from ..model.persist_flags import (
+            PERSIST_D_LOGLIKE_CASEWISE,
+            PERSIST_LOGLIKE_CASEWISE,
+        )
+
         if persist & PERSIST_LOGLIKE_CASEWISE:
-            result['ll_casewise'] = result_arrays.loglike * self.weight_normalization
+            result["ll_casewise"] = result_arrays.loglike * self.weight_normalization
         if persist & PERSIST_D_LOGLIKE_CASEWISE:
-            result['dll_casewise'] = result_arrays.d_loglike * self.weight_normalization
+            result["dll_casewise"] = result_arrays.d_loglike * self.weight_normalization
         if start_case is None and stop_case is None and step_case is None:
             self._check_if_best(result.ll)
         if return_series:
-            result['dll'] = pd.Series(result['dll'], index=self.pnames, )
-            result['bhhh'] = pd.DataFrame(
-                result['bhhh'], index=self.pnames, columns=self.pnames
+            result["dll"] = pd.Series(
+                result["dll"],
+                index=self.pnames,
             )
-        result['penalty'] = penalty
+            result["bhhh"] = pd.DataFrame(
+                result["bhhh"], index=self.pnames, columns=self.pnames
+            )
+        result["penalty"] = penalty
         return result
 
     def d2_loglike(
-            self,
-            x=None,
-            *,
-            start_case=None,
-            stop_case=None,
-            step_case=None,
-            leave_out=-1,
-            keep_only=-1,
-            subsample=-1,
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        leave_out=-1,
+        keep_only=-1,
+        subsample=-1,
     ):
-        raise NotImplementedError
-        # return super().d2_loglike(
-        #     x=x,
-        #     start_case=start_case,
-        #     stop_case=stop_case,
-        #     step_case=step_case,
-        #     leave_out=leave_out,
-        #     keep_only=keep_only,
-        #     subsample=subsample,
-        # )
+        if x is None:
+            x = self.pvals.copy()
+        from ..util.math import approx_fprime
+
+        return approx_fprime(
+            x,
+            lambda y: self.d_loglike(
+                y,
+                start_case=start_case,
+                stop_case=stop_case,
+                step_case=step_case,
+                leave_out=leave_out,
+                keep_only=keep_only,
+                subsample=subsample,
+            ),
+        )
 
     def neg_loglike(
-            self,
-            x=None,
-            start_case=None,
-            stop_case=None,
-            step_case=None,
-            leave_out=-1,
-            keep_only=-1,
-            subsample=-1,
+        self,
+        x=None,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        leave_out=-1,
+        keep_only=-1,
+        subsample=-1,
     ):
         result = self.loglike(
             x,
-            start_case=start_case, stop_case=stop_case, step_case=step_case,
-            leave_out=leave_out, keep_only=keep_only, subsample=subsample
-        )
-        return -result
-
-    def neg_loglike2(
-            self,
-            x=None,
-            start_case=None,
-            stop_case=None,
-            step_case=None,
-            leave_out=-1,
-            keep_only=-1,
-            subsample=-1,
-    ):
-        return -self.neg_loglike2(
-            x=x,
             start_case=start_case,
             stop_case=stop_case,
             step_case=step_case,
@@ -1736,24 +1862,50 @@ class NumbaModel(_BaseModel):
             keep_only=keep_only,
             subsample=subsample,
         )
+        return -result
+
+    def logloss(
+        self,
+        x=None,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        leave_out=-1,
+        keep_only=-1,
+        subsample=-1,
+    ):
+        result = self.loglike(
+            x,
+            start_case=start_case,
+            stop_case=stop_case,
+            step_case=step_case,
+            leave_out=leave_out,
+            keep_only=keep_only,
+            subsample=subsample,
+        )
+        return -result / self.total_weight()
 
     def neg_d_loglike(self, x=None, start_case=0, stop_case=-1, step_case=1, **kwargs):
         result = self.d_loglike(
-            x,
-            start_case=start_case, stop_case=stop_case, step_case=step_case,
-            **kwargs
+            x, start_case=start_case, stop_case=stop_case, step_case=step_case, **kwargs
         )
         return -np.asarray(result)
 
+    def d_logloss(self, x=None, start_case=0, stop_case=-1, step_case=1, **kwargs):
+        result = self.d_loglike(
+            x, start_case=start_case, stop_case=stop_case, step_case=step_case, **kwargs
+        )
+        return -np.asarray(result) / self.total_weight()
+
     def jumpstart_bhhh(
-            self,
-            steplen=0.5,
-            jumpstart=0,
-            jumpstart_split=5,
-            leave_out=-1,
-            keep_only=-1,
-            subsample=-1,
-            logger=None,
+        self,
+        steplen=0.5,
+        jumpstart=0,
+        jumpstart_split=5,
+        leave_out=-1,
+        keep_only=-1,
+        subsample=-1,
+        logger=None,
     ):
         """
         Jump start optimization
@@ -1766,9 +1918,11 @@ class NumbaModel(_BaseModel):
 
         """
         if logger is None:
+
             class NoLogger:
                 debug = lambda *x: None
                 info = lambda *x: None
+
             logger = NoLogger()
 
         for jump in range(jumpstart):
@@ -1795,57 +1949,59 @@ class NumbaModel(_BaseModel):
                 logger.debug(f"jump to {j_pvals}")
                 self.set_values(j_pvals)
 
-
-
     def __getstate__(self):
         attr = {}
         port = [
-            'availability_any',
-            'availability_ca_var',
-            'availability_co_vars',
-            'availability_var',
-            'choice_any',
-            'choice_ca_var',
-            'choice_co_code',
-            'choice_co_vars',
-            'common_draws',
-            '_compute_engine',
-            'constraint_intensity',
-            'constraint_sharpness',
-            'constraints',
-            'dataflows',
+            "availability_any",
+            "availability_ca_var",
+            "availability_co_vars",
+            "choice_any",
+            "choice_ca_var",
+            "choice_co_code",
+            "choice_co_vars",
+            "common_draws",
+            "_compute_engine",
+            "constraint_intensity",
+            "constraint_sharpness",
+            "constraints",
+            "dataflows",
             # 'dataset',
             # 'datatree',
-            'float_dtype',
-            'graph',
-            'groupid',
-            'logsum_parameter',
-            'mixtures',
-            'n_draws',
-            'parameters',
-            'prerolled_draws',
-            'quantity_ca',
-            'quantity_scale',
-            'rename_parameters',
-            'title',
-            'utility_ca',
-            'utility_co',
-            'weight_co_var',
+            "float_dtype",
+            "graph",
+            "groupid",
+            "logsum_parameter",
+            "mixtures",
+            "n_draws",
+            "parameters",
+            "prerolled_draws",
+            "quantity_ca",
+            "quantity_scale",
+            "rename_parameters",
+            "title",
+            "utility_ca",
+            "utility_co",
+            "weight_co_var",
         ]
         for k in port:
             attr[k] = getattr(self, k)
         return attr
 
     def __setstate__(self, state):
-        for k, v in state.items():
-            if k == 'parameters':
-                self._parameter_bucket.update_parameters(v)
-            else:
-                try:
-                    setattr(self, k, v)
-                except AttributeError as err:
-                    raise AttributeError(f"{k}: {err}")
-
+        defer = {
+            "constraints",
+        }
+        for check in [lambda i: i in defer, lambda i: i not in defer]:
+            for k, v in state.items():
+                if check(k):
+                    continue
+                if k == "parameters":
+                    self._parameter_bucket.update_parameters(v)
+                else:
+                    try:
+                        setattr(self, k, v)
+                    except AttributeError as err:
+                        raise AttributeError(f"{k}: {err}")
 
     def copy(self, datatree=True):
         dupe = type(self)()
@@ -1853,6 +2009,39 @@ class NumbaModel(_BaseModel):
         if datatree:
             dupe.datatree = self.datatree
         return dupe
+
+    def remove_unused_parameters(self, verbose=True):
+        """
+        Remove parameters that are not used in the model.
+
+        Parameters
+        ----------
+        verbose : bool, default True
+            Generate log messages about how many parameters were dropped.
+        """
+        old_param_names = self.pnames
+        old_parameters = self.parameters
+        # clear existing parameters
+        self._parameter_bucket._params = old_parameters.reindex(
+            {self._parameter_bucket.index_name: []}
+        )
+        self.unmangle(True)
+        new_param_names = self.pnames
+        self._parameter_bucket._params = old_parameters.reindex(
+            {self._parameter_bucket.index_name: new_param_names}
+        )
+        if verbose:
+            dropped_params = [p for p in old_param_names if p not in new_param_names]
+            if len(dropped_params) == 0:
+                pass
+            elif len(dropped_params) < 4:
+                logging.getLogger("Larch").warning(
+                    f"dropped {len(dropped_params)} parameters: {', '.join(dropped_params)}"
+                )
+            else:
+                logging.getLogger("Larch").warning(
+                    f"dropped {len(dropped_params)} parameters including: {', '.join(dropped_params[:3])}"
+                )
 
     @property
     def n_cases(self):
@@ -1874,8 +2063,6 @@ class NumbaModel(_BaseModel):
             return self._data_arrays.wt.sum()
         raise MissingDataError("no data_arrays are set")
 
-
-
     @property
     def dataset(self):
         """larch.Dataset : Data arrays as loaded for model computation."""
@@ -1892,6 +2079,7 @@ class NumbaModel(_BaseModel):
         if dataset is self._dataset:
             return
         from xarray import Dataset as _Dataset
+
         if isinstance(dataset, Dataset):
             self._dataset = dataset
             self._data_arrays = None
@@ -1942,6 +2130,7 @@ class NumbaModel(_BaseModel):
         pandas.DataFrame
         """
         from ..dataset import choice_avail_summary
+
         self.unmangle()
         graph = None if self.is_mnl() else self.graph
         return choice_avail_summary(
@@ -1951,9 +2140,9 @@ class NumbaModel(_BaseModel):
         )
 
     def maximize_loglike(
-            self,
-            *args,
-            **kwargs,
+        self,
+        *args,
+        **kwargs,
     ):
         """
         Maximize the log likelihood.
@@ -1983,4 +2172,173 @@ class NumbaModel(_BaseModel):
 
         """
         from .optimization import maximize_loglike
+
         return maximize_loglike(self, *args, **kwargs)
+
+    def _get_bounds_constraints(self, binding_tol=1e-4):
+        """
+        Convert bounds to parametric constraints on the model.
+
+        Parameters
+        ----------
+        binding_tol : Number or Mapping
+            The binding tolerance to use, which determines
+            whether a constraint is considered active or not.
+
+        Returns
+        -------
+        list
+            A list of constraints.
+        """
+        from numbers import Number
+        from typing import Mapping
+
+        from .constraints import FixedBound
+
+        if isinstance(binding_tol, Number):
+            default_binding_tol = binding_tol
+        else:
+            default_binding_tol = 1e-4
+        if not isinstance(binding_tol, Mapping):
+            binding_tol = {}
+        get_bind_tol = lambda x: binding_tol.get(x, default_binding_tol)
+        bounds = []
+        self.unmangle()
+        for pname, phold, pmin, pmax in zip(
+            self.pnames,
+            self.pholdfast,
+            self.pminimum,
+            self.pmaximum,
+        ):
+            if phold:
+                # don't create bounds constraints on holdfast parameters
+                continue
+            if pmin != -np.inf or pmax != np.inf:
+                bounds.append(
+                    FixedBound(
+                        pname, pmin, pmax, model=self, binding_tol=get_bind_tol(pname)
+                    )
+                )
+        return bounds
+
+    def _get_constraints(self, method):
+        if method.lower() in ("slsqp", "cobyla"):
+            constraint_dicts = []
+            for c in self.constraints:
+                constraint_dicts.extend(c.as_constraint_dicts())
+            return constraint_dicts
+        if method.lower() in ("trust-constr"):
+            constraints = []
+            for c in self.constraints:
+                constraints.extend(c.as_linear_constraints())
+            return constraints
+        return ()
+
+    def calculate_parameter_covariance(self, pvals=None):
+        if pvals is None:
+            pvals = self.pvals
+        locks = np.asarray(self.pholdfast.astype(bool))
+        if self.compute_engine == "jax":
+            se, hess, ihess = self.jax_param_cov(pvals)
+        else:
+            hess = -self.d2_loglike(pvals)
+            if self.parameters["holdfast"].sum():
+                free = self.pholdfast == 0
+                hess_ = hess[free][:, free]
+                ihess_ = np.linalg.inv(hess_)
+                ihess = _arr_inflate(ihess_, locks)
+            else:
+                ihess = np.linalg.inv(hess)
+            se = np.sqrt(ihess.diagonal())
+            self.pstderr = se
+        hess = np.asarray(hess).copy()
+        hess[locks, :] = 0
+        hess[:, locks] = 0
+        ihess = np.asarray(ihess).copy()
+        ihess[locks, :] = 0
+        ihess[:, locks] = 0
+        self.add_parameter_array("hess", hess)
+        self.add_parameter_array("ihess", ihess)
+
+        # constrained covariance
+        if self.constraints:
+            constraints = list(self.constraints)
+        else:
+            constraints = []
+        try:
+            constraints.extend(self._get_bounds_constraints())
+        except:
+            pass
+
+        if constraints:
+            binding_constraints = list()
+            self.add_parameter_array("unconstrained_std_err", self.pstderr)
+            self.add_parameter_array("unconstrained_covariance_matrix", ihess)
+
+            s = np.asarray(ihess)
+            pvals = self.pvals
+            for c in constraints:
+                if np.absolute(c.fun(pvals)) < c.binding_tol:
+                    binding_constraints.append(c)
+                    b = c.jac(self.pf.value)
+                    den = b @ s @ b
+                    if den != 0:
+                        s = s - (1 / den) * s @ b.reshape(-1, 1) @ b.reshape(1, -1) @ s
+            self.add_parameter_array("covariance_matrix", s)
+            self.pstderr = np.sqrt(s.diagonal())
+
+            # Fix numerical issues on some constraints, add constrained notes
+            if binding_constraints or any(self.pholdfast != 0):
+                notes = {}
+                for c in binding_constraints:
+                    pa = c.get_parameters()
+                    for p in pa:
+                        # if self.pf.loc[p, 't_stat'] > 1e5:
+                        #     self.pf.loc[p, 't_stat'] = np.inf
+                        #     self.pf.loc[p, 'std_err'] = np.nan
+                        # if self.pf.loc[p, 't_stat'] < -1e5:
+                        #     self.pf.loc[p, 't_stat'] = -np.inf
+                        #     self.pf.loc[p, 'std_err'] = np.nan
+                        n = notes.get(p, [])
+                        n.append(c.get_binding_note(pvals))
+                        notes[p] = n
+                constrained_note = (
+                    pd.Series({k: "\n".join(v) for k, v in notes.items()}, dtype=object)
+                    .reindex(self.pnames)
+                    .fillna("")
+                )
+                constrained_note[self.pholdfast != 0] = "fixed value"
+                self.add_parameter_array("constrained", constrained_note)
+
+        return se, hess, ihess
+
+    def histogram_on_idca_variable(
+        self,
+        x,
+        **kwargs,
+    ):
+        from ..util.figures import histogram_on_idca_variable
+
+        return histogram_on_idca_variable(
+            x,
+            pr=self.probability(),  # array-like
+            ds=self.dataset,
+            dt=self.datatree,
+            **kwargs,
+        )
+
+
+@njit(cache=True)
+def _arr_inflate(arr, locks):
+    s = locks.size
+    z = np.zeros((s, s), dtype=arr.dtype)
+    i_ = 0
+    for i in range(s):
+        if not locks[i]:
+            j_ = 0
+            for j in range(s):
+                if not locks[j]:
+                    z[i, j] = arr[i_, j_]
+                    j_ += 1
+            i_ += 1
+    return z

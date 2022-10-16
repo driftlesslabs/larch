@@ -2,17 +2,24 @@ import numpy as np
 import pandas as pd
 from numba import njit, prange
 
+
 @njit(parallel=True, nogil=True)
 def cascade_or(arr, dn_slots, up_slots):
     for i in prange(arr.shape[0]):
         for j in range(dn_slots.size):
-            arr[i,up_slots[j]] |= arr[i,dn_slots[j]]
+            arr[i, up_slots[j]] |= arr[i, dn_slots[j]]
+
 
 @njit(parallel=True, nogil=True)
-def cascade_sum(arr, dn_slots, up_slots):
+def cascade_sum(arr, dn_slots, up_slots, max_val=None):
     for i in prange(arr.shape[0]):
         for j in range(dn_slots.size):
-            arr[i,up_slots[j]] += arr[i,dn_slots[j]]
+            if max_val is None:
+                arr[i, up_slots[j]] += arr[i, dn_slots[j]]
+            else:
+                k = arr[i, up_slots[j]] + arr[i, dn_slots[j]]
+                arr[i, up_slots[j]] = min(k, max_val)
+
 
 def data_av_cascade(dataframes, graph):
     """
@@ -33,10 +40,11 @@ def data_av_cascade(dataframes, graph):
     array
     """
     result = np.zeros((len(dataframes.data_av.index), len(graph)), dtype=np.int8)
-    result[: ,:graph.n_elementals()] = dataframes.data_av
+    result[:, : graph.n_elementals()] = dataframes.data_av
     ups, dns, _1, _2 = graph.edge_slot_arrays()
     cascade_or(result, dns, ups)
     return result
+
 
 def data_ch_cascade(dataframes, graph, dtype=None):
     """
@@ -61,10 +69,11 @@ def data_ch_cascade(dataframes, graph, dtype=None):
         (len(dataframes.data_ch.index), len(graph)),
         dtype=dtype or dataframes.data_ch.dtype,
     )
-    result[: ,:graph.n_elementals()] = dataframes.data_ch
+    result[:, : graph.n_elementals()] = dataframes.data_ch
     ups, dns, _1, _2 = graph.edge_slot_arrays()
     cascade_sum(result, dns, ups)
     return result
+
 
 def array_av_cascade(arr_av, graph):
     """
@@ -87,10 +96,11 @@ def array_av_cascade(arr_av, graph):
     if arr_av is None:
         return None
     result = np.zeros((*arr_av.shape[:-1], len(graph)), dtype=np.int8)
-    result[... ,:graph.n_elementals()] = arr_av
+    result[..., : graph.n_elementals()] = arr_av
     ups, dns, _1, _2 = graph.edge_slot_arrays()
-    cascade_or(result.reshape(-1,len(graph)), dns, ups)
+    cascade_sum(result.reshape(-1, len(graph)), dns, ups, 127)
     return result
+
 
 def array_ch_cascade(arr_ch, graph, dtype=None):
     """
@@ -117,7 +127,7 @@ def array_ch_cascade(arr_ch, graph, dtype=None):
         (*arr_ch.shape[:-1], len(graph)),
         dtype=dtype or arr_ch.dtype,
     )
-    result[... ,:graph.n_elementals()] = arr_ch
+    result[..., : graph.n_elementals()] = arr_ch
     ups, dns, _1, _2 = graph.edge_slot_arrays()
-    cascade_sum(result.reshape(-1,len(graph)), dns, ups)
+    cascade_sum(result.reshape(-1, len(graph)), dns, ups)
     return result
