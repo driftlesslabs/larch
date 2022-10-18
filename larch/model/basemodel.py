@@ -1,4 +1,5 @@
 import logging
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -135,6 +136,16 @@ class BaseModel:
         self._compute_engine = engine
 
     @property
+    def most_recent_estimation_result(self):
+        """A copy of the result dict from most recent likelihood maximization."""
+        return self._most_recent_estimation_result.copy()
+
+    @property
+    def possible_overspecification(self):
+        "Not yet implemented"
+        return None
+
+    @property
     def datatree(self):
         """DataTree : A source for data for the model"""
         return self._datatree
@@ -205,6 +216,11 @@ class BaseModel:
     def pnullvals(self):
         self.unmangle()
         return self._parameter_bucket.pnullvals
+
+    @pnullvals.setter
+    def pnullvals(self, x):
+        self.unmangle()
+        self._parameter_bucket.pnullvals = x
 
     @property
     def pmaximum(self):
@@ -287,6 +303,83 @@ class BaseModel:
         cols = ["value", "best", "initvalue", "minimum", "maximum", "nullvalue"]
         cols = [i for i in cols if i in self._parameter_bucket._params]
         return self._parameter_bucket._params[cols].to_dataframe()
+
+    def set_values(self, values=None, **kwargs):
+        """
+        Set the parameter values for one or more parameters.
+
+        Parameters
+        ----------
+        values : {'null', 'init', 'best', array-like, dict, scalar}, optional
+            New values to set for the parameters.
+            If 'null' or 'init', the current values are set
+            equal to the null or initial values given in
+            the 'nullvalue' or 'initvalue' column of the
+            parameter frame, respectively.
+            If 'best', the current values are set equal to
+            the values given in the 'best' column of the
+            parameter frame, if that columns exists,
+            otherwise a ValueError exception is raised.
+            If given as array-like, the array must be a
+            vector with length equal to the length of the
+            parameter frame, and the given vector will replace
+            the current values.  If given as a dictionary,
+            the dictionary is used to update `kwargs` before
+            they are processed.
+        kwargs : dict
+            Any keyword arguments (or if `values` is a
+            dictionary) are used to update the included named
+            parameters only.  A warning will be given if any key of
+            the dictionary is not found among the existing named
+            parameters in the parameter frame, and the value
+            associated with that key is ignored.  Any parameters
+            not named by key in this dictionary are not changed.
+
+        Notes
+        -----
+        Setting parameters both in the `values` argument and
+        through keyword assignment is not explicitly disallowed,
+        although it is not recommended.
+
+        """
+        warnings.warn("")
+        warnings.warn(
+            "Model.set_values(x) is deprecated, use Model.pvals = x", DeprecationWarning
+        )
+        if isinstance(values, dict):
+            kwargs.update(values)
+        elif values is None:
+            self.pvals = kwargs
+        else:
+            self.pvals = values
+
+    def lock_value(self, name, value):
+        """
+        Set a fixed value for a model parameter.
+
+        Parameters with a fixed value (i.e., with "holdfast" set to 1)
+        will not be changed during estimation by the likelihood
+        maximization algorithm.
+
+        Parameters
+        ----------
+        name : str
+            The name of the parameter to set to a fixed value.
+        value : float
+            The numerical value to set for the parameter.
+        """
+        from .linear import ParameterRef
+
+        if isinstance(name, ParameterRef):
+            name = str(name)
+        if value == "null":
+            value = self.pf.loc[name, "nullvalue"]
+        self.pvals = {name: value}
+        self.pholdfast = {name: 0}
+        self.pnullvals = {name: value}
+        self.pminimum = {name: value}
+        self.pmaximum = {name: value}
+        self.pholdfast = {name: 1}
 
     def pretty_table(self):
         self.unmangle()

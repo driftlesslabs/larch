@@ -31,7 +31,7 @@ def _unsupported_operands(op, a, b):
     return f"unsupported operands for {op}: '{_what_is(a)}' and '{_what_is(b)}'"
 
 
-class UnicodeRef_(str):
+class UnicodeRef(str):
     """
     A common base class for all larch named reference types.
 
@@ -54,7 +54,7 @@ class Ref_Gen:
         return self._kind(str(arg))
 
 
-class ParameterRef(UnicodeRef_):
+class ParameterRef(UnicodeRef):
 
     _precedence = 99
 
@@ -264,7 +264,7 @@ class ParameterRef(UnicodeRef_):
         return x
 
 
-class DataRef(UnicodeRef_):
+class DataRef(UnicodeRef):
     def __repr__(self):
         if _re.match("[_A-Za-z][_a-zA-Z0-9]*$", self) and not _keyword.iskeyword(self):
             return "{}.{}".format(_DataRef_repr_txt, self)

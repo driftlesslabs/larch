@@ -22,12 +22,12 @@ from .basemodel import BaseModel as _BaseModel
 from .cascading import data_av_cascade, data_ch_cascade
 from .data_arrays import DataArrays
 
-warnings.warn(  ### EXPERIMENTAL ### )
+warnings.warn(  # Good news, everyone! This tool might not work. #  )
     "\n\n"
-    "##### larix is experimental, and not feature-complete  #####\n"
+    "#### larch v6 is experimental, and not feature-complete ####\n"
     "the first time you import on a new system, this package will\n"
-    "compile optimized binaries for your machine, which may take \n"
-    "a little while, please be patient \n"
+    "compile optimized binaries for your specific machine,  which\n"
+    "may take a little while, please be patient ...\n",
 )
 
 

@@ -13,6 +13,7 @@ from .model.jaxmodel import Model
 from .model.latent_class import LatentClass, MixedLatentClass
 from .model.param_core import ParameterBucket
 from .model.saving import load_model
+from .model.tree import NestingTree
 from .shorts import PX, P, X
 from .util import figures
 

@@ -4,7 +4,7 @@
 **Example Data**
 
 The MTC sample dataset is the same data used in the
-`Self Instructing Manual <http://www.caee.utexas.edu/prof/Bhat/COURSES/LM_Draft_060131Final-060630.pdf>`_
+[Self Instructing Manual](http://www.caee.utexas.edu/prof/Bhat/COURSES/LM_Draft_060131Final-060630.pdf)
 for discrete choice modeling.
 
 ```{note}

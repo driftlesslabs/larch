@@ -253,6 +253,22 @@ class ParameterBucket:
             {"holdfast": xr.DataArray(x, dims=self._params["holdfast"].dims)}
         )
 
+    @pnullvals.setter
+    def pnullvals(self, x):
+        if isinstance(x, dict):
+            x = (
+                xr.DataArray(
+                    np.asarray(list(x.values())),
+                    dims=self.index_name,
+                    coords={self.index_name: np.asarray(list(x.keys()))},
+                )
+                .reindex({self.index_name: self.pnames})
+                .fillna(self.pnullvals)
+            )
+        self._params = self._params.assign(
+            {"nullvalue": xr.DataArray(x, dims=self._params["nullvalue"].dims)}
+        )
+
     @property
     def pmaximum(self):
         return self._params["maximum"].to_numpy()
