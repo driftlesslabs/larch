@@ -1116,6 +1116,11 @@ class BaseModel:
             tabledata["Std Err"] = se
             tstat = (pbucket.pvals - pbucket.pnullvals) / np.where(se, se, 1.0)
             tabledata["t Stat"] = np.where(se, tstat, np.nan)
+        if "robust_std_err" in pbucket._params:
+            se_ = pbucket._params["robust_std_err"]
+            tabledata["Robust Std Err"] = se_
+            tstat_ = (pbucket.pvals - pbucket.pnullvals) / np.where(se_, se_, 1.0)
+            tabledata["Robust t Stat"] = np.where(se_, tstat_, np.nan)
         tabledata["Null Value"] = pbucket.pnullvals
 
         if "constrained" in pbucket.parameters:
@@ -1160,6 +1165,23 @@ class BaseModel:
             result.loc[result["t Stat"] == NBSP + "NA", "Signif"] = ""
             monospace_cols.append("t Stat")
             monospace_cols.append("Signif")
+        if "Robust t Stat" in result.columns:
+            result.insert(
+                result.columns.get_loc("Robust t Stat") + 1, "Robust Signif", ""
+            )
+            result.loc[
+                np.absolute(result["Robust t Stat"]) > 1.9600, "Robust Signif"
+            ] = "*"
+            result.loc[
+                np.absolute(result["Robust t Stat"]) > 2.5758, "Robust Signif"
+            ] = "**"
+            result.loc[
+                np.absolute(result["Robust t Stat"]) > 3.2905, "Robust Signif"
+            ] = "***"
+            result["Robust t Stat"] = result["Robust t Stat"].apply(fixie)
+            result.loc[result["Robust t Stat"] == NBSP + "NA", "Robust Signif"] = ""
+            monospace_cols.append("Robust t Stat")
+            monospace_cols.append("Robust Signif")
         if "Like Ratio" in result.columns:
             if "Signif" not in result.columns:
                 result.insert(result.columns.get_loc("Like Ratio") + 1, "Signif", "")
@@ -1184,14 +1206,15 @@ class BaseModel:
             monospace_cols.append("Like Ratio")
             if "Signif" not in monospace_cols:
                 monospace_cols.append("Signif")
-        if "Std Err" in result.columns:
-            _fmt_s = (
-                lambda x: f"{x: #.3g}".replace(" ", NBSP)
-                if np.isfinite(x)
-                else NBSP + "NA"
-            )
-            result["Std Err"] = result["Std Err"].apply(_fmt_s)
-            monospace_cols.append("Std Err")
+        for z in ["Std Err", "Robust Std Err"]:
+            if z in result.columns:
+                _fmt_s = (
+                    lambda x: f"{x: #.3g}".replace(" ", NBSP)
+                    if np.isfinite(x)
+                    else NBSP + "NA"
+                )
+                result[z] = result[z].apply(_fmt_s)
+                monospace_cols.append(z)
         if "Value" in result.columns:
             result["Value"] = result["Value"].apply(
                 lambda x: f"{x: #.3g}".replace(" ", NBSP)

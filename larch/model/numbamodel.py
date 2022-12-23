@@ -1561,6 +1561,53 @@ class NumbaModel(_BaseModel):
             result = pd.DataFrame(result, columns=self.pnames, index=self.pnames)
         return result
 
+    def robust_covariance(self):
+        if "robust_covariance_matrix" in self.parameters:
+            return self.parameters["robust_covariance_matrix"]
+        cov_dataarray = self.parameters["covariance_matrix"]
+        covariance_matrix = cov_dataarray.to_numpy()
+        take = np.full_like(covariance_matrix, True, dtype=bool)
+        dense_s = len(self.pvals)
+        for i in range(dense_s):
+            if self.pholdfast[i]:
+                # or (self.pf.loc[ii, 'value'] >= self.pf.loc[ii, 'maximum'])
+                # or (self.pf.loc[ii, 'value'] <= self.pf.loc[ii, 'minimum']):
+                take[i, :] = False
+                take[:, i] = False
+                dense_s -= 1
+        if dense_s > 0:
+            covariance_taken = covariance_matrix[take].reshape(dense_s, dense_s)
+            # try:
+            #     invhess = np.linalg.inv(hess_taken)
+            # except np.linalg.linalg.LinAlgError:
+            #     invhess = np.full_like(hess_taken, np.nan, dtype=np.float64)
+            # robust...
+            try:
+                bhhh_taken = self.bhhh()[take].reshape(dense_s, dense_s)
+            except NotImplementedError:
+                robust_covariance_matrix = np.full_like(
+                    covariance_matrix, 0, dtype=np.float64
+                )
+            else:
+                # import scipy.linalg.blas
+                # temp_b_times_h = scipy.linalg.blas.dsymm(float(1), invhess, bhhh_taken)
+                # robusto = scipy.linalg.blas.dsymm(float(1), invhess, temp_b_times_h, side=1)
+                robusto = np.dot(np.dot(covariance_taken, bhhh_taken), covariance_taken)
+                robust_covariance_matrix = np.full_like(
+                    covariance_matrix, 0, dtype=np.float64
+                )
+                robust_covariance_matrix[take] = robusto.reshape(-1)
+        else:
+            robust_covariance_matrix = np.full_like(
+                covariance_matrix, 0, dtype=np.float64
+            )
+
+        self.add_parameter_array("robust_covariance_matrix", robust_covariance_matrix)
+        self.add_parameter_array(
+            "robust_std_err", np.sqrt(np.diagonal(robust_covariance_matrix))
+        )
+        return self.parameters["robust_covariance_matrix"]
+
     def _wrap_as_dataframe(
         self,
         arr,
@@ -2234,7 +2281,7 @@ class NumbaModel(_BaseModel):
             return constraints
         return ()
 
-    def calculate_parameter_covariance(self, pvals=None):
+    def calculate_parameter_covariance(self, pvals=None, *, robust=False):
         if pvals is None:
             pvals = self.pvals
         locks = np.asarray(self.pholdfast.astype(bool))
@@ -2309,6 +2356,10 @@ class NumbaModel(_BaseModel):
                 )
                 constrained_note[self.pholdfast != 0] = "fixed value"
                 self.add_parameter_array("constrained", constrained_note)
+
+        if robust:
+            self.robust_covariance()
+            se = self.parameters["robust_std_err"]
 
         return se, hess, ihess
 
