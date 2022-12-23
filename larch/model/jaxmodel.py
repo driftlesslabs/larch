@@ -911,7 +911,8 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
 
     @jitmethod
     def jax_loglike(self, params):
-        return self.jax_loglike_casewise(params).sum()
+        wt = _as_jnp_array(self._data_arrays.wt)
+        return (self.jax_loglike_casewise(params) * wt).sum()
 
     def loglike(
         self, x=None, *, start_case=None, stop_case=None, step_case=None, **kwargs

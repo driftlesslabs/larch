@@ -217,12 +217,22 @@ class ParameterBucket:
                 self._params["value"].to_numpy(),
                 candidates.to_numpy(),
             )
-        if isinstance(x, Number):
+        elif isinstance(x, Number):
             candidates = xr.full_like(self._params["value"], x)
             x = np.where(
                 self._params["holdfast"].to_numpy(),
                 self._params["value"].to_numpy(),
                 candidates.to_numpy(),
+            )
+        else:
+            # we are getting an array
+            x = np.asanyarray(x).reshape(-1)
+            assert x.size == self._params["value"].size
+            # do not allow changing holdfast values
+            x = np.where(
+                self._params["holdfast"].to_numpy(),
+                self._params["value"].to_numpy(),
+                x,
             )
         self._params = self._params.assign(
             {"value": xr.DataArray(x, dims=self._params["value"].dims)}

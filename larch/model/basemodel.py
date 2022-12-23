@@ -805,18 +805,25 @@ class BaseModel:
         return self._mangled
 
     def mangle(self, data=True, structure=True):
-        self._mangled = (0x1 if data else 0) | (0x2 if structure else 0)
+        if data and not (self._mangled & 0x1):
+            logger.debug(f"mangling data for {self.title}")
+            self._mangled |= 0x1
+        if structure and not (self._mangled & 0x2):
+            logger.debug(f"mangling structure for {self.title}")
+            self._mangled |= 0x2
 
     def unmangle(self, force=False):
         if not self._mangled and not force:
             return
         marker = f"_currently_unmangling_{__file__}"
+        logger.debug(f"{marker=}")
         if getattr(self, marker, False):
             return
         try:
             setattr(self, marker, True)
             if force:
                 self.mangle()
+            logger.debug(f"{self._mangled=}")
             if (self._mangled & 0x2) or force:
                 self._scan_all_ensure_names()
                 self._mangled = 0
@@ -886,6 +893,12 @@ class BaseModel:
 
     quantity_scale = SingleParameter()
     logsum_parameter = SingleParameter()
+
+    def clear_cache(self):
+        """Remove all cached log likelihood values and estimation results."""
+        self._cached_loglike_best = None
+        self._cached_loglike_null = None
+        self._most_recent_estimation_result = None
 
     def _check_if_best(self, computed_ll, pvalues=None):
         if self._cached_loglike_best is None or computed_ll > self._cached_loglike_best:
