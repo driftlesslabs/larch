@@ -262,6 +262,7 @@ class OptimizeMixin(BucketAccess):
 
     def jax_param_cov(self, params):
         hess = self.jax_d2_loglike(params)
+        hess = jnp.nan_to_num(hess)
         holds = self.parameters["holdfast"] != 0
         frees = (self.parameters["holdfast"] == 0).astype(jnp.float32).values
         if holds.any():

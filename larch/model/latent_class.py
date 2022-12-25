@@ -1,3 +1,5 @@
+import logging
+
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -6,7 +8,8 @@ import xarray as xr
 
 from ..compiled import compiledmethod, jitmethod, reset_compiled_methods
 from ..dataset import Dataset, DataTree
-from ..folding import fold_dataset
+from ..exceptions import MissingDataError
+from ..folding import dissolve_zero_variance, fold_dataset
 from ..optimize import OptimizeMixin
 from .jaxmodel import PanelMixin, _get_jnp_array
 from .mixtures import MixtureList
@@ -22,15 +25,33 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
         PanelMixin.__init__(self, **kwargs)
         self._is_mangled = True
         self._dataset = None
+        choicemodels_keys = sorted(choicemodels.keys())
+        if (
+            classmodel.datatree is None
+            and isinstance(datatree, Dataset)
+            and self.groupid
+        ):
+            df = datatree.to_dataframe()
+            df["ingroup"] = df.groupby(self.groupid).cumcount() + 1
+            classdata = dissolve_zero_variance(
+                df.set_index([self.groupid, "ingroup"], drop=True).to_xarray(),
+                "ingroup",
+            )
+            classdata = classdata.dc.set_altids(choicemodels_keys).drop_dims("ingroup")
+            classdata.dc.CASEID = self.groupid
+            classmodel.datatree = classdata
         super().__init__(choicemodels, classmodel=classmodel)
         self.datatree = datatree
         if classmodel.dataset is not None:
-            assert sorted(classmodel.dataset.dc.altids()) == sorted(choicemodels.keys())
-        for choicemodel in choicemodels.values():
-            self.dataset = choicemodel.dataset
+            assert sorted(classmodel.dataset.dc.altids()) == choicemodels_keys
         if float_dtype is not None:
             for v in self._models.values():
                 v.float_dtype = float_dtype
+        for k, m in self._models.items():
+            if k == "classmodel":
+                pass
+            else:
+                m.datatree = self.datatree
 
     def save(self, filename, format="yaml", overwrite=False):
         from .saving import save_model
@@ -102,10 +123,17 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
         classmodel = self["classmodel"]
         pr_parts = []
         for n, k in enumerate(self["classmodel"].dataset.dc.altids()):
-            pr_parts.append(
-                self._models[k].jax_probability(params)
-                * jnp.expand_dims(classmodel.jax_probability(params)[..., n], -1)
-            )
+            class_pr = jnp.expand_dims(classmodel.jax_probability(params)[..., n], -1)
+            inclass_pr = self._models[k].jax_probability(params)
+            if inclass_pr.ndim < class_pr.ndim:
+                inclass_pr = inclass_pr.reshape(
+                    class_pr.shape[0],
+                    inclass_pr.shape[0] // class_pr.shape[0],
+                    *inclass_pr.shape[1:],
+                )
+            print(f"{class_pr.shape=}")
+            print(f"{inclass_pr.shape=}")
+            pr_parts.append(inclass_pr * class_pr)
         return sum(pr_parts)
 
     @jitmethod
@@ -119,14 +147,13 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
             return (log_pr[..., :n_alts] * ch[..., :n_alts]).sum()
         elif ch.ndim >= 3:
             classmodel = self["classmodel"]
+            class_pr = classmodel.jax_probability(params)
             likely_parts = []
             for n, k in enumerate(self["classmodel"].dataset.dc.altids()):
-                k_pr = self._models[k].jax_probability(params)
+                k_pr = self._models[k].jax_probability(params).reshape(ch.shape)
                 masked_k_pr = jnp.where(ch[..., :n_alts] > 0, k_pr[..., :n_alts], 1.0)
                 k_likely = jnp.power(masked_k_pr, ch[..., :n_alts]).prod([-2, -1])
-                likely_parts.append(
-                    k_likely * classmodel.jax_probability(params)[..., 0, n]
-                )
+                likely_parts.append(k_likely * class_pr[..., 0, n])
             return jnp.log(sum(likely_parts))
 
     @jitmethod
@@ -138,12 +165,13 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
     ):
         if self.compute_engine != "jax":
             raise NotImplementedError(f"latent class with engine={self.compute_engine}")
-        if start_case is not None:
-            raise NotImplementedError("start_case with engine=jax")
-        if stop_case is not None:
-            raise NotImplementedError("stop_case with engine=jax")
-        if step_case is not None:
-            raise NotImplementedError("step_case with engine=jax")
+        self.unmangle()
+        if start_case is not None and start_case != 0:
+            raise NotImplementedError(f"{start_case=} with engine=jax")
+        if stop_case is not None and stop_case != -1:
+            raise NotImplementedError(f"{stop_case=} with engine=jax")
+        if step_case is not None and step_case != 1:
+            raise NotImplementedError(f"{step_case=} with engine=jax")
         if x is not None:
             self.pvals = x
         result = float(self.jax_loglike(self.pvals))
@@ -188,12 +216,13 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
     ):
         if self.compute_engine != "jax":
             raise NotImplementedError(f"latent class with engine={self.compute_engine}")
-        if start_case is not None:
-            raise NotImplementedError("start_case with engine=jax")
-        if stop_case is not None:
-            raise NotImplementedError("stop_case with engine=jax")
-        if step_case is not None:
-            raise NotImplementedError("step_case with engine=jax")
+        self.unmangle()
+        if start_case is not None and start_case != 0:
+            raise NotImplementedError(f"{start_case=} with engine=jax")
+        if stop_case is not None and stop_case != -1:
+            raise NotImplementedError(f"{stop_case=} with engine=jax")
+        if step_case is not None and step_case != 1:
+            raise NotImplementedError(f"{step_case=} with engine=jax")
         if x is not None:
             self.pvals = x
         result = self.jax_d_loglike(self.pvals)
@@ -255,7 +284,8 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
         if datatree is None:
             raise ValueError("missing datatree")
 
-        request = self._models["classmodel"].required_data()
+        classmodel = self._models["classmodel"]
+        request = classmodel.required_data()
         request.pop("avail_any", None)
         for kname, kmodel in self._models.items():
             if kname == "classmodel":
@@ -295,9 +325,30 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
             if kname == "classmodel":
                 continue
             kmodel.dataset = self.dataset
-        self._models["classmodel"].dataset = self.dataset.drop_dims(
-            self.dataset.dc.ALTID
-        ).dc.set_altids(self._models["classmodel"].dataset.dc.altids())
+            # kmodel.reflow_data_arrays() # not full reflow, just...
+            kmodel._data_arrays = kmodel.dataset.dc.to_arrays(
+                kmodel.graph,
+                float_dtype=kmodel.float_dtype,
+            )
+            if kmodel.work_arrays is not None:
+                kmodel._rebuild_work_arrays()
+        classmodel_ids = [kid for kid in self._models.keys() if kid != "classmodel"]
+        classmodel_data = dissolve_zero_variance(
+            self.dataset.drop_dims(self.dataset.dc.ALTID).dc.set_altids(classmodel_ids),
+            "ingroup",
+        )
+        classmodel.dataset = classmodel_data
+
+        AAA_cmd = classmodel
+        AAA_kmd = self.dataset
+
+        classmodel.reflow_data_arrays()
+        # classmodel._data_arrays = classmodel.dataset.dc.to_arrays(
+        #     classmodel.graph,
+        #     float_dtype=classmodel.float_dtype,
+        # )
+        # if classmodel.work_arrays is not None:
+        #     classmodel._rebuild_work_arrays()
 
     def mangle(self):
         super().mangle()
@@ -367,6 +418,52 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
     @property
     def data_as_loaded(self):
         return self._dataset
+
+    @property
+    def classmodel(self):
+        return self._models["classmodel"]
+
+    def total_weight(self):
+        """
+        The total weight of cases in the loaded data.
+
+        Returns
+        -------
+        float
+        """
+        if self.classmodel._data_arrays is not None:
+            return self.classmodel._data_arrays.wt.sum()
+        raise MissingDataError("no data_arrays are set")
+
+    def logloss(
+        self,
+        x=None,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        leave_out=-1,
+        keep_only=-1,
+        subsample=-1,
+    ):
+        result = self.loglike(
+            x,
+            start_case=start_case,
+            stop_case=stop_case,
+            step_case=step_case,
+            leave_out=leave_out,
+            keep_only=keep_only,
+            subsample=subsample,
+        )
+        return -result / self.total_weight()
+
+    def d_logloss(self, x=None, start_case=0, stop_case=-1, step_case=1, **kwargs):
+        result = self.d_loglike(
+            x, start_case=start_case, stop_case=stop_case, step_case=step_case, **kwargs
+        )
+        return -np.asarray(result) / self.total_weight()
+
+    def simple_fit_bhhh(self, *args, **kwargs):
+        raise NotImplementedError()
 
 
 class MixedLatentClass(LatentClass):

@@ -1,3 +1,5 @@
+import logging
+
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -9,6 +11,8 @@ from ..folding import fold_dataset
 from ..optimize import OptimizeMixin
 from .numbamodel import NumbaModel
 from .param_core import ParameterBucket
+
+logger = logging.getLogger(__name__)
 
 
 def _get_jnp_array(dataset, name):
@@ -135,7 +139,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             super().unmangle(force=force)
             for mix in self.mixtures:
                 mix.prep(self._parameter_bucket)
-            if self.groupid is not None:
+            if self.groupid is not None and self.dataset is not None:
                 self.dataset = fold_dataset(self.dataset, self.groupid)
         finally:
             delattr(self, marker)
@@ -183,7 +187,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                     self.graph,
                     float_dtype=self.float_dtype,
                 )
-            except KeyError:  # no defined caseid dimension, JAX only
+            except KeyError as err:  # no defined caseid dimension, JAX only
                 self._data_arrays = None
                 self.work_arrays = None
             else:
@@ -209,7 +213,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
     def dataset(self, dataset):
         if dataset is self._dataset:
             return
-        from xarray import Dataset as _Dataset
+        # from xarray import Dataset as _Dataset
 
         if isinstance(dataset, Dataset):
             if self.groupid is not None:
@@ -217,12 +221,12 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             self._dataset = dataset
             self._data_arrays = None
             self._rebuild_fixed_arrays()
-        elif isinstance(dataset, _Dataset):
-            if self.groupid is not None:
-                dataset = fold_dataset(dataset, self.groupid)
-            self._dataset = Dataset(dataset)
-            self._data_arrays = None
-            self._rebuild_fixed_arrays()
+        # elif isinstance(dataset, _Dataset):
+        #     if self.groupid is not None:
+        #         dataset = fold_dataset(dataset, self.groupid)
+        #     self._dataset = Dataset(dataset)
+        #     self._data_arrays = None
+        #     self._rebuild_fixed_arrays()
         else:
             raise TypeError(f"dataset must be Dataset not {type(dataset)}")
 

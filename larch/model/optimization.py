@@ -417,7 +417,7 @@ def maximize_loglike(
         result["method"] = method_used
         try:
             result["n_cases"] = model.n_cases
-        except NotImplementedError:
+        except (NotImplementedError, AttributeError):
             pass
         result["iteration_number"] = iteration_number
 
