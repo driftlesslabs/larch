@@ -8,7 +8,7 @@ import larch as lx
 from larch import P, X
 
 
-@pytest.fixture
+# @pytest.fixture
 def swissmetro_data():
     raw = pd.read_csv(lx.example_file("swissmetro.csv.gz"))
     raw["SM_COST"] = raw["SM_CO"] * (raw["GA"] == 0)
@@ -72,13 +72,18 @@ def test_panel_latent_class(swissmetro_data):
     mk.utility_co[103] = P("W_COST")
     mk.groupid = "ID"
 
+    print("hello")
+
     b = lx.LatentClass(
         mk,
         {101: m1, 102: m2, 103: m3},
         datatree=swissmetro_data.dc.set_altids([1, 2, 3]),
         groupid="ID",
     )
-    b.lock(Z_COST=-10000)
+
+    print("hello2")
+
+    b.lock_value(Z_COST=-10000)
     assert b.loglike() == approx(-6867.245, rel=1e-4)
     assert b.d_loglike() == approx(
         [
@@ -94,3 +99,8 @@ def test_panel_latent_class(swissmetro_data):
 
     result = b.maximize_loglike(method="slsqp")
     assert result.loglike == approx(-4474.478515625)
+
+
+if __name__ == "__main__":
+    swissmetro_data_ = swissmetro_data()
+    test_panel_latent_class(swissmetro_data_)

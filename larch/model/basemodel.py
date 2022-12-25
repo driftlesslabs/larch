@@ -100,12 +100,21 @@ class BaseModel:
 
     mixtures = MixtureList()
 
-    def __init__(self, *, title=None, datatree=None, compute_engine=None):
+    def __init__(
+        self,
+        *,
+        title=None,
+        datatree=None,
+        compute_engine=None,
+        submodels=None,
+        named_submodels=None,
+    ):
         self._mangled = 0x3
         self._datatree = None
         self.title = title
         self.rename_parameters = {}
-        self._parameter_bucket = ParameterBucket()
+        bucket = ParameterBucket(submodels or {}, **(named_submodels or {}))
+        self._parameter_bucket = bucket
         self.datatree = datatree
         self._cached_loglike_best = None
         self._cached_loglike_null = None
@@ -253,6 +262,15 @@ class BaseModel:
             self._parameter_bucket.pmaximum,
         )
 
+    @property
+    def pstderr(self):
+        self.unmangle()
+        return self._parameter_bucket.pstderr
+
+    @pstderr.setter
+    def pstderr(self, x):
+        self._parameter_bucket.pstderr = x
+
     def set_cap(self, cap=25):
         """
         Set limiting values for one or more parameters.
@@ -353,7 +371,7 @@ class BaseModel:
         else:
             self.pvals = values
 
-    def lock_value(self, name, value):
+    def lock_value(self, name=None, value=None, **kwargs):
         """
         Set a fixed value for a model parameter.
 
@@ -367,8 +385,18 @@ class BaseModel:
             The name of the parameter to set to a fixed value.
         value : float
             The numerical value to set for the parameter.
+        **kwargs
+            Alternatively, use (name=value, ...) form for multiple
+            parameters.
         """
         from .linear import ParameterRef
+
+        if name is None or value is None:
+            if name is not None or value is not None or len(kwargs) == 0:
+                raise ValueError("give name and value or keyword arguments")
+            for k, v in kwargs.items():
+                self.lock_value(k, v)
+            return
 
         if isinstance(name, ParameterRef):
             name = str(name)

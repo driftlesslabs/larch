@@ -11,12 +11,13 @@ from ..dataset import Dataset, DataTree
 from ..exceptions import MissingDataError
 from ..folding import dissolve_zero_variance, fold_dataset
 from ..optimize import OptimizeMixin
+from .basemodel import BaseModel as _BaseModel
 from .jaxmodel import PanelMixin, _get_jnp_array
 from .mixtures import MixtureList
 from .param_core import ParameterBucket
 
 
-class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
+class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
     compute_engine = "jax"
 
     def __init__(
@@ -40,7 +41,11 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
             classdata = classdata.dc.set_altids(choicemodels_keys).drop_dims("ingroup")
             classdata.dc.CASEID = self.groupid
             classmodel.datatree = classdata
-        super().__init__(choicemodels, classmodel=classmodel)
+        self._name_in_parameter_bucket = "latent-class"
+        super().__init__(
+            submodels=choicemodels,
+            named_submodels={"classmodel": classmodel},
+        )
         self.datatree = datatree
         if classmodel.dataset is not None:
             assert sorted(classmodel.dataset.dc.altids()) == choicemodels_keys
@@ -52,6 +57,10 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
                 pass
             else:
                 m.datatree = self.datatree
+
+    @property
+    def _models(self):
+        return self._parameter_bucket._models
 
     def save(self, filename, format="yaml", overwrite=False):
         from .saving import save_model
@@ -146,10 +155,10 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
             log_pr = jnp.log(masked_pr)
             return (log_pr[..., :n_alts] * ch[..., :n_alts]).sum()
         elif ch.ndim >= 3:
-            classmodel = self["classmodel"]
+            classmodel = self.classmodel
             class_pr = classmodel.jax_probability(params)
             likely_parts = []
-            for n, k in enumerate(self["classmodel"].dataset.dc.altids()):
+            for n, k in enumerate(classmodel.dataset.dc.altids()):
                 k_pr = self._models[k].jax_probability(params).reshape(ch.shape)
                 masked_k_pr = jnp.where(ch[..., :n_alts] > 0, k_pr[..., :n_alts], 1.0)
                 k_likely = jnp.power(masked_k_pr, ch[..., :n_alts]).prod([-2, -1])
@@ -320,9 +329,10 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
         elif self.groupid is not None:
             dataset = fold_dataset(dataset, self.groupid)
         self.dataset = dataset
+        not_klass_models = ("classmodel", self._name_in_parameter_bucket)
 
         for kname, kmodel in self._models.items():
-            if kname == "classmodel":
+            if kname in not_klass_models:
                 continue
             kmodel.dataset = self.dataset
             # kmodel.reflow_data_arrays() # not full reflow, just...
@@ -332,7 +342,9 @@ class LatentClass(ParameterBucket, OptimizeMixin, PanelMixin):
             )
             if kmodel.work_arrays is not None:
                 kmodel._rebuild_work_arrays()
-        classmodel_ids = [kid for kid in self._models.keys() if kid != "classmodel"]
+        classmodel_ids = [
+            kid for kid in self._models.keys() if kid not in not_klass_models
+        ]
         classmodel_data = dissolve_zero_variance(
             self.dataset.drop_dims(self.dataset.dc.ALTID).dc.set_altids(classmodel_ids),
             "ingroup",

@@ -88,7 +88,7 @@ def fold_dataset(
         if group_dim in d.dims and ingroup_dim in d.dims:
             return d  # already folded!
     except AttributeError:
-        pass
+        raise
     if isinstance(groupid, str):
         if groupid not in d:
             return d
