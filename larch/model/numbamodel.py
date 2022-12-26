@@ -1112,7 +1112,7 @@ class NumbaModel(_BaseModel):
         else:
             self._fixed_arrays = None
 
-    def unmangle(self, force=False):
+    def unmangle(self, force=False, structure_only=False):
         if not self._mangled and not force:
             return
         marker = f"_currently_unmangling_{__file__}"
@@ -1121,13 +1121,16 @@ class NumbaModel(_BaseModel):
         try:
             setattr(self, marker, True)
             super().unmangle(force=force)
-            if self._dataset is None or force:
-                self.reflow_data_arrays()
-            if self._fixed_arrays is None or force:
-                self._rebuild_fixed_arrays()
-                self._rebuild_work_arrays()
-            if self._constraint_funcs is None:
-                self._constraint_funcs = [c.as_soft_penalty() for c in self.constraints]
+            if not structure_only:
+                if self._dataset is None or force:
+                    self.reflow_data_arrays()
+                if self._fixed_arrays is None or force:
+                    self._rebuild_fixed_arrays()
+                    self._rebuild_work_arrays()
+                if self._constraint_funcs is None:
+                    self._constraint_funcs = [
+                        c.as_soft_penalty() for c in self.constraints
+                    ]
         finally:
             delattr(self, marker)
 

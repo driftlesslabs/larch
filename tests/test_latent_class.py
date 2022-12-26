@@ -8,7 +8,7 @@ import larch as lx
 from larch import P, X
 
 
-# @pytest.fixture
+@pytest.fixture
 def swissmetro_data():
     raw = pd.read_csv(lx.example_file("swissmetro.csv.gz"))
     raw["SM_COST"] = raw["SM_CO"] * (raw["GA"] == 0)
@@ -36,14 +36,14 @@ def test_panel_latent_class(swissmetro_data):
         3: "CAR_AV_SP",
     }
 
-    m1 = lx.Model()
+    m1 = lx.Model(title="Model1")
     m1.availability_co_vars = availability_co_vars
     m1.choice_co_code = "CHOICE"
     m1.utility_co[1] = P("ASC_TRAIN") + X("TRAIN_COST_SCALED") * P("B_COST")
     m1.utility_co[2] = X("SM_COST_SCALED") * P("B_COST")
     m1.utility_co[3] = P("ASC_CAR") + X("CAR_CO_SCALED") * P("B_COST")
 
-    m2 = lx.Model()
+    m2 = lx.Model(title="Model2")
     m2.availability_co_vars = availability_co_vars
     m2.choice_co_code = "CHOICE"
     m2.utility_co[1] = (
@@ -60,19 +60,19 @@ def test_panel_latent_class(swissmetro_data):
         + X("CAR_CO_SCALED") * P("B_COST")
     )
 
-    m3 = lx.Model()
+    m3 = lx.Model(title="Model3")
     m3.availability_co_vars = availability_co_vars
     m3.choice_co_code = "CHOICE"
     m3.utility_co[1] = X("TRAIN_COST_SCALED") * P("Z_COST")
     m3.utility_co[2] = X("SM_COST_SCALED") * P("Z_COST")
     m3.utility_co[3] = X("CAR_CO_SCALED") * P("Z_COST")
 
-    mk = lx.Model()
+    mk = lx.Model(title="ModelC")
     mk.utility_co[102] = P("W_OTHER")
     mk.utility_co[103] = P("W_COST")
     mk.groupid = "ID"
 
-    print("hello")
+    # print("hello")
 
     b = lx.LatentClass(
         mk,
@@ -81,10 +81,17 @@ def test_panel_latent_class(swissmetro_data):
         groupid="ID",
     )
 
-    print("hello2")
+    # print("hello2")
+
+    # for k, m in b._models.items():
+    #     print(f"==========={k=}===========\n{m.dataset}")
 
     b.lock_value(Z_COST=-10000)
+    # for k, m in b._models.items():
+    #     print(f"~=========={k=}===========\n{m.dataset}")
+
     assert b.loglike() == approx(-6867.245, rel=1e-4)
+    # print(f"{b.loglike()=}")
     assert b.d_loglike() == approx(
         [
             -1.104770e02,
@@ -94,11 +101,15 @@ def test_panel_latent_class(swissmetro_data):
             -1.658521e02,
             8.292606e01,
             -1.490116e-08,
-        ]
+        ],
+        abs=1e-7,
+        rel=1e-3,
     )
+    # print(f"{b.d_loglike()=}")
 
     result = b.maximize_loglike(method="slsqp")
     assert result.loglike == approx(-4474.478515625)
+    # print(f"{result.loglike=}")
 
 
 if __name__ == "__main__":

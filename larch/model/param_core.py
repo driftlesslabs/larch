@@ -60,21 +60,61 @@ class ParameterBucket:
         self._aggregate_parameters()
 
     def attach_model(self, model, name=None, agg=True, unmangle=True):
+        """
+
+        Parameters
+        ----------
+        model
+        name
+        agg
+        unmangle : bool or str
+
+        Returns
+        -------
+
+        """
         if name is None:
-            name = new_name(self._models.keys())
-        if unmangle:
+            try:
+                name = model.ident
+            except AttributeError:
+                pass
+        else:
+            self.ident = name
+        if name is None:
+            raise ValueError("missing name")
+            # name = new_name(self._models.keys())
+        if unmangle == "structure":
+            model.unmangle(structure_only=True)
+        elif unmangle:
             model.unmangle()
         self._models[name] = model
-        model._name_in_parameter_bucket = name
+        model._parameter_bucket = self
         if agg:
             self._aggregate_parameters()
 
     def detach_model(self, model):
-        name = getattr(model, "_name_in_parameter_bucket", None)
+        name = getattr(model, "_ident", None)
+        # if getattr(self._models[name], "_parameter_bucket", None) is self:
+        #     del self._models[name]._parameter_bucket
         if name is None:
             return
-        elif self._models[name] is model:
+        elif self._models.get(name, None) is model:
             del self._models[name]
+        if getattr(model, "_parameter_bucket", None) is self:
+            del model._parameter_bucket
+
+    def rename_model(self, oldname, newname):
+        if oldname == newname:
+            return
+        try:
+            m = self._models[oldname]
+        except KeyError:
+            print("keys:", list(self._models.keys()))
+            raise
+        if newname in self._models:
+            raise ValueError("name exists")
+        self._models[newname] = m
+        del self._models[oldname]
 
     def _aggregate_parameters(self):
         should_mangle = False
@@ -109,6 +149,8 @@ class ParameterBucket:
         return new_params
 
     def update_parameters(self, other):
+        if isinstance(other, ParameterBucket):
+            other = other._params
         if isinstance(other, xr.Dataset):
             if "param_name_2" in other.dims:
                 other = other.drop_dims("param_name_2")  # TODO, keep 2nd dim
@@ -170,14 +212,18 @@ class ParameterBucket:
     def add_parameter_array(self, name, values):
         return self.add_array(name, values)
 
-    def mangle(self):
+    def mangle(self, data=True, structure=True):
         for m in self._models.values():
-            m.mangle()
+            m.mangle(data=data, structure=structure)
             m._ensure_names(self.pnames)
 
     def unmangle(self, *args, **kwargs):
         for m in self._models.values():
             m.unmangle(*args, **kwargs)
+
+    def _scan_all_ensure_names(self):
+        for m in self._models.values():
+            m._scan_all_ensure_names()
 
     @property
     def parameters(self):
@@ -470,6 +516,14 @@ class ParameterBucket:
         return bucket
 
     def __set__(self, instance, value):
+        """
+        Parameters
+        ----------
+        instance : Any
+            Instance of parent class that has `self` as a member.
+        value : ParameterBucket
+            The bucket being assigned.
+        """
         if not isinstance(value, ParameterBucket):
             raise TypeError(f"{self.name} must be a ParameterBucket")
         existing = getattr(instance, self.private_name, None)
@@ -477,20 +531,19 @@ class ParameterBucket:
             return
         if existing is not None:
             existing.detach_model(instance)
-        _name_in_parameter_bucket = getattr(instance, "_name_in_parameter_bucket", None)
-        value.attach_model(
-            instance, _name_in_parameter_bucket, agg=False, unmangle=False
-        )
+        # _name_in_parameter_bucket = getattr(instance, "_name_in_parameter_bucket", None)
+        setattr(instance, self.private_name, value)
+        instance.mangle()
+        value.attach_model(instance, agg=False, unmangle="structure")
         if existing is not None:
             value.update_parameters(existing)
-        setattr(instance, self.private_name, value)
         instance.mangle()
 
     def __delete__(self, instance):
         existing = getattr(instance, self.private_name, None)
+        setattr(instance, self.private_name, None)
         if existing is not None:
             existing.detach_model(instance)
-        setattr(instance, self.private_name, None)
         instance.mangle()
 
     def pretty_table(self, name_width=25):

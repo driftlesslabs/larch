@@ -1,4 +1,6 @@
+import base64
 import logging
+import uuid
 import warnings
 
 import numpy as np
@@ -15,10 +17,19 @@ from .tree import NestingTree
 
 logger = logging.getLogger("larch.model")
 
+MANGLE_DATA = 0x1
+MANGLE_STRUCTURE = 0x2
+
+
+def _unique_ident():
+    j = base64.b32encode(uuid.uuid4().bytes)[:25].decode()
+    return f"{j[:5]}-{j[5:10]}-{j[10:15]}-{j[15:20]}-{j[20:]}"
+
 
 class BaseModel:
 
     _parameter_bucket = ParameterBucket()
+    _model_subtype = None
 
     utility_co = DictOfLinearFunction()
     """DictOfLinearFunction : The portion of the utility function computed from |idco| data.
@@ -109,11 +120,22 @@ class BaseModel:
         submodels=None,
         named_submodels=None,
     ):
+        if not hasattr(self, "_ident"):
+            self._ident = _unique_ident()
         self._mangled = 0x3
         self._datatree = None
         self.title = title
         self.rename_parameters = {}
-        bucket = ParameterBucket(submodels or {}, **(named_submodels or {}))
+
+        if submodels is None:
+            submodels = {}
+        for k, m in submodels.items():
+            m.ident = k
+        if named_submodels is None:
+            named_submodels = {}
+        for k, m in named_submodels.items():
+            m.ident = k
+        bucket = ParameterBucket(submodels, **named_submodels)
         self._parameter_bucket = bucket
         self.datatree = datatree
         self._cached_loglike_best = None
@@ -133,6 +155,20 @@ class BaseModel:
 
         self._compute_engine = compute_engine
         self.ordering = None
+
+    @property
+    def ident(self):
+        return self._ident
+
+    @ident.setter
+    def ident(self, x):
+        try:
+            old_ident = self._ident
+        except AttributeError:
+            pass
+        else:
+            self._parameter_bucket.rename_model(old_ident, x)
+        self._ident = x
 
     @property
     def compute_engine(self):
@@ -835,12 +871,12 @@ class BaseModel:
     def mangle(self, data=True, structure=True):
         if data and not (self._mangled & 0x1):
             logger.debug(f"mangling data for {self.title}")
-            self._mangled |= 0x1
-        if structure and not (self._mangled & 0x2):
+            self._mangled |= MANGLE_DATA
+        if structure and not (self._mangled & MANGLE_STRUCTURE):
             logger.debug(f"mangling structure for {self.title}")
-            self._mangled |= 0x2
+            self._mangled |= MANGLE_STRUCTURE
 
-    def unmangle(self, force=False):
+    def unmangle(self, force=False, structure_only=False):
         if not self._mangled and not force:
             return
         marker = f"_currently_unmangling_{__file__}"
@@ -852,9 +888,12 @@ class BaseModel:
             if force:
                 self.mangle()
             logger.debug(f"{self._mangled=}")
-            if (self._mangled & 0x2) or force:
+            if (self._mangled & MANGLE_STRUCTURE) or force:
                 self._scan_all_ensure_names()
-                self._mangled = 0
+                if structure_only:
+                    self._mangled &= ~MANGLE_STRUCTURE
+                else:
+                    self._mangled = 0
         finally:
             delattr(self, marker)
 

@@ -11,6 +11,7 @@ from ..dataset import Dataset, DataTree
 from ..exceptions import MissingDataError
 from ..folding import dissolve_zero_variance, fold_dataset
 from ..optimize import OptimizeMixin
+from .basemodel import MANGLE_DATA
 from .basemodel import BaseModel as _BaseModel
 from .jaxmodel import PanelMixin, _get_jnp_array
 from .mixtures import MixtureList
@@ -23,6 +24,10 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
     def __init__(
         self, classmodel, choicemodels, datatree=None, float_dtype=np.float32, **kwargs
     ):
+        self._model_subtype = "latent-class"
+        classmodel._model_subtype = "class-membership"
+        for k, m in choicemodels.items():
+            m.ident = k
         PanelMixin.__init__(self, **kwargs)
         self._is_mangled = True
         self._dataset = None
@@ -41,22 +46,28 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
             classdata = classdata.dc.set_altids(choicemodels_keys).drop_dims("ingroup")
             classdata.dc.CASEID = self.groupid
             classmodel.datatree = classdata
-        self._name_in_parameter_bucket = "latent-class"
+        else:
+            pass
+        self.ident = "latent-class"
         super().__init__(
+            datatree=datatree,
             submodels=choicemodels,
             named_submodels={"classmodel": classmodel},
         )
-        self.datatree = datatree
+        # self.datatree = datatree
         if classmodel.dataset is not None:
             assert sorted(classmodel.dataset.dc.altids()) == choicemodels_keys
         if float_dtype is not None:
             for v in self._models.values():
                 v.float_dtype = float_dtype
         for k, m in self._models.items():
-            if k == "classmodel":
+            if m._model_subtype == "latent-class":
                 pass
+            elif m._model_subtype == "class-membership":
+                m.groupid = self.groupid
             else:
                 m.datatree = self.datatree
+                m.groupid = self.groupid
 
     @property
     def _models(self):
@@ -75,7 +86,7 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
         classmodel = None
         choicemodels = {}
         for k, v in _models.items():
-            if k == "classmodel":
+            if v._model_subtype == "class-membership":
                 classmodel = load_model(v)
             else:
                 choicemodels[k] = load_model(v)
@@ -129,9 +140,9 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
 
     @jitmethod
     def jax_probability(self, params):
-        classmodel = self["classmodel"]
+        classmodel = self.class_membership_model
         pr_parts = []
-        for n, k in enumerate(self["classmodel"].dataset.dc.altids()):
+        for n, k in enumerate(classmodel.dataset.dc.altids()):
             class_pr = jnp.expand_dims(classmodel.jax_probability(params)[..., n], -1)
             inclass_pr = self._models[k].jax_probability(params)
             if inclass_pr.ndim < class_pr.ndim:
@@ -155,11 +166,12 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
             log_pr = jnp.log(masked_pr)
             return (log_pr[..., :n_alts] * ch[..., :n_alts]).sum()
         elif ch.ndim >= 3:
-            classmodel = self.classmodel
+            classmodel = self.class_membership_model
             class_pr = classmodel.jax_probability(params)
             likely_parts = []
             for n, k in enumerate(classmodel.dataset.dc.altids()):
-                k_pr = self._models[k].jax_probability(params).reshape(ch.shape)
+                _yo_data = self._models[k].dataset
+                k_pr = self._models[k].jax_probability(params)  # .reshape(ch.shape)
                 masked_k_pr = jnp.where(ch[..., :n_alts] > 0, k_pr[..., :n_alts], 1.0)
                 k_likely = jnp.power(masked_k_pr, ch[..., :n_alts]).prod([-2, -1])
                 likely_parts.append(k_likely * class_pr[..., 0, n])
@@ -293,11 +305,11 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
         if datatree is None:
             raise ValueError("missing datatree")
 
-        classmodel = self._models["classmodel"]
+        classmodel = self.class_membership_model
         request = classmodel.required_data()
         request.pop("avail_any", None)
         for kname, kmodel in self._models.items():
-            if kname == "classmodel":
+            if kmodel._model_subtype in ("class-membership", "latent-class"):
                 continue
             kreq = kmodel.required_data()
             for k, v in kreq.items():
@@ -329,10 +341,9 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
         elif self.groupid is not None:
             dataset = fold_dataset(dataset, self.groupid)
         self.dataset = dataset
-        not_klass_models = ("classmodel", self._name_in_parameter_bucket)
 
         for kname, kmodel in self._models.items():
-            if kname in not_klass_models:
+            if kmodel._model_subtype in ("class-membership", "latent-class"):
                 continue
             kmodel.dataset = self.dataset
             # kmodel.reflow_data_arrays() # not full reflow, just...
@@ -340,20 +351,19 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
                 kmodel.graph,
                 float_dtype=kmodel.float_dtype,
             )
-            if kmodel.work_arrays is not None:
-                kmodel._rebuild_work_arrays()
+            # if kmodel.work_arrays is not None:
+            kmodel._rebuild_fixed_arrays()
+            kmodel._rebuild_work_arrays()
         classmodel_ids = [
-            kid for kid in self._models.keys() if kid not in not_klass_models
+            kid
+            for (kid, km) in self._models.items()
+            if km._model_subtype not in ("latent-class", "class-membership")
         ]
         classmodel_data = dissolve_zero_variance(
             self.dataset.drop_dims(self.dataset.dc.ALTID).dc.set_altids(classmodel_ids),
             "ingroup",
         )
         classmodel.dataset = classmodel_data
-
-        AAA_cmd = classmodel
-        AAA_kmd = self.dataset
-
         classmodel.reflow_data_arrays()
         # classmodel._data_arrays = classmodel.dataset.dc.to_arrays(
         #     classmodel.graph,
@@ -362,16 +372,19 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
         # if classmodel.work_arrays is not None:
         #     classmodel._rebuild_work_arrays()
 
-    def mangle(self):
-        super().mangle()
+    def mangle(self, data=True, structure=True):
+        super().mangle(data=data, structure=structure)
         reset_compiled_methods(self)
         self._is_mangled = True
 
-    def unmangle(self, *args, **kwargs):
+    def unmangle(self, force=False, structure_only=False):
         if self._is_mangled:
-            super().unmangle(*args, **kwargs)
-            self.reflow_data_arrays()
-            self._is_mangled = False
+            super().unmangle(force=force, structure_only=structure_only)
+            if not structure_only:
+                self.reflow_data_arrays()
+                self._is_mangled = False
+            else:
+                self._is_mangled = MANGLE_DATA
 
     @property
     def dataset(self):
@@ -432,8 +445,11 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
         return self._dataset
 
     @property
-    def classmodel(self):
-        return self._models["classmodel"]
+    def class_membership_model(self):
+        # TODO optimize this
+        for m in self._models.values():
+            if m._model_subtype == "class-membership":
+                return m
 
     def total_weight(self):
         """
@@ -443,8 +459,8 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
         -------
         float
         """
-        if self.classmodel._data_arrays is not None:
-            return self.classmodel._data_arrays.wt.sum()
+        if self.class_membership_model._data_arrays is not None:
+            return self.class_membership_model._data_arrays.wt.sum()
         raise MissingDataError("no data_arrays are set")
 
     def logloss(
@@ -546,7 +562,7 @@ class MixedLatentClass(LatentClass):
     def _jax_probability_by_class(self, params, databundle):
         # classmodel = self['classmodel']
         pr_parts = []
-        for n, k in enumerate(self["classmodel"].dataset.dc.altids()):
+        for n, k in enumerate(self.class_membership_model.dataset.dc.altids()):
             pr_parts.append(
                 self._models[k]._jax_probability(params, databundle)
                 # * jnp.expand_dims(classmodel._jax_probability(params, databundle)[..., n], -1)
@@ -567,7 +583,7 @@ class MixedLatentClass(LatentClass):
     def _jax_loglike_casewise_mixed(
         self, params, databundle, groupbundle=None, n_draws=100
     ):
-        classmodel = self["classmodel"]
+        classmodel = self.class_membership_model
         if self.prerolled_draws:
             draws = groupbundle.get("draws", None)
         else:

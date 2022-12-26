@@ -119,7 +119,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         self._draws = None
         reset_compiled_methods(self)
 
-    def unmangle(self, force=False):
+    def unmangle(self, force=False, structure_only=False):
         if not self._mangled and not force:
             return
         marker = f"_currently_unmangling_{__file__}"
@@ -127,11 +127,12 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             return
         try:
             setattr(self, marker, True)
-            super().unmangle(force=force)
+            super().unmangle(force=force, structure_only=structure_only)
             for mix in self.mixtures:
                 mix.prep(self._parameter_bucket)
-            if self.groupid is not None and self.dataset is not None:
-                self.dataset = fold_dataset(self.dataset, self.groupid)
+            if not structure_only:
+                if self.groupid is not None and self.dataset is not None:
+                    self.dataset = fold_dataset(self.dataset, self.groupid)
         finally:
             delattr(self, marker)
 
