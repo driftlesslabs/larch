@@ -8,6 +8,7 @@ def rip():
 
     targets = [
         "docs/examples/mtc/*.ipynb",
+        "docs/examples/swissmetro/*.ipynb",
         "docs/examples/exampville/*.ipynb",
         "docs/examples/xlogit-artificial/*.ipynb",
     ]
