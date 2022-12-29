@@ -36,3 +36,6 @@ def from_spec(cls, spec, datatree, title=None):
                     m.utility_co[alts_name_to_id[i]] += P(v) * X(expr)
     m.should_preload_data(False)
     return m
+
+
+NumbaModel.from_spec = classmethod(from_spec)
