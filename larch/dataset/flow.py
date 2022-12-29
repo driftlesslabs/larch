@@ -366,6 +366,10 @@ class _GenericFlow:
             )
             raise
 
+    @property
+    def n_in_panel(self):
+        return self.dims[self.INGROUP]
+
     def transfer_dimension_attrs(self, target):
         if not isinstance(target, (xr.DataArray, xr.Dataset)):
             return target
@@ -589,17 +593,30 @@ class _DatasetDC(_GenericFlow):
         if "wt" in self:
             wt = self["wt"].values.astype(float_dtype)
         else:
-            wt = np.ones(self.n_cases, dtype=float_dtype)
+            if self.GROUPID is None:
+                wt = np.ones(self.n_cases, dtype=float_dtype)
+            else:
+                wt = np.ones(self.n_panels, dtype=float_dtype)
 
         if "ch" in self:
             ch = array_ch_cascade(self["ch"].values, graph, dtype=float_dtype)
         else:
-            ch = np.zeros([self.n_cases, len(graph)], dtype=float_dtype)
+            if self.GROUPID is None:
+                ch = np.zeros([self.n_cases, len(graph)], dtype=float_dtype)
+            else:
+                ch = np.zeros(
+                    [self.n_panels, self.n_in_panel, len(graph)], dtype=float_dtype
+                )
 
         if "av" in self:
             av = array_av_cascade(self["av"].values, graph)
         else:
-            av = np.ones([self.n_cases, len(graph)], dtype=np.int8)
+            if self.GROUPID is None:
+                av = np.ones([self.n_cases, len(graph)], dtype=np.int8)
+            else:
+                av = np.ones(
+                    [self.n_panels, self.n_in_panel, len(graph)], dtype=np.int8
+                )
 
         return DataArrays(ch, av, wt, co, ca, ce_data, ce_altidx, ce_caseptr)
 

@@ -232,9 +232,6 @@ def test_prerolled_common(xlogit_artificial):
     r = m.jax_maximize_loglike()
     assert m._draws.shape == (100, 3)
     expected = {
-        "nit": 48,
-        "nfev": 103,
-        "njev": 48,
         "status": 0,
         "message": "Optimization terminated successfully",
         "success": True,
@@ -290,43 +287,6 @@ def test_prerolled_notcommon(xlogit_artificial):
     assert m._draws.shape == (4000, 100, 3)
     r = m.jax_maximize_loglike()
     expected = {
-        # "x": np.array(
-        #     [
-        #         0.998088,
-        #         0.86163,
-        #         -1.8877,
-        #         -0.996309,
-        #         1.662274,
-        #         -0.4996,
-        #         0.075712,
-        #         -0.003768,
-        #         -0.006356,
-        #         3.628446,
-        #         -1.069672,
-        #         -0.964553,
-        #         -1.380425,
-        #     ]
-        # ),
-        # "jac": np.array(
-        #     [
-        #         -0.00057065,
-        #         0.02387673,
-        #         0.04541352,
-        #         -0.03415966,
-        #         -0.00718924,
-        #         0.00062239,
-        #         -0.00588775,
-        #         0.00627816,
-        #         0.01326609,
-        #         0.01735568,
-        #         -0.00986013,
-        #         0.05631149,
-        #         0.01436687,
-        #     ]
-        # ),
-        # "nit": 48,
-        # "nfev": 99,
-        # "njev": 48,
         "status": 0,
         "message": "Optimization terminated successfully",
         "success": True,
@@ -574,43 +534,6 @@ def test_prerolled_common_panel_numpy(xlogit_artificial):
     r = m.jax_maximize_loglike()
     assert m._draws.shape == (100, 3)
     expected = {
-        # "x": np.array(
-        #     [
-        #         0.30727603,
-        #         0.36976524,
-        #         -0.69766116,
-        #         0.04635369,
-        #         0.54657644,
-        #         -0.13300727,
-        #         -0.04561595,
-        #         0.01681861,
-        #         -0.15851808,
-        #         1.47084643,
-        #         -0.04811115,
-        #         -0.25329047,
-        #         -0.62798715,
-        #     ]
-        # ),
-        # "jac": np.array(
-        #     [
-        #         0.04525796,
-        #         -0.07393569,
-        #         -0.12014583,
-        #         -0.09189719,
-        #         0.03262576,
-        #         0.01233688,
-        #         -0.05594884,
-        #         0.03427205,
-        #         -0.03790946,
-        #         -0.05002052,
-        #         0.01087214,
-        #         -0.07310218,
-        #         0.0087539,
-        #     ]
-        # ),
-        # "nit": 46,
-        # "nfev": 116,
-        # "njev": 46,
         "status": 0,
         "message": "Optimization terminated successfully",
         "success": True,
