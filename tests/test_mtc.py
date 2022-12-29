@@ -187,10 +187,11 @@ def test_mtc_17(compute_engine):
     m.parameter_summary()
 
 
-def test_mtc_22():
+@pytest.mark.parametrize("compute_engine", ["jax", "numba"])
+def test_mtc_22(compute_engine):
 
     m = lx.example(17)
-    m.compute_engine = "numba"
+    m.compute_engine = compute_engine
 
     m.graph.new_node(parameter="mu_motor", children=[1, 2, 3, 4], name="Motorized")
     m.graph.new_node(parameter="mu_nonmotor", children=[5, 6], name="Nonmotorized")
@@ -220,46 +221,44 @@ def test_mtc_22():
             "ASC.*",
         ),
     )
-    mj = m.copy()
-    mj.compute_engine = "jax"
 
-    result = m.maximize_loglike(method="bhhh")
+    result = m.maximize_loglike(options={"maxiter": 1000, "ftol": 1e-10})
     r = result
-    from pytest import approx
 
-    assert r.loglike == approx(-3441.6725273276093, rel=1e-4)
+    assert r.loglike == approx(-3441.6725273276093)
+    print(dict(zip(m.pnames, r.x)))
     assert dict(zip(m.pnames, r.x)) == approx(
         {
-            "ASC_Bike": -1.2024073703132545,
-            "ASC_SR2": -1.3257247399188727,
-            "ASC_SR3+": -2.506936202874175,
-            "ASC_Transit": -0.4041442821263078,
-            "ASC_Walk": 0.3447191316975722,
-            "costbyincome": -0.03864412094110262,
-            "hhinc#4": -0.003929601755651791,
-            "hhinc#5": -0.010035112486480783,
-            "hhinc#6": -0.006205979434206748,
-            "motorized_ovtbydist": -0.11389194935358538,
-            "motorized_time": -0.014518697124195973,
-            "mu_motor": 0.7261696323637531,
-            "mu_nonmotor": 0.7690391629698575,
-            "nonmotorized_time": -0.046200685225646534,
-            "vehbywrk_Bike": -0.7347520730837045,
-            "vehbywrk_SR": -0.22598417504565899,
-            "vehbywrk_Transit": -0.7075038510739201,
-            "vehbywrk_Walk": -0.7641289876632265,
-            "wkcbd_Bike": 0.4077477599180845,
-            "wkcbd_SR2": 0.1930608067123969,
-            "wkcbd_SR3+": 0.7814124041724411,
-            "wkcbd_Transit": 0.9217986579385763,
-            "wkcbd_Walk": 0.11364443225208345,
-            "wkempden_Bike": 0.0016747777566393732,
-            "wkempden_SR2": 0.0011502120827767475,
-            "wkempden_SR3+": 0.0016390812178071399,
-            "wkempden_Transit": 0.0022379922179423173,
-            "wkempden_Walk": 0.0021706844461508662,
+            "ASC_Bike": -1.2022643580576275,
+            "ASC_SR2": -1.3239486840262529,
+            "ASC_SR3+": -2.503503423322888,
+            "ASC_Transit": -0.40249583726117016,
+            "ASC_Walk": 0.3462064227795088,
+            "costbyincome": -0.03859339928950796,
+            "hhinc#4": -0.003928710415271551,
+            "hhinc#5": -0.010035216962362307,
+            "hhinc#6": -0.0062093631917092785,
+            "motorized_ovtbydist": -0.11378852066576858,
+            "motorized_time": -0.014515331451093159,
+            "mu_motor": 0.7252129820710107,
+            "mu_nonmotor": 0.7690004184450554,
+            "nonmotorized_time": -0.04620887135617445,
+            "vehbywrk_Bike": -0.7342905196563545,
+            "vehbywrk_SR": -0.22549947133533693,
+            "vehbywrk_Transit": -0.7065868457802653,
+            "vehbywrk_Walk": -0.7642463622733178,
+            "wkcbd_Bike": 0.4061962607111135,
+            "wkcbd_SR2": 0.19288312508936684,
+            "wkcbd_SR3+": 0.7801912977954216,
+            "wkcbd_Transit": 0.9201408146589309,
+            "wkcbd_Walk": 0.11230001789895555,
+            "wkempden_Bike": 0.0016763467101948183,
+            "wkempden_SR2": 0.0011481877527898439,
+            "wkempden_SR3+": 0.0016365681258954656,
+            "wkempden_Transit": 0.0022347686602729577,
+            "wkempden_Walk": 0.0021712802554135716,
         },
-        rel=1e-2,
+        rel=0.02,
     )
     m.calculate_parameter_covariance()
     m.parameter_summary()
@@ -297,79 +296,11 @@ def test_mtc_22():
         name="t_stat",
     )
     pd.testing.assert_series_equal(
-        m.parameters.std_err.to_series(), expected_se, rtol=5.0e-2, check_names=False
-    )
-    resultj = mj.maximize_loglike(stderr=True)
-    r = resultj
-    assert r.loglike == approx(-3441.6725273276093)
-    assert dict(zip(mj.pnames, r.x)) == approx(
-        {
-            "ASC_Bike": -1.2024073703132545,
-            "ASC_SR2": -1.3257247399188727,
-            "ASC_SR3+": -2.506936202874175,
-            "ASC_Transit": -0.4041442821263078,
-            "ASC_Walk": 0.3447191316975722,
-            "costbyincome": -0.03864412094110262,
-            "hhinc#4": -0.003929601755651791,
-            "hhinc#5": -0.010035112486480783,
-            "hhinc#6": -0.006205979434206748,
-            "motorized_ovtbydist": -0.11389194935358538,
-            "motorized_time": -0.014518697124195973,
-            "mu_motor": 0.7261696323637531,
-            "mu_nonmotor": 0.7690391629698575,
-            "nonmotorized_time": -0.046200685225646534,
-            "vehbywrk_Bike": -0.7347520730837045,
-            "vehbywrk_SR": -0.22598417504565899,
-            "vehbywrk_Transit": -0.7075038510739201,
-            "vehbywrk_Walk": -0.7641289876632265,
-            "wkcbd_Bike": 0.4077477599180845,
-            "wkcbd_SR2": 0.1930608067123969,
-            "wkcbd_SR3+": 0.7814124041724411,
-            "wkcbd_Transit": 0.9217986579385763,
-            "wkcbd_Walk": 0.11364443225208345,
-            "wkempden_Bike": 0.0016747777566393732,
-            "wkempden_SR2": 0.0011502120827767475,
-            "wkempden_SR3+": 0.0016390812178071399,
-            "wkempden_Transit": 0.0022379922179423173,
-            "wkempden_Walk": 0.0021706844461508662,
-        },
-        rel=1e-2,
-    )
-    assert mj.pstderr == approx(
-        np.array(
-            [
-                4.168558e-01,
-                2.545745e-01,
-                4.749014e-01,
-                2.212087e-01,
-                3.577894e-01,
-                1.036857e-02,
-                1.612386e-03,
-                4.650531e-03,
-                3.021172e-03,
-                2.110203e-02,
-                3.866330e-03,
-                1.349138e-01,
-                1.784958e-01,
-                5.396660e-03,
-                2.287765e-01,
-                6.506080e-02,
-                1.498349e-01,
-                1.633791e-01,
-                3.276509e-01,
-                9.619242e-02,
-                1.998420e-01,
-                2.218623e-01,
-                2.364309e-01,
-                1.087425e-03,
-                3.542897e-04,
-                4.488141e-04,
-                5.073145e-04,
-                7.623227e-04,
-            ],
-            dtype=np.float32,
-        ),
-        rel=1e-2,
+        m.parameters.std_err.to_series(),
+        expected_se,
+        rtol=0.02,
+        check_names=False,
+        check_dtype=False,
     )
 
 
