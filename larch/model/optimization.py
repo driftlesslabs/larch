@@ -118,7 +118,10 @@ def maximize_loglike(
                 and getattr(model, "datatree", None) is not None
             ):
                 model.unmangle()
-            if getattr(model, "data_as_loaded", None) is None:
+            if (
+                getattr(model, "data_as_loaded", None) is None
+                and not model.use_streaming
+            ):
                 raise ValueError("you must load data first -- try Model.load_data()")
 
         if prior_result is not None:

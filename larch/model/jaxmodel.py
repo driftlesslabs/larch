@@ -140,6 +140,9 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         """
         Reload the internal data_arrays so they are consistent with the datatree.
         """
+        if self.compute_engine != "jax":
+            return super().reflow_data_arrays()
+
         if self.graph is None:
             self._data_arrays = None
             return
@@ -168,6 +171,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                 float_dtype=self.float_dtype,
                 cache_dir=datatree.cache_dir,
                 flows=getattr(self, "dataflows", None),
+                make_unused_flows=self.use_streaming,
             )
             if isinstance(self.groupid, str):
                 dataset = fold_dataset(dataset, "group")
@@ -967,7 +971,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         if x is not None:
             self.pvals = x
         self.check_random_draws()
-        result = self.jax_d_loglike(self.pvals)
+        result = self.jax_d_loglike(self.pvals) * (self.pholdfast == 0)
         if return_series:
             result = pd.Series(result, index=self.pnames)
         return result

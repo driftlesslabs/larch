@@ -1,4 +1,5 @@
 import logging
+import pathlib
 import time
 import warnings
 from collections import namedtuple
@@ -21,6 +22,7 @@ from ..util import dictx
 from .basemodel import BaseModel as _BaseModel
 from .cascading import data_av_cascade, data_ch_cascade
 from .data_arrays import DataArrays
+from .numba_stream import ModelStreamer
 
 warnings.warn(  # Good news, everyone! This tool might not work. #  )
     "\n\n"
@@ -29,6 +31,8 @@ warnings.warn(  # Good news, everyone! This tool might not work. #  )
     "compile optimized binaries for your specific machine,  which\n"
     "may take a little while, please be patient ...\n",
 )
+
+logger = logging.getLogger(__package__)
 
 
 @njit(cache=True)
@@ -889,6 +893,7 @@ FixedArrays = namedtuple(
 class NumbaModel(_BaseModel):
 
     _null_slice = (None, None, None)
+    streaming = ModelStreamer()
 
     def __init__(self, *args, float_dtype=np.float64, datatree=None, **kwargs):
         for a in args:
@@ -905,6 +910,11 @@ class NumbaModel(_BaseModel):
         self._constraint_funcs = None
         self.datatree = datatree
         self._should_preload_data = True
+        cache_dir = kwargs.get("cache_dir", None)
+        if cache_dir is not None:
+            cache_dir = pathlib.Path(cache_dir)
+            cache_dir.mkdir(exist_ok=True)
+            self.datatree.cache_dir = cache_dir
 
     def save(self, filename, format="yaml", overwrite=False):
         from .saving import save_model
@@ -982,6 +992,7 @@ class NumbaModel(_BaseModel):
         if structure:
             self._constraint_funcs = None
             self._fixed_arrays = None
+            self.streaming = None
 
     def is_mnl(self):
         """
@@ -1005,9 +1016,13 @@ class NumbaModel(_BaseModel):
             self._data_arrays = None
             return
 
-        if self._should_preload_data:
+        if not self.use_streaming:
+            logger.debug("Model.reflow_data_arrays with full datatree")
             datatree = self.datatree
         else:
+            logger.debug(
+                "Model.reflow_data_arrays with partial datatree, one case only"
+            )
             datatree = self.datatree.replace_datasets(
                 {
                     self.datatree.root_node_name: self.datatree.root_dataset.isel(
@@ -1018,19 +1033,28 @@ class NumbaModel(_BaseModel):
         if datatree is not None:
             from .data_arrays import prepare_data
 
+            logger.debug(f"Model.datatree.cache_dir = {datatree.cache_dir}")
             self.dataset, self.dataflows = prepare_data(
                 datasource=datatree,
                 request=self,
                 float_dtype=self.float_dtype,
                 cache_dir=datatree.cache_dir,
                 flows=getattr(self, "dataflows", None),
+                make_unused_flows=self.use_streaming,
             )
-            self._data_arrays = self.dataset.dc.to_arrays(
-                self.graph,
-                float_dtype=self.float_dtype,
-            )
-            if self.work_arrays is not None:
-                self._rebuild_work_arrays()
+            if self.use_streaming:
+                # when streaming the dataset created above is a vestigial
+                # one-case dataset, really we just want the flows, so we
+                # get rid of the dataset now
+                self._dataset = None
+                self._data_arrays = None
+            else:
+                self._data_arrays = self.dataset.dc.to_arrays(
+                    self.graph,
+                    float_dtype=self.float_dtype,
+                )
+                if self.work_arrays is not None:
+                    self._rebuild_work_arrays()
 
     def _rebuild_work_arrays(
         self, n_cases=None, n_nodes=None, n_params=None, on_missing_data="silent"
@@ -1096,7 +1120,9 @@ class NumbaModel(_BaseModel):
                 model_q_ca_param_scale,
                 model_q_ca_param,
                 model_q_ca_data,
-                model_q_scale_param,
+                np.asarray([model_q_scale_param])
+                if self.use_streaming
+                else model_q_scale_param,
                 model_utility_ca_param_scale,
                 model_utility_ca_param,
                 model_utility_ca_data,
@@ -1445,10 +1471,18 @@ class NumbaModel(_BaseModel):
         -------
         float
         """
-        result_arrays, penalty = self._loglike_runner(
-            x, start_case=start_case, stop_case=stop_case, step_case=step_case
-        )
-        result = result_arrays.loglike.sum() * self.weight_normalization
+        if self._use_streaming:
+            result = (
+                self.streaming.loglike(
+                    x, start_case=start_case, stop_case=stop_case, step_case=step_case
+                )
+                * self.weight_normalization
+            )
+        else:
+            result_arrays, penalty = self._loglike_runner(
+                x, start_case=start_case, stop_case=stop_case, step_case=step_case
+            )
+            result = result_arrays.loglike.sum() * self.weight_normalization
         if start_case is None and stop_case is None and step_case is None:
             self._check_if_best(result)
         return result
@@ -1463,14 +1497,22 @@ class NumbaModel(_BaseModel):
         return_series=False,
         **kwargs,
     ):
-        result_arrays, penalty = self._loglike_runner(
-            x,
-            start_case=start_case,
-            stop_case=stop_case,
-            step_case=step_case,
-            return_gradient=True,
-        )
-        result = result_arrays.d_loglike.sum(0) * self.weight_normalization
+        if self._use_streaming:
+            result = (
+                self.streaming.d_loglike(
+                    x, start_case=start_case, stop_case=stop_case, step_case=step_case
+                )
+                * self.weight_normalization
+            )
+        else:
+            result_arrays, penalty = self._loglike_runner(
+                x,
+                start_case=start_case,
+                stop_case=stop_case,
+                step_case=step_case,
+                return_gradient=True,
+            )
+            result = result_arrays.d_loglike.sum(0) * self.weight_normalization
         if return_series:
             result = pd.Series(result, index=self.pnames)
         return result
@@ -2110,7 +2152,9 @@ class NumbaModel(_BaseModel):
         float
         """
         if self._data_arrays is not None:
-            return self._data_arrays.wt.sum()
+            return (self._data_arrays.ch[:, -1] * self._data_arrays.wt).sum()
+        if self.use_streaming:
+            return self.streaming.total_weight()
         raise MissingDataError("no data_arrays are set")
 
     @property
@@ -2182,12 +2226,31 @@ class NumbaModel(_BaseModel):
         from ..dataset import choice_avail_summary
 
         self.unmangle()
-        graph = None if self.is_mnl() else self.graph
-        return choice_avail_summary(
-            self.dataset,
-            graph,
-            self.availability_co_vars,
-        )
+        graph = self.graph
+        if self.use_streaming:
+            return self.streaming.choice_avail_summary()
+            # from .numba_stream import init_choice_avail_summary_streamer
+            # choice_avail_summary_streamer = init_choice_avail_summary_streamer(self)
+            # total_ch, total_av, total_wt = choice_avail_summary_streamer(
+            #     self.n_cases,
+            #     self._fixed_arrays.edge_slots,
+            #     self._fixed_arrays.mu_slot,
+            #     self.datatree.n_alts,
+            # )
+            # od = {}
+            # idx = pd.Index(graph.standard_sort, name="altid")
+            # od["name"] = pd.Series(graph.standard_sort_names, index=idx)
+            # od["chosen"] = pd.Series(total_ch, index=idx)
+            # od["available"] = pd.Series(total_av, index=idx)
+            # result = pd.DataFrame(od,  index = idx)
+            # from ..dataset.choice_avail_reporting import clean_summary
+            # return clean_summary(result, root_id=graph.root_id)
+        else:
+            return choice_avail_summary(
+                self.dataset,
+                graph,
+                self.availability_co_vars,
+            )
 
     def maximize_loglike(
         self,

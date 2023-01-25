@@ -83,6 +83,7 @@ def prepare_data(
     float_dtype=None,
     cache_dir=None,
     flows=None,
+    make_unused_flows=False,
 ):
     """
     Load data from a DataTree into a computationally-formatted Dataset.
@@ -255,6 +256,15 @@ def prepare_data(
                 a = a.item()
             da_ch[:, i] = np.asarray(choicecodes == a)
         model_dataset = model_dataset.merge(da_ch)
+        if make_unused_flows:
+            print("make_unused_flows!")
+            from .numba_stream import OneHotStreamer
+
+            flows["choice_co_code"] = OneHotStreamer(
+                request["choice_co_code"], datatree.root_dataset.coords[datatree.ALTID]
+            )
+        else:
+            print("do not make_unused_flows")
     if "choice_co" in request:
         log.debug(f"requested choice_co_vars data: {request['choice_co']}")
         da_ch = DataArray(
@@ -431,12 +441,14 @@ def _prep_ca(
                 and shared_data_ca.ALTID in proposal.dims
             ):
                 proposal = proposal.drop(list(proposal.coords)).rename(tag)
-                return model_dataset.merge(proposal), flow
+                return model_dataset.merge(proposal), vars_ca
     if isinstance(vars_ca, str):
         vars_ca = {vars_ca: vars_ca}
     if not isinstance(vars_ca, dict):
         vars_ca = {i: i for i in vars_ca}
     flowname = flownamer(tag, vars_ca, shared_data_ca._hash_features())
+    if isinstance(flow, str):
+        raise ValueError("expected flow {flow!r}")
     if flow is None or flowname != flow.name:
         flow = shared_data_ca.setup_flow(vars_ca, cache_dir=cache_dir, name=flowname)
     else:

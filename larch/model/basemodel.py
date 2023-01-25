@@ -1,5 +1,6 @@
 import base64
 import logging
+import pathlib
 import uuid
 import warnings
 
@@ -119,6 +120,8 @@ class BaseModel:
         compute_engine=None,
         submodels=None,
         named_submodels=None,
+        use_streaming=False,
+        cache_dir=None,
     ):
         if not hasattr(self, "_ident"):
             self._ident = _unique_ident()
@@ -126,6 +129,8 @@ class BaseModel:
         self._datatree = None
         self.title = title
         self.rename_parameters = {}
+        self._compute_engine = compute_engine
+        self._use_streaming = use_streaming
 
         if submodels is None:
             submodels = {}
@@ -138,6 +143,10 @@ class BaseModel:
         bucket = ParameterBucket(submodels, **named_submodels)
         self._parameter_bucket = bucket
         self.datatree = datatree
+        if cache_dir is not None:
+            cache_dir = pathlib.Path(cache_dir)
+            cache_dir.mkdir(exist_ok=True)
+            self.datatree.cache_dir = cache_dir
         self._cached_loglike_best = None
         self._cached_loglike_null = None
         self._most_recent_estimation_result = None
@@ -153,7 +162,6 @@ class BaseModel:
         self._availability_co_vars = None
         self._availability_any = True
 
-        self._compute_engine = compute_engine
         self.ordering = None
 
     @property
@@ -179,6 +187,22 @@ class BaseModel:
         if engine not in {"numba", "jax", None}:
             raise ValueError("invalid compute engine")
         self._compute_engine = engine
+        if self._compute_engine == "jax" and self.use_streaming:
+            warnings.warn("setting use_streaming to False, jax is not yet compatible")
+            self.use_streaming = False
+
+    @property
+    def use_streaming(self):
+        return self._use_streaming
+
+    @use_streaming.setter
+    def use_streaming(self, should):
+        should = bool(should)
+        if should and self.compute_engine != "numba":
+            raise ValueError(
+                "streaming is currently only compatible with the numba compute engine"
+            )
+        self._use_streaming = should
 
     @property
     def most_recent_estimation_result(self):
@@ -197,23 +221,53 @@ class BaseModel:
 
     @datatree.setter
     def datatree(self, tree):
+        self.swap_datatree(tree, True)
+        # from ..dataset import DataTree
+        #
+        # if tree is self.datatree:
+        #     return
+        # if isinstance(tree, DataTree) or tree is None:
+        #     self._datatree = tree
+        #     self.mangle(structure=False)
+        # elif isinstance(tree, xr.Dataset):
+        #     self._datatree = tree.dc.as_tree()
+        #     self.mangle(structure=False)
+        # else:
+        #     try:
+        #         self._datatree = DataTree(main=xr.Dataset.construct(tree))
+        #     except Exception as err:
+        #         raise TypeError(f"datatree must be DataTree not {type(tree)}") from err
+        #     else:
+        #         self.mangle(structure=False)
+
+    def swap_datatree(self, tree, should_mangle=False):
         from ..dataset import DataTree
 
+        if (
+            tree is not None
+            and hasattr(tree, "relationships_are_digitized")
+            and (not tree.relationships_are_digitized)
+            and self.use_streaming
+        ):
+            tree = tree.digitize_relationships()
         if tree is self.datatree:
             return
         if isinstance(tree, DataTree) or tree is None:
             self._datatree = tree
-            self.mangle(structure=False)
+            if should_mangle:
+                self.mangle(structure=False)
         elif isinstance(tree, xr.Dataset):
             self._datatree = tree.dc.as_tree()
-            self.mangle(structure=False)
+            if should_mangle:
+                self.mangle(structure=False)
         else:
             try:
                 self._datatree = DataTree(main=xr.Dataset.construct(tree))
             except Exception as err:
                 raise TypeError(f"datatree must be DataTree not {type(tree)}") from err
             else:
-                self.mangle(structure=False)
+                if should_mangle:
+                    self.mangle(structure=False)
 
     @property
     def parameters(self):

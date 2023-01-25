@@ -10,11 +10,12 @@ from larch import PX, P, X
 from larch.util.testing import assert_same_text
 
 
-@pytest.mark.parametrize("compute_engine", ["jax", "numba"])
-def test_mtc_1(compute_engine):
+@pytest.mark.parametrize(
+    "compute_engine,use_streaming", [("jax", False), ("numba", False), ("numba", True)]
+)
+def test_mtc_1(compute_engine, use_streaming):
     d = lx.examples.MTC(format="dataset")
-    m = lx.Model(d)
-    m.compute_engine = compute_engine
+    m = lx.Model(d, compute_engine=compute_engine, use_streaming=use_streaming)
     m.utility_co[2] = P("ASC_SR2") + P("hhinc#2") * X("hhinc")
     m.utility_co[3] = P("ASC_SR3P") + P("hhinc#3") * X("hhinc")
     m.utility_co[4] = P("ASC_TRAN") + P("hhinc#4") * X("hhinc")
@@ -24,7 +25,7 @@ def test_mtc_1(compute_engine):
     m.availability_ca_var = "avail"
     m.choice_ca_var = "chose"
     m.title = "MTC Example 1 (Simple MNL)"
-    m.choice_avail_summary()
+    ch_av_summary = m.choice_avail_summary()
     # TEST
     s = """            name  chosen available
     altid
@@ -36,8 +37,15 @@ def test_mtc_1(compute_engine):
     6                  Walk     166      1479
     < Total All Alternatives > 5029
     """
-    mash = lambda x: re.sub("\s+", " ", x).strip()
-    assert mash(s) == mash(str(m.choice_avail_summary()))
+    assert (
+        ch_av_summary.index.get_level_values(0)
+        == [1, 2, 3, 4, 5, 6, "< Total All Alternatives >"]
+    ).all()
+    assert (ch_av_summary["chosen"] == [3637, 517, 161, 498, 50, 166, 5029]).all()
+    assert (
+        ch_av_summary["available"].values[:-1].astype(int)
+        == np.asarray([4755, 5029, 5029, 4003, 1738, 1479])
+    ).all()
     m.set_cap(20)
     # TEST
     assert dict(m.required_data()) == {
