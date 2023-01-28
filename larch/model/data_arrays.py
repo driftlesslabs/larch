@@ -203,6 +203,7 @@ def prepare_data(
                 dtype=float_dtype,
                 cache_dir=cache_dir,
                 flow=flows.get("choice_ca"),
+                force_flow=make_unused_flows,
             )
         else:
             log.debug(f"  loading choice_ca data from idce")
@@ -217,6 +218,7 @@ def prepare_data(
                 cache_dir=cache_dir,
                 flow=flows.get("choice_ce"),
                 attach_indexes=False,
+                # force_flow=make_unused_flows,
             )
             da_ch = DataArray(
                 ce_to_dense(
@@ -291,7 +293,7 @@ def prepare_data(
             datatree_co,
             [request["weight_co"]],
             tag="wt",
-            preserve_vars=False,
+            preserve_vars=make_unused_flows,
             dtype=float_dtype,
             cache_dir=cache_dir,
             flow=flows.get("weight_co"),
@@ -304,7 +306,7 @@ def prepare_data(
             datatree_co,
             [request["group_co"]],
             tag="group",
-            preserve_vars=False,
+            preserve_vars=make_unused_flows,
             dtype=np.int64,
             cache_dir=cache_dir,
             flow=flows.get("group_co"),
@@ -323,6 +325,7 @@ def prepare_data(
                 dtype=np.int8,
                 cache_dir=cache_dir,
                 flow=flows.get("avail_ca"),
+                force_flow=make_unused_flows,
             )
         else:
             if (
@@ -383,7 +386,7 @@ def prepare_data(
             datatree_co,
             av_co_expressions,
             tag="av",
-            preserve_vars=False,
+            preserve_vars=make_unused_flows,
             dtype=np.int8,
             dim_name=datatree.ALTID,
             cache_dir=cache_dir,
@@ -429,12 +432,17 @@ def _prep_ca(
     dtype=None,
     cache_dir=None,
     flow=None,
+    force_flow=False,
 ):
     from ..dataset import DataArray, Dataset, DataTree
 
     assert isinstance(shared_data_ca, DataTree)
     if isinstance(vars_ca, str):
-        if not preserve_vars and vars_ca in shared_data_ca.root_dataset:
+        if (
+            not preserve_vars
+            and vars_ca in shared_data_ca.root_dataset
+            and not force_flow
+        ):
             proposal = shared_data_ca.root_dataset[vars_ca]
             if (
                 shared_data_ca.CASEID in proposal.dims

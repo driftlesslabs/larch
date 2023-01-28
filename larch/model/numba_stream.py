@@ -1,3 +1,5 @@
+import sys
+
 import numba as nb
 import numpy as np
 import pandas as pd
@@ -58,11 +60,12 @@ def get_data_streamers(model, default_dtype=np.float64):
         else:
             source = model.datatree
         if isinstance(v, Flow):
-            streamers[k] = v.init_streamer(
-                source=source,
-                dtype=dtypes.get(k, default_dtype),
-                closure=True,
-            )
+            streamers[k] = source.reuse_streamer(v, dtype=dtypes.get(k, default_dtype))
+            # streamers[k] = v.init_streamer(
+            #     source=source,
+            #     dtype=dtypes.get(k, default_dtype),
+            #     closure=True,
+            # )
         elif isinstance(v, str):
             streamers[k] = _raw_streamer(source, v, dtypes.get(k, default_dtype))
         elif isinstance(v, OneHotStreamer):
@@ -87,31 +90,34 @@ def init_streamer(
     n_alts = model.datatree.n_alts
 
     if "ca" in streamers:
-        stream_ca = streamers["ca"]
+        stream_ca = streamers["ca"].compiled
     else:
         stream_ca = nb.njit(lambda c: np.zeros((n_alts, 0), dtype=float_dtype))
 
     if "co" in streamers:
-        stream_co = streamers["co"]
+        stream_co = streamers["co"].compiled
     else:
         stream_co = nb.njit(lambda c: np.zeros((0,), dtype=float_dtype))
 
     if "avail_ca" in streamers:
-        stream_av = streamers["avail_ca"]
+        _stream_av_1 = streamers["avail_ca"]
+        _stream_av = streamers["avail_ca"].compiled
+        stream_av = nb.njit(lambda c: np.reshape(_stream_av(c), -1))
     elif model.availability_any:
         stream_av = nb.njit(lambda c: np.ones((n_alts), dtype=np.int8))
     else:
         raise NotImplementedError
 
     if "choice_ca" in streamers:
-        stream_ch = streamers["choice_ca"]
+        _stream_ch = streamers["choice_ca"].compiled
+        stream_ch = nb.njit(lambda c: np.reshape(_stream_ch(c), -1))
     elif "choice_co_code" in streamers:
         stream_ch = streamers["choice_co_code"]
     else:
         raise NotImplementedError
 
     if "weight_co" in streamers:
-        stream_wt = streamers["weight_co"]
+        stream_wt = streamers["weight_co"].compiled
     else:
         stream_wt = nb.njit(lambda c: np.ones((1,), dtype=float_dtype))
 
@@ -287,14 +293,17 @@ def init_choice_avail_summary_streamer(model):
         stream_co = nb.njit(lambda c: np.zeros((1, 0), dtype=float_dtype))
 
     if "avail_ca" in streamers:
-        stream_av = streamers["avail_ca"]
+        _stream_av_1 = streamers["avail_ca"]
+        _stream_av = streamers["avail_ca"].compiled
+        stream_av = nb.njit(lambda c: np.reshape(_stream_av(c), -1))
     elif model.availability_any:
-        stream_av = nb.njit(lambda c: np.ones((1, n_alts), dtype=np.int8))
+        stream_av = nb.njit(lambda c: np.ones((n_alts), dtype=np.int8))
     else:
         raise NotImplementedError
 
     if "choice_ca" in streamers:
-        stream_ch = streamers["choice_ca"]
+        _stream_ch = streamers["choice_ca"].compiled
+        stream_ch = nb.njit(lambda c: np.reshape(_stream_ch(c), -1))
     elif "choice_co_code" in streamers:
         stream_ch = streamers["choice_co_code"]
     else:

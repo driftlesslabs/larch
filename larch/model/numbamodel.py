@@ -1,5 +1,6 @@
 import logging
 import pathlib
+import sys
 import time
 import warnings
 from collections import namedtuple
@@ -1120,9 +1121,10 @@ class NumbaModel(_BaseModel):
                 model_q_ca_param_scale,
                 model_q_ca_param,
                 model_q_ca_data,
-                np.asarray([model_q_scale_param])
-                if self.use_streaming
-                else model_q_scale_param,
+                # (np.asarray([model_q_scale_param])
+                # if self.use_streaming
+                # else model_q_scale_param),
+                model_q_scale_param,
                 model_utility_ca_param_scale,
                 model_utility_ca_param,
                 model_utility_ca_data,
@@ -2152,7 +2154,20 @@ class NumbaModel(_BaseModel):
         float
         """
         if self._data_arrays is not None:
-            return (self._data_arrays.ch[:, -1] * self._data_arrays.wt).sum()
+            if self._data_arrays.ch.ndim - 1 == self._data_arrays.wt.ndim:
+                return (self._data_arrays.ch[:, -1] * self._data_arrays.wt).sum()
+            elif self._data_arrays.ch.ndim - 2 == self._data_arrays.wt.ndim:
+                return (
+                    self._data_arrays.ch[:, -1]
+                    * np.expand_dims(self._data_arrays.wt, -1)
+                ).sum()
+            elif self._data_arrays.ch.ndim - 3 == self._data_arrays.wt.ndim:
+                return (
+                    self._data_arrays.ch[:, -1]
+                    * np.expand_dims(self._data_arrays.wt, (-1, -2))
+                ).sum()
+            else:
+                raise ValueError
         if self.use_streaming:
             return self.streaming.total_weight()
         raise MissingDataError("no data_arrays are set")
