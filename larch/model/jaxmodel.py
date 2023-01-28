@@ -1066,6 +1066,8 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         -------
         float
         """
+        if self.compute_engine != "jax":
+            return super().loglike_null(use_cache)
         if self._cached_loglike_null is not None and use_cache:
             return self._cached_loglike_null
         elif use_cache == -1:
