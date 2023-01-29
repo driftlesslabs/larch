@@ -259,14 +259,11 @@ def prepare_data(
             da_ch[:, i] = np.asarray(choicecodes == a)
         model_dataset = model_dataset.merge(da_ch)
         if make_unused_flows:
-            print("make_unused_flows!")
             from .numba_stream import OneHotStreamer
 
             flows["choice_co_code"] = OneHotStreamer(
                 request["choice_co_code"], datatree.root_dataset.coords[datatree.ALTID]
             )
-        else:
-            print("do not make_unused_flows")
     if "choice_co" in request:
         log.debug(f"requested choice_co_vars data: {request['choice_co']}")
         da_ch = DataArray(
