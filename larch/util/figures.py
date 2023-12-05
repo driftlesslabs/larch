@@ -988,7 +988,6 @@ def share_figure(
             )
 
     for i in range(pr.shape[1]):
-
         h_pr[i], _ = numpy.histogram(
             x,
             weights=pr[:, i] * wt,
@@ -1039,7 +1038,6 @@ def share_figure(
         xlim = (bins[0], bins[-1])
 
     if style == "dataframe":
-
         if ch is not None:
             result = pandas.concat(
                 {
@@ -1063,7 +1061,6 @@ def share_figure(
             result.index.name = xlabel
 
     elif style == "stacked":
-
         fig, (ax0, ax1) = plt.subplots(1, 2, figsize=figsize)
 
         bottom0 = 0
@@ -1150,7 +1147,6 @@ def share_figure(
             result = fig
 
     else:
-
         fig, axes = plt.subplots(len(h_pr_share.columns), 1, figsize=figsize)
 
         shift = 0.4 if discrete else 0
@@ -1430,7 +1426,6 @@ def distribution_on_idco_variable(
         xlim = (bins[0], bins[-1])
 
     if style == "dataframe":
-
         result = pandas.concat(
             {
                 "Modeled Shares": h_pr_share,
@@ -1445,7 +1440,6 @@ def distribution_on_idco_variable(
             result.index.name = xlabel
 
     elif style == "stacked":
-
         fig, (ax0, ax1) = plt.subplots(1, 2, figsize=figsize)
 
         bottom0 = 0
@@ -1508,7 +1502,6 @@ def distribution_on_idco_variable(
             result = fig
 
     else:
-
         fig, axes = plt.subplots(len(h_pr_share.columns), 1, figsize=figsize)
 
         shift = 0.4 if discrete else 0

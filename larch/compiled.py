@@ -1,5 +1,6 @@
 import jax
 
+
 def reset_compiled_methods(obj):
     precompiled_funcs = [i for i in obj.__dict__ if i.startswith("_precompiled_")]
     for i in precompiled_funcs:
@@ -22,13 +23,13 @@ class compiledmethod:
         # owner : parent class that will have `self` as a member
         # name : the name of the attribute that `self` will be
         self.public_name = name
-        self.private_name = '_precompiled_' + name
+        self.private_name = "_precompiled_" + name
 
     def __get__(self, obj, objtype=None):
         # self : compiledmethod
         # obj : instance of parent class that has `self` as a member
         # objtype : class of `obj`
-        unmangle = getattr(obj, 'unmangle', None)
+        unmangle = getattr(obj, "unmangle", None)
         if unmangle is not None:
             unmangle()
         result = getattr(obj, self.private_name, None)
@@ -88,7 +89,7 @@ class jitmethod:
             The name of the attribute to which self is being assigned.
         """
         self.public_name = name
-        self.private_name = '_precompiled_' + name
+        self.private_name = "_precompiled_" + name
 
     def __get__(self, obj, objtype=None):
         """
@@ -101,7 +102,7 @@ class jitmethod:
         objtype : class
             Class of `obj`.
         """
-        unmangle = getattr(obj, 'unmangle', None)
+        unmangle = getattr(obj, "unmangle", None)
         if unmangle is not None:
             unmangle()
         result = getattr(obj, self.private_name, None)
@@ -128,4 +129,3 @@ class jitmethod:
             Instance of parent class that has `self` as a member.
         """
         setattr(obj, self.private_name, None)
-

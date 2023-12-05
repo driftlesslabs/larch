@@ -1,4 +1,3 @@
-import jax.numpy as jnp
 import numpy as np
 import xarray as xr
 from pytest import approx, fixture

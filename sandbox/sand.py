@@ -4,19 +4,15 @@
 # In[1]:
 
 
-
 import os
-os.chdir(
-    "/Users/jeffnewman/LocalGit/airtaxi-airport"
-)
+
+os.chdir("/Users/jeffnewman/LocalGit/airtaxi-airport")
 import sys
+
 sys.path.insert(0, "/Users/jeffnewman/LocalGit/airtaxi-airport")
 
-import pandas as pd
-import numpy as np
-import xarray as xr
-import larch as lx
 import airtaxi_airport as aa
+import numpy as np
 
 # In[2]:
 
@@ -96,34 +92,35 @@ nt_model.jax_loglike_casewise(nt_model.pvals)
 
 
 nt_model.pvals = {
-    'AIRTAXI_ASC': -0.17443869277157972,
-    'AIRTAXI_Automation': -0.06072019610437766,
-    'AIRTAXI_FlewBizFirst': 0.6212327774278571,
-    'AIRTAXI_FlewPrCoach': 0.46904019636061667,
-    'AIRTAXI_OTCat4': -0.023784771031072485,
-    'AIRTAXI_RSFreq123': 0.45695320795364053,
-    'AIRTAXI_RSFreq4': 0.08209171966002254,
-    'AIRTAXI_RideGuarantee': 0.28916999367465684,
-    'AIRTAXI_Time': -0.0011128267274963827,
-    'ANYMODE_Cost_Total': -(0.003537405347599533),
-    'AUTO_I_ParkAirport': 0.20551731167886292,
-    'AUTO_Male': 0.0564899173692452,
-    'AUTO_ParkCat1': -0.0076732946513516686,
-    'AUTO_Time': -0.00849744774221313,
-    'SR_ASC': 0.030519594165332724,
-    'SR_Automation': -0.3004062310002925,
-    'SR_I_RSAirport': 0.1116174971178979,
-    'SR_I_RSDistance': -0.034450460809031476,
-    'SR_RSFreq123': 0.9911743309045934,
-    'SR_RSFreq4': 0.6695528077561699,
-    'SR_Time': -0.006211167141351883,
-    '_NT_AIRTAXI': -2.4506250423285794,
-    '_NT_AUTO': -2.4973467748004814,
-    '_NT_COST_TOTAL': -2.7189461990800803,
-    '_NT_SR': -2.4639440029473296,
-    '_NT_TIME': -5.598850269655563,
-    '_NonTraderConst': 500.0,
-    '_NonTraderVar': -500.0}
+    "AIRTAXI_ASC": -0.17443869277157972,
+    "AIRTAXI_Automation": -0.06072019610437766,
+    "AIRTAXI_FlewBizFirst": 0.6212327774278571,
+    "AIRTAXI_FlewPrCoach": 0.46904019636061667,
+    "AIRTAXI_OTCat4": -0.023784771031072485,
+    "AIRTAXI_RSFreq123": 0.45695320795364053,
+    "AIRTAXI_RSFreq4": 0.08209171966002254,
+    "AIRTAXI_RideGuarantee": 0.28916999367465684,
+    "AIRTAXI_Time": -0.0011128267274963827,
+    "ANYMODE_Cost_Total": -(0.003537405347599533),
+    "AUTO_I_ParkAirport": 0.20551731167886292,
+    "AUTO_Male": 0.0564899173692452,
+    "AUTO_ParkCat1": -0.0076732946513516686,
+    "AUTO_Time": -0.00849744774221313,
+    "SR_ASC": 0.030519594165332724,
+    "SR_Automation": -0.3004062310002925,
+    "SR_I_RSAirport": 0.1116174971178979,
+    "SR_I_RSDistance": -0.034450460809031476,
+    "SR_RSFreq123": 0.9911743309045934,
+    "SR_RSFreq4": 0.6695528077561699,
+    "SR_Time": -0.006211167141351883,
+    "_NT_AIRTAXI": -2.4506250423285794,
+    "_NT_AUTO": -2.4973467748004814,
+    "_NT_COST_TOTAL": -2.7189461990800803,
+    "_NT_SR": -2.4639440029473296,
+    "_NT_TIME": -5.598850269655563,
+    "_NonTraderConst": 500.0,
+    "_NonTraderVar": -500.0,
+}
 
 # #### 100
 
@@ -132,26 +129,31 @@ nt_model.pvals = {
 
 A1 = np.log(
     np.where(
-        nt_model.dataset['ch'],
+        nt_model.dataset["ch"],
         nt_model._models[100].jax_probability(nt_model.pvals),
-        1.0
-    ).prod(
-        (1, 2)
-    )
+        1.0,
+    ).prod((1, 2))
 )
 A1
 
 # In[12]:
 
 
-A2 = np.log(np.where(nt_model.dataset['ch'], nt_model._models[201].jax_probability(nt_model.pvals), 1.0).prod((1, 2)))
+A2 = np.log(
+    np.where(
+        nt_model.dataset["ch"],
+        nt_model._models[201].jax_probability(nt_model.pvals),
+        1.0,
+    ).prod((1, 2))
+)
 
 # In[13]:
 
 
 np.log(
-    nt_model._models['classmodel'].jax_probability(nt_model.pvals)[0, 0, 0] * np.exp(A1)
-    + nt_model._models['classmodel'].jax_probability(nt_model.pvals)[0, 0, 1] * np.exp(A2)
+    nt_model._models["classmodel"].jax_probability(nt_model.pvals)[0, 0, 0] * np.exp(A1)
+    + nt_model._models["classmodel"].jax_probability(nt_model.pvals)[0, 0, 1]
+    * np.exp(A2)
 )
 
 # In[ ]:
@@ -204,12 +206,14 @@ np.log(
 # In[15]:
 
 
-m1 = aa.business_models.mix_cost(biz_data, n_draws=300, seed=42, prerolled_draws=True, common_draws=True)
+m1 = aa.business_models.mix_cost(
+    biz_data, n_draws=300, seed=42, prerolled_draws=True, common_draws=True
+)
 
 # In[16]:
 
 
-m1.pvals = {'ANYMODE_Cost_Total': np.log(0.00078141051), 'ANYMODE_Cost_Total_s': 0.1}
+m1.pvals = {"ANYMODE_Cost_Total": np.log(0.00078141051), "ANYMODE_Cost_Total_s": 0.1}
 m1.jax_loglike(m1.pvals)
 
 # In[17]:
@@ -284,46 +288,47 @@ nt_mix_model.jax_loglike(nt_mix_model.pvals)
 # In[ ]:
 
 
-nt_mix_model.pvals = {'ANYMODE_Cost_Total': -8, 'ANYMODE_Cost_Total_s': 0.01}
+nt_mix_model.pvals = {"ANYMODE_Cost_Total": -8, "ANYMODE_Cost_Total_s": 0.01}
 
 # In[ ]:
 
 
 LC_params_1 = {
-    'AIRTAXI_ASC': -0.17443869277157972,
-    'AIRTAXI_Automation': -0.06072019610437766,
-    'AIRTAXI_FlewBizFirst': 0.6212327774278571,
-    'AIRTAXI_FlewPrCoach': 0.46904019636061667,
-    'AIRTAXI_OTCat4': -0.023784771031072485,
-    'AIRTAXI_RSFreq123': 0.45695320795364053,
-    'AIRTAXI_RSFreq4': 0.08209171966002254,
-    'AIRTAXI_RideGuarantee': 0.28916999367465684,
-    'AIRTAXI_Time': -0.0011128267274963827,
-    'ANYMODE_Cost_Total': np.log(0.003537405347599533),
-    'ANYMODE_Cost_Total_s': 0.0,
-    'AUTO_I_ParkAirport': 0.20551731167886292,
-    'AUTO_Male': 0.0564899173692452,
-    'AUTO_ParkCat1': -0.0076732946513516686,
-    'AUTO_Time': -0.00849744774221313,
-    'SR_ASC': 0.030519594165332724,
-    'SR_Automation': -0.3004062310002925,
-    'SR_I_RSAirport': 0.1116174971178979,
-    'SR_I_RSDistance': -0.034450460809031476,
-    'SR_RSFreq123': 0.9911743309045934,
-    'SR_RSFreq4': 0.6695528077561699,
-    'SR_Time': -0.006211167141351883,
-    '_NT_AIRTAXI': -2.4506250423285794,
-    '_NT_AUTO': -2.4973467748004814,
-    '_NT_COST_TOTAL': -2.7189461990800803,
-    '_NT_SR': -2.4639440029473296,
-    '_NT_TIME': -5.598850269655563,
-    '_NonTraderConst': 500.0,
-    '_NonTraderVar': -500.0}
+    "AIRTAXI_ASC": -0.17443869277157972,
+    "AIRTAXI_Automation": -0.06072019610437766,
+    "AIRTAXI_FlewBizFirst": 0.6212327774278571,
+    "AIRTAXI_FlewPrCoach": 0.46904019636061667,
+    "AIRTAXI_OTCat4": -0.023784771031072485,
+    "AIRTAXI_RSFreq123": 0.45695320795364053,
+    "AIRTAXI_RSFreq4": 0.08209171966002254,
+    "AIRTAXI_RideGuarantee": 0.28916999367465684,
+    "AIRTAXI_Time": -0.0011128267274963827,
+    "ANYMODE_Cost_Total": np.log(0.003537405347599533),
+    "ANYMODE_Cost_Total_s": 0.0,
+    "AUTO_I_ParkAirport": 0.20551731167886292,
+    "AUTO_Male": 0.0564899173692452,
+    "AUTO_ParkCat1": -0.0076732946513516686,
+    "AUTO_Time": -0.00849744774221313,
+    "SR_ASC": 0.030519594165332724,
+    "SR_Automation": -0.3004062310002925,
+    "SR_I_RSAirport": 0.1116174971178979,
+    "SR_I_RSDistance": -0.034450460809031476,
+    "SR_RSFreq123": 0.9911743309045934,
+    "SR_RSFreq4": 0.6695528077561699,
+    "SR_Time": -0.006211167141351883,
+    "_NT_AIRTAXI": -2.4506250423285794,
+    "_NT_AUTO": -2.4973467748004814,
+    "_NT_COST_TOTAL": -2.7189461990800803,
+    "_NT_SR": -2.4639440029473296,
+    "_NT_TIME": -5.598850269655563,
+    "_NonTraderConst": 500.0,
+    "_NonTraderVar": -500.0,
+}
 
 # In[ ]:
 
 
-nt_mix_model.pmaximum = {'ANYMODE_Cost_Total': -1.0, 'ANYMODE_Cost_Total_s': 25.0}
+nt_mix_model.pmaximum = {"ANYMODE_Cost_Total": -1.0, "ANYMODE_Cost_Total_s": 25.0}
 
 # In[ ]:
 
@@ -352,20 +357,24 @@ nt_mix_model.jax_loglike_casewise(nt_mix_model.pvals)
 # In[ ]:
 
 
-np.log(np.where(
-    nt_mix_model.dataset['ch'],
-    nt_mix_model._models[100].jax_probability(B0),
-    1.0,
-).prod((1, 2)))
+np.log(
+    np.where(
+        nt_mix_model.dataset["ch"],
+        nt_mix_model._models[100].jax_probability(B0),
+        1.0,
+    ).prod((1, 2))
+)
 
 # In[ ]:
 
 
-np.log(np.where(
-    nt_mix_model.dataset['ch'],
-    nt_mix_model._models[201].jax_probability(B0),
-    1.0,
-).prod((1, 2)))
+np.log(
+    np.where(
+        nt_mix_model.dataset["ch"],
+        nt_mix_model._models[201].jax_probability(B0),
+        1.0,
+    ).prod((1, 2))
+)
 
 # In[ ]:
 
@@ -411,20 +420,19 @@ nt_mix_model.jax_probability(nt_mix_model.pvals).shape
 # In[ ]:
 
 
-nt_mix_model.dataset['ch'].shape
+nt_mix_model.dataset["ch"].shape
 
 # In[ ]:
 
 
 m1.mixtures[0].roll(
     m1._draws[:, 0],
-
 )
 
 # In[ ]:
 
 
-m1.pvals = {'Cost_Total': 2.0, 'Cost_Total_s': 0.0}
+m1.pvals = {"Cost_Total": 2.0, "Cost_Total_s": 0.0}
 
 # In[ ]:
 
@@ -447,7 +455,3 @@ m1.apply_random_draws(m1.pvals, m1._draws)[:, 14]
 m1.pnames[14]
 
 # In[ ]:
-
-
-
-

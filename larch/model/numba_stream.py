@@ -1,4 +1,3 @@
-import sys
 
 import numba as nb
 import numpy as np
@@ -360,7 +359,7 @@ def _ll_streaming(
                 return_bhhh,
             ],
             dtype=np.int8,
-        )
+        ),
     )
     return loglike[0], d_loglike, bhhh
 

@@ -29,7 +29,6 @@ def split_keys(d):
 
 
 class NestingTree(nx.DiGraph):
-
     node_dict_factory = OrderedDict
     adjlist_dict_factory = OrderedDict
 
@@ -63,7 +62,7 @@ class NestingTree(nx.DiGraph):
         setattr(instance, self.private_name, t)
         try:
             t._instance.mangle()
-        except AttributeError as err:
+        except AttributeError:
             pass  # print(f"GRR: {err}")
         else:
             pass  # print(f"GRR Mangle: {instance}")
@@ -72,7 +71,7 @@ class NestingTree(nx.DiGraph):
         setattr(instance, self.private_name, None)
         try:
             instance.mangle()
-        except AttributeError as err:
+        except AttributeError:
             pass  # print(f"GRR: {err}")
         else:
             pass  # print(f"GRR Mangle: {instance}")
@@ -663,7 +662,6 @@ class NestingTree(nx.DiGraph):
             else:
                 raise NotImplementedError(f"output {output} with use_viz")
         else:
-
             pydot = dot
 
             # set Graphviz graph type
@@ -773,7 +771,7 @@ class NestingTree(nx.DiGraph):
             elif output == "png":
                 prog = [P.prog, "-Gdpi=300"]
                 if figsize is not None:
-                    prog.append(f"-Gsize={figsize[0]},{figsize[1]}\!")
+                    prog.append(rf"-Gsize={figsize[0]},{figsize[1]}\!")
                 e = Elem.from_any(P.create(prog=prog, format=output, **format))
                 e.attrib["dpi"] = (300, 300)
                 return e
@@ -1050,7 +1048,6 @@ class NestingTree(nx.DiGraph):
 
 
 def graph_to_figure(graph, output_format="svg", **format):
-
     try:
         import pygraphviz as viz
     except ImportError:

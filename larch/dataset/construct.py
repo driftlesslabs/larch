@@ -1,20 +1,22 @@
-import numpy as np
-import pandas as pd
-import xarray as xr
-import sharrow.dataset as sd
-from sharrow.dataset import construct
-from .patch import register_dataset_classmethod
-
 from typing import Mapping
 
-from .dim_names import CASEID, ALTID, CASEALT, ALTIDX, CASEPTR, GROUPID, INGROUP
+import numpy as np
+import pandas as pd
+import sharrow.dataset as sd
+import xarray as xr
+from sharrow.dataset import construct
+
+from .dim_names import ALTID, ALTIDX, CASEALT, CASEID, CASEPTR
+
 
 def _steal(func):
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
+
     wrapper.__doc__ = func.__doc__
     wrapper.__name__ = func.__name__
     return staticmethod(wrapper)
+
 
 def _initialize_for_larch(obj, caseid=None, alts=None):
     """
@@ -40,20 +42,24 @@ def _initialize_for_larch(obj, caseid=None, alts=None):
             raise ValueError(f"no dim named '{caseid}' to make into {CASEID}")
         obj.attrs[CASEID] = caseid
     if isinstance(alts, pd.Series):
-        alts_dim_name = alts.name or alts.index.name or '_altid_'
+        alts_dim_name = alts.name or alts.index.name or "_altid_"
         alts_k = xr.DataArray(
-            alts.index, dims=alts_dim_name,
+            alts.index,
+            dims=alts_dim_name,
         )
         alts_v = xr.DataArray(
-            alts.values, dims=alts_dim_name,
+            alts.values,
+            dims=alts_dim_name,
         )
     elif isinstance(alts, Mapping):
-        alts_dim_name = '_altid_'
+        alts_dim_name = "_altid_"
         alts_k = xr.DataArray(
-            list(alts.keys()), dims=alts_dim_name,
+            list(alts.keys()),
+            dims=alts_dim_name,
         )
         alts_v = xr.DataArray(
-            list(alts.values()), dims=alts_dim_name,
+            list(alts.values()),
+            dims=alts_dim_name,
         )
     elif isinstance(alts, str):
         alts_dim_name = alts
@@ -62,7 +68,7 @@ def _initialize_for_larch(obj, caseid=None, alts=None):
         alts_dim_name = None
         alts_k = alts_v = None
     else:
-        alts_dim_name = getattr(alts, 'name', '_altid_')
+        alts_dim_name = getattr(alts, "name", "_altid_")
         alts_v = np.asarray(alts).reshape(-1)
         alts_k = None
     if alts_dim_name:
@@ -70,10 +76,10 @@ def _initialize_for_larch(obj, caseid=None, alts=None):
     if alts_k is not None:
         if np.issubdtype(alts_v, np.integer) and not np.issubdtype(alts_k, np.integer):
             obj.coords[alts_dim_name] = alts_v
-            obj.coords['alt_names'] = alts_k
+            obj.coords["alt_names"] = alts_k
         else:
             obj.coords[alts_dim_name] = alts_k
-            obj.coords['alt_names'] = alts_v
+            obj.coords["alt_names"] = alts_v
     elif alts_v is not None:
         obj.coords[alts_dim_name] = alts_v
     return obj
@@ -81,7 +87,6 @@ def _initialize_for_larch(obj, caseid=None, alts=None):
 
 @xr.register_dataset_accessor("construct")
 class _DatasetConstruct:
-
     _parent_class = xr.Dataset
 
     def __new__(cls, *args, **kwargs):
@@ -144,15 +149,18 @@ class _DatasetConstruct:
         Dataset
         """
         if df.index.nlevels != 1:
-            raise ValueError("source idco dataframe must have a one "
-                             "level Index giving case id's")
-        caseidname = df.index.name or 'index'
+            raise ValueError(
+                "source idco dataframe must have a one " "level Index giving case id's"
+            )
+        caseidname = df.index.name or "index"
         ds = cls()(df, caseid=caseidname, alts=alts)
         ds = ds.set_dtypes(df)
         return ds
 
     @classmethod
-    def from_idca(cls, df, crack=True, altnames=None, avail='_avail_', fill_missing=None):
+    def from_idca(
+        cls, df, crack=True, altnames=None, avail="_avail_", fill_missing=None
+    ):
         """
         Construct a Dataset from an idca-format DataFrame.
 
@@ -189,18 +197,24 @@ class _DatasetConstruct:
 
         """
         if df.index.nlevels != 2:
-            raise ValueError("source idca dataframe must have a two "
-                             "level MultiIndex giving case and alt id's")
+            raise ValueError(
+                "source idca dataframe must have a two "
+                "level MultiIndex giving case and alt id's"
+            )
         caseidname, altidname = df.index.names
 
         # check altids are integers, if they are not then fix it
-        if df.index.levels[1].dtype.kind != 'i':
+        if df.index.levels[1].dtype.kind != "i":
             if altnames is None:
                 altnames = df.index.levels[1]
                 df.index = df.index.set_levels(np.arange(1, len(altnames) + 1), level=1)
             else:
-                new_index = df.index.get_level_values(1).astype(pd.CategoricalDtype(altnames))
-                df.index = df.index.set_codes(new_index.codes, level=1).set_levels(np.arange(1, len(altnames) + 1), level=1)
+                new_index = df.index.get_level_values(1).astype(
+                    pd.CategoricalDtype(altnames)
+                )
+                df.index = df.index.set_codes(new_index.codes, level=1).set_levels(
+                    np.arange(1, len(altnames) + 1), level=1
+                )
 
         ds = cls()(df, caseid=caseidname, alts=altidname)
         if crack:
@@ -209,7 +223,11 @@ class _DatasetConstruct:
         if altnames is not None:
             ds = ds.dc.set_altnames(altnames)
         if avail not in ds and len(df) < ds.dc.n_cases * ds.dc.n_alts:
-            av = xr.DataArray.from_series(pd.Series(1, index=df.index)).fillna(0).astype(np.int8)
+            av = (
+                xr.DataArray.from_series(pd.Series(1, index=df.index))
+                .fillna(0)
+                .astype(np.int8)
+            )
             ds[avail] = av
             if fill_missing is not None:
                 if isinstance(fill_missing, Mapping):
@@ -219,16 +237,25 @@ class _DatasetConstruct:
                         if k not in fill_missing and i.dtype not in fill_missing:
                             continue
                         filler = fill_missing.get(k, fill_missing[i.dtype])
-                        ds[k] = i.where(ds['_avail_']!=0, filler)
+                        ds[k] = i.where(ds["_avail_"] != 0, filler)
                 else:
                     for k, i in ds.items():
                         if ds.dc.ALTID not in i.dims:
                             continue
-                        ds[k] = i.where(ds['_avail_']!=0, fill_missing)
+                        ds[k] = i.where(ds["_avail_"] != 0, fill_missing)
         return ds
 
     @classmethod
-    def from_idce(cls, df, crack=True, altnames=None, dim_name=None, alt_index='alt_idx', case_index=None, case_pointer=None):
+    def from_idce(
+        cls,
+        df,
+        crack=True,
+        altnames=None,
+        dim_name=None,
+        alt_index="alt_idx",
+        case_index=None,
+        case_pointer=None,
+    ):
         """
         Construct a Dataset from a sparse idca-format DataFrame.
 
@@ -268,8 +295,10 @@ class _DatasetConstruct:
         Dataset.from_idca : Construct a dense Dataset from a idca-format DataFrame.
         """
         if df.index.nlevels != 2:
-            raise ValueError("source idce dataframe must have a two "
-                             "level MultiIndex giving case and alt id's")
+            raise ValueError(
+                "source idce dataframe must have a two "
+                "level MultiIndex giving case and alt id's"
+            )
         caseidname, altidname = df.index.names
         caseidname = caseidname or CASEID
         altidname = altidname or ALTID
@@ -281,13 +310,13 @@ class _DatasetConstruct:
         if case_index is not None:
             ds.coords[case_index] = xr.DataArray(df.index.codes[0], dims=dim_name)
         if alt_index is None:
-            raise ValueError('alt_index cannot be None')
+            raise ValueError("alt_index cannot be None")
         ds.coords[alt_index] = xr.DataArray(df.index.codes[1], dims=dim_name)
         ds.coords[case_pointer] = xr.DataArray(
             np.where(np.diff(df.index.codes[0], prepend=np.nan, append=np.nan))[0],
             dims=case_pointer,
         )
-        ds.attrs['_exclude_dims_'] = (caseidname, altidname, case_pointer)
+        ds.attrs["_exclude_dims_"] = (caseidname, altidname, case_pointer)
         ds.attrs[CASEID] = caseidname
         ds.attrs[ALTID] = altidname
         ds.attrs[CASEALT] = dim_name

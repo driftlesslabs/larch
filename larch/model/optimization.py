@@ -24,8 +24,8 @@ class ModelDashboard:
             self.head, self.subhead, self.body = tags
         else:
             if visible:
-                self.head = display_head(f"Larch Model Dashboard", level=3)
-                self.subhead = display_p(f"LL = ...")
+                self.head = display_head("Larch Model Dashboard", level=3)
+                self.subhead = display_p("LL = ...")
                 self.body = display_p("...")
             else:
                 self.head = display_nothing()

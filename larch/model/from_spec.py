@@ -1,6 +1,5 @@
 import pandas as pd
 
-from ..dataset import DataTree
 from ..shorts import P, X
 from .numbamodel import NumbaModel
 

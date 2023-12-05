@@ -1,8 +1,7 @@
-import warnings
 
 import numpy as np
 import xarray as xr
-from xarray import DataArray, Dataset
+from xarray import Dataset
 
 _GROUPID = "_groupid_"
 _INGROUP = "_ingroup_"

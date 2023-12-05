@@ -1,6 +1,5 @@
 import logging
 import pathlib
-import sys
 import time
 import warnings
 from collections import namedtuple
@@ -8,21 +7,17 @@ from collections import namedtuple
 import numpy as np
 import pandas as pd
 import xarray as xr
-from numba import boolean
+from numba import boolean, guvectorize, njit
 from numba import float32 as f32
 from numba import float64 as f64
-from numba import guvectorize
 from numba import int8 as i8
 from numba import int32 as i32
 from numba import int64 as i64
-from numba import njit
 
 from ..dataset import DataArray, Dataset, DataTree
 from ..exceptions import MissingDataError
 from ..util import dictx
 from .basemodel import BaseModel as _BaseModel
-from .cascading import data_av_cascade, data_ch_cascade
-from .data_arrays import DataArrays
 from .numba_stream import ModelStreamer
 
 warnings.warn(  # Good news, everyone! This tool might not work. #  )
@@ -116,7 +111,6 @@ def quantity_from_data_ca(
         scale_param_holdfast = 1
 
     for j in range(n_alts):
-
         # if self._array_ce_reversemap is not None:
         #     if c >= self._array_ce_reversemap.shape[0] or j >= self._array_ce_reversemap.shape[1]:
         #         row = -1
@@ -125,7 +119,6 @@ def quantity_from_data_ca(
         row = -1
 
         if array_av[j]:  # and row != -1:
-
             if model_q_ca_param.shape[0]:
                 for i in range(model_q_ca_param.shape[0]):
                     # if row >= 0:
@@ -192,13 +185,10 @@ def utility_from_data_ca(
             utility_elem[j] = -np.inf
             j += 1
     else:
-
         for j in range(n_alts):
-
             row = -1
 
             if array_av[j]:
-
                 for i in range(model_utility_ca_param.shape[0]):
                     if row >= 0:
                         _temp = 0.0  # _temp = self._array_ce[row, self.model_utility_ca_data[i]]
@@ -264,7 +254,6 @@ def _numba_utility_to_loglike(
     d_loglike,  # float output shape=[n_params]
     loglike,  # float output shape=[]
 ):
-
     assert edgeslots.shape[1] == 4
     upslots = edgeslots[:, 0]  # int input shape=[edges]
     dnslots = edgeslots[:, 1]  # int input shape=[edges]
@@ -371,7 +360,6 @@ def _numba_utility_to_loglike(
             loglike[0] += logprob[dn] * array_ch[dn] * array_wt[0]
 
     if return_probability or return_grad or return_bhhh:
-
         # logprob becomes conditional_probability
         conditional_probability = logprob
         for i in range(logprob.size):
@@ -389,7 +377,6 @@ def _numba_utility_to_loglike(
                 probability[dn] = 0.0
 
         if return_grad or return_bhhh:
-
             d_loglike[:] = 0.0
 
             # d utility
@@ -894,7 +881,6 @@ FixedArrays = namedtuple(
 
 
 class NumbaModel(_BaseModel):
-
     _null_slice = (None, None, None)
     streaming = ModelStreamer()
 
@@ -1066,7 +1052,7 @@ class NumbaModel(_BaseModel):
         if n_cases is None:
             try:
                 n_cases = self.n_cases
-            except MissingDataError as err:
+            except MissingDataError:
                 if on_missing_data != "silent":
                     log.error("MissingDataError, cannot rebuild work arrays")
                 self.work_arrays = None
@@ -1285,7 +1271,7 @@ class NumbaModel(_BaseModel):
             self.float_dtype(self.constraint_intensity),
             self.float_dtype(self.constraint_sharpness),
         )
-        for (cf, dcf, dcf_bind) in self._constraint_funcs:
+        for cf, dcf, dcf_bind in self._constraint_funcs:
             penalty += cf(
                 self.pvals,
                 self.constraint_intensity,

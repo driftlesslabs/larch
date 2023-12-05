@@ -109,7 +109,6 @@ def fit_bhhh(
     message = "Optimization terminated for undetermined reason."
 
     while True:
-
         # check various break conditions
         current_constraint_violation = model.constraint_violation(
             on_violation="return", intensity_check=True
@@ -198,7 +197,7 @@ def fit_bhhh(
                         logger.debug(message)
                         break
                     else:
-                        logger.debug(f"-- not yet well converged")
+                        logger.debug("-- not yet well converged")
             else:
                 raise BHHHSimpleStepFailure(
                     f"simple step bhhh failed\ndirection = {str(direction)}"

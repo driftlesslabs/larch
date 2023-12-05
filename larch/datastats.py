@@ -1,12 +1,9 @@
 import numpy as np
 import pandas as pd
-import seaborn as sns
 import xarray as xr
-import xmle
-from scipy.stats import gaussian_kde
 
 from .dataset import DataArray, Dataset
-from .util.bounded_kde import BoundedKDE, bounded_gaussian_kde, weighted_sample_std
+from .util.bounded_kde import BoundedKDE
 
 
 def fair_range(x, buffering=0.1):

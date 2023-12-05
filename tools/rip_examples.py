@@ -5,7 +5,6 @@ import textwrap
 
 
 def rip():
-
     targets = [
         "docs/examples/mtc/*.ipynb",
         "docs/examples/swissmetro/*.ipynb",

@@ -1,10 +1,8 @@
-import numpy as np
-import pandas as pd
-import xarray as xr
-from typing import Mapping
 import warnings
 
-from sharrow.accessors import register_dataset_method, register_dataarray_method
+import pandas as pd
+import xarray as xr
+from sharrow.accessors import register_dataset_method
 
 
 class NameConflictWarning(Warning):
@@ -58,7 +56,7 @@ def register_dataset_classmethod(func):
 
 
 @register_dataset_method
-def set_dtypes(self, dtypes, inplace=False, on_error='warn'):
+def set_dtypes(self, dtypes, inplace=False, on_error="warn"):
     """
     Set the dtypes for the variables in this Dataset.
 
@@ -88,8 +86,8 @@ def set_dtypes(self, dtypes, inplace=False, on_error='warn'):
         try:
             obj[k] = obj[k].astype(dtypes[k])
         except Exception as err:
-            if on_error == 'warn':
+            if on_error == "warn":
                 warnings.warn(f"{err!r} on converting {k}")
-            elif on_error == 'raise':
+            elif on_error == "raise":
                 raise
     return obj

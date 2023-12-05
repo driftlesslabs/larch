@@ -1,6 +1,4 @@
-
 class SingleParameter:
-
     def __set_name__(self, owner, name):
         self.name = name
         self.private_name = "_" + name

@@ -1,6 +1,6 @@
-
 import jax
 import jax.numpy as jnp
+
 
 def lhs_draw_maker(n_draws, n_cols):
     """
@@ -22,7 +22,7 @@ def lhs_draw_maker(n_draws, n_cols):
         k1, k2, k3 = jax.random.split(key, 3)
         return k3, jax.random.permutation(
             k1,
-            (jnp.arange(n_draws)+jax.random.uniform(k2, shape=(n_draws,)))/n_draws
+            (jnp.arange(n_draws) + jax.random.uniform(k2, shape=(n_draws,))) / n_draws,
         )
 
     @jax.jit

@@ -1,13 +1,13 @@
-import jax
-import jax.scipy as js
-import jax.numpy as jnp
-from .param_core import ParameterBucket
 from collections.abc import MutableSequence
 
-from dataclasses import dataclass
+import jax
+import jax.numpy as jnp
+import jax.scipy as js
+
+from .param_core import ParameterBucket
+
 
 class Mixture:
-
     def __init__(self):
         self._parent = None
 
@@ -24,22 +24,22 @@ class Mixture:
     def prep(self, bucket: ParameterBucket):
         raise NotImplementedError()
 
-    def roll(self, draws, parameters) -> jax.xla.DeviceArray:
+    def roll(self, draws: jax.Array, parameters: jax.Array) -> jax.Array:
         """
         Apply this mixing distribution to some random draws.
 
         Parameters
         ----------
-        draws : jax.xla.DeviceArray, shape [...]
+        draws : jax.Array, shape [...]
             A set of pseudo-random draws, nominally uniformly distributed
             in the range 0 to 1.
-        parameters : jax.xla.DeviceArray, shape [..., n_params]
+        parameters : jax.Array, shape [..., n_params]
             An array of parameters, previously broadcasted to the same shape
             as the draws, plus the parameter dimension itself.
 
         Returns
         -------
-        parameters : jax.xla.DeviceArray, shape [..., n_params]
+        parameters : jax.Array, shape [..., n_params]
             The computed distribution of the target parameter has been overlaid.
         """
         raise NotImplementedError()
@@ -49,7 +49,6 @@ class Mixture:
 
 
 class MixtureList(MutableSequence):
-
     def __init__(self, init=None):
         self._parent = None
         self._mixtures = list()
@@ -58,7 +57,9 @@ class MixtureList(MutableSequence):
                 if isinstance(i, Mixture):
                     self._mixtures.append(i)
                 else:
-                    raise TypeError(f'members of {self.__class__.__name__} must be Mixture')
+                    raise TypeError(
+                        f"members of {self.__class__.__name__} must be Mixture"
+                    )
 
     def set_parent(self, instance):
         self._parent = instance
@@ -74,7 +75,7 @@ class MixtureList(MutableSequence):
     def __mangle(self):
         try:
             self._parent.mangle()
-        except AttributeError as err:
+        except AttributeError:
             pass
 
     def __get__(self, instance, owner):
@@ -107,14 +108,14 @@ class MixtureList(MutableSequence):
 
     def __set_name__(self, owner, name):
         self.name = name
-        self.private_name = "_private_"+name
+        self.private_name = "_private_" + name
 
     def __getitem__(self, item):
         return self._mixtures[item]
 
-    def __setitem__(self, key:int, value):
+    def __setitem__(self, key: int, value):
         if not isinstance(value, Mixture):
-            raise TypeError('items must be of type Mixture')
+            raise TypeError("items must be of type Mixture")
         self._mixtures[key] = value
         self.__mangle()
         self._mixtures[key]._parent = self._parent
@@ -128,7 +129,7 @@ class MixtureList(MutableSequence):
 
     def insert(self, index, value):
         if not isinstance(value, Mixture):
-            raise TypeError('items must be of type Mixture')
+            raise TypeError("items must be of type Mixture")
         self._mixtures.insert(index, value)
         self.__mangle()
         self._mixtures[index]._parent = self._parent
@@ -148,15 +149,15 @@ class MixtureList(MutableSequence):
     def from_list(self, j):
         self._mixtures.clear()
         for i in j:
-            kind = i.pop('type')
+            kind = i.pop("type")
             if kind is None:
-                raise ValueError('missing mixture type')
+                raise ValueError("missing mixture type")
             cls = globals()[kind]
             self._mixtures.append(cls(**i))
 
-class Normal(Mixture):
 
-    def __init__(self, mean:str, std:str):
+class Normal(Mixture):
+    def __init__(self, mean: str, std: str):
         super().__init__()
         self.mean_ = mean
         self.std_ = std
@@ -172,7 +173,7 @@ class Normal(Mixture):
         return (
             isinstance(other, Normal)
             and self.mean_ == other.mean_
-        and self.std_ == other.std_
+            and self.std_ == other.std_
         )
 
     def param_names(self):
@@ -181,15 +182,17 @@ class Normal(Mixture):
             self.std_: self.default_std,
         }
 
-    def prep(self, bucket:ParameterBucket):
+    def prep(self, bucket: ParameterBucket):
         self.imean = bucket.get_param_loc(self.mean_)
         self.istd = bucket.get_param_loc(self.std_)
 
     def roll(self, draw_vec, parameters):
         assert self.imean >= 0
         assert self.istd >= 0
-        v = js.stats.norm.ppf(draw_vec, parameters[...,self.imean], parameters[..., self.istd])
-        parameters = parameters.at[...,self.imean].set(v)
+        v = js.stats.norm.ppf(
+            draw_vec, parameters[..., self.imean], parameters[..., self.istd]
+        )
+        parameters = parameters.at[..., self.imean].set(v)
         return parameters
 
     def to_dict(self):
@@ -199,21 +202,24 @@ class Normal(Mixture):
             std=self.std_,
         )
 
-class LogNormal(Normal):
 
+class LogNormal(Normal):
     def roll(self, draw_vec, parameters):
         assert self.imean >= 0
         assert self.istd >= 0
-        v = js.stats.norm.ppf(draw_vec, parameters[...,self.imean], parameters[..., self.istd])
-        parameters = parameters.at[...,self.imean].set(jnp.exp(v))
+        v = js.stats.norm.ppf(
+            draw_vec, parameters[..., self.imean], parameters[..., self.istd]
+        )
+        parameters = parameters.at[..., self.imean].set(jnp.exp(v))
         return parameters
 
 
 class NegLogNormal(Normal):
-
     def roll(self, draw_vec, parameters):
         assert self.imean >= 0
         assert self.istd >= 0
-        v = js.stats.norm.ppf(draw_vec, parameters[...,self.imean], parameters[..., self.istd])
-        parameters = parameters.at[...,self.imean].set(-jnp.exp(v))
+        v = js.stats.norm.ppf(
+            draw_vec, parameters[..., self.imean], parameters[..., self.istd]
+        )
+        parameters = parameters.at[..., self.imean].set(-jnp.exp(v))
         return parameters

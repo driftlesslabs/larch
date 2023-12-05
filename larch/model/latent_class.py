@@ -1,4 +1,3 @@
-import logging
 
 import jax
 import jax.numpy as jnp
@@ -6,7 +5,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from ..compiled import compiledmethod, jitmethod, reset_compiled_methods
+from ..compiled import jitmethod, reset_compiled_methods
 from ..dataset import Dataset, DataTree
 from ..exceptions import MissingDataError
 from ..folding import dissolve_zero_variance, fold_dataset
@@ -15,7 +14,6 @@ from .basemodel import MANGLE_DATA
 from .basemodel import BaseModel as _BaseModel
 from .jaxmodel import PanelMixin, _get_jnp_array
 from .mixtures import MixtureList
-from .param_core import ParameterBucket
 
 
 class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
@@ -581,7 +579,6 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
 
 
 class MixedLatentClass(LatentClass):
-
     mixtures = MixtureList()
 
     def __init__(

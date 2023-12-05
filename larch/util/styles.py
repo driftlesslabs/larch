@@ -1,48 +1,47 @@
-
 body_font = 'font-family: "Book-Antiqua", "Palatino", serif;'
 
-signature_font = 'font-size:70%; font-weight:100; font-style:italic; font-family: Roboto, Helvetica, sans-serif;'
+signature_font = "font-size:70%; font-weight:100; font-style:italic; font-family: Roboto, Helvetica, sans-serif;"
 
 signature_name_font = 'font-weight:400; font-style:normal; font-family: "Roboto Slab", Roboto, Helvetica, sans-serif;'
 
 
-
-
 def load_css(filename):
-	import os
-	css = None
-	if filename is None or not isinstance(filename, str):
-		return None
-	if os.path.exists(filename):
-		with open(filename, 'r') as f:
-			css = f.read()
-		return css
-	f0 = "{}.css".format(filename)
-	if os.path.exists(f0):
-		with open(f0, 'r') as f:
-			css = f.read()
-		return css
-	try:
-		import appdirs
-	except ImportError:
-		pass
-	else:
-		f1 = os.path.join(appdirs.user_config_dir('Larch'), filename)
-		if os.path.exists(f1):
-			with open(f1, 'r') as f:
-				css = f.read()
-			return css
-		f2 = "{}.css".format(f1)
-		if os.path.exists(f2):
-			with open(f2, 'r') as f:
-				css = f.read()
-			return css
-	if '{' in filename and '}' in filename:
-		return filename
-	return css
+    import os
+
+    css = None
+    if filename is None or not isinstance(filename, str):
+        return None
+    if os.path.exists(filename):
+        with open(filename, "r") as f:
+            css = f.read()
+        return css
+    f0 = "{}.css".format(filename)
+    if os.path.exists(f0):
+        with open(f0, "r") as f:
+            css = f.read()
+        return css
+    try:
+        import appdirs
+    except ImportError:
+        pass
+    else:
+        f1 = os.path.join(appdirs.user_config_dir("Larch"), filename)
+        if os.path.exists(f1):
+            with open(f1, "r") as f:
+                css = f.read()
+            return css
+        f2 = "{}.css".format(f1)
+        if os.path.exists(f2):
+            with open(f2, "r") as f:
+                css = f.read()
+            return css
+    if "{" in filename and "}" in filename:
+        return filename
+    return css
 
 
-_default_css_jupyter = """
+_default_css_jupyter = (
+    """
 
 @import url('https://fonts.googleapis.com/css?family=Roboto:400,700,500italic,100italic|Roboto+Mono:300,400,700|EB+Garamond:400,400i');
 @import url('https://fonts.googleapis.com/css?family=Roboto+Slab:100,400,700&display=swap');
@@ -51,16 +50,18 @@ _default_css_jupyter = """
 	color:red; font-family:monospace;
 }
 
-div.output_wrapper {""" + body_font + """}
+div.output_wrapper {"""
+    + body_font
+    + """}
 
 div.output_wrapper table,
 div.jp-OutputArea-output table
-{	
+{
 	border-collapse:collapse;
 }
 
 div.output_wrapper table, div.output_wrapper th, div.output_wrapper td,
-div.jp-OutputArea-output table, div.jp-OutputArea-output th, div.jp-OutputArea-output td 
+div.jp-OutputArea-output table, div.jp-OutputArea-output th, div.jp-OutputArea-output td
 {
 	border: 1px solid #999999;
 	font-family:"Roboto Mono", monospace;
@@ -70,8 +71,8 @@ div.jp-OutputArea-output table, div.jp-OutputArea-output th, div.jp-OutputArea-o
 
 div.output_wrapper th, div.output_wrapper td,
 div.jp-OutputArea-output th, div.jp-OutputArea-output td
-{ 
-	padding:2px; text-align:left; 
+{
+	padding:2px; text-align:left;
 }
 
 div.output_wrapper td.parameter_category,
@@ -79,7 +80,7 @@ div.jp-OutputArea-output td.parameter_category
 {
 	font-family:"Roboto", monospace;
 	font-weight:500;
-	background-color: #f4f4f4; 
+	background-color: #f4f4f4;
 	font-style: italic;
 }
 
@@ -92,14 +93,14 @@ div.jp-OutputArea-output th
 
 div.output_wrapper table.dicta,
 div.jp-OutputArea-output table.dicta
-{ 
+{
 	border-left: 2px solid black; margin-bottom:2px; border-top:0; border-right:0
 }
 
 div.output_wrapper th.dicta, div.output_wrapper td.dicta,
-div.jp-OutputArea-output th.dicta, div.jp-OutputArea-output td.dicta 
-{ 
-	padding-top:0px; text-align:left; border:0; 
+div.jp-OutputArea-output th.dicta, div.jp-OutputArea-output td.dicta
+{
+	padding-top:0px; text-align:left; border:0;
 }
 
 div.output_wrapper div.LinearFunc,
@@ -112,8 +113,12 @@ div.jp-OutputArea-output div.LinearFunc
 
 
 
-.larch_signature {""" + signature_font + """ }
-.larch_name_signature {""" + signature_name_font + """}
+.larch_signature {"""
+    + signature_font
+    + """ }
+.larch_name_signature {"""
+    + signature_name_font
+    + """}
 
 .larch_head_tag {font-size:150%; font-weight:900; font-family:"Roboto Slab", "Roboto", Verdana;}
 .larch_head_tag_ver {font-size:80%; font-weight:200; font-family:"Roboto Slab", "Roboto", Verdana;}
@@ -126,16 +131,16 @@ div.jp-OutputArea-output a.parameter_reference
 	font-style: italic; text-decoration: none
 }
 
-div.output_wrapper .strut2, 
-div.jp-OutputArea-output .strut2 
+div.output_wrapper .strut2,
+div.jp-OutputArea-output .strut2
 {
 	min-width:1in
 }
 
 div.output_wrapper .histogram_cell,
-div.jp-OutputArea-output .histogram_cell 
-{ 
-	padding-top:1; padding-bottom:1; vertical-align:center; 
+div.jp-OutputArea-output .histogram_cell
+{
+	padding-top:1; padding-bottom:1; vertical-align:center;
 }
 
 div.output_wrapper .raw_log pre,
@@ -146,7 +151,7 @@ div.jp-OutputArea-output .raw_log pre
 	font-size:70%;
 }
 
-.dicta pre 
+.dicta pre
 {
 	margin:0;
 }
@@ -162,7 +167,7 @@ div.jp-OutputArea-output caption,
 	font-size: 80%;
 }
 
-table.running_parameter_update caption 
+table.running_parameter_update caption
 {
     caption-side: top;
 	text-align: left;
@@ -172,9 +177,9 @@ table.running_parameter_update caption
 	font-size: 100%;
 }
 
-table.dictionary 
-{ 
-	border:0px hidden !important; border-collapse: collapse !important; 
+table.dictionary
+{
+	border:0px hidden !important; border-collapse: collapse !important;
 }
 
 div.blurb {
@@ -191,6 +196,7 @@ h3.figure_head {
 }
 
 """
+)
 
 
 deprecated_notebook_formatting = """
@@ -212,17 +218,18 @@ div.jp-RenderedMarkdown p code {
 
 """
 
-from .display import display_html, HTML
-from .xhtml import tooltipped_style, floating_table_head, _tooltipped_style_css
+from .display import HTML, display_html
+from .xhtml import tooltipped_style
 
-css = HTML("<style>{}\n\n{}</style>".format(_default_css_jupyter,tooltipped_style().tostring()))
+css = HTML(
+    "<style>{}\n\n{}</style>".format(
+        _default_css_jupyter, tooltipped_style().tostring()
+    )
+)
+
 
 def stylesheet():
-	display_html(css)
-	# floatThead, floatTheadA = floating_table_head()
-	# display_html(HTML(floatThead.tostring()))
-	# display_html(HTML(floatTheadA.tostring()))
-
-
-
-
+    display_html(css)
+    # floatThead, floatTheadA = floating_table_head()
+    # display_html(HTML(floatThead.tostring()))
+    # display_html(HTML(floatTheadA.tostring()))

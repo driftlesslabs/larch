@@ -17,7 +17,6 @@ def empty(dtype, index_name):
 
 
 class ParameterBucket:
-
     index_name = "param_name"
     _data_types = {
         "value": np.float32,

@@ -8,7 +8,7 @@ from rich.table import Table
 from scipy.optimize import Bounds, minimize
 from xarray import Dataset
 
-from .compiled import compiledmethod, jitmethod
+from .compiled import jitmethod
 
 
 class BucketAccess(ABC):
@@ -67,7 +67,6 @@ class BucketAccess(ABC):
 
 
 class OptimizeMixin(BucketAccess):
-
     _cached_loglike_best = None
     log_nans = False
 

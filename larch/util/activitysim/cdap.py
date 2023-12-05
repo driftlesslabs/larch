@@ -1,18 +1,18 @@
+import importlib
+import itertools
+import logging
+import os
+import re
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-import re
-import itertools
-from larch import P, X, DataFrames, Model
+import yaml
+
+from larch import DataFrames, Model, P, X
+from larch.log import logger_name
 from larch.model.model_group import ModelGroup
 from larch.util import Dict
-import larch
-import os
-import yaml
-import importlib
-
-import logging
-from larch.log import logger_name
-from pathlib import Path
 
 from .general import apply_coefficients, explicit_value_parameters
 
@@ -62,7 +62,7 @@ def apply_replacements(expression, prefix, tokens):
         The modified expression
     """
     for i in tokens:
-        expression = re.sub(fr"\b{i}\b", f"{prefix}_{i}", expression)
+        expression = re.sub(rf"\b{i}\b", f"{prefix}_{i}", expression)
     return expression
 
 
@@ -138,7 +138,6 @@ def interact_pattern(n_persons, select_persons, tag):
 
 
 def cdap_interaction_utility(model, n_persons, alts, interaction_coef, coefficients):
-
     person_numbers = list(range(1, n_persons + 1))
 
     matcher = re.compile("coef_[HMN]_.*")
@@ -148,13 +147,15 @@ def cdap_interaction_utility(model, n_persons, alts, interaction_coef, coefficie
             c_split = c.split("_")
             for j in c_split[2:]:
                 interact_coef_map[(c_split[1], j)] = c
-                if all((i=='x' for i in j)): # wildcards also map to empty
-                    interact_coef_map[(c_split[1], '')] = c
+                if all((i == "x" for i in j)):  # wildcards also map to empty
+                    interact_coef_map[(c_split[1], "")] = c
 
     for (cardinality, activity), coefs in interaction_coef.groupby(
         ["cardinality", "activity"]
     ):
-        _logger.info(f"{n_persons} person households, interaction cardinality {cardinality}, activity {activity}")
+        _logger.info(
+            f"{n_persons} person households, interaction cardinality {cardinality}, activity {activity}"
+        )
         if cardinality > n_persons:
             continue
         elif cardinality == n_persons:
@@ -167,16 +168,17 @@ def cdap_interaction_utility(model, n_persons, alts, interaction_coef, coefficie
                     if t != "*"
                 )
                 if expression:
-                    if (activity,row.interaction_ptypes) in interact_coef_map:
-                        linear_component = (
-                            X(expression)
-                            * P(interact_coef_map[(activity,row.interaction_ptypes)])
+                    if (activity, row.interaction_ptypes) in interact_coef_map:
+                        linear_component = X(expression) * P(
+                            interact_coef_map[(activity, row.interaction_ptypes)]
                         )
                     else:
                         linear_component = X(expression) * P(row.coefficient)
                 else:
                     if (activity, row.interaction_ptypes) in interact_coef_map:
-                        linear_component = P(interact_coef_map[(activity,row.interaction_ptypes)])
+                        linear_component = P(
+                            interact_coef_map[(activity, row.interaction_ptypes)]
+                        )
                     else:
                         linear_component = P(row.coefficient)
                 _logger.debug(
@@ -197,13 +199,19 @@ def cdap_interaction_utility(model, n_persons, alts, interaction_coef, coefficie
                             # interaction terms without ptypes (i.e. with wildcards)
                             # only apply when the household size matches the cardinality
                             if expression != "":
-                                if (activity, row.interaction_ptypes) in interact_coef_map:
-                                    linear_component = (
-                                        X(expression)
-                                        * P(interact_coef_map[(activity,row.interaction_ptypes)])
+                                if (
+                                    activity,
+                                    row.interaction_ptypes,
+                                ) in interact_coef_map:
+                                    linear_component = X(expression) * P(
+                                        interact_coef_map[
+                                            (activity, row.interaction_ptypes)
+                                        ]
                                     )
                                 else:
-                                    linear_component = X(expression) * P(row.coefficient)
+                                    linear_component = X(expression) * P(
+                                        row.coefficient
+                                    )
                                 _logger.debug(
                                     f"utility_co[{anum} {aname}] += {linear_component}"
                                 )
@@ -276,17 +284,16 @@ def cdap_dataframes(households, values):
 #     return result
 
 
-
 def cdap_data(
-        name="cdap",
-        edb_directory="output/estimation_data_bundle/{name}/",
-        coefficients_file="{name}_coefficients.csv",
-        interaction_coeffs_file="{name}_interaction_coefficients.csv",
-        households_file="../../final_households.csv",
-        persons_file="../../final_persons.csv",
-        spec1_file="{name}_INDIV_AND_HHSIZE1_SPEC.csv",
-        settings_file="{name}_model_settings.yaml",
-        chooser_data_file="{name}_values_combined.csv",
+    name="cdap",
+    edb_directory="output/estimation_data_bundle/{name}/",
+    coefficients_file="{name}_coefficients.csv",
+    interaction_coeffs_file="{name}_interaction_coefficients.csv",
+    households_file="../../final_households.csv",
+    persons_file="../../final_persons.csv",
+    spec1_file="{name}_INDIV_AND_HHSIZE1_SPEC.csv",
+    settings_file="{name}_model_settings.yaml",
+    chooser_data_file="{name}_values_combined.csv",
 ):
     edb_directory = edb_directory.format(name=name)
     if not os.path.exists(edb_directory):
@@ -298,7 +305,7 @@ def cdap_data(
 
     def read_yaml(filename, **kwargs):
         filename = filename.format(name=name)
-        with open(os.path.join(edb_directory, filename), 'rt') as f:
+        with open(os.path.join(edb_directory, filename), "rt") as f:
             return yaml.load(f, Loader=yaml.SafeLoader, **kwargs)
 
     settings = read_yaml(settings_file)
@@ -318,22 +325,22 @@ def cdap_data(
 
     coefficients = read_csv(
         coefficients_file,
-        index_col='coefficient_name',
+        index_col="coefficient_name",
         comment="#",
     )
 
     interaction_coef = read_csv(
         interaction_coeffs_file,
         dtype={
-            'interaction_ptypes': str,
+            "interaction_ptypes": str,
         },
         keep_default_na=False,
         comment="#",
     )
 
-    spec1 = read_csv(spec1_file, comment='#')
-    values = read_csv(chooser_data_file, comment='#')
-    values['cdap_rank'] = person_rank
+    spec1 = read_csv(spec1_file, comment="#")
+    values = read_csv(chooser_data_file, comment="#")
+    values["cdap_rank"] = person_rank
 
     return Dict(
         edb_directory=Path(edb_directory),
@@ -345,16 +352,17 @@ def cdap_data(
         settings=settings,
     )
 
+
 def cdap_model(
-        edb_directory="output/estimation_data_bundle/{name}/",
-        coefficients_file="{name}_coefficients.csv",
-        interaction_coeffs_file="{name}_interaction_coefficients.csv",
-        households_file="../../final_households.csv",
-        persons_file="../../final_persons.csv",
-        spec1_file="{name}_INDIV_AND_HHSIZE1_SPEC.csv",
-        settings_file="{name}_model_settings.yaml",
-        chooser_data_file="{name}_values_combined.csv",
-        return_data=False,
+    edb_directory="output/estimation_data_bundle/{name}/",
+    coefficients_file="{name}_coefficients.csv",
+    interaction_coeffs_file="{name}_interaction_coefficients.csv",
+    households_file="../../final_households.csv",
+    persons_file="../../final_persons.csv",
+    spec1_file="{name}_INDIV_AND_HHSIZE1_SPEC.csv",
+    settings_file="{name}_model_settings.yaml",
+    chooser_data_file="{name}_values_combined.csv",
+    return_data=False,
 ):
     d = cdap_data(
         name="cdap",
@@ -376,15 +384,17 @@ def cdap_model(
 
     cdap_dfs = cdap_dataframes(households, values)
     m = {}
-    _logger.info(f"building for model 1")
+    _logger.info("building for model 1")
     m[1] = Model(dataservice=cdap_dfs[1])
     cdap_base_utility_by_person(m[1], n_persons=1, spec=spec1)
     m[1].choice_any = True
     m[1].availability_any = True
 
     # Add cardinality into interaction_coef if not present
-    if 'cardinality' not in interaction_coef:
-        interaction_coef['cardinality'] = interaction_coef['interaction_ptypes'].str.len()
+    if "cardinality" not in interaction_coef:
+        interaction_coef["cardinality"] = interaction_coef[
+            "interaction_ptypes"
+        ].str.len()
     for s in [2, 3, 4, 5]:
         _logger.info(f"building for model {s}")
         m[s] = Model(dataservice=cdap_dfs[s])

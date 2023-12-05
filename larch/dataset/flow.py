@@ -1,10 +1,8 @@
 import logging
-import warnings
 from typing import Mapping
 
 import numba as nb
 import numpy as np
-import pandas as pd
 import xarray as xr
 
 from .dim_names import ALTID, ALTIDX, CASEALT, CASEID, CASEPTR, GROUPID, INGROUP
@@ -400,7 +398,7 @@ class _GenericFlow:
             else:
                 flow = self.setup_flow({expression: expression})
                 self._flow_library[expression] = flow
-            if not flow.tree.root_dataset is self:
+            if flow.tree.root_dataset is not self:
                 flow.tree = self.as_tree()
             result = flow.load_dataarray().isel(expressions=0)
         result = self.transfer_dimension_attrs(result)
@@ -466,7 +464,6 @@ class _GenericFlow:
 
 @xr.register_dataarray_accessor("dc")
 class _DataArrayDC(_GenericFlow):
-
     _parent_class = xr.DataArray
 
     @property
@@ -492,7 +489,6 @@ class _DataArrayDC(_GenericFlow):
 
 @xr.register_dataset_accessor("dc")
 class _DatasetDC(_GenericFlow):
-
     _parent_class = xr.Dataset
 
     @property

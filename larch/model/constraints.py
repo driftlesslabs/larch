@@ -457,7 +457,6 @@ class ParametricConstraintList(MutableSequence):
         return newself
 
     def __get__(self, instance, owner):
-
         if instance is None:
             return self
         try:
@@ -469,7 +468,6 @@ class ParametricConstraintList(MutableSequence):
         return newself
 
     def __set__(self, instance, values):
-
         try:
             newself = getattr(instance, self.private_name)
         except AttributeError:
@@ -479,13 +477,12 @@ class ParametricConstraintList(MutableSequence):
         newself.__init__(values)
         try:
             newself._instance.mangle()
-        except AttributeError as err:
+        except AttributeError:
             pass
         for i in newself._cx:
             i.link_model(newself._instance)
 
     def __delete__(self, instance):
-
         try:
             newself = getattr(instance, self.private_name)
         except AttributeError:
@@ -494,7 +491,7 @@ class ParametricConstraintList(MutableSequence):
         newself._instance = instance
         try:
             newself._instance.mangle()
-        except AttributeError as err:
+        except AttributeError:
             pass
 
     def __set_name__(self, owner, name):
@@ -513,7 +510,7 @@ class ParametricConstraintList(MutableSequence):
             self._cx[key] = value
             try:
                 self._instance.mangle()
-            except AttributeError as err:
+            except AttributeError:
                 pass
             self._cx[key].link_model(self._instance)
 
@@ -521,7 +518,7 @@ class ParametricConstraintList(MutableSequence):
         del self._cx[key]
         try:
             self._instance.mangle()
-        except AttributeError as err:
+        except AttributeError:
             pass
 
     def __len__(self):
@@ -536,7 +533,7 @@ class ParametricConstraintList(MutableSequence):
             self._cx.insert(index, value)
             try:
                 self._instance.mangle()
-            except AttributeError as err:
+            except AttributeError:
                 pass
             self._cx[index].link_model(self._instance)
 

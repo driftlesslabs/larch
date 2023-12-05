@@ -1,17 +1,17 @@
+import logging
+import os
+from pathlib import Path
+from typing import Mapping
+
 import numpy as np
 import pandas as pd
-import re
-import os
 import yaml
-import itertools
-from typing import Mapping
-from larch import P, X, DataFrames, Model
+
+from larch import P, X
 from larch.model.abstract_model import AbstractChoiceModel
 from larch.model.tree import NestingTree
 from larch.util import Dict
-from pathlib import Path
 
-import logging
 from ...log import logger_name
 
 _logger = logging.getLogger(logger_name)
@@ -128,7 +128,10 @@ def linear_utility_from_spec(spec, x_col, p_col, ignore_x=(), segment_id=None):
         partial_utility = {}
         for seg_p_col, segval in p_col.items():
             partial_utility[seg_p_col] = linear_utility_from_spec(
-                spec, x_col, seg_p_col, ignore_x,
+                spec,
+                x_col,
+                seg_p_col,
+                ignore_x,
             ) * X(f"{segment_id}=={segval}")
         return sum(partial_utility.values())
     return sum(
@@ -207,7 +210,9 @@ def explicit_value_parameters_from_spec(spec, p_col, model):
                 pass
             else:
                 model.set_value(
-                    getattr(i, p_col), value=j, holdfast=True,
+                    getattr(i, p_col),
+                    value=j,
+                    holdfast=True,
                 )
 
 
@@ -373,13 +378,12 @@ def remove_apostrophes(df, from_columns=None):
     return df
 
 
-
 def clean_values(
-        values,
-        alt_names,
-        choice_col='override_choice',
-        alt_names_to_codes=None,
-        choice_code='override_choice_code',
+    values,
+    alt_names,
+    choice_col="override_choice",
+    alt_names_to_codes=None,
+    choice_code="override_choice_code",
 ):
     """
 
@@ -414,29 +418,30 @@ def clean_values(
 
 
 def simple_simulate_data(
-        name="tour_mode_choice",
-        edb_directory="output/estimation_data_bundle/{name}/",
-        coefficients_file="{name}_coefficients.csv",
-        coefficients_template="{name}_coefficients_template.csv",
-        spec_file="{name}_SPEC.csv",
-        settings_file="{name}_model_settings.yaml",
-        chooser_data_file="{name}_values_combined.csv",
-        values_index_col="tour_id",
+    name="tour_mode_choice",
+    edb_directory="output/estimation_data_bundle/{name}/",
+    coefficients_file="{name}_coefficients.csv",
+    coefficients_template="{name}_coefficients_template.csv",
+    spec_file="{name}_SPEC.csv",
+    settings_file="{name}_model_settings.yaml",
+    chooser_data_file="{name}_values_combined.csv",
+    values_index_col="tour_id",
 ):
     edb_directory = edb_directory.format(name=name)
+
     def _read_csv(filename, **kwargs):
         filename = filename.format(name=name)
         return pd.read_csv(os.path.join(edb_directory, filename), **kwargs)
 
     coefficients = _read_csv(
         coefficients_file,
-        index_col='coefficient_name',
+        index_col="coefficient_name",
     )
 
     try:
         coef_template = _read_csv(
             coefficients_template,
-            index_col='coefficient_name',
+            index_col="coefficient_name",
         )
     except FileNotFoundError:
         coef_template = None
@@ -444,7 +449,7 @@ def simple_simulate_data(
     spec = _read_csv(
         spec_file,
     )
-    spec = remove_apostrophes(spec, ['Label'])
+    spec = remove_apostrophes(spec, ["Label"])
     alt_names = list(spec.columns[3:])
     alt_codes = np.arange(1, len(alt_names) + 1)
     alt_names_to_codes = dict(zip(alt_names, alt_codes))
@@ -479,5 +484,5 @@ def simple_simulate_data(
 def update_coefficients(model, data):
     coefficients = data.coefficients.copy()
     est_names = [j for j in coefficients.index if j in model.pf.index]
-    coefficients.loc[est_names, 'value'] = model.pf.loc[est_names, 'value']
+    coefficients.loc[est_names, "value"] = model.pf.loc[est_names, "value"]
     return coefficients

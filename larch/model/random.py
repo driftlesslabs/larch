@@ -1,5 +1,6 @@
 import jax
 
+
 def keysplit(key, shapes):
     if key.ndim == 1:
         new_keys = jax.random.split(key, shapes[0])

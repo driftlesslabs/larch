@@ -4,13 +4,12 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import pandas as pd
-from xarray import DataArray, Dataset
+from xarray import Dataset
 
 from ..compiled import compiledmethod, jitmethod, reset_compiled_methods
 from ..folding import fold_dataset
 from ..optimize import OptimizeMixin
 from .numbamodel import NumbaModel
-from .param_core import ParameterBucket
 
 logger = logging.getLogger(__name__)
 
@@ -158,7 +157,6 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                 }
             )
         if datatree is not None:
-
             request = self.required_data()
             if isinstance(self.groupid, str):
                 request["group_co"] = self.groupid
@@ -183,7 +181,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                     self.graph,
                     float_dtype=self.float_dtype,
                 )
-            except KeyError as err:  # no defined caseid dimension, JAX only
+            except KeyError:  # no defined caseid dimension, JAX only
                 self._data_arrays = None
                 self.work_arrays = None
             else:

@@ -1,127 +1,120 @@
-
-
 from .interface_info import ipython_status as _ipython_status
 from .rate_limiter import NonBlockingRateLimiter
+
 _message_set = _ipython_status()
 
 
-class Throttlable():
-
-	def __init__(self, throttle=None):
-		if throttle is not None:
-			self._throttle = NonBlockingRateLimiter(throttle)
-		else:
-			self._throttle = True
-
+class Throttlable:
+    def __init__(self, throttle=None):
+        if throttle is not None:
+            self._throttle = NonBlockingRateLimiter(throttle)
+        else:
+            self._throttle = True
 
 
-if 'IPython' in _message_set:
-	from IPython.display import display, clear_output, display_html, HTML
+if "IPython" in _message_set:
+    from IPython.display import HTML, clear_output, display, display_html
 
-	class display_head(Throttlable):
+    class display_head(Throttlable):
+        def __init__(self, text, level=3, throttle=2):
+            super().__init__(throttle)
+            self.level = level
+            self.tag = display(
+                HTML(f"<h{self.level}>{text}</h{self.level}>"), display_id=True
+            )
 
-		def __init__(self, text, level=3, throttle=2):
-			super().__init__(throttle)
-			self.level = level
-			self.tag = display(HTML(f'<h{self.level}>{text}</h{self.level}>'), display_id=True)
+        def update(self, text, newline=False, force=False):
+            if self._throttle or force:
+                self.tag.update(HTML(f"<h{self.level}>{text}</h{self.level}>"))
 
-		def update(self, text, newline=False, force=False):
-			if self._throttle or force:
-				self.tag.update(HTML(f'<h{self.level}>{text}</h{self.level}>'))
+        def __call__(self, *text, **kwargs):
+            self.update(*text, **kwargs)
 
-		def __call__(self, *text, **kwargs):
-			self.update(*text, **kwargs)
+        def linefeed(self):
+            pass
 
-		def linefeed(self):
-			pass
+    class display_p(Throttlable):
+        def __init__(self, text, force=False, throttle=2):
+            super().__init__(throttle)
+            if isinstance(text, str):
+                self.tag = display(HTML(f"<p>{text}</p>"), display_id=True)
+            else:
+                self.tag = display(text, display_id=True)
 
-	class display_p(Throttlable):
+        def update(self, text, force=False):
+            if self._throttle or force:
+                if isinstance(text, str):
+                    self.tag.update(HTML(f"<p>{text}</p>"))
+                else:
+                    self.tag.update(text)
 
-		def __init__(self, text, force=False, throttle=2):
-			super().__init__(throttle)
-			if isinstance(text, str):
-				self.tag = display(HTML(f'<p>{text}</p>'), display_id=True)
-			else:
-				self.tag = display(text, display_id=True)
-
-		def update(self, text, force=False):
-			if self._throttle or force:
-				if isinstance(text, str):
-					self.tag.update(HTML(f'<p>{text}</p>'))
-				else:
-					self.tag.update(text)
-
-		def __call__(self, *text, **kwargs):
-			self.update(*text, **kwargs)
+        def __call__(self, *text, **kwargs):
+            self.update(*text, **kwargs)
 
 else:
 
-	class fake_display():
+    class fake_display:
+        def __init__(self, *args, **kwargs):
+            print(*args)
 
-		def __init__(self, *args, **kwargs):
-			print(*args)
+        def update(self, *args):
+            print(*args)
 
-		def update(self, *args):
-			print(*args)
+    display = fake_display
+    clear_output = lambda *x, **y: None
+    display_html = lambda *x, **y: None
+    HTML = lambda *x, **y: None
 
-	display = fake_display
-	clear_output = lambda *x,**y: None
-	display_html = lambda *x,**y: None
-	HTML = lambda *x,**y: None
+    class display_head(Throttlable):
+        def __init__(self, text, level=3, throttle=2):
+            super().__init__(throttle)
+            self.level = level
+            print(f"{text}: ", end="")
 
-	class display_head(Throttlable):
+        def update(self, text, newline=False, force=False):
+            if self._throttle or force:
+                if newline:
+                    print("")
+                    print(f"{text} ", end="")
+                else:
+                    print(f"{text}: ", end="")
 
-		def __init__(self, text, level=3, throttle=2):
-			super().__init__(throttle)
-			self.level = level
-			print(f'{text}: ',end="")
+        def __call__(self, *text, **kwargs):
+            self.update(*text, **kwargs)
 
-		def update(self, text, newline=False, force=False):
-			if self._throttle or force:
-				if newline:
-					print("")
-					print(f'{text} ',end="")
-				else:
-					print(f'{text}: ', end="")
+        def linefeed(self):
+            print("")
 
-		def __call__(self, *text, **kwargs):
-			self.update(*text, **kwargs)
+    class display_p(Throttlable):
+        def __init__(self, text, force=False, throttle=2):
+            super().__init__(throttle)
+            if isinstance(text, str):
+                print(text)
+            else:
+                if force:
+                    print(str(text))
 
-		def linefeed(self):
-			print("")
+        def update(self, text, force=False):
+            if self._throttle or force:
+                if isinstance(text, str):
+                    print(text)
+                else:
+                    if force:
+                        print(str(text))
 
-	class display_p(Throttlable):
-
-		def __init__(self, text, force=False, throttle=2):
-			super().__init__(throttle)
-			if isinstance(text, str):
-				print(text)
-			else:
-				if force:
-					print(str(text))
-
-		def update(self, text, force=False):
-			if self._throttle or force:
-				if isinstance(text, str):
-					print(text)
-				else:
-					if force:
-						print(str(text))
-
-		def __call__(self, *text, **kwargs):
-			self.update(*text, **kwargs)
+        def __call__(self, *text, **kwargs):
+            self.update(*text, **kwargs)
 
 
-class display_nothing():
+class display_nothing:
+    def __init__(self, *args, **kwargs):
+        pass
 
-	def __init__(self, *args, **kwargs):
-		pass
+    def update(self, *args, **kwargs):
+        pass
 
-	def update(self, *args, **kwargs):
-		pass
+    def __call__(self, *text, **kwargs):
+        pass
 
-	def __call__(self, *text, **kwargs):
-		pass
-
-	def linefeed(self):
-		pass
+    def linefeed(self):
+        pass

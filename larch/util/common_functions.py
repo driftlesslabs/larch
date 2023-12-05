@@ -1,19 +1,13 @@
 
-from ..shorts import P, X, LinearFunction
 import numpy
 import pandas
-import re, ast
-from numpy import log, exp, log1p, absolute, fabs, sqrt, isnan, isfinite, logaddexp, \
-    fmin, fmax, nan_to_num, sin, cos, pi
 
+from ..shorts import LinearFunction, P, X
 
 # duplicate these here for legacy compatibility
-from .data_expansion import piece, piecewise_linear, parse_piece, hard_sigmoid
 
 
-
-def polynomial( x, p, powers=None, funs=None ):
-
+def polynomial(x, p, powers=None, funs=None):
     if powers is None:
         powers = {
             1: "",
@@ -22,7 +16,7 @@ def polynomial( x, p, powers=None, funs=None ):
         }
     z = LinearFunction()
     for pwr, label in powers.items():
-        if pwr==1:
+        if pwr == 1:
             z = z + X(x) * P(f"{p}{label}")
         else:
             z = z + X(f"({x})**{pwr}") * P(f"{p}{label}")
@@ -34,14 +28,14 @@ def polynomial( x, p, powers=None, funs=None ):
     return z
 
 
-def fourier_series( x, p=None, length=4):
+def fourier_series(x, p=None, length=4):
     z = LinearFunction()
     if p is None:
         p = x
     for i in range(length):
-        func = 'cos' if i % 2 else 'sin'
+        func = "cos" if i % 2 else "sin"
         mult = ((i // 2) + 1) * 2
-        z = z + X(f'{func}({x}*{mult}*pi)') * P(f'{func}_{mult}π{p}')
+        z = z + X(f"{func}({x}*{mult}*pi)") * P(f"{func}_{mult}π{p}")
     return z
 
 
@@ -62,9 +56,9 @@ def fourier_expansion_names(basename, length=4):
     """
     columns = []
     for i in range(length):
-        func = 'cos' if i % 2 else 'sin'
+        func = "cos" if i % 2 else "sin"
         mult = ((i // 2) + 1) * 2
-        columns.append(f'{func}({basename}*{mult}*pi)')
+        columns.append(f"{func}({basename}*{mult}*pi)")
     return columns
 
 
@@ -132,7 +126,7 @@ def normalize(x, std_div=1):
     m = numpy.nanmean(x)
     s = numpy.nanstd(x)
     s *= std_div
-    return (x-m)/s
+    return (x - m) / s
 
 
 def boolean(x):
@@ -150,4 +144,4 @@ def boolean(x):
     try:
         return x.astype(bool)
     except:
-        return numpy.asarray(x, dtype='bool')
+        return numpy.asarray(x, dtype="bool")

@@ -55,7 +55,6 @@ SafeDumper.add_representer(
 
 
 def save_model(m, filename=None, format="yaml", overwrite=False):
-
     if format == "yaml":
         if overwrite and os.path.isfile(filename):
             os.unlink(filename)

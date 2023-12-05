@@ -3,14 +3,10 @@ from typing import NamedTuple
 
 import numba as nb
 import numpy as np
-import pandas as pd
-import xarray as xr
 
 from ..dataset.dim_names import ALTID as _ALTID
-from ..dataset.dim_names import ALTIDX as _ALTIDX
 from ..dataset.dim_names import CASEALT as _CASEALT
 from ..dataset.dim_names import CASEID as _CASEID
-from ..dataset.dim_names import CASEPTR as _CASEPTR
 
 
 class _case_slice:
@@ -140,7 +136,7 @@ def prepare_data(
         flows = {}
 
     if isinstance(datasource, (DataTree,)):
-        log.debug(f"adopting existing DataTree")
+        log.debug("adopting existing DataTree")
         if not datasource.relationships_are_digitized:
             datasource.digitize_relationships(inplace=True)
         datatree = datasource
@@ -151,7 +147,7 @@ def prepare_data(
             datatree.digitize_relationships(inplace=True)
         datatree_co = datatree.idco_subtree()
     else:
-        log.debug(f"initializing new DataTree")
+        log.debug("initializing new DataTree")
         datatree = DataTree(main=datasource)
         datatree.digitize_relationships(inplace=True)
         datatree_co = datatree.idco_subtree()
@@ -193,7 +189,7 @@ def prepare_data(
         log.debug(f"requested choice_ca data: {request['choice_ca']}")
         casealt_dim = datatree.root_dataset.attrs.get(_CASEALT)
         if casealt_dim is None:
-            log.debug(f"  loading choice_ca data from idca")
+            log.debug("  loading choice_ca data from idca")
             model_dataset, flows["choice_ca"] = _prep_ca(
                 model_dataset,
                 datatree,
@@ -206,7 +202,7 @@ def prepare_data(
                 force_flow=make_unused_flows,
             )
         else:
-            log.debug(f"  loading choice_ca data from idce")
+            log.debug("  loading choice_ca data from idce")
             model_dataset, flows["choice_ce"] = _prep_ce(
                 model_dataset,
                 datatree,
@@ -431,7 +427,7 @@ def _prep_ca(
     flow=None,
     force_flow=False,
 ):
-    from ..dataset import DataArray, Dataset, DataTree
+    from ..dataset import DataArray, DataTree
 
     assert isinstance(shared_data_ca, DataTree)
     if isinstance(vars_ca, str):
@@ -509,7 +505,7 @@ def _prep_ce(
     flow=None,
     attach_indexes=True,
 ):
-    from ..dataset import DataArray, Dataset, DataTree
+    from ..dataset import DataArray, DataTree
 
     assert isinstance(datatree, DataTree)
     if isinstance(vars_ca, str):

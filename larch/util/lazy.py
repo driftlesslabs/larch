@@ -1,4 +1,3 @@
-
 # from: https://github.com/stefanholek/lazy
 #
 # Copyright (c) 2011-2017 Stefan H. Holek
@@ -27,9 +26,6 @@
 # SUCH DAMAGE.
 
 
-
-
-
 """Decorator to create lazy attributes."""
 
 import functools
@@ -49,12 +45,14 @@ class lazy(object):
         if inst is None:
             return self
 
-        if not hasattr(inst, '__dict__'):
-            raise AttributeError("'%s' object has no attribute '__dict__'" % (inst_cls.__name__,))
+        if not hasattr(inst, "__dict__"):
+            raise AttributeError(
+                "'%s' object has no attribute '__dict__'" % (inst_cls.__name__,)
+            )
 
         name = self.__name__
-        if name.startswith('__') and not name.endswith('__'):
-            name = '_%s%s' % (inst_cls.__name__, name)
+        if name.startswith("__") and not name.endswith("__"):
+            name = "_%s%s" % (inst_cls.__name__, name)
 
         value = self.__func(inst)
         inst.__dict__[name] = value

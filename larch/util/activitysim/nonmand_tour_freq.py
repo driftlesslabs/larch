@@ -1,33 +1,36 @@
-import numpy as np
-import pandas as pd
-import re
+import logging
 import os
-import yaml
-import itertools
-from typing import Mapping
-from larch import P, X, DataFrames, Model
-from larch.util import Dict
 from pathlib import Path
 
-import logging
+import pandas as pd
+import yaml
+
+from larch import DataFrames, Model
+from larch.util import Dict
+
 from ...log import logger_name
-from .general import remove_apostrophes, linear_utility_from_spec, apply_coefficients, cv_to_ca
+from .general import (
+    apply_coefficients,
+    cv_to_ca,
+    linear_utility_from_spec,
+    remove_apostrophes,
+)
 
 _logger = logging.getLogger(logger_name)
 
 
 def interaction_simulate_data(
-        name="non_mandatory_tour_frequency",
-        edb_directory="output/estimation_data_bundle/{name}/",
-        settings_file="{name}_model_settings.yaml",
-        spec_file="{name}_SPEC.csv",
-        alt_def_file="{name}_alternatives.csv",
-
-        coefficients_files="{segment_name}/{name}_coefficients_{segment_name}.csv",
-        chooser_data_files="{segment_name}/{name}_choosers_combined.csv",
-        alt_values_files="{segment_name}/{name}_interaction_expression_values.csv",
+    name="non_mandatory_tour_frequency",
+    edb_directory="output/estimation_data_bundle/{name}/",
+    settings_file="{name}_model_settings.yaml",
+    spec_file="{name}_SPEC.csv",
+    alt_def_file="{name}_alternatives.csv",
+    coefficients_files="{segment_name}/{name}_coefficients_{segment_name}.csv",
+    chooser_data_files="{segment_name}/{name}_choosers_combined.csv",
+    alt_values_files="{segment_name}/{name}_interaction_expression_values.csv",
 ):
     edb_directory = edb_directory.format(name=name)
+
     def _read_csv(filename, **kwargs):
         filename = filename.format(name=name)
         return pd.read_csv(os.path.join(edb_directory, filename), **kwargs)
@@ -43,12 +46,12 @@ def interaction_simulate_data(
     chooser_data = {}
     alt_values = {}
 
-    segment_names = [s['NAME'] for s in settings['SPEC_SEGMENTS']]
+    segment_names = [s["NAME"] for s in settings["SPEC_SEGMENTS"]]
 
     for segment_name in segment_names:
         coefficients[segment_name] = _read_csv(
             coefficients_files.format(name=name, segment_name=segment_name),
-            index_col='coefficient_name',
+            index_col="coefficient_name",
         )
         chooser_data[segment_name] = _read_csv(
             chooser_data_files.format(name=name, segment_name=segment_name),
@@ -57,11 +60,10 @@ def interaction_simulate_data(
             alt_values_files.format(name=name, segment_name=segment_name),
         )
 
-
     spec = _read_csv(
         spec_file,
     )
-    spec = remove_apostrophes(spec, ['Label'])
+    spec = remove_apostrophes(spec, ["Label"])
     # alt_names = list(spec.columns[3:])
     # alt_codes = np.arange(1, len(alt_names) + 1)
     # alt_names_to_codes = dict(zip(alt_names, alt_codes))
@@ -89,8 +91,12 @@ def link_same_value_coefficients(segment_names, coefficients, spec):
 
     relabel_coef = {}
     for segment_name in segment_names:
-        coef_backwards_map = dict([(j, i) for i, j in coefficients[segment_name]['value'].items()])
-        relabel_coef[segment_name] = r = coefficients[segment_name]['value'].map(coef_backwards_map)
+        coef_backwards_map = dict(
+            [(j, i) for i, j in coefficients[segment_name]["value"].items()]
+        )
+        relabel_coef[segment_name] = r = coefficients[segment_name]["value"].map(
+            coef_backwards_map
+        )
         spec[segment_name] = spec[segment_name].map(r)
 
 
@@ -113,8 +119,8 @@ def unavail(model, x_ca):
 
 
 def nonmand_tour_freq_model(
-        edb_directory="output/estimation_data_bundle/{name}/",
-        return_data=False,
+    edb_directory="output/estimation_data_bundle/{name}/",
+    return_data=False,
 ):
     data = interaction_simulate_data(
         name="non_mandatory_tour_frequency",
@@ -122,7 +128,7 @@ def nonmand_tour_freq_model(
     )
 
     settings = data.settings
-    segment_names = [s['NAME'] for s in settings['SPEC_SEGMENTS']]
+    segment_names = [s["NAME"] for s in settings["SPEC_SEGMENTS"]]
     link_same_value_coefficients(segment_names, data.coefficients, data.spec)
     spec = data.spec
     coefficients = data.coefficients
@@ -140,16 +146,20 @@ def nonmand_tour_freq_model(
 
         ### Utility specifications
         segment_model.utility_ca = linear_utility_from_spec(
-            spec, x_col='Label', p_col=segment_name,
+            spec,
+            x_col="Label",
+            p_col=segment_name,
         )
         apply_coefficients(coefficients[segment_name], segment_model)
-        segment_model.choice_co_code = 'override_choice'
+        segment_model.choice_co_code = "override_choice"
 
         ### Attach Data
-        x_co = chooser_data[segment_name].set_index('person_id').rename(columns={'TAZ': 'HOMETAZ'})
-        x_ca = cv_to_ca(
-            alt_values[segment_name].set_index(['person_id', 'variable'])
+        x_co = (
+            chooser_data[segment_name]
+            .set_index("person_id")
+            .rename(columns={"TAZ": "HOMETAZ"})
         )
+        x_ca = cv_to_ca(alt_values[segment_name].set_index(["person_id", "variable"]))
         d = DataFrames(
             co=x_co,
             ca=x_ca,

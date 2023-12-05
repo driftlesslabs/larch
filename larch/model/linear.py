@@ -1,20 +1,19 @@
 import keyword as _keyword
 import re
 import re as _re
-import sys
 from collections.abc import Mapping, MutableMapping
 from numbers import Number as _Number
 
 import numpy as _numpy
 
-from ..util.naming import parenthize, valid_identifier_or_parenthized_string
+from ..util.naming import parenthize
 
 _ParameterRef_C_repr_txt = "P"
 _DataRef_repr_txt = "X"
 
 _null_ = "_"
 
-_boolmatch = re.compile("^boolean\((.+)==(.+)\)$")
+_boolmatch = re.compile(r"^boolean\((.+)==(.+)\)$")
 
 
 def _what_is(thing):
@@ -55,7 +54,6 @@ class Ref_Gen:
 
 
 class ParameterRef(UnicodeRef):
-
     _precedence = 99
 
     def __init__(self, *args):
@@ -241,7 +239,6 @@ class ParameterRef(UnicodeRef):
         return ParameterNoop(self)
 
     def __xml__(self, resolve_parameters=None, value_in_tooltips=True):
-
         if resolve_parameters is not None:
             if value_in_tooltips:
                 p_display = repr(self)
@@ -296,9 +293,9 @@ class DataRef(UnicodeRef):
                 return self
             # Double zero is trapped here as it is used to flag duplicate terms in a utility function.
             if self == "00":
-                return DataRef("0+{}".format(parenthize(self), parenthize(other, True)))
+                return DataRef("0+{}".format(parenthize(self), ))
             if other == "00":
-                return DataRef("{}+0".format(parenthize(self), parenthize(other, True)))
+                return DataRef("{}+0".format(parenthize(self), ))
             return DataRef("{}+{}".format(parenthize(self), parenthize(other, True)))
         if isinstance(self, DataRef) and isinstance(other, ParameterRef):
             return P(_null_) * self + other
@@ -909,19 +906,18 @@ class LinearComponent:
 def _try_mangle(instance):
     try:
         instance.mangle()
-    except AttributeError as err:
+    except AttributeError:
         pass  # print(f"No Mangle L: {err}")
 
 
 def _try_mangle_h(instance_holder):
     try:
         instance_holder._instance.mangle()
-    except AttributeError as err:
+    except AttributeError:
         pass  # print(f"No Mangle L2: {err}")
 
 
 class LinearFunction:
-
     _instance = None
 
     def __init__(self, init=None):
@@ -949,7 +945,6 @@ class LinearFunction:
         return newself
 
     def __get__(self, instance, owner):
-
         # LinearFunction newself
 
         if instance is None:
@@ -963,7 +958,6 @@ class LinearFunction:
         return newself
 
     def __set__(self, instance, values):
-
         try:
             newself = getattr(instance, self.private_name)
         except AttributeError:
@@ -974,13 +968,12 @@ class LinearFunction:
         # _try_mangle_h(newself)
         try:
             newself._instance.mangle()
-        except AttributeError as err:
+        except AttributeError:
             pass  # print(f"No Mangle L2: {err}")
         else:
             pass  # print(f"Yes Mangle L2: {newself._instance}")
 
     def __delete__(self, instance):
-
         try:
             newself = getattr(instance, self.private_name)
         except AttributeError:
@@ -990,7 +983,7 @@ class LinearFunction:
         # _try_mangle_h(newself)
         try:
             newself._instance.mangle()
-        except AttributeError as err:
+        except AttributeError:
             pass  # print(f"No Mangle L2: {err}")
         else:
             pass  # print(f"Yes Mangle L2: {newself._instance}")
@@ -1467,7 +1460,6 @@ class LinearFunction:
         header=None,
         **other_namespace,
     ):
-
         # Delayed evaluation mode...
         if p_getter is None:
             return lambda x: self.linear_plot_2d(
@@ -1523,7 +1515,6 @@ class LinearFunction:
         header=None,
         **other_namespace,
     ):
-
         # Delayed evaluation mode...
         if p_getter is None:
             return lambda x: self._inplot_linear_plot_2d(
@@ -1562,7 +1553,7 @@ class LinearFunction:
         for i in self:
             if i.data != "1":
                 raise NotImplementedError(f"{type(self)} has non-unit data")
-        from .linear_math import ParameterAdd, ParameterMultiply
+        from .linear_math import ParameterAdd
 
         if len(self) == 0:
             return 0
@@ -1576,7 +1567,6 @@ class LinearFunction:
 
 
 class DictOfAlts(MutableMapping):
-
     _instance = None
 
     def __set_name__(self, owner, name):
@@ -1649,7 +1639,7 @@ class DictOfAlts(MutableMapping):
         )
         try:
             newself._instance.mangle()
-        except AttributeError as err:
+        except AttributeError:
             pass
 
     def __delete__(self, instance):
@@ -1673,7 +1663,7 @@ class DictOfAlts(MutableMapping):
             self._map[k] = v
             try:
                 self._instance.mangle()
-            except AttributeError as err:
+            except AttributeError:
                 pass
 
     def __delitem__(self, key):
@@ -1706,7 +1696,6 @@ class DictOfAlts(MutableMapping):
 
 
 class DictOfLinearFunction:
-
     _instance = None
 
     def __init__(self, mapping=None, alts_validator=None, **kwargs):
@@ -1763,7 +1752,7 @@ class DictOfLinearFunction:
         # _try_mangle_h(newself)
         try:
             newself._instance.mangle()
-        except AttributeError as err:
+        except AttributeError:
             pass  # print(f"No Mangle L2: {err}")
         else:
             pass  # print(f"Yes Mangle L2: {newself._instance}")
@@ -1836,7 +1825,6 @@ class DictOfLinearFunction:
         return "{0}({1})".format(type(self).__name__, repr(self._map))
 
     def __xml__(self):
-        from pprint import pformat
 
         from xmle import Elem
 

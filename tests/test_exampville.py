@@ -1,4 +1,3 @@
-import re
 
 import numpy as np
 import pandas as pd
@@ -6,8 +5,7 @@ import pytest
 from pytest import approx
 
 import larch as lx
-from larch import PX, P, X
-from larch.util.testing import assert_same_text
+from larch import P, X
 
 
 @pytest.mark.parametrize(

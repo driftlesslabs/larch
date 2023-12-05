@@ -28,7 +28,6 @@ def _unique_ident():
 
 
 class BaseModel:
-
     _parameter_bucket = ParameterBucket()
     _model_subtype = None
 
@@ -821,7 +820,7 @@ class BaseModel:
                         tf.loc[(a, line), :] = f"    {op} {i._str_exponentiate()}"
                         op = "+"
                         line += 1
-                    tf.loc[(a, line), :] = f")"
+                    tf.loc[(a, line), :] = ")"
                     op = "+"
                     line += 1
 
@@ -848,7 +847,7 @@ class BaseModel:
                     tf.loc[(a, line), :] = f"    {op} {i._str_exponentiate()}"
                     op = "+"
                     line += 1
-                tf.loc[(a, line), :] = f")"
+                tf.loc[(a, line), :] = ")"
                 op = "+"
                 line += 1
 

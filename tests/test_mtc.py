@@ -1,4 +1,3 @@
-import re
 
 import numpy as np
 import pandas as pd
@@ -7,7 +6,6 @@ from pytest import approx
 
 import larch as lx
 from larch import PX, P, X
-from larch.util.testing import assert_same_text
 
 
 @pytest.mark.parametrize(
@@ -197,7 +195,6 @@ def test_mtc_17(compute_engine):
 
 @pytest.mark.parametrize("compute_engine", ["jax", "numba"])
 def test_mtc_22(compute_engine):
-
     m = lx.example(17)
     m.compute_engine = compute_engine
 
