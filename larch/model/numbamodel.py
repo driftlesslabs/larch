@@ -20,7 +20,7 @@ from ..util import dictx
 from .basemodel import BaseModel as _BaseModel
 from .numba_stream import ModelStreamer
 
-warnings.warn(  # Good news, everyone! This tool might not work. #  )
+warnings.warn(  ## Good news, everyone! This tool might be buggy. ## )
     "\n\n"
     "#### larch v6 is experimental, and not feature-complete ####\n"
     "the first time you import on a new system, this package will\n"
@@ -2127,7 +2127,7 @@ class NumbaModel(_BaseModel):
 
     @property
     def n_cases(self):
-        """int : The number of cases in the attached data."""
+        """Int : The number of cases in the attached data."""
         data_as_possible = self.data_as_possible
         if data_as_possible is None:
             raise MissingDataError("no data are set")
