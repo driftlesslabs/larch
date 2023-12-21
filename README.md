@@ -29,6 +29,9 @@ mkdir -p .env/LARIX
 mamba env update -p .env/LARIX -f larch/envs/development.yaml
 conda activate .env/LARIX
 
+# rip examples to loadable modules
+python larch/tools/rip_examples.py
+
 # compile and install 
 python -m pip install -e ./sharrow
 python -m pip install -e ./larch
