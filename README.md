@@ -5,6 +5,15 @@ Discrete choice models using numba and JAX
 
 # Developer's Installation
 
+Before you start with the installation, you need have the following tools already:
+- [miniforge for Mac or Linux](https://github.com/conda-forge/miniforge#unix-like-platforms-mac-os--linux)
+  or [miniforge for Windows](https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe)
+- [gh](https://cli.github.com), the github command line tool (`mamba install gh` should work)
+
+For now, you also need to have a github account and have authenticated 
+with `gh` using `gh auth login`.  Once this repository is public, this
+will no longer be necessary.
+
 ```zsh
 #!/usr/bin/env zsh
 
