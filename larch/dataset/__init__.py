@@ -140,44 +140,6 @@ def ones(cls, *coords, dtype=np.float64, name=None, attrs=None):
     )
 
 
-@register_dataarray_method
-def to_zarr(self, store=None, *args, **kwargs):
-    """
-    Write DataArray contents to a zarr store.
-
-    All parameters are passed directly to :py:meth:`xarray.Dataset.to_zarr`.
-
-    Notes
-    -----
-    Only xarray.Dataset objects can be written to netCDF files, so
-    the xarray.DataArray is converted to a xarray.Dataset object
-    containing a single variable. If the DataArray has no name, or if the
-    name is the same as a coordinate name, then it is given the name
-    ``"__xarray_dataarray_variable__"``.
-
-    See Also
-    --------
-    Dataset.to_zarr
-    """
-    from xarray.backends.api import DATAARRAY_VARIABLE
-
-    if self.name is None:
-        # If no name is set then use a generic xarray name
-        dataset = self.to_dataset(name=DATAARRAY_VARIABLE)
-    else:
-        # No problems with the name - so we're fine!
-        dataset = self.to_dataset()
-
-    if isinstance(store, (str, pathlib.Path)) and len(args) == 0:
-        if str(store).endswith(".zip"):
-            import zarr
-
-            with zarr.ZipStore(store, mode="w") as zstore:
-                dataset.to_zarr(zstore, **kwargs)
-            return
-
-    return dataset.to_zarr(*args, **kwargs)
-
 
 @register_dataarray_classmethod
 def from_zarr(cls, *args, name=None, **kwargs):
