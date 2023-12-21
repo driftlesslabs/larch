@@ -1,8 +1,21 @@
+"""
+Base model class and related functions for a discrete choice modeling framework.
+
+The main class in this module is `BaseModel`, which serves as the base class for
+all models in the framework. It contains a `ParameterBucket` for storing parameters,
+a `DictOfLinearFunction` for computing utility from idco data, and a placeholder
+for the model subtype.
+
+The `BaseModel` class is designed to be subclassed by other model classes that
+implement specific types of discrete choice models.
+"""
+
 import base64
 import logging
 import pathlib
 import uuid
 import warnings
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
@@ -16,6 +29,8 @@ from .param_core import ParameterBucket
 from .single_parameter import SingleParameter
 from .tree import NestingTree
 
+from ..dataset import DataTree
+
 logger = logging.getLogger("larch.model")
 
 MANGLE_DATA = 0x1
@@ -28,6 +43,8 @@ def _unique_ident():
 
 
 class BaseModel:
+    """Base class for discrete choice models."""
+
     _parameter_bucket = ParameterBucket()
     _model_subtype = None
 
@@ -165,6 +182,7 @@ class BaseModel:
 
     @property
     def ident(self):
+        """Getter method for the ident property."""
         return self._ident
 
     @ident.setter
@@ -239,7 +257,38 @@ class BaseModel:
         #     else:
         #         self.mangle(structure=False)
 
-    def swap_datatree(self, tree, should_mangle=False):
+    def swap_datatree(self, tree: DataTree | xr.Dataset, should_mangle=False) -> None:
+        """
+        Swap the current datatree with a new datatree.
+
+        Parameters
+        ----------
+        tree : DataTree or xr.Dataset or None
+            The new datatree to be swapped. If None, the datatree will be set to None.
+        should_mangle : bool, optional
+            A boolean indicating whether to mangle the structure after swapping the datatree.
+            Default is False.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        TypeError
+            If the `tree` parameter is not of type DataTree or xr.Dataset.
+
+        Notes
+        -----
+        If `tree` is an xr.Dataset, it will be converted to a DataTree using the `as_tree` method of the xr.Dataset.
+        If `should_mangle` is True, the structure of the datatree will be mangled after swapping.
+
+        Examples
+        --------
+        >>> model = BaseModel()
+        >>> tree = DataTree()
+        >>> model.swap_datatree(tree, should_mangle=True)
+        """
         from ..dataset import DataTree
 
         if (
@@ -1034,7 +1083,7 @@ class BaseModel:
 
     @property
     def choice_ca_var(self):
-        """str : An |idca| variable giving the choices as indicator values."""
+        """Str : An |idca| variable giving the choices as indicator values."""
         return self._choice_ca_var
 
     @choice_ca_var.setter
@@ -1084,7 +1133,7 @@ class BaseModel:
 
     @property
     def choice_co_code(self):
-        """str : An |idco| variable giving the choices as alternative id's."""
+        """Str : An |idco| variable giving the choices as alternative id's."""
         if self._choice_co_code:
             return self._choice_co_code
         else:
@@ -1143,7 +1192,7 @@ class BaseModel:
 
     @property
     def availability_ca_var(self):
-        """str : An |idca| variable or expression indicating if alternatives are available."""
+        """Str : An |idca| variable or expression indicating if alternatives are available."""
         return self._availability_ca_var
 
     @availability_ca_var.setter
@@ -1188,7 +1237,7 @@ class BaseModel:
 
     @property
     def availability_any(self):
-        """bool : A flag indicating whether availability should be inferred from the data.
+        """Bool : A flag indicating whether availability should be inferred from the data.
 
         This only applies to DataFrames-based models, as the Dataset interface does
         not include a mechanism for the data to self-describe an availability feature.
@@ -1433,7 +1482,6 @@ class BaseModel:
         xmle.Elem
 
         """
-
         from xmle import Elem
 
         div = Elem("div")

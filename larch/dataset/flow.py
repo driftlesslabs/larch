@@ -19,20 +19,23 @@ def case_ptr_to_indexes(n_casealts, case_ptrs):
 @nb.njit
 def ce_dissolve_zero_variance(ce_data, ce_caseptr):
     """
+    Dissolves zero variance in the given data based on case pointers.
 
     Parameters
     ----------
-    ce_data : array-like, shape [n_casealts] one-dim only
-    ce_altidx
-    ce_caseptr
-    n_alts
+    ce_data : array-like, shape [n_casealts]
+        One-dimensional array containing the data.
+    ce_caseptr : array-like, shape [n_cases]
+        One-dimensional array containing the case pointers.
 
     Returns
     -------
     out : ndarray
+        One-dimensional array containing the dissolved data.
     flag : int
-        1 if variance was detected, 0 if no variance was found and
-        the `out` array is valid.
+        Flag indicating whether variance was detected or not.
+        - 1 if variance was detected
+        - 0 if no variance was found and the `out` array is valid.
     """
     failed = 0
     if ce_caseptr.ndim == 2:
