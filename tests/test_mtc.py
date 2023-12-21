@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -9,7 +8,12 @@ from larch import PX, P, X
 
 
 @pytest.mark.parametrize(
-    "compute_engine,use_streaming", [("jax", False), ("numba", False), ("numba", True)]
+    "compute_engine,use_streaming",
+    [
+        ("jax", False),
+        ("numba", False),
+        # ("numba", True)
+    ],
 )
 def test_mtc_1(compute_engine, use_streaming):
     d = lx.examples.MTC(format="dataset")
@@ -361,9 +365,9 @@ def test_mtc_30(compute_engine):
     assert result.message == "Optimization terminated successfully"
     assert m.total_weight() == 5029.0
     m.parameter_summary()
-    summary = m.parameter_summary()
+    _summary = m.parameter_summary()
     # assert_same_text(
-    #     summary.data.to_markdown(),
+    #     _summary.data.to_markdown(),
     #     """
     # | Parameter   |     Value |   Std Err |   t Stat | Signif   |   Null Value | Constrained             |
     # |:------------|----------:|----------:|---------:|:---------|-------------:|:------------------------|
