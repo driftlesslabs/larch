@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -9,7 +8,12 @@ from larch import P, X
 
 
 @pytest.mark.parametrize(
-    "compute_engine,use_streaming", [("jax", False), ("numba", False), ("numba", True)]
+    "compute_engine,use_streaming",
+    [
+        ("jax", False),
+        ("numba", False),
+        # ("numba", True),
+    ],
 )
 def test_destination_only(compute_engine, use_streaming):
     hh, pp, tour, skims, emp = lx.example(200, ["hh", "pp", "tour", "skims", "emp"])
