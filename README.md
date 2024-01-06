@@ -38,6 +38,9 @@ mkdir -p .env/LARIX
 mamba env update -p .env/LARIX -f larch/envs/development.yaml
 conda activate .env/LARIX
 
+# make this environment available to jupyter
+ipython kernel install --user --name=LARIX
+
 # rip examples to loadable modules
 python larch/tools/rip_examples.py
 
