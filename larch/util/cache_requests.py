@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
+"""Provides a cache for requests.get and requests.post."""
 
-import appdirs
-import joblib
 import requests
 
 cache_dir = None
@@ -17,7 +15,7 @@ def set_cache_dir(location=None, compress=True, verbose=0, **kwargs):
     location: str or None or False
             The path of the base directory to use as a data store
             or None or False.  If None, a default directory is created
-            using appdirs.user_cache_dir.
+            using platformdirs.user_cache_dir.
             If False is given, no caching is done and
             the Memory object is completely transparent.
 
@@ -37,10 +35,14 @@ def set_cache_dir(location=None, compress=True, verbose=0, **kwargs):
     global memory, cache_dir
 
     if location is None:
-        location = appdirs.user_cache_dir("cached_requests")
+        import platformdirs  # imported here as this is an optional install
+
+        location = platformdirs.user_cache_dir("cached_requests")
 
     if location is False:
         location = None
+
+    import joblib  # imported here as this is an optional install
 
     memory = joblib.Memory(location, compress=compress, verbose=verbose, **kwargs)
 

@@ -21,11 +21,11 @@ def load_css(filename):
             css = f.read()
         return css
     try:
-        import appdirs
+        import platformdirs
     except ImportError:
         pass
     else:
-        f1 = os.path.join(appdirs.user_config_dir("Larch"), filename)
+        f1 = os.path.join(platformdirs.user_config_dir("Larch"), filename)
         if os.path.exists(f1):
             with open(f1, "r") as f:
                 css = f.read()
