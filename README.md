@@ -1,6 +1,10 @@
 # Larch v6
 
-Discrete choice models using numba and JAX
+This repository contains the under-development next generation of the Larch
+package, for estimating and applying discrete choice models. Version 6
+is a substanial rewrite of the package, changing to a platform that allows
+swapping out the underlying computational engine, so that the same model
+can run in numba or JAX.
 
 
 # Developer's Installation
