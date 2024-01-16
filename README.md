@@ -56,3 +56,15 @@ python -m pip install -e ./larch
 python -m pytest -v ./sharrow/sharrow/tests
 python -m pytest -v ./larch/tests
 ```
+
+
+## Windows Installation
+
+The above script should *mostly* work on Windows as well, but one minor modification
+is required, as the JAX library is not yet available for Windows via conda.  You need to
+install it with pip instead.  So, replace the `mamba env update` line in the script
+above with the following:
+
+```
+mamba env update -p .env/LARIX -f larch/envs/windows.yaml
+```
