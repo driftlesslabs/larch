@@ -260,7 +260,7 @@ def check_gradient(
     if not stylize:
         return f
     try:
-        return f.style.applymap(_color_poor_similarity, subset="similarity")
+        return f.style.map(_color_poor_similarity, subset="similarity")
     except ValueError:
         return f
 

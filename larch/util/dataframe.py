@@ -493,7 +493,7 @@ def counts_and_shares(
     # except ValueError:
     # 	pass
 
-    result.applymap(
+    result.map(
         lambda y: "text-align:right;",
         # subset=pandas.IndexSlice[firstcat:lastcat, [i for i in result.columns if i[0]=='Counts']]
     )

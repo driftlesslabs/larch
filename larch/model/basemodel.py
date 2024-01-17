@@ -1448,7 +1448,7 @@ class BaseModel:
         return (
             result.style.set_table_styles(styles)
             .format({"Null Value": "{: .2f}"})
-            .applymap(lambda x: "font-family:monospace", subset=monospace_cols)
+            .map(lambda x: "font-family:monospace", subset=monospace_cols)
         )
 
     def estimation_statistics(self, compute_loglike_null=True):
