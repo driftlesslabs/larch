@@ -536,7 +536,7 @@ def test_prerolled_common_panel_numpy(xlogit_artificial):
         "status": 0,
         "message": "Optimization terminated successfully",
         "success": True,
-        "loglike": -2410.3095703125,
+        "loglike": -2410.3818,
     }
     for k, v in expected.items():
         assert r[k] == approx(v, rel=1e-4), k

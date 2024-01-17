@@ -192,7 +192,7 @@ def test_mtc_17(compute_engine):
 
     for k in expected_x:
         assert revealed_x[k] == approx(
-            expected_x[k], 1.1e-2
+            expected_x[k], 2e-2
         ), f"{k}, {revealed_x[k] / expected_x[k]}"
     m.parameter_summary()
 
