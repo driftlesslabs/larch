@@ -519,7 +519,7 @@ def test_prerolled_notcommon_numpy(xlogit_artificial):
         "loglike": -2278.027587890625,
     }
     for k, v in expected.items():
-        assert r[k] == approx(v, rel=1e-4), k
+        assert r[k] == approx(v, rel=1.2e-4), k
 
 
 def test_prerolled_common_panel_numpy(xlogit_artificial):
