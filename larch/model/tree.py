@@ -780,7 +780,12 @@ class NestingTree(nx.DiGraph):
     def _repr_html_(self):
         from xmle import Elem
 
-        x = Elem("div") << (self.__xml__())
+        try:
+            xml = self.__xml__()
+        except FileNotFoundError as err:
+            return Elem("div", text="Graphviz not installed").tostring()
+        else:
+            x = Elem("div") << (xml)
         return x.tostring()
 
     def to_png(self, figsize=None, filename=None):
