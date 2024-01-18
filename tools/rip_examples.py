@@ -95,9 +95,7 @@ def rip():
             import_stmts.append(f"from ._{example} import example as _{example}")
             assign_stmts.append(f"ex[{ex_n!r}] = _{example}")
 
-    with open(
-        os.path.join(generator_dest, "__init__.py"), "w", encoding="utf8"
-    ) as gen:
+    with open(os.path.join(generator_dest, "__init__.py"), "w", encoding="utf8") as gen:
         gen.write(
             textwrap.dedent(
                 """

@@ -203,7 +203,10 @@ class BaseModel:
             raise ValueError("invalid compute engine")
         self._compute_engine = engine
         if self._compute_engine == "jax" and self.use_streaming:
-            warnings.warn("setting use_streaming to False, jax is not yet compatible", stacklevel=2)
+            warnings.warn(
+                "setting use_streaming to False, jax is not yet compatible",
+                stacklevel=2,
+            )
             self.use_streaming = False
 
     @property
@@ -500,7 +503,9 @@ class BaseModel:
 
         """
         warnings.warn(
-            "Model.set_values(x) is deprecated, use Model.pvals = x", DeprecationWarning, stacklevel=2
+            "Model.set_values(x) is deprecated, use Model.pvals = x",
+            DeprecationWarning,
+            stacklevel=2,
         )
         if isinstance(values, dict):
             kwargs.update(values)
@@ -640,7 +645,8 @@ class BaseModel:
                 import warnings
 
                 warnings.warn(
-                    "cannot initialize graph, must define alternatives somehow", stacklevel=2
+                    "cannot initialize graph, must define alternatives somehow",
+                    stacklevel=2,
                 )
                 raise RuntimeError(
                     "cannot initialize graph, must define alternatives somehow"

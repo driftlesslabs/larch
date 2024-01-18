@@ -118,7 +118,6 @@ def ones(cls, *coords, dtype=np.float64, name=None, attrs=None):
     )
 
 
-
 @register_dataarray_classmethod
 def from_zarr(cls, *args, name=None, **kwargs):
     dataset = xr.open_zarr(*args, **kwargs)
@@ -153,7 +152,6 @@ Dataset = _sharrow_Dataset
 
 
 class DataTree(_sharrow_DataTree):
-
     DatasetType = Dataset
 
     def __init__(

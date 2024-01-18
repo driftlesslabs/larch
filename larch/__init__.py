@@ -27,7 +27,8 @@ except Exception:
     __version__ = _install_version
 
 __all__ = [
-"NumberedCaption", "Reporter",
+    "NumberedCaption",
+    "Reporter",
     "read_metadata",
     "examples",
     "example",
@@ -47,4 +48,4 @@ __all__ = [
     "P",
     "X",
     "figures",
-    ]
+]

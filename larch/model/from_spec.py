@@ -6,9 +6,12 @@ from ..shorts import P, X
 from .basemodel import BaseModel
 from .numbamodel import NumbaModel
 
-SomeModel = TypeVar('SomeModel', bound=BaseModel)
+SomeModel = TypeVar("SomeModel", bound=BaseModel)
 
-def from_spec(cls: type[SomeModel], spec: pd.DataFrame, datatree, title=None) -> SomeModel:
+
+def from_spec(
+    cls: type[SomeModel], spec: pd.DataFrame, datatree, title=None
+) -> SomeModel:
     """
     Create a model from an ActivitySim style spec.
 
