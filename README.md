@@ -15,7 +15,7 @@ yet, especially for more advanced models.
 
 # Quick Start Guide
 
-You can install Larch v6 from PyPI with the following command:
+You can install Larch v6 with pip:
 
 ```shell
 python -m pip install larch6
@@ -24,6 +24,13 @@ python -m pip install larch6
 This will install the package and all of its required dependencies.  Note that
 while the installation name is "larch6", the package import name is "larch", and
 you cannot install both Larch v5 and Larch v6 in the same environment.
+
+Or you can install it using `mamba` to create a new environment:
+
+```shell
+mamba env create -p ARBORETUM -f https://raw.githubusercontent.com/driftlesslabs/larch/main/envs/arboretum.yml
+conda activate ./ARBORETUM
+```
 
 
 # Developer's Installation
