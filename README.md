@@ -13,6 +13,19 @@ open issues in the issue tracker.  But, please don't expect it to work perfectly
 yet, especially for more advanced models.
 
 
+# Quick Start Guide
+
+You can install Larch v6 from PyPI with the following command:
+
+```shell
+python -m pip install larch6
+```
+
+This will install the package and all of its required dependencies.  Note that
+while the installation name is "larch6", the package import name is "larch", and
+you cannot install both Larch v5 and Larch v6 in the same environment.
+
+
 # Developer's Installation
 
 Before you start with the installation, you need have the following tools already:
