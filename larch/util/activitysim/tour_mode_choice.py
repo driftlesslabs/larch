@@ -63,7 +63,7 @@ def tour_mode_choice_model(
     apply_coefficients(coefficients, m)
 
     avail = {}
-    for acode, aname in data.alt_codes_to_names.items():
+    for acode, _aname in data.alt_codes_to_names.items():
         unavail_cols = list(
             (
                 chooser_data[i.data]

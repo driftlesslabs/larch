@@ -5,6 +5,8 @@ class SingleParameter:
 
     def __get__(self, instance, instancetype=None):
         """
+        Get attribute from the instance.
+
         Parameters
         ----------
         instance : Any
@@ -18,6 +20,8 @@ class SingleParameter:
 
     def __set__(self, instance, value):
         """
+        Get attribute on the instance.
+
         Parameters
         ----------
         instance : Any

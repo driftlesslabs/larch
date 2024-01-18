@@ -1,8 +1,5 @@
 class TouchNotify:
-    """
-    A mixin to execute a notification callback any time a
-    mutate-possible command is called.
-    """
+    """A mixin to execute a callback when a mutate-possible command is called."""
 
     def __init__(self, *args, touch_callback_name="mangle", **kwargs):
         self._touch_name = touch_callback_name

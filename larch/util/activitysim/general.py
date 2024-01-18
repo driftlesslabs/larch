@@ -193,10 +193,6 @@ def explicit_value_parameters_from_spec(spec, p_col, model):
         function.
     model : larch.Model
         The model to insert fixed value parameters.
-
-    Returns
-    -------
-
     """
     if isinstance(p_col, dict):
         for p_col_ in p_col:
@@ -223,10 +219,6 @@ def explicit_value_parameters(model):
     ----------
     model : larch.Model
         The model to insert fixed value parameters.
-
-    Returns
-    -------
-
     """
     for i in model.pf.index:
         try:
@@ -385,6 +377,7 @@ def clean_values(
     choice_code="override_choice_code",
 ):
     """
+    Clean the values table to remove invalid choices.
 
     Parameters
     ----------

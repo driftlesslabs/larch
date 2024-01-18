@@ -60,6 +60,7 @@ class ParameterBucket:
 
     def attach_model(self, model, name=None, agg=True, unmangle=True):
         """
+        Attach a model to the bucket.
 
         Parameters
         ----------
@@ -67,10 +68,8 @@ class ParameterBucket:
         name
         agg
         unmangle : bool or str
-
-        Returns
-        -------
-
+            If True, unmangle the model.  If "structure", only unmangle the
+            structure of the model.
         """
         if name is None:
             try:
@@ -502,6 +501,8 @@ class ParameterBucket:
 
     def __get__(self, instance, owner=None):
         """
+        Get attribute from the instance.
+
         Parameters
         ----------
         instance : Any
@@ -516,6 +517,8 @@ class ParameterBucket:
 
     def __set__(self, instance, value):
         """
+        Set attribute on the instance.
+
         Parameters
         ----------
         instance : Any

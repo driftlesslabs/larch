@@ -73,20 +73,27 @@ select = [
 ignore-init-module-imports = true
 fix = true
 line-length = 88
-ignore = ["B905", "D1", "E731"]
+ignore = ["B905", "D1", "E731", "UP038"]
 target-version = "py311"
 extend-include = ["*.ipynb"]
-per-file-ignores = { "*.ipynb" = [
+extend-exclude = ["sandbox"]
+
+[tool.ruff.per-file-ignores]
+"*.ipynb" = [
     "E402", # allow imports to appear anywhere in Jupyter Notebooks
     "E501", # allow long lines in Jupyter Notebooks
     "F811", # allow redefinition of unused variables in Jupyter Notebooks
-] }
+]
+"tests/*.py" = [
+    "E501", # allow long lines in tests
+]
 
 [tool.ruff.lint.isort]
 known-first-party = ["larch"]
 
 [tool.ruff.lint.pycodestyle]
 max-line-length = 105
+ignore-overlong-task-comments = true
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"

@@ -4,7 +4,7 @@ import jax.numpy as jnp
 
 def lhs_draw_maker(n_draws, n_cols):
     """
-    Create a jitted function that makes draws
+    Create a jitted function that makes draws.
 
     Parameters
     ----------

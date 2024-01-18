@@ -136,9 +136,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             delattr(self, marker)
 
     def reflow_data_arrays(self):
-        """
-        Reload the internal data_arrays so they are consistent with the datatree.
-        """
+        """Reload the internal data_arrays so they are consistent with the datatree."""
         if self.compute_engine != "jax":
             return super().reflow_data_arrays()
 
@@ -350,7 +348,6 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
     @jitmethod
     def _jax_quantity(self, params, databundle):
         ca = databundle.get("ca", None)
-        av = databundle.get("av", None)
         n_alts = self.dataset.dc.n_alts
         n_nodes = len(self.graph)
         u = jnp.zeros([n_nodes])
@@ -375,7 +372,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         else:
             raise ValueError("missing data")
         f = self._jax_quantity
-        for level in range(depth):
+        for _level in range(depth):
             f = jax.vmap(f, in_axes=(None, 0))
         return f(params, {"ca": ca, "av": av})
 
@@ -431,7 +428,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         else:
             raise ValueError("missing data")
         f = self._jax_utility
-        for level in range(depth):
+        for _level in range(depth):
             f = jax.vmap(f, in_axes=(None, 0))
         return f(params, {"ca": ca, "co": co, "av": av})
 
@@ -623,7 +620,6 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
     def _jax_utility_include_nests(self, params, databundle):
         av = databundle.get("av", None)
         n_alts = self.dataset.dc.n_alts
-        n_nodes = len(self.graph)
         utility_array = self._jax_utility(params, databundle)
         # downshift to prevent over/underflow
         shifter = utility_array[:n_alts].max(axis=-1)
@@ -651,7 +647,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         else:
             raise ValueError("missing data")
         f = self._jax_utility_include_nests
-        for level in range(depth):
+        for _level in range(depth):
             f = jax.vmap(f, in_axes=(None, 0))
         return f(params, {"ca": ca, "co": co, "av": av})
 
@@ -716,7 +712,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         else:
             raise ValueError("missing data")
         f = self._jax_log_probability
-        for level in range(depth):
+        for _level in range(depth):
             f = jax.vmap(f, in_axes=(None, 0))
         return f(params, {"ca": ca, "co": co, "av": av})
 
@@ -739,7 +735,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         else:
             raise ValueError("missing data")
         f = self._jax_probability
-        for level in range(depth):
+        for _level in range(depth):
             f = jax.vmap(f, in_axes=(None, 0))
         return f(params, {"ca": ca, "co": co, "av": av})
 
@@ -791,7 +787,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         from .random import keysplit
 
         commons = None if self.common_draws else 0
-        for i in range(depth):
+        for _i in range(depth):
             f = jax.vmap(f, in_axes=(None, 0, commons, None))
             if not self.prerolled_draws:
                 random_key, shape = keysplit(random_key, shape)
@@ -888,7 +884,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         from .random import keysplit
 
         commons = None if self.common_draws else 0
-        for i in range(depth):
+        for _i in range(depth):
             f = jax.vmap(f, in_axes=(None, 0, commons, None))
             if not self.prerolled_draws:
                 random_key, shape = keysplit(random_key, shape)

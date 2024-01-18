@@ -29,7 +29,7 @@ def test_mtc_1(compute_engine, use_streaming):
     m.title = "MTC Example 1 (Simple MNL)"
     ch_av_summary = m.choice_avail_summary()
     # TEST
-    s = """            name  chosen available
+    _s = """            name  chosen available
     altid
     1                    DA    3637      4755
     2                   SR2     517      5029
@@ -401,7 +401,7 @@ def test_mtc_30(compute_engine):
         ),
     )
     m.parameter_summary()
-    summary2 = m.parameter_summary()
+    _summary2 = m.parameter_summary()
     # assert_same_text(
     #     summary2.data.to_markdown(),
     #     """

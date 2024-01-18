@@ -36,7 +36,9 @@ class Info:
     def _repr_html_(self):
         from ..util.styles import _default_css_jupyter, _tooltipped_style_css
 
-        style_prefix = f"<style>{_default_css_jupyter}\n\n{_tooltipped_style_css}</style>\n"
+        style_prefix = (
+            f"<style>{_default_css_jupyter}\n\n{_tooltipped_style_css}</style>\n"
+        )
         from xmle import Elem
 
         xsign = Elem("div", {"class": "larch_head_tag"})
@@ -86,7 +88,7 @@ class Info:
 
     def __call__(self, *args, **kwargs):
         """
-        Calling an Info object is a no-op.
+        Do nothing (for now).
 
         Returns
         -------
@@ -99,8 +101,8 @@ def ipython_status(magic_matplotlib=False):
     message_set = set()
     try:
         # This will work in iPython, and fail otherwise
-        cfg = get_ipython().config
-    except:
+        cfg = get_ipython().config  # noqa: F821
+    except Exception:
         message_set.add("Not IPython")
     else:
         import IPython
@@ -110,7 +112,7 @@ def ipython_status(magic_matplotlib=False):
 
         if magic_matplotlib:
             try:
-                get_ipython().magic("matplotlib inline")
+                get_ipython().magic("matplotlib inline")  # noqa: F821
             except (IPython.core.error.UsageError, KeyError):
                 message_set.add("IPython inline plotting not available")
 
@@ -122,7 +124,7 @@ def ipython_status(magic_matplotlib=False):
                     message_set.add("pylab inline")
                 else:
                     message_set.add("pylab loaded but not inline")
-            except:
+            except Exception:
                 message_set.add("pylab not loaded")
         elif cfg["TerminalIPythonApp"]:
             try:
@@ -130,6 +132,6 @@ def ipython_status(magic_matplotlib=False):
                     message_set.add("pylab inline")
                 else:
                     message_set.add("pylab loaded but not inline")
-            except:
+            except Exception:
                 message_set.add("pylab not loaded")
     return message_set

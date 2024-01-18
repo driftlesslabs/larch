@@ -9,7 +9,7 @@ import pandas
 
 
 def _to_categorical(y, num_classes=None, dtype="float32"):
-    """Converts a class vector (integers) to binary class matrix.
+    """Convert a class vector (integers) to binary class matrix.
 
     E.g. for use with categorical_crossentropy.
 
@@ -205,7 +205,7 @@ def fourier_expansion(s, length=4, column=None, inplace=False):
         index=s.index,
         columns=columns,
     )
-    for i, col in enumerate(columns):
+    for i, _col in enumerate(columns):
         func = numpy.cos if i % 2 else numpy.sin
         mult = ((i // 2) + 1) * 2
         df.iloc[:, i] = func(s * mult * numpy.pi)
@@ -460,7 +460,7 @@ def _nonzero_minimum_rescale(x):
 
 def ratio_min(s, column=None, inplace=False, result_name=None):
     """
-    Modify a pandas Series or DataFrame in `idce` format to scale within cases relative to the minimum value.
+    Modify data in `idce` format to scale within cases relative to the minimum value.
 
     Parameters
     ----------

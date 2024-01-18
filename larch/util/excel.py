@@ -9,7 +9,7 @@ import pandas as pd
 from pandas.io.formats.style import Styler
 from xmle import Elem
 
-from .. import __version__
+from .. import Model, __version__
 from ..jaxmodel.model_group import ModelGroup
 from .png import make_png
 
@@ -140,7 +140,7 @@ class ExcelWriter(_XlsxWriter):
                 self.sheets["Parameters"].set_column(
                     n, n, width=new_width, cell_format=wrap
                 )
-        except:
+        except Exception:
             if on_error == "raise":
                 raise
 
@@ -167,7 +167,7 @@ class ExcelWriter(_XlsxWriter):
                 start_row=startrow,
                 buffer_cols=ps_data_index_nlevels - 1,
             )
-        except:
+        except Exception:
             if on_error == "raise":
                 raise
 
@@ -184,7 +184,7 @@ class ExcelWriter(_XlsxWriter):
                             sheetname="CO Data",
                             heading="CO Data",
                         )
-                    except:
+                    except Exception:
                         if on_error == "raise":
                             raise
                 if model.dataframes.data_ca is not None and len(
@@ -196,7 +196,7 @@ class ExcelWriter(_XlsxWriter):
                             sheetname="CA Data",
                             heading="CA Data",
                         )
-                    except:
+                    except Exception:
                         if on_error == "raise":
                             raise
                 if model.dataframes.data_ce is not None and len(
@@ -208,7 +208,7 @@ class ExcelWriter(_XlsxWriter):
                             sheetname="CE Data",
                             heading="CE Data",
                         )
-                    except:
+                    except Exception:
                         if on_error == "raise":
                             raise
                 if (
@@ -224,7 +224,7 @@ class ExcelWriter(_XlsxWriter):
                             sheetname="Choice",
                             heading="Choices",
                         )
-                    except:
+                    except Exception:
                         if on_error == "raise":
                             raise
 
@@ -244,7 +244,7 @@ class ExcelWriter(_XlsxWriter):
                         heading="Utility Functions",
                     )
                 self.sheets["Utility"].set_column("B:B", None, None, {"hidden": 1})
-            except:
+            except Exception:
                 if on_error == "raise":
                     raise
 
@@ -255,7 +255,7 @@ class ExcelWriter(_XlsxWriter):
                     sheetname="Nesting",
                     heading="Nesting Tree",
                 )
-            except:
+            except Exception:
                 if on_error == "raise":
                     raise
             try:
@@ -264,7 +264,7 @@ class ExcelWriter(_XlsxWriter):
                     sheetname="Nesting",
                     heading="Nesting Node List",
                 )
-            except:
+            except Exception:
                 if on_error == "raise":
                     raise
 
@@ -277,7 +277,7 @@ class ExcelWriter(_XlsxWriter):
                             sheetname="Nesting",
                             heading="Nesting Tree",
                         )
-                    except:
+                    except Exception:
                         if on_error == "raise":
                             raise
                     try:
@@ -286,7 +286,7 @@ class ExcelWriter(_XlsxWriter):
                             sheetname="Nesting",
                             heading="Nesting Node List",
                         )
-                    except:
+                    except Exception:
                         if on_error == "raise":
                             raise
 
@@ -435,7 +435,7 @@ class ExcelWriter(_XlsxWriter):
                         output="Elem",
                         facecolor="w",
                     )
-                except:
+                except Exception:
                     pass
 
         # Extract PNG data from Elem if found there
@@ -448,12 +448,12 @@ class ExcelWriter(_XlsxWriter):
             if _v is not None:
                 try:
                     dpi = _v.attrib["dpi"]
-                except:
+                except Exception:
                     dpi = None
 
                 try:
                     _v = _v.attrib["src"]
-                except:
+                except Exception:
                     pass
                 else:
                     if isinstance(_v, str) and _v[:22] == "data:image/png;base64,":
@@ -547,7 +547,8 @@ class ExcelWriter(_XlsxWriter):
             import warnings
 
             warnings.warn(
-                f"content not written to sheet {sheetname}, type {type(content_in)}"
+                f"content not written to sheet {sheetname}, type {type(content_in)}",
+                stacklevel=2,
             )
         else:
             if blurb is not None:
@@ -622,8 +623,6 @@ def _make_excel_writer(model, filename, save_now=True, **kwargs):
         xl.save()
     return xl
 
-
-from .. import Model
 
 Model.to_xlsx = _make_excel_writer
 
@@ -850,6 +849,6 @@ def _estimation_statistics_excel(
         row += 2  # gap
         xlsxwriter.sheet_startrow[worksheet.name] = row
         return row
-    except:
+    except Exception:
         logger.exception("error in _estimation_statistics_excel")
         raise

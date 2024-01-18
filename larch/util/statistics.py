@@ -82,7 +82,7 @@ def statistics_for_array(
     base_def, lowbound, highbound, piece_exactly = parse_piece(varname)
 
     try:
-        nans = numpy.isnan(a)
+        _nans = numpy.isnan(a)
     except TypeError:
         can_nan = False
     else:
@@ -139,7 +139,7 @@ def statistics_for_array(
     if a_masked_is_category is None:
         try:
             a_masked_is_category = isinstance(a_masked.dtype, pandas.CategoricalDtype)
-        except:
+        except Exception:
             a_masked_is_category = False
 
     if (can_nan and histogram) or a_masked_is_category:
@@ -251,7 +251,7 @@ def statistics_for_array5(arr, histogram=5, *args, **kwargs):
     dictx
 
     """
-    return statistics_for_array(arr, histogram=histogram, *args, **kwargs)
+    return statistics_for_array(arr, *args, histogram=histogram, **kwargs)
 
 
 def statistics_for_dataframe(df, histogram=True, ch_weights=None, avail=None, **kwargs):
@@ -301,7 +301,7 @@ def statistics_for_dataframe(df, histogram=True, ch_weights=None, avail=None, **
         result["nans"].fillna(0, inplace=True)
     try:
         result = result.drop("description", axis=1)
-    except:
+    except Exception:
         pass
     return result
 
@@ -363,7 +363,7 @@ def invmap(s, mapping):
 
     Returns
     -------
-
+    array-like
     """
     if isinstance(mapping, enum.EnumMeta):
         mapping = mapping.__members__

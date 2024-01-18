@@ -22,7 +22,7 @@ def _any_dot(s):
 def _zipdir(path, ziph, skip_dots=True, extra_layer=True, log=print):
     # ziph is zipfile handle
     keep_dots = not skip_dots
-    for root, dirs, files in os.walk(path):
+    for root, _dirs, files in os.walk(path):
         folder = os.path.basename(root)
         if keep_dots or not _any_dot(folder):
             log(f"zipping folder: {folder} in {root}")
@@ -43,10 +43,11 @@ def zipdir(
     source_dir, zip_file_name=None, skip_dots=True, extra_layer=False, log=print
 ):
     """
+    Compress a folder into a zip file.
 
     Parameters
     ----------
-    source_dir
+    source_dir : Path-like
     zip_file_name : str
             If not given, uses the name of the sourcedir.
     skip_dots : bool, defaults True
@@ -68,19 +69,15 @@ def zipdir(
     return zip_file_name
 
 
-def zipmod(module, zip_file_name, skip_dots=True):
+def zipmod(module, zip_file_name, skip_dots=True) -> None:
     """
-    Create a zipfile from a module
+    Create a zipfile from a module.
 
     Parameters
     ----------
     module
     zip_file_name
     skip_dots
-
-    Returns
-    -------
-
     """
     with zipfile.ZipFile(zip_file_name, "w", zipfile.ZIP_DEFLATED) as zipf:
         _zipdir(module.__path__[0], zipf, skip_dots=skip_dots)
@@ -129,7 +126,7 @@ def verify_hash_file(fname, hash_dir=None, max_retries=5):
 
             time.sleep(5)
             retries += 1
-        except:
+        except Exception:
             raise
         else:
             break
@@ -224,7 +221,10 @@ def gzip_archive(
     remove_original=False,
     log=None,
 ):
-    """Same as gzip_dir but different default inputs.
+    """
+    Individually gzip every file matching patterns in source_dir.
+
+    This function is the same as gzip_dir but with different default inputs.
 
     Parameters
     ----------
@@ -235,10 +235,7 @@ def gzip_archive(
     destination_dir
     archive_subdir
     remove_original
-
-    Returns
-    -------
-
+    log
     """
     return gzip_dir(
         source_dir=source_dir,

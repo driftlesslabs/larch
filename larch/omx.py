@@ -63,7 +63,6 @@ class OMX(_omx_base_class):
         return s
 
     def __init__(self, *arg, complevel=1, complib="zlib", **kwarg):
-
         if len(arg) > 0 and isinstance(arg[0], str) and arg[0][-3:] == ".gz":
             from .util.temporaryfile import TemporaryGzipInflation
 
@@ -95,27 +94,29 @@ class OMX(_omx_base_class):
         try:
             self.data = self._get_or_create_path("/data", True)
         except _tb.exceptions.FileModeError:
-            raise OMXBadFormat("the '/data' node does not exist and cannot be created")
+            raise OMXBadFormat(
+                "the '/data' node does not exist and cannot be created"
+            ) from None
         try:
             self.lookup = self._get_or_create_path("/lookup", True)
         except _tb.exceptions.FileModeError:
             raise OMXBadFormat(
                 "the '/lookup' node does not exist and cannot be created"
-            )
+            ) from None
         if "OMX_VERSION" not in self.root._v_attrs:
             try:
                 self.root._v_attrs.OMX_VERSION = b"0.2"
             except _tb.exceptions.FileModeError:
                 raise OMXBadFormat(
                     "the root OMX_VERSION attribute does not exist and cannot be created"
-                )
+                ) from None
         if "SHAPE" not in self.root._v_attrs:
             try:
                 self.root._v_attrs.SHAPE = numpy.zeros(2, dtype=int)
             except _tb.exceptions.FileModeError:
                 raise OMXBadFormat(
                     "the root SHAPE attribute does not exist and cannot be created"
-                )
+                ) from None
         self.rlookup = Dict()
         self.rlookup._helper = self.get_reverse_lookup
 
@@ -227,7 +228,8 @@ class OMX(_omx_base_class):
             )
         if shape0 != shape1 and start0 == start1:
             raise TypeError(
-                "do not automatically crop a square array into a non-square shape, results may be ambiguous"
+                "do not automatically crop a square array into a non-square shape, "
+                "results may be ambiguous"
             )
         for i in self.data._v_children:
             self.add_matrix(
@@ -266,7 +268,7 @@ class OMX(_omx_base_class):
         self, name, atom=None, shape=None, complevel=1, complib="zlib", **kwargs
     ):
         """
-        Adds a blank lookup to the OMX file.
+        Add a blank lookup to the OMX file.
 
         Parameters
         ----------
@@ -327,7 +329,7 @@ class OMX(_omx_base_class):
         self, name, atom=None, shape=None, complevel=1, complib="zlib", **kwargs
     ):
         """
-        Adds a blank matrix to the OMX file.
+        Add a blank matrix to the OMX file.
 
         Parameters
         ----------
@@ -388,7 +390,7 @@ class OMX(_omx_base_class):
         **kwargs,
     ):
         """
-        Adds a matrix to the OMX file.
+        Add a matrix to the OMX file.
 
         Parameters
         ----------
@@ -452,7 +454,7 @@ class OMX(_omx_base_class):
         **kwargs,
     ):
         """
-        Adds a lookup mapping to the OMX file.
+        Add a lookup mapping to the OMX file.
 
         Parameters
         ----------
@@ -530,7 +532,8 @@ class OMX(_omx_base_class):
                     neww[i] = orig[i]
                 if require_smaller and neww.size_on_disk >= orig.size_on_disk:
                     warnings.warn(
-                        f"abort change_atom_type on {name}, {neww.size_on_disk} > {orig.size_on_disk}"
+                        f"abort change_atom_type on {name}, {neww.size_on_disk} > {orig.size_on_disk}",
+                        stacklevel=2,
                     )
                     neww._f_remove()
                 else:
@@ -543,7 +546,8 @@ class OMX(_omx_base_class):
                     neww[i] = orig[i]
                 if require_smaller and neww.size_on_disk >= orig.size_on_disk:
                     warnings.warn(
-                        f"abort change_atom_type on {name}, {neww.size_on_disk} > {orig.size_on_disk}"
+                        f"abort change_atom_type on {name}, {neww.size_on_disk} > {orig.size_on_disk}",
+                        stacklevel=2,
                     )
                     neww._f_remove()
                 else:
@@ -599,112 +603,6 @@ class OMX(_omx_base_class):
         index_malordered = numpy.digitize(arr, uniq_labels, right=True)
         return uniq_indexes[index_malordered]
 
-    # def import_datatable_as_lookups(
-    #     self,
-    #     filepath,
-    #     chunksize=10000,
-    #     column_map=None,
-    #     log=None,
-    #     n_rows=None,
-    #     zone_ix=None,
-    #     zone_ix1=1,
-    #     drop_zone=None,
-    # ):
-    #     """Import a table in r_or_c,x,x,x... format into the matrix.
-    #
-    # 	The r_or_c column needs to be either 0-based or 1-based index values
-    # 	(this may be relaxed in the future). The matrix must already be set up
-    # 	with the correct shape before importing the datatable.
-    #
-    # 	Parameters
-    # 	----------
-    # 	filepath : str or buffer
-    # 		This argument will be fed directly to the :func:`pandas.read_csv` function.
-    # 	chunksize : int
-    # 		The number of rows of the source file to read as a chunk.  Reading a giant file in moderate sized
-    # 		chunks can be much faster and less memory intensive than reading the entire file.
-    # 	column_map : dict or None
-    # 		If given, this dict maps columns of the input file to OMX tables, with the keys as
-    # 		the columns in the input and the values as the tables in the output.
-    # 	n_rows : int or None
-    # 		If given, this is the number of rows in the source file.  It can be omitted and will
-    # 		be discovered automatically, but only for source files with consecutive zone numbering.
-    # 	zone_ix : str or None
-    # 		If given, this is the column name in the source file that gives the zone numbers.
-    # 	zone_ix1 : 1 or 0
-    # 		The smallest zone number.  Defaults to 1
-    # 	drop_zone : int or None
-    # 		If given, zones with this number (typically 0 or -1) will be ignored.
-    #
-    # 	"""
-    #     if log is not None:
-    #         log("START import_datatable")
-    #     if isinstance(filepath, str) and filepath.casefold()[-4:] == ".dbf":
-    #         from simpledbf import Dbf5
-    #
-    #         chunk0 = next(
-    #             Dbf5(filepath, codec="utf-8").to_dataframe(chunksize=chunksize)
-    #         )
-    #         dbf = Dbf5(filepath, codec="utf-8")
-    #         reader = dbf.to_dataframe(chunksize=chunksize)
-    #         if n_rows is None:
-    #             n_rows = dbf.numrec
-    #     elif isinstance(filepath, str) and filepath.casefold()[-5:] == ".xlsx":
-    #         raise NotImplementedError()
-    #     # reader = pandas.read_excel(sfr, chunksize=chunksize, engine='openpyxl')
-    #     else:
-    #         from .util.smartread import SmartFileReader
-    #
-    #         sfr = SmartFileReader(filepath)
-    #         reader = pandas.read_csv(sfr, chunksize=chunksize)
-    #         chunk0 = next(pandas.read_csv(filepath, chunksize=chunksize))
-    #         if n_rows is None:
-    #             n_rows = sum(1 for line in open(filepath, mode="r")) - 1
-    #
-    #     if column_map is None:
-    #         column_map = {i: i.strip() for i in chunk0.columns}
-    #     try:
-    #         for tsource, tresult in column_map.items():
-    #             use_dtype = chunk0[tsource].dtype
-    #             if use_dtype.kind == "O":
-    #                 use_dtype = chunk0[tsource].astype("S").dtype
-    #             self.add_blank_lookup(
-    #                 tresult, atom=_tb.Atom.from_dtype(use_dtype), shape=n_rows
-    #             )
-    #     except ValueError:
-    #         raise
-    #         import traceback
-    #
-    #         traceback.print_exc()
-    #         return chunk0
-    #
-    #     start_ix = 0
-    #
-    #     for n, chunk in enumerate(reader):
-    #         if log is not None:
-    #             log("PROCESSING CHUNK {} [{}]".format(n, sfr.progress()))
-    #
-    #         if drop_zone is not None:
-    #             chunk = chunk[chunk[zone_ix] != drop_zone]
-    #
-    #         for col in chunk.columns:
-    #             if col in column_map:
-    #                 if zone_ix is not None:
-    #                     self.lookup._v_children[column_map[col]][
-    #                         chunk[zone_ix].values - zone_ix1
-    #                     ] = chunk[col].values
-    #                 else:
-    #                     self.lookup._v_children[column_map[col]][
-    #                         start_ix : start_ix + len(chunk)
-    #                     ] = chunk[col].values
-    #                 self.lookup._v_children[column_map[col]].flush()
-    #         if log is not None:
-    #             log("finished processing chunk {} [{}]".format(n, sfr.progress()))
-    #
-    #         self.flush()
-    #     if log is not None:
-    #         log("import_datatable({}) complete".format(filepath))
-
     def import_datatable(
         self,
         filepath,
@@ -725,19 +623,21 @@ class OMX(_omx_base_class):
         filepath : str or buffer
             This argument will be fed directly to the :func:`pandas.read_csv` function.
         one_based : bool
-            If True (the default) it is assumed that zones are indexed sequentially starting with 1
-            (as is typical for travel demand forecasting applications).
-            Otherwise, it is assumed that zones are indexed sequentially starting with 0 (typical for other c and python applications).
+            If True (the default) it is assumed that zones are indexed sequentially
+            starting with 1 (as is typical for travel demand forecasting applications).
+            Otherwise, it is assumed that zones are indexed sequentially starting
+            with 0 (typical for other c and python applications).
         chunksize : int
-            The number of rows of the source file to read as a chunk.  Reading a giant file in moderate sized
-            chunks can be much faster and less memory intensive than reading the entire file.
+            The number of rows of the source file to read as a chunk.  Reading a
+            giant file in moderate sized chunks can be much faster and less memory
+            intensive than reading the entire file.
         column_map : dict or None
-            If given, this dict maps columns of the input file to OMX tables, with the keys as
-            the columns in the input and the values as the tables in the output.
+            If given, this dict maps columns of the input file to OMX tables, with
+            the keys as the columns in the input and the values as the tables in
+            the output.
         default_atom : str or dtype
-            The default atomic type for imported data when the table does not already exist in this
-            openmatrix.
-
+            The default atomic type for imported data when the table does not already
+            exist in this openmatrix.
         """
         if log is not None:
             log("START import_datatable")
@@ -796,24 +696,26 @@ class OMX(_omx_base_class):
         (this may be relaxed in the future). The matrix must already be set up
         with the correct size before importing the datatable.
 
-        This method is functionally the same as :meth:`import_datatable` but uses a different implementation.
-        It is much more memory intensive but also much faster than the non-3d version.
+        This method is functionally the same as :meth:`import_datatable` but uses
+        a different implementation. It is much more memory intensive but also much
+        faster than the non-3d version.
 
         Parameters
         ----------
         filepath : str or buffer
             This argument will be fed directly to the :func:`pandas.read_csv` function.
         one_based : bool
-            If True (the default) it is assumed that zones are indexed sequentially starting with 1
-            (as is typical for travel demand forecasting applications).
-            Otherwise, it is assumed that zones are indexed sequentially starting with 0 (typical for other c and python applications).
+            If True (the default) it is assumed that zones are indexed sequentially
+            starting with 1 (as is typical for travel demand forecasting applications).
+            Otherwise, it is assumed that zones are indexed sequentially starting
+            with 0 (typical for other c and python applications).
         chunksize : int
-            The number of rows of the source file to read as a chunk.  Reading a giant file in moderate sized
-            chunks can be much faster and less memory intensive than reading the entire file.
+            The number of rows of the source file to read as a chunk.  Reading a
+            giant file in moderate sized chunks can be much faster and less memory
+            intensive than reading the entire file.
         default_atom : str or dtype
-            The default atomic type for imported data when the table does not already exist in this
-            openmatrix.
-
+            The default atomic type for imported data when the table does not already
+            exist in this openmatrix.
         """
         if log is not None:
             log("START import_datatable")
@@ -897,8 +799,8 @@ class OMX(_omx_base_class):
     def __setitem__(self, key, value):
         try:
             value_shape = value.shape
-        except:
-            raise TypeError("value must array-like with one or two dimensions")
+        except Exception as err:
+            raise TypeError("value must array-like with one or two dimensions") from err
         if len(value_shape) == 1:
             if value_shape[0] == self.shape[0] or value_shape[0] == self.shape[1]:
                 self.add_lookup(key, numpy.asarray(value))
@@ -975,7 +877,7 @@ class OMX(_omx_base_class):
 
     def all_matrix_at(self, r, c):
         """
-        Get the value from all matrices at a coordinate
+        Get the value from all matrices at a coordinate.
 
         Parameters
         ----------
@@ -1154,8 +1056,9 @@ class OMX(_omx_base_class):
         """
         Read an existing OMX into a new file, remapping columns as appropriate.
 
-        The new matrix is filled with blanks, and then the values are set by slicing the arrays and assigning
-        the old array to the sliced new. (Sorry if this is confusing.)
+        The new matrix is filled with blanks, and then the values are set by
+        slicing the arrays and assigning the old array to the sliced new.
+        (Sorry if this is confusing.)
 
         Parameters
         ----------
@@ -1300,8 +1203,6 @@ class OMX(_omx_base_class):
         COMMA = (OP, ",")
         OBRAC = (OP, "[")
         CBRAC = (OP, "]")
-        OPAR = (OP, "(")
-        CPAR = (OP, ")")
         from io import BytesIO
 
         recommand = []
@@ -1319,18 +1220,12 @@ class OMX(_omx_base_class):
             cmd_encode = cmd.encode("utf-8")
         except AttributeError:
             cmd_encode = str(cmd).encode("utf-8")
-        dims = len(self.shape)
         g = tokenize(BytesIO(cmd_encode).readline)
         if selector is None:
             screen_tokens = [
                 COLON,
             ]
         else:
-            # try:
-            # 	slicer_encode = selector.encode('utf-8')
-            # except AttributeError:
-            # 	slicer_encode = str(selector).encode('utf-8')
-            # screen_tokens = [(toknum, tokval) for toknum, tokval, _, _, _ in tokenize(BytesIO(slicer_encode).readline)]
             screen_tokens = [
                 (NAME, "selector"),
             ]
@@ -1413,7 +1308,6 @@ class OMX(_omx_base_class):
         )
         # important globals
 
-
         try:
             if receiver is not None:
                 exec(j)
@@ -1432,14 +1326,12 @@ class OMX(_omx_base_class):
             if "max" in cmd:
                 arg0 = (
                     arg0
-                    + '\n(note to get the maximum of arrays use "fmax" not "max")'.format(
-                        )
+                    + '\n(note to get the maximum of arrays use "fmax" not "max")'.format()
                 )
             if "min" in cmd:
                 arg0 = (
                     arg0
-                    + '\n(note to get the minimum of arrays use "fmin" not "min")'.format(
-                        )
+                    + '\n(note to get the minimum of arrays use "fmin" not "min")'.format()
                 )
             if isinstance(exc, NameError):
                 badname = str(exc).split("'")[1]

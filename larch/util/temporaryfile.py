@@ -1,3 +1,4 @@
+import atexit
 import os
 import shutil
 import tempfile
@@ -15,16 +16,14 @@ def TemporaryBucketCleanUp():
         except PermissionError:
             try:
                 shutil.rmtree(i.name)
-            except:
+            except Exception:
                 pass
                 # traceback.print_exc()
-        except:
+        except Exception:
             pass
             # traceback.print_exc()
     del TemporaryBucket
 
-
-import atexit
 
 atexit.register(TemporaryBucketCleanUp)
 
@@ -76,10 +75,10 @@ def TemporaryFile(suffix="", mode="w+", use_chrome=True):
 def _try_write(self, content):
     try:
         self.write_(content)
-    except:
+    except Exception:
         try:
             self.write_(str(content))
-        except:
+        except Exception:
             self.write_(str(content).encode("utf-8"))
 
 

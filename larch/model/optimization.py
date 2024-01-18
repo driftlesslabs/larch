@@ -245,7 +245,8 @@ def maximize_loglike(
                 }
             except BHHHSimpleStepFailure:
                 dashboard.update(
-                    f"Iteration {iteration_number:03} [BHHH Start Failure, Recovering] {iteration_number_tail}",
+                    f"Iteration {iteration_number:03} "
+                    f"[BHHH Start Failure, Recovering] {iteration_number_tail}",
                     body=model.pf,
                     force=True,
                 )
@@ -323,7 +324,7 @@ def maximize_loglike(
                 if method2 is not None:
                     method_used = f"{method_used}|{method2}"
                     method = method2
-            except:
+            except Exception:
                 dashboard.update(
                     f"Iteration {iteration_number:03} [Exception] {iteration_number_tail}",
                     body=model.pf,
@@ -348,19 +349,21 @@ def maximize_loglike(
 
                         warnings.warn(  # infinite bounds # )
                             f"{method} may not play nicely with unbounded parameters\n"
-                            "if you get poor results, consider setting global bounds with model.set_cap()"
+                            "if you get poor results, consider setting global bounds "
+                            "with model.set_cap()",
+                            stacklevel=2,
                         )
 
                 try:
                     constraints = model._get_constraints(method)
-                except:
+                except Exception:
                     constraints = ()
 
                 args = getattr(model, "_null_slice", (0, -1, 1))
                 raw_result = minimize(
                     model.logloss,
                     model.pvals,
-                    args=args,  # +(leave_out, keep_only, subsample), # start_case, stop_case, step_case, leave_out, keep_only, subsample
+                    args=args,
                     method=method,
                     jac=model.d_logloss,
                     bounds=bounds,
@@ -369,7 +372,7 @@ def maximize_loglike(
                     constraints=constraints,
                     **kwargs,
                 )
-            except:
+            except Exception:
                 dashboard.update(
                     f"Iteration {iteration_number:03} [Exception] {iteration_number_tail}",
                     body=model.pf,
@@ -440,7 +443,7 @@ def maximize_loglike(
 
         return result
 
-    except:
+    except Exception:
         logger.exception("error in maximize_loglike")
         raise
     finally:
@@ -458,7 +461,7 @@ def propose_direction(bhhh, dloglike, freedoms):
     direction1 = np.linalg.lstsq(bhhh[freedoms, :][:, freedoms], dloglike[freedoms])[0]
     try:
         direction[freedoms] = direction1
-    except:
+    except Exception:
         print("direction", direction.shape)
         print("direction1", direction1.shape)
         print("freedoms", freedoms.shape)
@@ -487,7 +490,7 @@ def fit_bhhh(
     step_constraint_sharpness=1.2,
 ):
     """
-    Makes a series of steps using the BHHH algorithm.
+    Make a series of steps using the BHHH algorithm.
 
     Parameters
     ----------
@@ -549,9 +552,7 @@ def fit_bhhh(
                 f"simple step bhhh failed\ndirection = {str(direction)}"
             )
         if printer is not None:
-            printer(
-                f"simple step bhhh {steplen} to gain {proposed_ll - current_ll}"
-            )
+            printer(f"simple step bhhh {steplen} to gain {proposed_ll - current_ll}")
         steps.append(steplen)
 
         current_ll, current_dll, current_bhhh = proposed_ll, proposed_dll, proposed_bhhh

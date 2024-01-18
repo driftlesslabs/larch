@@ -25,9 +25,7 @@ from sklearn.neighbors import KernelDensity
 
 
 def weighted_sample_std(values, weights, ddof=1.0):
-    """
-    Weighted sample standard deviation.
-    """
+    """Weighted sample standard deviation."""
     average = np.average(values, weights=weights)
     variance = np.average((values - average) ** 2, weights=weights)
     variance = variance * sum(weights) / (sum(weights) - ddof)
@@ -112,9 +110,7 @@ class bounded_gaussian_kde(gaussian_kde):
         self.upper_bound = ub if ub != "max" else np.nanmax(dataset)
 
     def evaluate(self, pts):
-        """
-        Return an estimate of the density evaluated at the given points
-        """
+        """Return an estimate of the density evaluated at the given points."""
         x = pts.T
         pdf = super().evaluate(pts.T)
         if self.lower_bound is not None:

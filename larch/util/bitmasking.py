@@ -3,6 +3,7 @@ import numpy
 
 def define_masks(bitmask_sizes):
     """
+    Define a list of bitmasks from a list of bitmask sizes.
 
     Parameters
     ----------
@@ -25,6 +26,7 @@ def define_masks(bitmask_sizes):
 
 def define_min_masks_from_sets(sets):
     """
+    Define a list of bitmasks from a list of sets.
 
     Parameters
     ----------
@@ -40,6 +42,7 @@ def define_min_masks_from_sets(sets):
 
 def define_min_masks_from_df(df):
     """
+    Define a list of bitmasks from a DataFrame.
 
     Parameters
     ----------

@@ -135,7 +135,7 @@ def prepare_data(
     if flows is None:
         flows = {}
 
-    if isinstance(datasource, (DataTree,)):
+    if isinstance(datasource, DataTree):
         log.debug("adopting existing DataTree")
         if not datasource.relationships_are_digitized:
             datasource.digitize_relationships(inplace=True)
@@ -452,8 +452,6 @@ def _prep_ca(
         raise ValueError("expected flow {flow!r}")
     if flow is None or flowname != flow.name:
         flow = shared_data_ca.setup_flow(vars_ca, cache_dir=cache_dir, name=flowname)
-    else:
-        logging
     arr = flow.load(
         shared_data_ca,
         dtype=dtype,

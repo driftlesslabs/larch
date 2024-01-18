@@ -43,7 +43,7 @@ def fit_bhhh(
     jumpstart_split=5,
 ):
     """
-    Makes a series of steps using the BHHH algorithm.
+    Make a series of steps using the BHHH algorithm.
 
     Parameters
     ----------
@@ -122,13 +122,19 @@ def fit_bhhh(
             break
         if iter >= maxiter:
             if current_constraint_violation:
-                message = f"Optimization terminated after {iter} iterations with {current_constraint_violation}"
+                message = (
+                    f"Optimization terminated after {iter} iterations "
+                    f"with {current_constraint_violation}"
+                )
             else:
                 message = f"Optimization terminated after {iter} iterations"
             break
         if soft_maxiter is not None:
             if iter >= soft_maxiter and not current_constraint_violation:
-                message = f"Optimization terminated after {iter} iterations with no constraint violations"
+                message = (
+                    f"Optimization terminated after {iter} iterations "
+                    f"with no constraint violations"
+                )
                 break
 
         # no break, make a step
@@ -161,7 +167,8 @@ def fit_bhhh(
                 # no violations, check that penalty is small
                 if np.absolute(current_result.penalty * model.n_cases) > 0.01:
                     logger.debug(
-                        f"-- penalty is not small ({current_result.penalty * model.n_cases}), increasing sharpness"
+                        f"-- penalty is not small ({current_result.penalty * model.n_cases}), "
+                        f"increasing sharpness"
                     )
                     # penalty is not small, crank up sharpness
                     proposed.penalty = current_result.penalty
@@ -188,7 +195,8 @@ def fit_bhhh(
                     )
                 else:
                     logger.debug(
-                        f"-- penalty is small ({current_result.penalty * model.n_cases}), checking for converge"
+                        f"-- penalty is small ({current_result.penalty * model.n_cases}), "
+                        f"checking for converge"
                     )
                     tolerance = model.constraint_converge_tolerance()
                     logger.debug(f"-- tolerance is {tolerance}")

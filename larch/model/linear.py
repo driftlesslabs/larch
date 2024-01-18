@@ -175,12 +175,12 @@ class ParameterRef(UnicodeRef):
 
     def value(self, *args):
         """
-        The value of the parameter in a given model.
+        Get the value of the parameter in a given model.
 
         Parameters
         ----------
         m : Model
-                The model from which to extract a parameter value.
+            The model from which to extract a parameter value.
 
         Returns
         -------
@@ -199,12 +199,12 @@ class ParameterRef(UnicodeRef):
 
     def string(self, m):
         """
-        The value of the parameter in a given model, as a formatted string.
+        Get the value of the parameter in a given model, as a formatted string.
 
         Parameters
         ----------
         m : Model
-                The model from which to extract a parameter value.
+            The model from which to extract a parameter value.
 
         Returns
         -------
@@ -222,7 +222,7 @@ class ParameterRef(UnicodeRef):
         Parameters
         ----------
         m : Model
-                The model from which to extract a parameter value.
+            The model from which to extract a parameter value.
 
         Returns
         -------
@@ -352,9 +352,7 @@ class DataRef(UnicodeRef):
                             if boolmatch1.group(1) == boolmatch2.group(1):
                                 if boolmatch1.group(2) != boolmatch2.group(2):
                                     return DataRef("0")
-                return DataRef(
-                    f"{parenthize(self)}*{parenthize(other, True)}"
-                )
+                return DataRef(f"{parenthize(self)}*{parenthize(other, True)}")
             if isinstance(other, ParameterRef):
                 return LinearComponent(param=str(other), data=str(self))
             if isinstance(other, LinearComponent):
@@ -373,9 +371,7 @@ class DataRef(UnicodeRef):
                     return self
                 if isinstance(self, _Number):
                     return P(_null_) * self * other
-                return DataRef(
-                    f"{parenthize(self)}*{parenthize(other, True)}"
-                )
+                return DataRef(f"{parenthize(self)}*{parenthize(other, True)}")
             if isinstance(self, ParameterRef):
                 return LinearComponent(param=str(self), data=str(other))
             if isinstance(self, LinearComponent):
@@ -439,9 +435,6 @@ class DataRef(UnicodeRef):
 
     def __neg__(self):
         return DataRef(f"-{parenthize(self, True)}")
-
-    def __pos__(self):
-        return self
 
     def eval(self, namespace=None, *, globals=None, **more_namespace):
         import numpy
@@ -511,7 +504,7 @@ class LinearComponent:
             if self.scale == 1.0:
                 try:
                     data_is_1 = float(self.data) == 1
-                except:
+                except Exception:
                     data_is_1 = False
                 if data_is_1:
                     return f"{self.param!r}"
@@ -526,7 +519,7 @@ class LinearComponent:
             if self.scale == 1.0:
                 try:
                     data_is_1 = float(self.data) == 1
-                except:
+                except Exception:
                     data_is_1 = False
                 if data_is_1:
                     return f"exp({self.param!r})"
@@ -649,7 +642,7 @@ class LinearComponent:
                     self.as_pmath(),
                     other.as_pmath(),
                 )
-            if isinstance(other, (ParameterRef,)):
+            if isinstance(other, ParameterRef):
                 if other == _null_:
                     return self
                 elif self.param == _null_:
@@ -734,7 +727,10 @@ class LinearComponent:
             if resolve_parameters is not None:
                 if exponentiate_parameter:
                     if value_in_tooltips:
-                        p_tooltip = f"exp({self.param.string(resolve_parameters)}) = {self.param.value(resolve_parameters):.4g}"
+                        p_tooltip = (
+                            f"exp({self.param.string(resolve_parameters)}) "
+                            f"= {self.param.value(resolve_parameters):.4g}"
+                        )
                         p_display = f"{repr(self.param)}"
                     else:
                         p_display = f"{self.param.string(resolve_parameters)}"
@@ -754,7 +750,7 @@ class LinearComponent:
             try:
                 if float(self.data) == 1:
                     data_tail = ""
-            except:
+            except Exception:
                 pass
 
             if self.scale == 1.0:
@@ -820,7 +816,7 @@ class LinearComponent:
             try:
                 if float(self.data) == 1:
                     data_tail = ""
-            except:
+            except Exception:
                 pass
 
             if self.scale == 1.0:
@@ -889,7 +885,7 @@ class LinearComponent:
         if self.data != "1":
             try:
                 scale = float(self.data) * self.scale
-            except:
+            except Exception:
                 pass
             else:
                 if scale == 1:
@@ -1606,6 +1602,8 @@ class DictOfAlts(MutableMapping):
 
     def __get__(self, instance, instancetype):
         """
+        Get attribute of instance.
+
         Parameters
         ----------
         instance : Any
@@ -1706,7 +1704,7 @@ class DictOfLinearFunction:
         for k, v in kwargs.items():
             try:
                 self._map[k] = LinearFunction(v)
-            except:
+            except Exception:
                 print(v)
                 print(type(v))
                 raise
@@ -1722,6 +1720,8 @@ class DictOfLinearFunction:
 
     def __get__(self, instance, instancetype):
         """
+        Get attribute of instance.
+
         Parameters
         ----------
         instance : Any
@@ -1823,7 +1823,6 @@ class DictOfLinearFunction:
         return f"{type(self).__name__}({repr(self._map)})"
 
     def __xml__(self):
-
         from xmle import Elem
 
         x = Elem("div")

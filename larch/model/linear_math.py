@@ -38,7 +38,7 @@ class _ParameterOp:
 
     def string(self, m):
         """
-        The value of the parameter math from a given model, as a formatted string.
+        Get the value of the parameter math from a given model, as a formatted string.
 
         Parameters
         ----------
@@ -60,7 +60,7 @@ class _ParameterOp:
         if hasattr(other, "as_pmath"):
             try:
                 return ParameterAdd(self, other.as_pmath())
-            except:
+            except Exception:
                 pass
         raise NotImplementedError(f"{_what_is(self)} + {_what_is(other)}")
 
@@ -70,7 +70,7 @@ class _ParameterOp:
         if hasattr(other, "as_pmath"):
             try:
                 return ParameterAdd(other.as_pmath(), self)
-            except:
+            except Exception:
                 pass
         raise NotImplementedError(f"{_what_is(other)} + {_what_is(self)}")
 
@@ -80,7 +80,7 @@ class _ParameterOp:
         if hasattr(other, "as_pmath"):
             try:
                 return ParameterSubtract(self, other.as_pmath())
-            except:
+            except Exception:
                 pass
         raise NotImplementedError(f"{_what_is(self)} - {_what_is(other)}")
 
@@ -90,7 +90,7 @@ class _ParameterOp:
         if hasattr(other, "as_pmath"):
             try:
                 return ParameterSubtract(other.as_pmath(), self)
-            except:
+            except Exception:
                 pass
         raise NotImplementedError(f"{_what_is(other)} - {_what_is(self)}")
 
@@ -100,7 +100,7 @@ class _ParameterOp:
         if hasattr(other, "as_pmath"):
             try:
                 return ParameterMultiply(self, other.as_pmath())
-            except:
+            except Exception:
                 pass
         raise NotImplementedError(f"{_what_is(self)} * {_what_is(other)}")
 
@@ -110,7 +110,7 @@ class _ParameterOp:
         if hasattr(other, "as_pmath"):
             try:
                 return ParameterMultiply(other.as_pmath(), self)
-            except:
+            except Exception:
                 pass
         raise NotImplementedError(f"{_what_is(other)} * {_what_is(self)}")
 
@@ -120,7 +120,7 @@ class _ParameterOp:
         if hasattr(other, "as_pmath"):
             try:
                 return ParameterDivide(self, other.as_pmath())
-            except:
+            except Exception:
                 pass
         raise NotImplementedError(f"{_what_is(self)} / {_what_is(other)}")
 
@@ -130,7 +130,7 @@ class _ParameterOp:
         if hasattr(other, "as_pmath"):
             try:
                 return ParameterDivide(other.as_pmath(), self)
-            except:
+            except Exception:
                 pass
         raise NotImplementedError(f"{_what_is(other)} / {_what_is(self)}")
 

@@ -1,8 +1,17 @@
+from .display import HTML, display_html
+from .xhtml import tooltipped_style
+
 body_font = 'font-family: "Book-Antiqua", "Palatino", serif;'
 
-signature_font = "font-size:70%; font-weight:100; font-style:italic; font-family: Roboto, Helvetica, sans-serif;"
+signature_font = (
+    "font-size:70%; font-weight:100; font-style:italic; "
+    "font-family: Roboto, Helvetica, sans-serif;"
+)
 
-signature_name_font = 'font-weight:400; font-style:normal; font-family: "Roboto Slab", Roboto, Helvetica, sans-serif;'
+signature_name_font = (
+    "font-weight:400; font-style:normal; "
+    'font-family: "Roboto Slab", Roboto, Helvetica, sans-serif;'
+)
 
 
 def load_css(filename):
@@ -122,8 +131,13 @@ div.jp-OutputArea-output div.LinearFunc
 
 .larch_head_tag {font-size:150%; font-weight:900; font-family:"Roboto Slab", "Roboto", Verdana;}
 .larch_head_tag_ver {font-size:80%; font-weight:200; font-family:"Roboto Slab", "Roboto", Verdana;}
-.larch_head_tag_pth {font-size:40%; font-weight:200; font-family:"Roboto Slab", "Roboto", Verdana; padding-left:5px;}
-.larch_head_tag_more {font-size:50%; font-weight:300; font-family:"Roboto Mono", monospace; line-height:130%;}
+.larch_head_tag_pth {
+  font-size:40%; font-weight:200;
+  font-family:"Roboto Slab", "Roboto", Verdana; padding-left:5px;
+}
+.larch_head_tag_more {
+  font-size:50%; font-weight:300; font-family:"Roboto Mono", monospace; line-height:130%;
+}
 
 div.output_wrapper a.parameter_reference,
 div.jp-OutputArea-output a.parameter_reference
@@ -218,12 +232,8 @@ div.jp-RenderedMarkdown p code {
 
 """
 
-from .display import HTML, display_html
-from .xhtml import tooltipped_style
 
-css = HTML(
-    f"<style>{_default_css_jupyter}\n\n{tooltipped_style().tostring()}</style>"
-)
+css = HTML(f"<style>{_default_css_jupyter}\n\n{tooltipped_style().tostring()}</style>")
 
 
 def stylesheet():

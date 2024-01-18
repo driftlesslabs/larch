@@ -11,7 +11,7 @@ def make_estimation_data(directory="test"):
             asim_create = importlib.import_module("activitysim.cli.create")
             asim_create.get_example("example_estimation_sf", directory)
             os.chdir(directory)
-            cp = subprocess.run(
+            _cp = subprocess.run(
                 [
                     "activitysim",
                     "run",

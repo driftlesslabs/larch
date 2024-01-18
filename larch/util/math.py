@@ -21,10 +21,7 @@ def debug_array(name, arr):
 
 
 def _approx_fprime_helper(xk, f, epsilon, args=(), f0=None, *, status_widget=None):
-    """
-    See ``approx_fprime``.  An optional initial function value arg is added.
-
-    """
+    """See ``approx_fprime``.  An optional initial function value arg is added."""
     if f0 is None:
         f0_ = f(*((xk,) + args))
         try:
@@ -49,10 +46,7 @@ def _approx_fprime_helper(xk, f, epsilon, args=(), f0=None, *, status_widget=Non
 
 
 def _approx_fprime_helper_trailing(xk, f, epsilon, args=(), f0=None):
-    """
-    See ``approx_fprime``.  An optional initial function value arg is added.
-
-    """
+    """See ``approx_fprime``.  An optional initial function value arg is added."""
     if f0 is None:
         f0_ = f(*((xk,) + args))
         try:
@@ -91,7 +85,7 @@ def approx_fprime(xk, f, epsilon=None, trailing=False, *args, status_widget=None
         If a scalar, uses the same finite difference delta for all partial
         derivatives.  If an array, should contain one value per element of
         `xk`.
-    \\*args : args, optional
+    *args : args, optional
         Any other arguments that are to be passed to `f`.
 
     Returns
@@ -128,7 +122,7 @@ def approx_fprime(xk, f, epsilon=None, trailing=False, *args, status_widget=None
 
 def similarity(a, b, to_zero=None):
     """
-    The similarity between two values or arrays.
+    Compute the similarity between two values or arrays.
 
     Returns a similarity measure indicating approximately the number of
     significant figures in common between the two values.  Returns 100
@@ -166,7 +160,9 @@ def similarity(a, b, to_zero=None):
 
 def _color_poor_similarity(val):
     """
-    Takes a scalar similarity and returns a string with
+    Take a scalar similarity and returns a string.
+
+    Results in a string with
     the css property `'color: red'` for negative
     strings, black otherwise.
     """
@@ -204,7 +200,7 @@ def check_gradient(
     x0 : ndarray
         Points to check `grad` against forward difference approximation of grad
         using `func`.
-    args : \\*args, optional
+    args : *args, optional
         Extra arguments passed to `func` and `grad`.
     epsilon : float, optional
         Step size used for the finite difference approximation. It defaults to
@@ -239,7 +235,7 @@ def check_gradient(
     ]
     try:
         f = pandas.DataFrame.from_dict(OrderedDict(lister))
-    except:
+    except Exception:
         print(lister)
         raise
     if names is not None and len(names) == g_a_.size:

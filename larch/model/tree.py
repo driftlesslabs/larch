@@ -1,4 +1,5 @@
 import heapq
+import warnings
 from collections import OrderedDict
 
 import networkx as nx
@@ -342,7 +343,7 @@ class NestingTree(nx.DiGraph):
         """
         replace_edges = {k: self.edges[k].copy() for k in self.edges(n)}
         replace_heads = [k for k, _ in self.in_edges(n)]
-        super(NestingTree, self).remove_node(n)
+        super().remove_node(n)
         for k, attrs in replace_edges.items():
             for h in replace_heads:
                 super().add_edge(h, k[1], **attrs)
@@ -361,7 +362,7 @@ class NestingTree(nx.DiGraph):
 
             try:
                 cycle = find_cycle(self)
-            except:
+            except Exception:
                 pass
             else:
                 print("Found graph cycle:")
@@ -553,8 +554,6 @@ class NestingTree(nx.DiGraph):
                 pass
 
         if viz is None and dot is None:
-            import warnings
-
             if use_viz and use_dot:
                 msg = "neither pydot nor pygraphviz modules are installed, unable to draw nesting tree"
             elif use_viz:
@@ -563,7 +562,7 @@ class NestingTree(nx.DiGraph):
                 msg = "pydot module not installed, unable to draw nesting tree"
             else:
                 msg = "no drawing module used, unable to draw nesting tree"
-            warnings.warn(msg)
+            warnings.warn(msg, stacklevel=2)
             raise NotImplementedError(msg)
 
         if viz is not None:
@@ -606,7 +605,7 @@ class NestingTree(nx.DiGraph):
                         style="rounded,solid",
                         shape="box",
                     )
-            eG = G.add_subgraph(
+            _eG = G.add_subgraph(
                 name="cluster_elemental",
                 nbunch=self.elementals,
                 color="#cccccc",
@@ -615,24 +614,27 @@ class NestingTree(nx.DiGraph):
                 labelloc="b",
                 style="rounded,solid",
             )
-            unavailable_nodes = set()
+            # unavailable_nodes = set()
             # if format['UNAVAILABLE']:
             # 	if self.is_provisioned():
             # 		try:
             # 			for n, ncode in enumerate(self.alternative_codes()):
             # 				if np.sum(self.Data('Avail'),axis=0)[n,0]==0: unavailable_nodes.add(ncode)
-            # 		except: raise
+            # 		except Exception: raise
             # 	try:
             # 		legible_avail = not isinstance(self.df.queries.avail, str)
-            # 	except:
+            # 	except Exception:
             # 		legible_avail = False
             # 	if legible_avail:
             # 		for ncode,navail in self.df.queries.avail.items():
             # 			try:
             # 				if navail=='0': unavailable_nodes.add(ncode)
-            # 			except: raise
-            # 	eG.add_subgraph(name='cluster_elemental_unavailable', nbunch=unavailable_nodes, color='#bbbbbb', bgcolor='#dddddd',
-            # 				   label='Unavailable Alternatives', labelloc='b', style='rounded,solid')
+            # 			except Exception: raise
+            # 	_eG.add_subgraph(
+            #       name='cluster_elemental_unavailable', nbunch=unavailable_nodes,
+            #       color='#bbbbbb', bgcolor='#dddddd',
+            # 		label='Unavailable Alternatives', labelloc='b', style='rounded,solid'
+            # 		)
             G.add_node(self.root_id, label="Root")
             up_nodes = set()
             down_nodes = set()
@@ -647,10 +649,11 @@ class NestingTree(nx.DiGraph):
                 )  # write postscript in k5.ps with neato layout
             except ValueError as err:
                 if "in path" in str(err):
-                    import warnings
-
-                    warnings.warn(str(err) + "; unable to draw nesting tree in report")
-                    raise NotImplementedError()
+                    warnings.warn(
+                        str(err) + "; unable to draw nesting tree in report",
+                        stacklevel=2,
+                    )
+                    raise NotImplementedError() from err
             if output == "svg":
                 import xml.etree.ElementTree as ET
 
@@ -707,9 +710,12 @@ class NestingTree(nx.DiGraph):
                 )
 
                 if "parameter" in nodedata:
-                    param_label = '<BR ALIGN="CENTER" /><FONT COLOR="#999999" POINT-SIZE="9"><I>{0}</I></FONT>'.format(
-                        nodedata["parameter"]
-                    )
+                    param_label = (
+                        '<BR ALIGN="CENTER" />'
+                        '<FONT COLOR="#999999" POINT-SIZE="9">'
+                        "<I>{}</I>"
+                        "</FONT>"
+                    ).format(nodedata["parameter"])
                 else:
                     param_label = ""
 
@@ -898,6 +904,7 @@ class NestingTree(nx.DiGraph):
 
     def node_slot_arrays(self, model, parameter_dict=None):
         """
+        Return arrays for node parameters.
 
         Parameters
         ----------
@@ -943,7 +950,7 @@ class NestingTree(nx.DiGraph):
         n = self.n_edges
         for upcode in reversed(self.standard_sort):
             upslot = self.standard_slot_map[upcode]
-            for dnslot in reversed(self.successor_slots(upcode)):
+            for _dnslot in reversed(self.successor_slots(upcode)):
                 n -= 1
                 num[upslot] += 1
                 start[upslot] = n
@@ -1054,12 +1061,12 @@ def graph_to_figure(graph, output_format="svg", **format):
     try:
         import pygraphviz as viz
     except ImportError:
-        import warnings
-
-        warnings.warn("pygraphviz module not installed, unable to draw nesting tree")
+        warnings.warn(
+            "pygraphviz module not installed, unable to draw nesting tree", stacklevel=2
+        )
         raise NotImplementedError(
             "pygraphviz module not installed, unable to draw nesting tree"
-        )
+        ) from None
     existing_format_keys = list(format.keys())
     for key in existing_format_keys:
         if key.upper() != key:
@@ -1086,9 +1093,7 @@ def graph_to_figure(graph, output_format="svg", **format):
     for n in graph.nodes:
         nname = graph.nodes[n].get("name", n)
         if nname == n:
-            G.add_node(
-                n, label=f"<{nname}>", style="rounded,solid", shape="box"
-            )
+            G.add_node(n, label=f"<{nname}>", style="rounded,solid", shape="box")
         else:
             G.add_node(
                 n,
@@ -1097,11 +1102,11 @@ def graph_to_figure(graph, output_format="svg", **format):
                 shape="box",
             )
     try:
-        graph.elementals
+        graph.elementals  # noqa: B018
     except AttributeError:
         pass
     else:
-        eG = G.add_subgraph(
+        _eG = G.add_subgraph(
             name="cluster_elemental",
             nbunch=graph.elementals,
             color="#cccccc",
@@ -1110,24 +1115,28 @@ def graph_to_figure(graph, output_format="svg", **format):
             labelloc="b",
             style="rounded,solid",
         )
-    unavailable_nodes = set()
+    # unavailable_nodes = set()
     # if format['UNAVAILABLE']:
     # 	if self.is_provisioned():
     # 		try:
     # 			for n, ncode in enumerate(self.alternative_codes()):
     # 				if np.sum(self.Data('Avail'),axis=0)[n,0]==0: unavailable_nodes.add(ncode)
-    # 		except: raise
+    # 		except Exception: raise
     # 	try:
     # 		legible_avail = not isinstance(self.df.queries.avail, str)
-    # 	except:
+    # 	except Exception:
     # 		legible_avail = False
     # 	if legible_avail:
     # 		for ncode,navail in self.df.queries.avail.items():
     # 			try:
     # 				if navail=='0': unavailable_nodes.add(ncode)
-    # 			except: raise
-    # 	eG.add_subgraph(name='cluster_elemental_unavailable', nbunch=unavailable_nodes, color='#bbbbbb', bgcolor='#dddddd',
-    # 				   label='Unavailable Alternatives', labelloc='b', style='rounded,solid')
+    # 			except Exception: raise
+    # 	eG.add_subgraph(
+    #  	    name='cluster_elemental_unavailable',
+    #  	    nbunch=unavailable_nodes,
+    #  	    color='#bbbbbb', bgcolor='#dddddd',
+    #  	    label='Unavailable Alternatives', labelloc='b', style='rounded,solid'
+    #  	    )
     try:
         G.add_node(graph.root_id, label="Root")
     except AttributeError:
@@ -1145,10 +1154,10 @@ def graph_to_figure(graph, output_format="svg", **format):
         )  # write postscript in k5.ps with neato layout
     except ValueError as err:
         if "in path" in str(err):
-            import warnings
-
-            warnings.warn(str(err) + "; unable to draw nesting tree in report")
-            raise NotImplementedError()
+            warnings.warn(
+                str(err) + "; unable to draw nesting tree in report", stacklevel=2
+            )
+            raise NotImplementedError() from err
     from xmle import Elem
 
     if output_format == "svg":
@@ -1169,7 +1178,7 @@ def graph_to_figure(graph, output_format="svg", **format):
 
 def reverse_lexicographical_topological_sort(G, key=None):
     """
-    Generator of nodes in reverse lexicographically topologically sorted order.
+    Generate nodes in reverse lexicographically topologically sorted order.
 
     A general topological sort is a nonunique permutation of the nodes such that
     an edge from u to v implies that u appears before v in the topological sort
@@ -1231,7 +1240,7 @@ def reverse_lexicographical_topological_sort(G, key=None):
 
         if node not in G:
             raise RuntimeError("Graph changed during iteration")
-        for parent, child in G.in_edges(node):
+        for parent, _child in G.in_edges(node):
             try:
                 outdegree_map[parent] -= 1
             except KeyError as e:

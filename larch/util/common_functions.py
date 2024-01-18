@@ -1,4 +1,3 @@
-
 import numpy
 import pandas
 
@@ -93,7 +92,7 @@ def fourier_expansion(s, length=4, column=None, inplace=False):
         index=s.index,
         columns=columns,
     )
-    for i, col in enumerate(columns):
+    for i, _col in enumerate(columns):
         func = numpy.cos if i % 2 else numpy.sin
         mult = ((i // 2) + 1) * 2
         df.iloc[:, i] = func(s * mult * numpy.pi)
@@ -143,5 +142,5 @@ def boolean(x):
     """
     try:
         return x.astype(bool)
-    except:
+    except Exception:
         return numpy.asarray(x, dtype="bool")

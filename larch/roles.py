@@ -190,9 +190,7 @@ class DataRef(str, metaclass=Role):
         return DataRef(f"{parenthize(other)}^{parenthize(self, True)}")
 
     def __neg__(self):
-        return DataRef(
-            f"-({self})"
-        )
+        return DataRef(f"-({self})")
 
     def __pos__(self):
         return self
@@ -296,7 +294,7 @@ class ParameterRef(str, metaclass=Role):
         x = Elem("div")
         a_p = x.elem("div", attrib={"class": "tooltipped"}, text=repr(self))
         if resolve_parameters is not None:
-            plabel = "{0:.3g}".format(
+            plabel = "{:.3g}".format(
                 resolve_parameters.pvalue(self, default_value="This is a Parameter")
             )
         else:
@@ -306,7 +304,7 @@ class ParameterRef(str, metaclass=Role):
 
     def value(self, m):
         """
-        The value of the parameter in a given model.
+        Get the value of the parameter in a given model.
 
         Parameters
         ----------
@@ -392,7 +390,7 @@ class ParameterRef(str, metaclass=Role):
 
     def strf(self, m, fmt=None):
         """
-        Gives the :meth:`value` of the parameter in a given model as a string.
+        Get the :meth:`value` of the parameter in a given model as a string.
 
         The string is formated using the :meth:`fmt` string if given. If not
         given, Python's default string formatting is used.
@@ -571,7 +569,7 @@ class ParameterRef(str, metaclass=Role):
         try:
             oth = other._is_scaled_parameter()
         except AttributeError:
-            raise TypeError("other is not scaled parameter")
+            raise TypeError("other is not scaled parameter") from None
         if oth:
             return ParameterScaledOrdering(None, *self._is_scaled_parameter(), *oth)
         else:
@@ -583,7 +581,7 @@ class ParameterRef(str, metaclass=Role):
         try:
             oth = other._is_scaled_parameter()
         except AttributeError:
-            raise TypeError("other is not scaled parameter")
+            raise TypeError("other is not scaled parameter") from None
         if oth:
             return ParameterScaledOrdering(
                 None, *oth, *self._is_scaled_parameter(), snap_out="greater?"
@@ -602,7 +600,7 @@ class ParameterRef(str, metaclass=Role):
         except AttributeError:
             if isinstance(other, Number):
                 return ParameterBound(None, *self._is_scaled_parameter(), None, other)
-            raise TypeError("other is not scaled parameter")
+            raise TypeError("other is not scaled parameter") from None
         if oth:
             return ParameterScaledOrdering(None, *self._is_scaled_parameter(), *oth)
         else:
@@ -622,7 +620,7 @@ class ParameterRef(str, metaclass=Role):
         except AttributeError:
             if isinstance(other, Number):
                 return ParameterBound(None, None, other, *self._is_scaled_parameter())
-            raise TypeError("other is not scaled parameter")
+            raise TypeError("other is not scaled parameter") from None
         if oth:
             return ParameterScaledOrdering(
                 None, *oth, *self._is_scaled_parameter(), snap_out="greater"
@@ -642,7 +640,7 @@ class ParameterRef(str, metaclass=Role):
         try:
             oth = other._is_scaled_parameter()
         except AttributeError:
-            raise TypeError("other is not scaled parameter")
+            raise TypeError("other is not scaled parameter") from None
         if oth:
             return ParameterScaledEquality(None, *self._is_scaled_parameter(), *oth)
         else:
@@ -655,7 +653,7 @@ class ParameterRef(str, metaclass=Role):
         try:
             return other.equalto(self)
         except AttributeError:
-            raise NotImplementedError
+            raise NotImplementedError from None
 
     def between(self, lower, upper):
         return self.greaterthan(lower), self.lessthan(upper)
@@ -1050,7 +1048,7 @@ class LinearComponent2(tuple):
                 if not isinstance(plabel, str):
                     plabel = f"exp({plabel:.3g})={numpy.exp(plabel):.3g}"
             else:
-                plabel = "{0:.3g}".format(
+                plabel = "{:.3g}".format(
                     resolve_parameters.pvalue(
                         self.param, default_value="This is a Parameter"
                     )
@@ -1572,7 +1570,7 @@ class DictOfLinearFunction2(MutableMapping):
         for k, v in kwargs.items():
             try:
                 self.__map[k] = LinearFunction2(v)
-            except:
+            except Exception:
                 print(v)
                 print(type(v))
                 raise
@@ -1838,7 +1836,7 @@ class LinearComponent0(TouchNotify):
                 if not isinstance(plabel, str):
                     plabel = f"exp({plabel:.3g})={numpy.exp(plabel):.3g}"
             else:
-                plabel = "{0:.3g}".format(
+                plabel = "{:.3g}".format(
                     resolve_parameters.pvalue(
                         self.param, default_value="This is a Parameter"
                     )

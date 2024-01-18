@@ -203,7 +203,7 @@ class BaseModel:
             raise ValueError("invalid compute engine")
         self._compute_engine = engine
         if self._compute_engine == "jax" and self.use_streaming:
-            warnings.warn("setting use_streaming to False, jax is not yet compatible")
+            warnings.warn("setting use_streaming to False, jax is not yet compatible", stacklevel=2)
             self.use_streaming = False
 
     @property
@@ -226,12 +226,12 @@ class BaseModel:
 
     @property
     def possible_overspecification(self):
-        "Not yet implemented"
+        """Not yet implemented."""
         return None
 
     @property
     def datatree(self):
-        """DataTree : A source for data for the model"""
+        """DataTree : A source for data for the model."""
         return self._datatree
 
     @datatree.setter
@@ -278,8 +278,11 @@ class BaseModel:
 
         Notes
         -----
-        If `tree` is an xr.Dataset, it will be converted to a DataTree using the `as_tree` method of the xr.Dataset.
-        If `should_mangle` is True, the structure of the datatree will be mangled after swapping.
+        If `tree` is a xarray.Dataset, it will be converted to a DataTree using
+        the `as_tree` method of the Dataset.
+
+        If `should_mangle` is True, the structure of the datatree will be mangled
+        after swapping.
 
         Examples
         --------
@@ -438,9 +441,9 @@ class BaseModel:
             from .linear import LinearComponent, ParameterRef
             from .linear_math import ParameterOp
 
-            if isinstance(name, (ParameterRef, ParameterOp)):
+            if isinstance(name, (ParameterRef | ParameterOp)):
                 return name.value(self)
-            if isinstance(name, (LinearComponent, LinearFunction)):
+            if isinstance(name, (LinearComponent | LinearFunction)):
                 return name.as_pmath().value(self)
             if kind == "value":
                 return self.pvals[self.get_param_loc(name)]
@@ -496,9 +499,8 @@ class BaseModel:
         although it is not recommended.
 
         """
-        warnings.warn("")
         warnings.warn(
-            "Model.set_values(x) is deprecated, use Model.pvals = x", DeprecationWarning
+            "Model.set_values(x) is deprecated, use Model.pvals = x", DeprecationWarning, stacklevel=2
         )
         if isinstance(values, dict):
             kwargs.update(values)
@@ -634,15 +636,15 @@ class BaseModel:
         if self._graph is None:
             try:
                 self.initialize_graph()
-            except ValueError:
+            except ValueError as err:
                 import warnings
 
                 warnings.warn(
-                    "cannot initialize graph, must define alternatives somehow"
+                    "cannot initialize graph, must define alternatives somehow", stacklevel=2
                 )
                 raise RuntimeError(
                     "cannot initialize graph, must define alternatives somehow"
-                )
+                ) from err
         return self._graph
 
     @graph.setter
@@ -687,7 +689,7 @@ class BaseModel:
                     alts = self.dataframes.alternative_codes()
                 else:
                     alts = self.utility_co.keys()
-            except:
+            except Exception:
                 alts = self.utility_co.keys()
             t_head = t.elem("thead")
             tr = t_head.elem("tr")
@@ -836,7 +838,7 @@ class BaseModel:
                     alts = self.dataframes.alternative_codes()
                 else:
                     alts = self.utility_co.keys()
-            except:
+            except Exception:
                 alts = self.utility_co.keys()
 
             for a in alts:
@@ -902,7 +904,7 @@ class BaseModel:
 
     def required_data(self):
         """
-        What data is required in DataFrames for this model to be used.
+        Report what data is required in DataFrames for this model to be used.
 
         Returns
         -------
@@ -928,7 +930,7 @@ class BaseModel:
             if self.utility_co is not None and len(self.utility_co):
                 if "co" not in req_data:
                     req_data.co = set()
-                for alt, func in self.utility_co.items():
+                for _alt, func in self.utility_co.items():
                     for i in func:
                         if str(i.data) != "1":
                             req_data.co.add(str(i.data))
@@ -958,7 +960,7 @@ class BaseModel:
                 req_data.avail_any = True
 
             return req_data
-        except:
+        except Exception:
             logger.exception("error in required_data")
 
     def __contains__(self, item):
@@ -1016,10 +1018,8 @@ class BaseModel:
                 nameset.add(self.__p_rename(component.param))
                 try:
                     u_co_dataset.add(str(component.data))
-                except:
-                    import warnings
-
-                    warnings.warn(f"bad data in altcode {altcode}")
+                except Exception:
+                    warnings.warn(f"bad data in altcode {altcode}", stacklevel=2)
                     raise
         linear_function_ca = self.utility_ca
         for component in linear_function_ca:
@@ -1298,8 +1298,9 @@ class BaseModel:
         )
 
         # pf = self.pf
-        # columns = [i for i in ['value', 'std_err', 't_stat', 'likelihood_ratio', 'nullvalue', 'constrained'] if
-        #            i in pf.columns]
+        # columns = [i for i in
+        #           ['value', 'std_err', 't_stat', 'likelihood_ratio', 'nullvalue', 'constrained']
+        #           if i in pf.columns]
         # result = pf[columns].rename(
         #     columns={
         #         'value': 'Value',

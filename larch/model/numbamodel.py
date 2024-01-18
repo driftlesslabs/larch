@@ -1,6 +1,5 @@
 import logging
 import pathlib
-import time
 import warnings
 from collections import namedtuple
 
@@ -26,6 +25,7 @@ warnings.warn(  ## Good news, everyone! This tool might be buggy. ## )
     "the first time you import on a new system, this package will\n"
     "compile optimized binaries for your specific machine,  which\n"
     "may take a little while, please be patient ...\n",
+    stacklevel=1,
 )
 
 logger = logging.getLogger(__package__)
@@ -116,7 +116,7 @@ def quantity_from_data_ca(
         #         row = -1
         #     else:
         #         row = self._array_ce_reversemap[c, j]
-        row = -1
+        _row = -1
 
         if array_av[j]:  # and row != -1:
             if model_q_ca_param.shape[0]:
@@ -258,7 +258,7 @@ def _numba_utility_to_loglike(
     upslots = edgeslots[:, 0]  # int input shape=[edges]
     dnslots = edgeslots[:, 1]  # int input shape=[edges]
     visit1 = edgeslots[:, 2]  # int input shape=[edges]
-    allocslot = edgeslots[:, 3]  # int input shape=[edges]
+    _allocslot = edgeslots[:, 3]  # int input shape=[edges]
 
     assert return_flags.size == 4
     only_utility = return_flags[0]  # [19] int8 input
@@ -339,7 +339,8 @@ def _numba_utility_to_loglike(
             utility[up] += exp_util_dn_mu_up
             # util_nx[up] -= util_dn * exp_util_dn_mu_up / mu_up
 
-        # mu_extra[mu_extra.size-1] += np.log(utility[utility.size-1]) + util_nx[-1]/utility[utility.size-1]
+        # mu_extra[mu_extra.size-1] += np.log(utility[utility.size-1])
+        #                              + util_nx[-1]/utility[utility.size-1]
         utility[utility.size - 1] = np.log(utility[utility.size - 1])
 
     if only_utility == 2:
@@ -419,7 +420,8 @@ def _numba_utility_to_loglike(
             #
             #         scratch[:] *= multiplier
             #         scratch[:] += d_probability[up, :]
-            #         d_probability[dn, :] += scratch[:] * conditional_probability[dn] # FIXME: for CNL, use edge not dn
+            #         d_probability[dn, :] += scratch[:] *
+            #           conditional_probability[dn] # FIXME: for CNL, use edge not dn
 
             # d probability alternate path slightly lower memory usage and some faster
             d_probability = np.zeros_like(dutility)
@@ -985,7 +987,7 @@ class NumbaModel(_BaseModel):
 
     def is_mnl(self):
         """
-        Check if this model is a MNL model
+        Check if this model is a MNL model.
 
         Returns
         -------
@@ -998,9 +1000,7 @@ class NumbaModel(_BaseModel):
         return False
 
     def reflow_data_arrays(self):
-        """
-        Reload the internal data_arrays so they are consistent with the datatree.
-        """
+        """Reload the internal data_arrays so they are consistent with the datatree."""
         if self.graph is None:
             self._data_arrays = None
             return
@@ -1180,7 +1180,6 @@ class NumbaModel(_BaseModel):
     ):
         if caseslice is None:
             caseslice = slice(caseslice)
-        missing_ch, missing_av = False, False
         if self.datatree is None and self.dataset is None:
             raise MissingDataError("dataset and datatree are both not set")
         self.unmangle()
@@ -1263,7 +1262,6 @@ class NumbaModel(_BaseModel):
     def constraint_penalty(self, x=None):
         if x is not None:
             self.pvals = x
-        start = time.time()
         penalty, dpenalty, dpenalty_binding = bounds_penalty(
             self.pvals.astype(self.float_dtype),
             self.pminimum.astype(self.float_dtype),
@@ -1388,7 +1386,7 @@ class NumbaModel(_BaseModel):
                 else:
                     penalty = 0.0
 
-        except:
+        except Exception:
             shp = lambda y: getattr(y, "shape", "scalar")
             dtp = lambda y: getattr(y, "dtype", f"{type(y)} ")
             import inspect
@@ -1408,8 +1406,9 @@ class NumbaModel(_BaseModel):
                     f" {arg_names[n]:{arg_name_width}} [{n:2}] {s.strip():9}: {dtp(a)}{shp(a)}"
                 )
             print("# Output Arrays")
+            final_n = n
             for n, (a, s) in enumerate(
-                zip(self.work_arrays, out_sig_shapes), start=n + 1
+                zip(self.work_arrays, out_sig_shapes), start=final_n + 1
             ):
                 s = s.rstrip(" ),")
                 print(
@@ -1990,7 +1989,7 @@ class NumbaModel(_BaseModel):
         logger=None,
     ):
         """
-        Jump start optimization
+        Jump start optimization.
 
         Parameters
         ----------
@@ -2007,7 +2006,7 @@ class NumbaModel(_BaseModel):
 
             logger = NoLogger()
 
-        for jump in range(jumpstart):
+        for _jump in range(jumpstart):
             j_pvals = self.pvals.copy()
             #
             # jump_breaks = list(
@@ -2083,7 +2082,7 @@ class NumbaModel(_BaseModel):
                     try:
                         setattr(self, k, v)
                     except AttributeError as err:
-                        raise AttributeError(f"{k}: {err}")
+                        raise AttributeError(f"{k}: {err}") from None
 
     def copy(self, datatree=True):
         dupe = type(self)()
@@ -2122,7 +2121,8 @@ class NumbaModel(_BaseModel):
                 )
             else:
                 logging.getLogger("Larch").warning(
-                    f"dropped {len(dropped_params)} parameters including: {', '.join(dropped_params[:3])}"
+                    f"dropped {len(dropped_params)} parameters including: "
+                    f"{', '.join(dropped_params[:3])}"
                 )
 
     @property
@@ -2133,9 +2133,9 @@ class NumbaModel(_BaseModel):
             raise MissingDataError("no data are set")
         return data_as_possible.n_cases
 
-    def total_weight(self):
+    def total_weight(self) -> float:
         """
-        The total weight of cases in the loaded data.
+        Compute the total weight of cases in the loaded data.
 
         Returns
         -------
@@ -2383,7 +2383,7 @@ class NumbaModel(_BaseModel):
             constraints = []
         try:
             constraints.extend(self._get_bounds_constraints())
-        except:
+        except Exception:
             pass
 
         if constraints:

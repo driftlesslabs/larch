@@ -33,7 +33,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -106,6 +105,8 @@ def _non_reducing_slice(slice_):
 
     def pred(part) -> bool:
         """
+        Check if slice does not reduce.
+
         Returns
         -------
         bool
@@ -132,6 +133,8 @@ def _non_reducing_slice(slice_):
 
 def _maybe_numeric_slice(df, slice_, include_bool=False):
     """
+    Check for numeric dtypes in the DataFrame.
+
     Want nice defaults for background_gradient that don't break
     with non-numeric data. But if slice_ is passed go with that.
     """
@@ -170,10 +173,12 @@ class OverspecView(Styler):
         axis=0,
         subset=None,
         text_color_threshold=0.408,
-        vmin: Optional[float] = 0,
-        vmax: Optional[float] = None,
+        vmin: float | None = 0,
+        vmax: float | None = None,
     ):
         """
+        Color the background in a gradient style.
+
         Color the background in a gradient style,
         based on the magnitude (absolute value).
         The background color is determined according
@@ -244,12 +249,10 @@ class OverspecView(Styler):
         low=0,
         high=0,
         text_color_threshold=0.408,
-        vmin: Optional[float] = 0,
-        vmax: Optional[float] = None,
+        vmin: float | None = 0,
+        vmax: float | None = None,
     ):
-        """
-        Color background in a range according to the data.
-        """
+        """Color background in a range according to the data."""
         if (
             not isinstance(text_color_threshold, (float, int))
             or not 0 <= text_color_threshold <= 1
@@ -271,6 +274,7 @@ class OverspecView(Styler):
             def relative_luminance(rgba):
                 """
                 Calculate relative luminance of a color.
+
                 The calculation adheres to the W3C standards
                 (https://www.w3.org/WAI/GL/wiki/Relative_luminance)
 

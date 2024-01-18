@@ -1,4 +1,3 @@
-
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -58,7 +57,7 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
         if float_dtype is not None:
             for v in self._models.values():
                 v.float_dtype = float_dtype
-        for k, m in self._models.items():
+        for _k, m in self._models.items():
             if m._model_subtype == "latent-class":
                 pass
             elif m._model_subtype == "class-membership":
@@ -295,9 +294,7 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
         return maximize_loglike(self, *args, **kwargs)
 
     def reflow_data_arrays(self):
-        """
-        Reload the internal data_arrays so they are consistent with the datatree.
-        """
+        """Reload the internal data_arrays so they are consistent with the datatree."""
         datatree = self.datatree
         if datatree is None:
             raise ValueError("missing datatree")
@@ -305,7 +302,7 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
         classmodel = self.class_membership_model
         request = classmodel.required_data()
         request.pop("avail_any", None)
-        for kname, kmodel in self._models.items():
+        for _kname, kmodel in self._models.items():
             if kmodel._model_subtype in ("class-membership", "latent-class"):
                 continue
             kreq = kmodel.required_data()
@@ -315,7 +312,7 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
                 else:
                     if isinstance(request[k], dict):
                         request[k].update(v)
-                    elif isinstance(request[k], (list, tuple)):
+                    elif isinstance(request[k], (list | tuple)):
                         request[k] = list(set(request[k]) | set(v))
                     else:
                         if request[k] != v:
@@ -339,7 +336,7 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
             dataset = fold_dataset(dataset, self.groupid)
         self.dataset = dataset
 
-        for kname, kmodel in self._models.items():
+        for _kname, kmodel in self._models.items():
             if kmodel._model_subtype in ("class-membership", "latent-class"):
                 continue
             kmodel.dataset = self.dataset
@@ -413,7 +410,7 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
 
     @property
     def datatree(self):
-        """DataTree : A source for data for the model"""
+        """DataTree : A source for data for the model."""
         try:
             return self._datatree
         except AttributeError:
@@ -450,7 +447,7 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
 
     def total_weight(self):
         """
-        The total weight of cases in the loaded data.
+        Compute the total weight of cases in the loaded data.
 
         Returns
         -------
@@ -644,7 +641,7 @@ class MixedLatentClass(LatentClass):
     def _jax_probability_by_class(self, params, databundle):
         # classmodel = self['classmodel']
         pr_parts = []
-        for n, k in enumerate(self.class_membership_model.dataset.dc.altids()):
+        for _n, k in enumerate(self.class_membership_model.dataset.dc.altids()):
             pr_parts.append(
                 self._models[k]._jax_probability(params, databundle)
                 # * jnp.expand_dims(classmodel._jax_probability(params, databundle)[..., n], -1)
@@ -749,7 +746,7 @@ class MixedLatentClass(LatentClass):
         from .random import keysplit
 
         commons = None if self.common_draws else 0
-        for i in range(depth):
+        for _i in range(depth):
             f = jax.vmap(f, in_axes=(None, 0, commons, None))
             if not self.prerolled_draws:
                 random_key, shape = keysplit(random_key, shape)

@@ -64,7 +64,7 @@ def joint_parameter_summary(
         if model.title in model_titles:
             import warnings
 
-            warnings.warn(f"duplicate model title: {model.title}")
+            warnings.warn(f"duplicate model title: {model.title}", stacklevel=2)
         else:
             model_titles.add(model.title)
 
@@ -105,7 +105,7 @@ def joint_parameter_summary(
         for model in models:
             try:
                 ll = model.most_recent_estimation_result.loglike
-            except:
+            except Exception:
                 pass
             else:
                 summary.loc[
@@ -114,7 +114,7 @@ def joint_parameter_summary(
 
             try:
                 ll_null = model.loglike_null(-1)
-            except:
+            except Exception:
                 pass
             else:
                 summary.loc[
@@ -123,7 +123,7 @@ def joint_parameter_summary(
 
             try:
                 ll_nil = model.loglike_nil(-1)
-            except:
+            except Exception:
                 pass
             else:
                 summary.loc[
@@ -133,7 +133,7 @@ def joint_parameter_summary(
             for b in bases:
                 try:
                     comp_ll[b.title] = ll = b.most_recent_estimation_result.loglike
-                except:
+                except Exception:
                     pass
                 else:
                     summary.loc[
@@ -144,7 +144,7 @@ def joint_parameter_summary(
         for model in models:
             try:
                 rho = model.rho_sq_null(use_cache=-1)
-            except:
+            except Exception:
                 pass
             else:
                 summary.loc[
@@ -153,7 +153,7 @@ def joint_parameter_summary(
 
             try:
                 rho_nil = model.rho_sq_nil(use_cache=-1)
-            except:
+            except Exception:
                 pass
             else:
                 summary.loc[
@@ -166,7 +166,7 @@ def joint_parameter_summary(
                     rho_comp = 1 - (
                         model.most_recent_estimation_result.loglike / ll_compare
                     )
-                except:
+                except Exception:
                     pass
                 else:
                     summary.loc[

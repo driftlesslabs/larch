@@ -113,7 +113,7 @@ def timing_log(label=""):
     log.critical(f"<TIME BEGINS> {label}")
     try:
         yield
-    except:  # noqa: E722
+    except Exception:  # noqa: E722
         log.critical(
             f"<TIME ERROR!> {label} <{timesize_stack(time.time() - start_time)}>"
         )

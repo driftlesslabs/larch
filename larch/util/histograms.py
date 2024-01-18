@@ -1,6 +1,8 @@
 import numpy
 import numpy.ma as ma
+import pandas
 from numpy.lib.histograms import _hist_bin_selectors
+from numpy.ma.core import nomask as _nomask
 
 from .colors import hexcolor
 
@@ -161,10 +163,6 @@ def get_histogram_bins(
     )
 
 
-import pandas
-from numpy.ma.core import nomask as _nomask
-
-
 def _compress_by_mask(arr, mask=None):
     if arr is None:
         return None
@@ -260,7 +258,8 @@ _histogram_notes = {
     ): "Histograms are orange if the zeros are numerous and have been excluded.",
     hexcolor(
         "red"
-    ): "Histograms are red if the zeros are numerous and have been excluded, and the displayed range truncates some extreme outliers.",
+    ): "Histograms are red if the zeros are numerous and have been excluded, "
+    "and the displayed range truncates some extreme outliers.",
     hexcolor(
         "forest"
     ): "Histograms are green if the displayed range truncates some extreme outliers.",
@@ -311,27 +310,27 @@ def draw_histogram_figure(
         color = hexcolor("forest")
     else:
         color = hexcolor("ocean")
-    rects1 = ax.bar(
-        bin_edges[:-1],
-        bin_heights,
-        widths,
-        color=color,
-        align="center" if discrete else "edge",
-    )
+    # rects1 = ax.bar(
+    #     bin_edges[:-1],
+    #     bin_heights,
+    #     widths,
+    #     color=color,
+    #     align="center" if discrete else "edge",
+    # )
 
     chart_top = bin_heights.max()
 
     if ch_heights is not None:
-        rects2 = ax.bar(
-            bin_edges[:-1],
-            height=numpy.zeros_like(ch_heights),
-            width=widths,
-            bottom=ch_heights,
-            edgecolor="black",
-            linewidth=1.0,
-            align="center" if discrete else "edge",
-            clip_on=False,
-        )
+        # rects2 = ax.bar(
+        #     bin_edges[:-1],
+        #     height=numpy.zeros_like(ch_heights),
+        #     width=widths,
+        #     bottom=ch_heights,
+        #     edgecolor="black",
+        #     linewidth=1.0,
+        #     align="center" if discrete else "edge",
+        #     clip_on=False,
+        # )
         chart_top = max(chart_top, ch_heights.max())
 
     if left_thermo is not None:
@@ -520,7 +519,10 @@ def draw_histogram_figure(
         if left_thermo or right_thermo:
             if len(tooltip):
                 tooltip += "\n"
-            tooltip += "Side thermometers indicate the fraction of all observations at or beyond the limits, and are scaled independently."
+            tooltip += (
+                "Side thermometers indicate the fraction of all observations "
+                "at or beyond the limits, and are scaled independently."
+            )
 
         ret = plot_as_svg_xhtml(plt, tooltip=tooltip, pad_inches=pad_inches)
         plt.clf()
@@ -631,7 +633,7 @@ def histogram_figure(
             right_thermo=pct_over or None,
             **kwargs,
         )
-    except:
+    except Exception:
         print("bin_heights\n", bin_heights)
         print("bin_edges\n", bin_edges)
         print("zeros_are_dropped\n", zeros_are_dropped)
@@ -662,7 +664,7 @@ def sizable_histogram_figure(
             kwargs["bins"] = "discrete"
     try:
         return histogram_figure(*args, **kwargs)
-    except:
+    except Exception:
         if on_error == "ignore":
             return None
         else:

@@ -62,13 +62,7 @@ rules:
 class Format:
     @staticmethod
     def parsable(problem, filename):
-        return "%(file)s:%(line)s:%(column)s: [%(level)s] %(message)s" % {
-            "file": filename,
-            "line": problem.line,
-            "column": problem.column,
-            "level": problem.level,
-            "message": problem.message,
-        }
+        return f"{filename}:{problem.line}:{problem.column}: [{problem.level}] {problem.message}"
 
     @staticmethod
     def standard(problem, filename):

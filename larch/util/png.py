@@ -37,7 +37,7 @@ def make_png(
                 if not hasattr(content, "savefig"):
                     raise TypeError(
                         "matplotlib content must provide `get_figure` or `savefig` method."
-                    )
+                    ) from None
 
         # content is a Figure or otherwise has a savefig method
         try:
@@ -48,12 +48,12 @@ def make_png(
         if facecolor is None:
             try:
                 facecolor = content.get_facecolor()
-            except:
+            except Exception:
                 facecolor = "w"
 
         try:
             edgecolor = content.get_edgecolor()
-        except:
+        except Exception:
             edgecolor = "none"
 
         _bytes_io = io.BytesIO()

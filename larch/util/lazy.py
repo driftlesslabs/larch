@@ -32,7 +32,9 @@ import functools
 
 
 class lazy:
-    """lazy descriptor
+    """
+    Lazy descriptor.
+
     Used as a decorator to create lazy attributes. Lazy attributes
     are evaluated on first use.
     """
@@ -47,12 +49,12 @@ class lazy:
 
         if not hasattr(inst, "__dict__"):
             raise AttributeError(
-                "'%s' object has no attribute '__dict__'" % (inst_cls.__name__,)
+                f"'{inst_cls.__name__}' object has no attribute '__dict__'"
             )
 
         name = self.__name__
         if name.startswith("__") and not name.endswith("__"):
-            name = "_%s%s" % (inst_cls.__name__, name)
+            name = f"_{inst_cls.__name__}{name}"
 
         value = self.__func(inst)
         inst.__dict__[name] = value
@@ -60,7 +62,9 @@ class lazy:
 
     @classmethod
     def invalidate(cls, inst, name):
-        """Invalidate a lazy attribute.
+        """
+        Invalidate a lazy attribute.
+
         This obviously violates the lazy contract. A subclass of lazy
         may however have a contract where invalidation is appropriate.
         """
@@ -77,7 +81,8 @@ class lazy:
         #     name = '_%s%s' % (inst_cls.__name__, name)
         #
         # if not isinstance(getattr(inst_cls, name), cls):
-        #     raise AttributeError("'%s.%s' is not a %s attribute" % (inst_cls.__name__, name, cls.__name__))
+        #     raise AttributeError("'%s.%s' is not a %s attribute"
+        #                           % (inst_cls.__name__, name, cls.__name__))
 
         if name in inst.__dict__:
             del inst.__dict__[name]

@@ -1,5 +1,5 @@
 try:
-    from PIL import Image, ImageChops, ImageDraw, ImageEnhance
+    from PIL import Image, ImageChops, ImageDraw
     from selenium import webdriver
 except ImportError:
     pass  # Nothing in this module will work
@@ -101,7 +101,7 @@ def _process_region(image, x, y, width, height, tolerance=100):
             try:
                 pixel = image.getpixel((coordinateX, coordinateY))
                 region_total += sum(pixel) / 4
-            except:
+            except Exception:
                 return
 
     return region_total / factor
@@ -109,16 +109,19 @@ def _process_region(image, x, y, width, height, tolerance=100):
 
 def diff_images(imagefile1, imagefile2, return_blocked1=False, tolerance=100):
     """
+    Compare two images and return the number of mismatched blocks.
 
     Parameters
     ----------
     imagefile1, imagefile2 : images
-            Two images to compare.  They should be the same size.  Give by filename or with
-            raw data.
+            Two images to compare.  They should be the same size.  Give by
+            filename or with raw data.
     return_blocked1 : bool, default False
-            If true, also return an image `Elem` based on imagefile1 showing where the mismatch blocks are.
+            If true, also return an image `Elem` based on imagefile1 showing
+            where the mismatch blocks are.
     tolerance : int
-            This can be used as the sensitivity factor, the larger it is the less sensitive the comparison
+            This can be used as the sensitivity factor, the larger it is the
+            less sensitive the comparison
 
     Returns
     -------
@@ -190,7 +193,7 @@ def diff_images(imagefile1, imagefile2, return_blocked1=False, tolerance=100):
 
 def trim_uniform_border(im):
     """
-    Trim a border from
+    Trim a border from an image.
 
     Parameters
     ----------

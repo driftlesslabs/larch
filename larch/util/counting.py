@@ -11,7 +11,7 @@ def tally(arr):
         values, freqs = numpy.unique(arr[~pandas.isnull(arr)], return_counts=True)
         try:
             d = arr_.DICTIONARY
-        except:
+        except Exception:
             d = {}
         s = pandas.Series(freqs, index=[d.get(i, i) for i in values]).sort_values(
             ascending=False

@@ -102,7 +102,7 @@ def replace_levels(multiindex, level, new_label_array):
         except TypeError:
             raise ValueError(
                 f"missing {j} in new_label_array, all the old labels must appear"
-            )
+            ) from None
 
     old_codes = list(multiindex.codes[level])
     codes[level] = list(map(where_in_new_label_array.get, old_codes))

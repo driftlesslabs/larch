@@ -74,7 +74,7 @@ def load_model(filename_or_content):
 
             try:
                 y = read_metadata(filename_or_content)
-            except:
+            except Exception:
                 raise
             else:
                 if isinstance(y, str) and "\n" in y:

@@ -1,3 +1,6 @@
+import xmle.xhtml
+from xmle import Elem
+
 from . import styles
 
 # xml.etree.ElementTree.register_namespace("", "http://www.w3.org/2000/svg")
@@ -139,8 +142,6 @@ p.admonition-title {
 """
 )
 
-from xmle import Elem
-
 
 def larch_style():
     return Elem(
@@ -231,12 +232,8 @@ def logo_in_signature():
             "style": "position:relative;top:2px;",
         },
     )
-    sig << Elem(
-        "span", {"class": "larch_name_signature"}, text=f" Larch {version}"
-    )
+    sig << Elem("span", {"class": "larch_name_signature"}, text=f" Larch {version}")
     return sig
 
-
-import xmle.xhtml
 
 xmle.xhtml.logo_in_signature = logo_in_signature

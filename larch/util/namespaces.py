@@ -8,7 +8,7 @@ class Namespace(SimpleNamespace, MutableMapping):
         try:
             return getattr(self, item)
         except AttributeError:
-            raise KeyError(item)
+            raise KeyError(item) from None
 
     def __setitem__(self, key, value):
         setattr(self, key, value)
@@ -17,7 +17,7 @@ class Namespace(SimpleNamespace, MutableMapping):
         try:
             delattr(self, key)
         except AttributeError:
-            raise KeyError(key)
+            raise KeyError(key) from None
 
     def __iter__(self):
         return iter(self.__dict__)

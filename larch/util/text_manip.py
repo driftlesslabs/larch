@@ -47,9 +47,9 @@ def case_insensitive_close_matches(word, possibilities, n=3, cutoff=0.6, excpt=N
     ['nonlocal']
     """
     if not n > 0:
-        raise ValueError("n must be > 0: %r" % (n,))
+        raise ValueError(f"n must be > 0: {n!r}")
     if not 0.0 <= cutoff <= 1.0:
-        raise ValueError("cutoff must be in [0.0, 1.0]: %r" % (cutoff,))
+        raise ValueError(f"cutoff must be in [0.0, 1.0]: {cutoff!r}")
     result = []
     s = _SequenceMatcher()
     s.set_seq2(supercasefold(word))
@@ -80,10 +80,10 @@ def max_len(arg, at_least=0):
         return at_least
     try:
         return max(at_least, *map(len, arg))
-    except:
+    except Exception:
         try:
             return max(at_least, *map(len, *arg))
-        except:
+        except Exception:
             print("ERR max_len")
             print("arg=", arg)
             print("type(arg)=", type(arg))
@@ -107,7 +107,8 @@ def grid_str(arg, lineprefix="", linesuffix=""):
 
 
 def truncate_path_for_display(p, maxlen=30):
-    """Truncates a path if it is too long to display neatly.
+    """
+    Truncate a path if it is too long to display neatly.
 
     Do not use the trunacted path for actual file operations, it won't work.
 

@@ -22,7 +22,7 @@ def auto_ownership_model(
     # coef_template = data.coef_template # not used
     spec = data.spec
     chooser_data = data.chooser_data
-    settings = data.settings
+    _settings = data.settings
 
     altnames = list(spec.columns[3:])
     altcodes = range(len(altnames))

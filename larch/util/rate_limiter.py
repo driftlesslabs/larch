@@ -58,6 +58,6 @@ _global_rate_limiters = {}
 def GlobalRateLimiter(tag, interval=1, wait_now=True):
     global _global_rate_limiters
     if tag not in _global_rate_limiters:
-        _global_rate_limiters[tag] = RateLimiter(interval)
+        _global_rate_limiters[tag] = NonBlockingRateLimiter(interval)
     if wait_now:
         return next(_global_rate_limiters[tag])

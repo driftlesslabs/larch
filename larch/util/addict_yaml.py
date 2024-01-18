@@ -42,6 +42,7 @@ class Dict(_Dict):
         **kwargs,
     ):
         """
+        Load a yaml file into a Dict.
 
         Parameters
         ----------
@@ -78,6 +79,7 @@ class Dict(_Dict):
     @classmethod
     def load_multi(cls, *filenames, **kwargs):
         """
+        Load multiple yaml files into a Dict.
 
         Parameters
         ----------

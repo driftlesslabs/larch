@@ -1,22 +1,28 @@
+from typing import TypeVar
+
 import pandas as pd
 
 from ..shorts import P, X
+from .basemodel import BaseModel
 from .numbamodel import NumbaModel
 
+SomeModel = TypeVar('SomeModel', bound=BaseModel)
 
-def from_spec(cls, spec, datatree, title=None):
+def from_spec(cls: type[SomeModel], spec: pd.DataFrame, datatree, title=None) -> SomeModel:
     """
+    Create a model from an ActivitySim style spec.
 
     Parameters
     ----------
-    cls : NumbaModel
+    cls : Type[SomeModel]
+        The model class to construct, some subclass of BaseModel.
     spec : pd.DataFrame
     datatree : DataTree
     title : str, optional
 
     Returns
     -------
-
+    m : SomeModel
     """
     m = cls(datatree=datatree)
     if title:

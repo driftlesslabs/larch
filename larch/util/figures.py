@@ -25,6 +25,8 @@ colors = [
 
 def pseudo_bar_data(x_bins, y, gap=0):
     """
+    Generate pseudo bar data.
+
     Parameters
     ----------
     x_bins : array-like, shape=(N+1,)
@@ -369,6 +371,7 @@ def histogram_on_idca_variable(
     filter_co=None,
 ):
     """
+    Generate a figure of observed and modeled choices over a range of variable values.
 
     Parameters
     ----------
@@ -403,7 +406,7 @@ def histogram_on_idca_variable(
     if isinstance(x, str):
         raise ValueError("x not decoded")
 
-    n_cases = pr.shape[0]
+    # n_cases = pr.shape[0]
     n_alts = pr.shape[1]
 
     if ds is not None:
@@ -614,10 +617,14 @@ def distribution_on_idca_variable(
         except AttributeError:
             x_label = ""
 
-    # if model.dataframes and model.dataframes.data_ca is not None and continuous_variable in model.dataframes.data_ca:
+    # if model.dataframes \
+    #       and model.dataframes.data_ca is not None \
+    #       and continuous_variable in model.dataframes.data_ca:
     # 	cv = model.dataframes.data_ca[continuous_variable].values.reshape(-1)
     # else:
-    # 	cv = model.dataservice.make_dataframes({'ca': [continuous_variable]}, explicit=True).array_ca().reshape(-1)
+    # 	cv = model.dataservice.make_dataframes(
+    #   	{'ca': [continuous_variable]}, explicit=True
+    #   ).array_ca().reshape(-1)
 
     discrete_values = None
     if discrete:
@@ -910,7 +917,8 @@ def share_figure(
 
         warnings.warn(
             "including nests in a stacked figure is likely to give "
-            "misleading results unless constituent alternatives are omitted"
+            "misleading results unless constituent alternatives are omitted",
+            stacklevel=2,
         )
 
     if exclude_alts is None:
@@ -921,8 +929,6 @@ def share_figure(
             xlabel = x.name
         except AttributeError:
             pass
-
-    filter_ = slice(None)
 
     h_pr = {}
     h_ch = {}
@@ -1284,7 +1290,8 @@ def distribution_on_idco_variable(
 
         warnings.warn(
             "including nests in a stacked figure is likely to give "
-            "misleading results unless constituent alternatives are omitted"
+            "misleading results unless constituent alternatives are omitted",
+            stacklevel=2,
         )
 
     if exclude_alts is None:

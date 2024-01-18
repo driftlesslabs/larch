@@ -169,7 +169,7 @@ class SmartFileReader:
         except io.UnsupportedOperation:
             try:
                 return 1.0 - (float(self.file._left) / float(self._filesize) * 100)
-            except:
+            except Exception:
                 return 0
 
     def __iter__(self):
@@ -178,7 +178,7 @@ class SmartFileReader:
     def bytesread(self):
         try:
             b = float(self.file.tell())
-        except:
+        except Exception:
             return "error in bytesread"
         labels = ["B", "KB", "MB", "GB", "TB"]
         scale = 0
@@ -204,15 +204,12 @@ def interpret_header_name(h):
         eL.warning("'group' is a reserved keyword, changing column header to 'groupid'")
         h = h + "id"
     if h.upper() in _sqlite_keywords:
-        eL.warning(
-            "'%s' is a reserved keyword, changing column header to '%s_'" % (h, h)
-        )
+        eL.warning(f"'{h}' is a reserved keyword, changing column header to '{h}_'")
         h = h + "_"
     if "." in h:
         h = h.replace(".", "_")
         eL.warning(
-            "dots are not allowed in column headers, changing column header to '%s'"
-            % (h,)
+            f"dots are not allowed in column headers, changing column header to '{h}'"
         )
     if len(h) == 0:
         eL.error("zero length header")
@@ -227,6 +224,7 @@ def interpret_header_name(h):
 def prepare_import_headers(rawfilename, headers=None):
     """
     Identify the file type and read the column headers from the first row.
+
     For each column, data type is presumed to be FLOAT unless the column name is
     prepended with '@' or '#' which makes the column format TEXT or INT respectively.
     Since data is stored in SQLite, format is just a suggestion anyhow.
@@ -271,6 +269,7 @@ def prepare_import_headers(rawfilename, headers=None):
 def prepare_import_headers_plain(rawfilename, headers=None):
     """
     Identify the file type and read the column headers from the first row.
+
     For each column, data type is presumed to be FLOAT unless the column name is
     prepended with '@' or '#' which makes the column format TEXT or INT respectively.
     Since data is stored in SQLite, format is just a suggestion anyhow.

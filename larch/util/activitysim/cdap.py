@@ -160,7 +160,7 @@ def cdap_interaction_utility(model, n_persons, alts, interaction_coef, coefficie
         elif cardinality == n_persons:
             this_aname = activity * n_persons
             this_altnum = alts[this_aname]
-            for rowindex, row in coefs.iterrows():
+            for _rowindex, row in coefs.iterrows():
                 expression = "&".join(
                     f"(p{p}_ptype == {t})"
                     for (p, t) in zip(person_numbers, row.interaction_ptypes)
@@ -189,7 +189,7 @@ def cdap_interaction_utility(model, n_persons, alts, interaction_coef, coefficie
                 pattern = interact_pattern(n_persons, combo, activity)
                 for aname, anum in alts.items():
                     if pattern.match(aname):
-                        for rowindex, row in coefs.iterrows():
+                        for _rowindex, row in coefs.iterrows():
                             expression = "&".join(
                                 f"(p{p}_ptype == {t})"
                                 for (p, t) in zip(combo, row.interaction_ptypes)

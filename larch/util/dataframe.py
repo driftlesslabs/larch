@@ -2,6 +2,8 @@ from collections.abc import Mapping
 
 import numpy
 import pandas
+import seaborn
+from matplotlib import colors
 from xmle import Elem
 
 try:
@@ -60,9 +62,6 @@ class DataFrameViewer(pandas.DataFrame):
 # DataFrame Styling
 #####################
 
-import seaborn
-from matplotlib import colors
-
 
 def global_background_gradient(s, m, M, cmap=None, low=0, high=0):
     if cmap is None:
@@ -93,20 +92,20 @@ def apply_global_background_gradient(
 ###################
 
 
-def dataframe_from_dict_of_series(dict_of_series):
-    dict_of_numpy_arrays = {}
-    renaming = {}
-    for k in sorted(dict_of_series.keys()):
-        v = dict_of_series[k]
-        if v in df:
-            dict_of_numpy_arrays[str(k)] = df[v].to_numpy()
-        else:
-            dict_of_numpy_arrays[str(k)] = df.eval(v).to_numpy()
-        renaming[str(k)] = k
-
-    out = pa.table(dict_of_numpy_arrays).to_pandas()
-    out.rename(columns=renaming, inplace=True)
-    return out
+# def dataframe_from_dict_of_series(dict_of_series):
+#     dict_of_numpy_arrays = {}
+#     renaming = {}
+#     for k in sorted(dict_of_series.keys()):
+#         v = dict_of_series[k]
+#         if v in df:
+#             dict_of_numpy_arrays[str(k)] = df[v].to_numpy()
+#         else:
+#             dict_of_numpy_arrays[str(k)] = df.eval(v).to_numpy()
+#         renaming[str(k)] = k
+#
+#     out = pa.table(dict_of_numpy_arrays).to_pandas()
+#     out.rename(columns=renaming, inplace=True)
+#     return out
 
 
 def columnize_with_joinable_backing(
@@ -143,8 +142,8 @@ def _get_str_fallback(d, key):
     except KeyError as err:
         try:
             return d[str(key)]
-        except:
-            raise err
+        except Exception:
+            raise err from None
 
 
 def columnize(df, name, inplace=True, dtype=None, debug=False, backing=None):
@@ -205,7 +204,7 @@ def columnize(df, name, inplace=True, dtype=None, debug=False, backing=None):
     from .aster import asterize
 
     DOT = (OP, ".")
-    COLON = (OP, ":")
+    # COLON = (OP, ":")
     COMMA = (OP, ",")
     OBRAC = (OP, "[")
     CBRAC = (OP, "]")
@@ -279,7 +278,7 @@ def columnize(df, name, inplace=True, dtype=None, debug=False, backing=None):
         recommand += [DOT, (NAME, "astype"), OPAR, (STRING, f"'{dtype_}'"), CPAR]
     try:
         ret = untokenize(recommand).decode("utf-8")
-    except:
+    except Exception:
         print("<recommand>")
         print(recommand)
         print("</recommand>")
@@ -291,7 +290,6 @@ def columnize(df, name, inplace=True, dtype=None, debug=False, backing=None):
         print(ret)
         print("</ret>")
     j = asterize(ret, mode="exec" if inplace else "eval")
-
 
     try:
         if inplace:
@@ -314,14 +312,12 @@ def columnize(df, name, inplace=True, dtype=None, debug=False, backing=None):
         if "max" in name:
             arg0 = (
                 arg0
-                + '\n(note to get the maximum of arrays use "fmax" not "max")'.format(
-                    )
+                + '\n(note to get the maximum of arrays use "fmax" not "max")'.format()
             )
         if "min" in name:
             arg0 = (
                 arg0
-                + '\n(note to get the minimum of arrays use "fmin" not "min")'.format(
-                    )
+                + '\n(note to get the minimum of arrays use "fmin" not "min")'.format()
             )
         if isinstance(exc, NameError):
             badname = str(exc).split("'")[1]
@@ -393,7 +389,7 @@ def counts_and_shares(
             raise TypeError("column for rows must be categorical")
         cats = rows.copy()
 
-    firstcat, lastcat = cats.cat.categories[0], cats.cat.categories[-1]
+    # firstcat, lastcat = cats.cat.categories[0], cats.cat.categories[-1]
 
     cats = cats.cat.add_categories(["TOTAL", "% of TOT"])
 

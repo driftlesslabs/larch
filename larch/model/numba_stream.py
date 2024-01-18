@@ -1,4 +1,3 @@
-
 import numba as nb
 import numpy as np
 import pandas as pd
@@ -282,14 +281,14 @@ def init_choice_avail_summary_streamer(model):
     n_alts = model.datatree.n_alts
 
     if "ca" in streamers:
-        stream_ca = streamers["ca"]
+        stream_ca = streamers["ca"]  # noqa: F841
     else:
-        stream_ca = nb.njit(lambda c: np.zeros((1, n_alts, 0), dtype=float_dtype))
+        stream_ca = nb.njit(lambda c: np.zeros((1, n_alts, 0), dtype=float_dtype))  # noqa: F841
 
     if "co" in streamers:
-        stream_co = streamers["co"]
+        stream_co = streamers["co"]  # noqa: F841
     else:
-        stream_co = nb.njit(lambda c: np.zeros((1, 0), dtype=float_dtype))
+        stream_co = nb.njit(lambda c: np.zeros((1, 0), dtype=float_dtype))  # noqa: F841
 
     if "avail_ca" in streamers:
         _stream_av_1 = streamers["avail_ca"]
@@ -449,6 +448,8 @@ class ModelStreamer:
 
     def __get__(self, obj, objtype=None):
         """
+        Get the value of an attribute.
+
         Parameters
         ----------
         obj : Any
@@ -467,6 +468,8 @@ class ModelStreamer:
 
     def __set__(self, instance, value):
         """
+        Set the value of an attribute.
+
         Parameters
         ----------
         instance : Any
