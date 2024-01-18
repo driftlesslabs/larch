@@ -2,9 +2,9 @@ import numpy
 import numpy as np
 import pandas
 import pandas as pd
-from matplotlib import pyplot as plt
 from xarray import Dataset
 
+from .._optional import pyplot as plt
 from ..dataset import DataTree
 from ..model.basemodel import BaseModel
 from .plotting import plot_as_svg_xhtml

@@ -1471,7 +1471,7 @@ class LinearFunction:
             )
 
         # Active evaluation mode...
-        from matplotlib import pyplot as plt
+        from .._optional import pyplot as plt
 
         plt.clf()
         x, y = self._linear_plot_2d_data(

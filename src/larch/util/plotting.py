@@ -97,7 +97,7 @@ def line_graph(
     if x_title is None:
         x_title = getattr(x, "name", None)
 
-    from matplotlib import pyplot as plt
+    from .._optional import pyplot as plt
 
     fig, ax = plt.subplots()
 

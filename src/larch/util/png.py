@@ -28,7 +28,8 @@ def make_png(
 
     if "matplotlib" in str(type(content)):
         import matplotlib.figure
-        from matplotlib import pyplot as plt
+
+        from .._optional import pyplot as plt
 
         if not isinstance(content, matplotlib.figure.Figure):
             try:

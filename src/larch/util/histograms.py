@@ -294,7 +294,7 @@ def draw_histogram_figure(
     left_thermo=None,
     right_thermo=None,
 ):
-    from matplotlib import pyplot as plt
+    from .._optional import pyplot as plt
 
     fig, ax = plt.subplots(nrows=1, ncols=1, sharex=False, sharey=False)
     widths = bin_edges[1:] - bin_edges[:-1]

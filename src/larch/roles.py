@@ -1485,7 +1485,7 @@ class LinearFunction2(MutableSequence):
             )
 
         # Active evaluation mode...
-        from matplotlib import pyplot as plt
+        from .._optional import pyplot as plt
 
         plt.clf()
         x, y = self._linear_plot_2d_data(
@@ -2231,7 +2231,7 @@ class LinearFunction0(TouchNotify, list):
             )
 
         # Active evaluation mode...
-        from matplotlib import pyplot as plt
+        from .._optional import pyplot as plt
 
         plt.clf()
         x, y = self._linear_plot_2d_data(
@@ -2336,7 +2336,7 @@ def multiple_linear_plot_2d(
         )
 
     # Active evaluation mode...
-    from matplotlib import pyplot as plt
+    from .._optional import pyplot as plt
 
     plt.clf()
 
