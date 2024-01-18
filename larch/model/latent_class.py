@@ -298,7 +298,6 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
         """
         Reload the internal data_arrays so they are consistent with the datatree.
         """
-
         datatree = self.datatree
         if datatree is None:
             raise ValueError("missing datatree")

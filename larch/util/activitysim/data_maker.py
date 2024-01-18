@@ -26,7 +26,7 @@ def make_estimation_data(directory="test"):
                 ],
                 capture_output=True,
             )
-            with open(check_file, "rt") as f:
+            with open(check_file) as f:
                 f.write("**/*.csv\n")
                 f.write("**/*.txt\n")
                 f.write("**/*.yaml\n")

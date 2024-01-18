@@ -66,7 +66,7 @@ class BoundedKDE:
                     weights.sum(), -1.0 / 5
                 )
         elif getattr(bw_method, "bandwidth", None) is not None:
-            bw = getattr(bw_method, "bandwidth")
+            bw = bw_method.bandwidth
         elif np.isscalar(bw_method) and not isinstance(bw_method, str):
             bw = bw_method
         else:

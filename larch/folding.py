@@ -150,7 +150,6 @@ def folder(cls, ds, fold_on, crack=True, avail="_avail_", fill_missing=None):
     Dataset
 
     """
-
     # if df.index.nlevels != 2:
     #     raise ValueError("source idca dataframe must have a two "
     #                      "level MultiIndex giving case and alt id's")

@@ -55,7 +55,7 @@ def label_to_index(labels, arr):
     uniq_labels, uniq_indexes = numpy.unique(labels, return_inverse=True)
     if len(uniq_labels) != len(labels):
         raise NonUniqueLookup(
-            "lookup '{}' does not have unique labels for each item".format(lookupname)
+            f"lookup '{lookupname}' does not have unique labels for each item"
         )
     index_malordered = numpy.digitize(arr, uniq_labels, right=True)
     return uniq_indexes[index_malordered]

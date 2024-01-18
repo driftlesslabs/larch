@@ -1,5 +1,5 @@
 import operator
-from typing import Mapping
+from collections.abc import Mapping
 
 import numpy
 import pandas

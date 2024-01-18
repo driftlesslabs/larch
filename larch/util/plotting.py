@@ -1,5 +1,5 @@
+from collections.abc import Callable, Collection, Mapping
 from io import BytesIO
-from typing import Callable, Collection, Mapping
 
 import pandas
 from xmle import Elem

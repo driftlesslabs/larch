@@ -37,10 +37,10 @@ class DataRef(str, metaclass=Role):
     def __new__(cls, name, **kwarg):
         if hasattr(str, name):
             raise NameError(
-                "cannot create DataRef with the name of a str method ({})".format(name)
+                f"cannot create DataRef with the name of a str method ({name})"
             )
         if name in ("_descrip", "descrip", "_role"):
-            raise NameError("cannot create DataRef with the name ({})".format(name))
+            raise NameError(f"cannot create DataRef with the name ({name})")
         try:
             raise TypeError("debugging")  # The getattr here is not really needed?
             return getattr(cls, name)
@@ -77,29 +77,29 @@ class DataRef(str, metaclass=Role):
     def __repr__(self):
         s = super().__str__()
         if _re.match("[_A-Za-z][_a-zA-Z0-9]*$", s) and not _keyword.iskeyword(s):
-            return "{}.{}".format(_DataRef_repr_txt, s)
+            return f"{_DataRef_repr_txt}.{s}"
         else:
-            return "{}('{}')".format(_DataRef_repr_txt, s)
+            return f"{_DataRef_repr_txt}('{s}')"
 
     def __add__(self, other):
         if isinstance(other, (ParameterRef, LinearComponent, LinearFunction)):
             return LinearComponent(data=str(self), param="CONSTANT") + other
-        return DataRef("{}+{}".format(parenthize(self), parenthize(other, True)))
+        return DataRef(f"{parenthize(self)}+{parenthize(other, True)}")
 
     def __radd__(self, other):
         if isinstance(other, (ParameterRef, LinearComponent, LinearFunction)):
             return other + LinearComponent(data=str(self), param="CONSTANT")
-        return DataRef("{}+{}".format(parenthize(other), parenthize(self, True)))
+        return DataRef(f"{parenthize(other)}+{parenthize(self, True)}")
 
     def __sub__(self, other):
         if isinstance(other, (ParameterRef, LinearComponent, LinearFunction)):
             return LinearComponent(data=str(self), param="CONSTANT") - other
-        return DataRef("{}-{}".format(parenthize(self), parenthize(other, True)))
+        return DataRef(f"{parenthize(self)}-{parenthize(other, True)}")
 
     def __rsub__(self, other):
         if isinstance(other, (ParameterRef, LinearComponent, LinearFunction)):
             return other - LinearComponent(data=str(self), param="CONSTANT")
-        return DataRef("{}-{}".format(parenthize(other), parenthize(self, True)))
+        return DataRef(f"{parenthize(other)}-{parenthize(self, True)}")
 
     def __mul__(self, other):
         if isinstance(other, LinearFunction):
@@ -126,7 +126,7 @@ class DataRef(str, metaclass=Role):
             return LinearComponent(data=str(-self), param=str(other._orig))
         if other == 0:
             return 0
-        return DataRef("{}*{}".format(parenthize(self), parenthize(other, True)))
+        return DataRef(f"{parenthize(self)}*{parenthize(other, True)}")
 
     def __rmul__(self, other):
         if isinstance(other, LinearFunction):
@@ -139,7 +139,7 @@ class DataRef(str, metaclass=Role):
             return LinearComponent(data=str(-self), param=str(other._orig))
         if other == 0:
             return 0
-        return DataRef("{}*{}".format(parenthize(other), parenthize(self, True)))
+        return DataRef(f"{parenthize(other)}*{parenthize(self, True)}")
 
     def __truediv__(self, other):
         if isinstance(other, LinearFunction):
@@ -148,7 +148,7 @@ class DataRef(str, metaclass=Role):
             raise NotImplementedError
         if isinstance(other, ParameterRef):
             raise NotImplementedError
-        return DataRef("{}/{}".format(parenthize(self), parenthize(other, True)))
+        return DataRef(f"{parenthize(self)}/{parenthize(other, True)}")
 
     def __rtruediv__(self, other):
         if isinstance(other, LinearFunction):
@@ -157,43 +157,41 @@ class DataRef(str, metaclass=Role):
             raise NotImplementedError
         if isinstance(other, ParameterRef):
             raise NotImplementedError
-        return DataRef("{}/{}".format(parenthize(other), parenthize(self, True)))
+        return DataRef(f"{parenthize(other)}/{parenthize(self, True)}")
 
     def __and__(self, other):
         if isinstance(other, (ParameterRef, LinearComponent, LinearFunction)):
             raise NotImplementedError
-        return DataRef("{}&{}".format(parenthize(self), parenthize(other, True)))
+        return DataRef(f"{parenthize(self)}&{parenthize(other, True)}")
 
     def __rand__(self, other):
         if isinstance(other, (ParameterRef, LinearComponent, LinearFunction)):
             raise NotImplementedError
-        return DataRef("{}&{}".format(parenthize(other), parenthize(self, True)))
+        return DataRef(f"{parenthize(other)}&{parenthize(self, True)}")
 
     def __or__(self, other):
         if isinstance(other, (ParameterRef, LinearComponent, LinearFunction)):
             raise NotImplementedError
-        return DataRef("{}|{}".format(parenthize(self), parenthize(other, True)))
+        return DataRef(f"{parenthize(self)}|{parenthize(other, True)}")
 
     def __ror__(self, other):
         if isinstance(other, (ParameterRef, LinearComponent, LinearFunction)):
             raise NotImplementedError
-        return DataRef("{}|{}".format(parenthize(other), parenthize(self, True)))
+        return DataRef(f"{parenthize(other)}|{parenthize(self, True)}")
 
     def __xor__(self, other):
         if isinstance(other, (ParameterRef, LinearComponent, LinearFunction)):
             raise NotImplementedError
-        return DataRef("{}^{}".format(parenthize(self), parenthize(other, True)))
+        return DataRef(f"{parenthize(self)}^{parenthize(other, True)}")
 
     def __rxor__(self, other):
         if isinstance(other, (ParameterRef, LinearComponent, LinearFunction)):
             raise NotImplementedError
-        return DataRef("{}^{}".format(parenthize(other), parenthize(self, True)))
+        return DataRef(f"{parenthize(other)}^{parenthize(self, True)}")
 
     def __neg__(self):
         return DataRef(
-            "-({})".format(
-                self,
-            )
+            f"-({self})"
         )
 
     def __pos__(self):
@@ -285,9 +283,9 @@ class ParameterRef(str, metaclass=Role):
     def __repr__(self):
         s = super().__str__()
         if _re.match("[_A-Za-z][_a-zA-Z0-9]*$", s) and not _keyword.iskeyword(s):
-            return "{}.{}".format(_ParameterRef_repr_txt, s)
+            return f"{_ParameterRef_repr_txt}.{s}"
         else:
-            return "{}('{}')".format(_ParameterRef_repr_txt, s)
+            return f"{_ParameterRef_repr_txt}('{s}')"
 
     def __str__(self):
         return super().__str__()
@@ -718,10 +716,10 @@ class _param_add(_param_math_binaryop):
         return x
 
     def __repr__(self):
-        return "({} + {})".format(repr(self._left), repr(self._right))
+        return f"({repr(self._left)} + {repr(self._right)})"
 
     def __str__(self):
-        return "{} + {}".format(repr(self._left), repr(self._right))
+        return f"{repr(self._left)} + {repr(self._right)}"
 
     def _to_Linear(self):
         return self._left._to_Linear() + self._right._to_Linear()
@@ -754,10 +752,10 @@ class _param_subtract(_param_math_binaryop):
         return x
 
     def __repr__(self):
-        return "({} - {})".format(repr(self._left), repr(self._right))
+        return f"({repr(self._left)} - {repr(self._right)})"
 
     def __str__(self):
-        return "{} - {}".format(repr(self._left), repr(self._right))
+        return f"{repr(self._left)} - {repr(self._right)}"
 
 
 class _param_multiply(_param_math_binaryop):
@@ -782,10 +780,10 @@ class _param_multiply(_param_math_binaryop):
         return x
 
     def __repr__(self):
-        return "({} * {})".format(repr(self._left), repr(self._right))
+        return f"({repr(self._left)} * {repr(self._right)})"
 
     def __str__(self):
-        return "{} * {}".format(repr(self._left), repr(self._right))
+        return f"{repr(self._left)} * {repr(self._right)}"
 
     def _is_scaled_parameter(self):
         if type(self._left) is ParameterRef and isinstance(self._right, Number):
@@ -854,10 +852,10 @@ class _param_divide(_param_math_binaryop):
         return x
 
     def __repr__(self):
-        return "({} / {})".format(repr(self._left), repr(self._right))
+        return f"({repr(self._left)} / {repr(self._right)})"
 
     def __str__(self):
-        return "{} / {}".format(repr(self._left), repr(self._right))
+        return f"{repr(self._left)} / {repr(self._right)}"
 
 
 class _param_negate(ParameterRef):
@@ -865,7 +863,7 @@ class _param_negate(ParameterRef):
         self = super().__new__(cls, "")
         self._orig = orig
         self._fmt = orig._fmt
-        self._name = "-({})".format(orig.getname())
+        self._name = f"-({orig.getname()})"
         self._role = "parameter_math"
         return self
 
@@ -882,10 +880,10 @@ class _param_negate(ParameterRef):
             return True
 
     def __repr__(self):
-        return "-({})".format(repr(self._orig))
+        return f"-({repr(self._orig)})"
 
     def __str__(self):
-        return "-({})".format(repr(self._orig))
+        return f"-({repr(self._orig)})"
 
 
 try:
@@ -898,14 +896,14 @@ except ImportError:
 
 def log(x):
     if isinstance(x, DataRef):
-        return DataRef("log({})".format(x))
+        return DataRef(f"log({x})")
     else:
         return _log(x)
 
 
 def exp(x):
     if isinstance(x, DataRef):
-        return DataRef("exp({})".format(x))
+        return DataRef(f"exp({x})")
     else:
         return _exp(x)
 
@@ -1050,7 +1048,7 @@ class LinearComponent2(tuple):
                     self.param, default_value="This is a Parameter"
                 )
                 if not isinstance(plabel, str):
-                    plabel = "exp({0:.3g})={1:.3g}".format(plabel, numpy.exp(plabel))
+                    plabel = f"exp({plabel:.3g})={numpy.exp(plabel):.3g}"
             else:
                 plabel = "{0:.3g}".format(
                     resolve_parameters.pvalue(
@@ -1209,7 +1207,7 @@ class LinearFunction2(MutableSequence):
             result = type(self)(self)
             result.append(other)
             return result
-        raise TypeError("cannot add type {} to LinearFunction".format(type(other)))
+        raise TypeError(f"cannot add type {type(other)} to LinearFunction")
 
     def __iadd__(self, other):
         if isinstance(other, ParameterRef):
@@ -1221,7 +1219,7 @@ class LinearFunction2(MutableSequence):
         elif isinstance(other, LinearComponent2):
             self.append(other)
         else:
-            raise TypeError("cannot add type {} to LinearFunction".format(type(other)))
+            raise TypeError(f"cannot add type {type(other)} to LinearFunction")
         return self
 
     def __radd__(self, other):
@@ -1650,7 +1648,7 @@ class DictOfLinearFunction2(MutableMapping):
         return type(self)(self)
 
     def __repr__(self):
-        return "{0}({1})".format(type(self).__name__, repr(self.__map))
+        return f"{type(self).__name__}({repr(self.__map)})"
 
     def __xml__(self):
         from xmle import Elem
@@ -1763,9 +1761,7 @@ class LinearComponent0(TouchNotify):
             )
         else:
             raise TypeError(
-                "unsupported operand type(s) for LinearComponent0: {}".format(
-                    type(other)
-                )
+                f"unsupported operand type(s) for LinearComponent0: {type(other)}"
             )
 
     def __rmul__(self, other):
@@ -1785,9 +1781,7 @@ class LinearComponent0(TouchNotify):
             )
         else:
             raise TypeError(
-                "unsupported operand type(s) for LinearComponent0: {}".format(
-                    type(other)
-                )
+                f"unsupported operand type(s) for LinearComponent0: {type(other)}"
             )
 
     def __imul__(self, other):
@@ -1803,9 +1797,7 @@ class LinearComponent0(TouchNotify):
             self.data = self.data * other
         else:
             raise TypeError(
-                "unsupported operand type(s) for LinearComponent0: {}".format(
-                    type(other)
-                )
+                f"unsupported operand type(s) for LinearComponent0: {type(other)}"
             )
 
     def __iter__(self):
@@ -1844,7 +1836,7 @@ class LinearComponent0(TouchNotify):
                     self.param, default_value="This is a Parameter"
                 )
                 if not isinstance(plabel, str):
-                    plabel = "exp({0:.3g})={1:.3g}".format(plabel, numpy.exp(plabel))
+                    plabel = f"exp({plabel:.3g})={numpy.exp(plabel):.3g}"
             else:
                 plabel = "{0:.3g}".format(
                     resolve_parameters.pvalue(
@@ -1944,7 +1936,7 @@ class LinearFunction0(TouchNotify, list):
             result = type(self)(self)
             result.append(other)
             return result
-        raise TypeError("cannot add type {} to LinearFunction0".format(type(other)))
+        raise TypeError(f"cannot add type {type(other)} to LinearFunction0")
 
     def __iadd__(self, other):
         if isinstance(other, ParameterRef):
@@ -1956,7 +1948,7 @@ class LinearFunction0(TouchNotify, list):
         elif isinstance(other, LinearComponent0):
             super().append(other)
         else:
-            raise TypeError("cannot add type {} to LinearFunction0".format(type(other)))
+            raise TypeError(f"cannot add type {type(other)} to LinearFunction0")
         return self
 
     def __radd__(self, other):
@@ -2406,8 +2398,8 @@ class DictOfLinearFunction0(TouchNotify, dict):
     @staticmethod  # because this doesn't make sense as a global function.
     def _process_args(mapping=(), **kwargs):
         if hasattr(mapping, "items"):
-            mapping = getattr(mapping, "items")()
-        return ((k, v) for k, v in chain(mapping, getattr(kwargs, "items")()))
+            mapping = mapping.items()
+        return ((k, v) for k, v in chain(mapping, kwargs.items()))
 
     def __init__(self, mapping=(), alts_validator=None, **kwargs):
         if mapping is None:
@@ -2473,7 +2465,7 @@ class DictOfLinearFunction0(TouchNotify, dict):
         return result
 
     def __repr__(self):
-        return "{0}({1})".format(type(self).__name__, super().__repr__())
+        return f"{type(self).__name__}({super().__repr__()})"
 
     def set_touch_callback(self, callback):
         super().set_touch_callback(callback)
@@ -2521,8 +2513,8 @@ class DictOfStrings(TouchNotify, dict):
     @staticmethod  # because this doesn't make sense as a global function.
     def _process_args(mapping=(), **kwargs):
         if hasattr(mapping, "items"):
-            mapping = getattr(mapping, "items")()
-        return ((k, v) for k, v in chain(mapping, getattr(kwargs, "items")()))
+            mapping = mapping.items()
+        return ((k, v) for k, v in chain(mapping, kwargs.items()))
 
     def __init__(self, mapping=(), **kwargs):
         if mapping is None:
@@ -2545,7 +2537,7 @@ class DictOfStrings(TouchNotify, dict):
         return type(self)(self)
 
     def __repr__(self):
-        return "{0}({1})".format(type(self).__name__, super().__repr__())
+        return f"{type(self).__name__}({super().__repr__()})"
 
     def __xml__(self):
         from xmle import Elem
@@ -2578,8 +2570,8 @@ class DictOfStringKeys(TouchNotify, dict):
     @staticmethod  # because this doesn't make sense as a global function.
     def _process_args(mapping=(), **kwargs):
         if hasattr(mapping, "items"):
-            mapping = getattr(mapping, "items")()
-        return ((k, v) for k, v in chain(mapping, getattr(kwargs, "items")()))
+            mapping = mapping.items()
+        return ((k, v) for k, v in chain(mapping, kwargs.items()))
 
     def __init__(self, mapping=(), **kwargs):
         if mapping is None:
@@ -2602,7 +2594,7 @@ class DictOfStringKeys(TouchNotify, dict):
         return type(self)(self)
 
     def __repr__(self):
-        return "{0}({1})".format(type(self).__name__, super().__repr__())
+        return f"{type(self).__name__}({super().__repr__()})"
 
     def __xml__(self):
         from xmle import Elem

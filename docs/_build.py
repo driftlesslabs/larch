@@ -1,5 +1,4 @@
 #!/Users/jeffnewman/opt/anaconda3/envs/autumn22/bin/python3.1
-# -*- coding: utf-8 -*-
 import re
 import sys
 

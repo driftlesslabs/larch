@@ -24,7 +24,6 @@ def remove_unused_level(multiindex, level=0):
     pandas.MultiIndex
 
     """
-
     new_levels = []
     new_codes = []
     if isinstance(level, int):
@@ -91,7 +90,6 @@ def replace_levels(multiindex, level, new_label_array):
     -------
     pandas.MultiIndex
     """
-
     levels = [i for i in multiindex.levels]
     codes = [i for i in multiindex.codes]
 

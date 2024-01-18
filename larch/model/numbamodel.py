@@ -2306,8 +2306,8 @@ class NumbaModel(_BaseModel):
         list
             A list of constraints.
         """
+        from collections.abc import Mapping
         from numbers import Number
-        from typing import Mapping
 
         from .constraints import FixedBound
 

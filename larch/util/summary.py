@@ -110,7 +110,7 @@ def joint_parameter_summary(
             else:
                 summary.loc[
                     ("Log Likelihood", "Converged"), (model.title, "Param")
-                ] = "{:,.2f}".format(ll)
+                ] = f"{ll:,.2f}"
 
             try:
                 ll_null = model.loglike_null(-1)
@@ -119,7 +119,7 @@ def joint_parameter_summary(
             else:
                 summary.loc[
                     ("Log Likelihood", "Null"), (model.title, "Param")
-                ] = "{:,.2f}".format(ll_null)
+                ] = f"{ll_null:,.2f}"
 
             try:
                 ll_nil = model.loglike_nil(-1)
@@ -128,7 +128,7 @@ def joint_parameter_summary(
             else:
                 summary.loc[
                     ("Log Likelihood", "Nil"), (model.title, "Param")
-                ] = "{:,.2f}".format(ll_nil)
+                ] = f"{ll_nil:,.2f}"
 
             for b in bases:
                 try:
@@ -138,7 +138,7 @@ def joint_parameter_summary(
                 else:
                     summary.loc[
                         ("Log Likelihood", b.title), (model.title, "Param")
-                    ] = "{:,.2f}".format(ll)
+                    ] = f"{ll:,.2f}"
 
     if rhosq:
         for model in models:
@@ -149,7 +149,7 @@ def joint_parameter_summary(
             else:
                 summary.loc[
                     ("Rho Squared", "vs Null"), (model.title, "Param")
-                ] = "{:,.4f}".format(rho)
+                ] = f"{rho:,.4f}"
 
             try:
                 rho_nil = model.rho_sq_nil(use_cache=-1)
@@ -158,7 +158,7 @@ def joint_parameter_summary(
             else:
                 summary.loc[
                     ("Rho Squared", "vs Nil"), (model.title, "Param")
-                ] = "{:,.4f}".format(rho_nil)
+                ] = f"{rho_nil:,.4f}"
 
             for b in bases:
                 try:
@@ -171,6 +171,6 @@ def joint_parameter_summary(
                 else:
                     summary.loc[
                         ("Rho Squared", f"vs {b.title}"), (model.title, "Param")
-                    ] = "{:,.4f}".format(rho_comp)
+                    ] = f"{rho_comp:,.4f}"
 
     return summary.fillna("")

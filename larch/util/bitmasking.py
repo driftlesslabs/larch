@@ -12,7 +12,6 @@ def define_masks(bitmask_sizes):
     -------
     list
     """
-
     shifts = ((numpy.cumsum(bitmask_sizes[::-1]))[::-1]).astype(int)
     shifts[:-1] = shifts[1:]
     shifts[-1] = 0

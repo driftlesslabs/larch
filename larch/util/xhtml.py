@@ -227,12 +227,12 @@ def logo_in_signature():
         {
             "width": "14",
             "height": "14",
-            "src": "data:image/png;base64,{}".format(favicon),
+            "src": f"data:image/png;base64,{favicon}",
             "style": "position:relative;top:2px;",
         },
     )
     sig << Elem(
-        "span", {"class": "larch_name_signature"}, text=" Larch {}".format(version)
+        "span", {"class": "larch_name_signature"}, text=f" Larch {version}"
     )
     return sig
 

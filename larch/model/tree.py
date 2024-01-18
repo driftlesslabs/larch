@@ -117,7 +117,7 @@ class NestingTree(nx.DiGraph):
 
     @property
     def root_id(self):
-        """int : The code for the root node."""
+        """Int : The code for the root node."""
         return self._root_id
 
     @root_id.setter
@@ -595,16 +595,14 @@ class NestingTree(nx.DiGraph):
                 if nname == n:
                     G.add_node(
                         n,
-                        label="<{1}>".format(n, nname),
+                        label=f"<{nname}>",
                         style="rounded,solid",
                         shape="box",
                     )
                 else:
                     G.add_node(
                         n,
-                        label='<{1} <FONT COLOR="#999999">({0})</FONT>>'.format(
-                            n, nname
-                        ),
+                        label=f'<{nname} <FONT COLOR="#999999">({n})</FONT>>',
                         style="rounded,solid",
                         shape="box",
                     )
@@ -719,9 +717,9 @@ class NestingTree(nx.DiGraph):
                     name = nodedata["name"]
                     str_nodedata["label"] = (
                         "<"
-                        '<FONT COLOR="#999999" POINT-SIZE="9">({1}) </FONT>'
-                        "{0}"
-                        "{2}>".format(name, n, param_label)
+                        f'<FONT COLOR="#999999" POINT-SIZE="9">({n}) </FONT>'
+                        f"{name}"
+                        f"{param_label}>"
                     )
 
                 # Default styling for nodes can have been overridden
@@ -782,7 +780,7 @@ class NestingTree(nx.DiGraph):
 
         try:
             xml = self.__xml__()
-        except FileNotFoundError as err:
+        except FileNotFoundError:
             return Elem("div", text="Graphviz not installed").tostring()
         else:
             x = Elem("div") << (xml)
@@ -1089,12 +1087,12 @@ def graph_to_figure(graph, output_format="svg", **format):
         nname = graph.nodes[n].get("name", n)
         if nname == n:
             G.add_node(
-                n, label="<{1}>".format(n, nname), style="rounded,solid", shape="box"
+                n, label=f"<{nname}>", style="rounded,solid", shape="box"
             )
         else:
             G.add_node(
                 n,
-                label='<{1} <FONT COLOR="#999999">({0})</FONT>>'.format(n, nname),
+                label=f'<{nname} <FONT COLOR="#999999">({n})</FONT>>',
                 style="rounded,solid",
                 shape="box",
             )
@@ -1209,7 +1207,6 @@ def reverse_lexicographical_topological_sort(G, key=None):
             If `G` is changed while the returned iterator is being processed.
 
     """
-
     if not G.is_directed():
         msg = "Topological sort not defined on undirected graphs."
         raise nx.NetworkXError(msg)

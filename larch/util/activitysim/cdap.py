@@ -128,7 +128,6 @@ def interact_pattern(n_persons, select_persons, tag):
     -------
     re.compile
     """
-
     pattern = ""
     p = 1
     while len(pattern) < n_persons:
@@ -147,7 +146,7 @@ def cdap_interaction_utility(model, n_persons, alts, interaction_coef, coefficie
             c_split = c.split("_")
             for j in c_split[2:]:
                 interact_coef_map[(c_split[1], j)] = c
-                if all((i == "x" for i in j)):  # wildcards also map to empty
+                if all(i == "x" for i in j):  # wildcards also map to empty
                     interact_coef_map[(c_split[1], "")] = c
 
     for (cardinality, activity), coefs in interaction_coef.groupby(
@@ -305,7 +304,7 @@ def cdap_data(
 
     def read_yaml(filename, **kwargs):
         filename = filename.format(name=name)
-        with open(os.path.join(edb_directory, filename), "rt") as f:
+        with open(os.path.join(edb_directory, filename)) as f:
             return yaml.load(f, Loader=yaml.SafeLoader, **kwargs)
 
     settings = read_yaml(settings_file)

@@ -131,7 +131,7 @@ _sqlite_keywords = {
 }
 
 
-class SmartFileReader(object):
+class SmartFileReader:
     def __init__(self, file, *args, **kwargs):
         if file[-3:] == ".gz":
             with open(file, "rb") as f:
@@ -149,7 +149,7 @@ class SmartFileReader(object):
             self.file = zf.open(zf_info.filename, "r", *args, **kwargs)
             self._filesize = zf_info.file_size
         else:
-            self.file = open(file, "rt", *args, **kwargs)
+            self.file = open(file, *args, **kwargs)
             self._filesize = os.fstat(self.file.fileno()).st_size
 
     def __getattr__(self, name):
@@ -185,12 +185,12 @@ class SmartFileReader(object):
         while scale < 4 and b > 1024:
             b /= 1024
             scale += 1
-        return "{:.2f}{}".format(b, labels[scale])
+        return f"{b:.2f}{labels[scale]}"
 
     def progress(self):
         pct = self.percentread()
         if pct > 0 and pct < 100:
-            return "{}%".format(pct)
+            return f"{pct}%"
         else:
             return self.bytesread()
 

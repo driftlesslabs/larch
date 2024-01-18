@@ -136,11 +136,11 @@ def verify_hash_file(fname, hash_dir=None, max_retries=5):
 
     h = hash256.hexdigest()
     if hash_dir is None:
-        with open(fname + ".sha256.txt", "r") as fh:
+        with open(fname + ".sha256.txt") as fh:
             h_x = fh.read()
     else:
         with open(
-            os.path.join(hash_dir, os.path.basename(fname) + ".sha256.txt"), "r"
+            os.path.join(hash_dir, os.path.basename(fname) + ".sha256.txt")
         ) as fh:
             h_x = fh.read()
     if h != h_x:
@@ -170,7 +170,6 @@ def gzip_dir(
     log=None,
 ):
     """Individually gzip every file matching patterns in source_dir."""
-
     import glob
     import gzip
     import os

@@ -1,9 +1,9 @@
-from .signal_dict import SignalDict
-
-import pprint
 import datetime
+import pprint
+
 from .addict_yaml import Dict
-from .data_expansion import piece, hard_sigmoid
+from .data_expansion import hard_sigmoid, piece
+from .signal_dict import SignalDict
 
 
 def _prettyprint_fallback(x):
@@ -32,7 +32,7 @@ class dictx(dict):
 	def __setattr__(self, name, value):
 		if hasattr(dictx, name):
 			raise AttributeError("'dictx' object attribute "
-								 "'{0}' is read-only".format(name))
+								 f"'{name}' is read-only")
 		else:
 			self[name] = value
 

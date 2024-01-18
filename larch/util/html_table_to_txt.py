@@ -4,7 +4,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 
-class html_tables(object):
+class html_tables:
     def __init__(self, raw_html):
         self.url_soup = BeautifulSoup(raw_html, "lxml")
 

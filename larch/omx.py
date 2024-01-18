@@ -1,6 +1,6 @@
 import os
 import warnings
-from typing import Mapping
+from collections.abc import Mapping
 
 import numpy
 import pandas
@@ -201,9 +201,7 @@ class OMX(_omx_base_class):
         if self.data._v_nchildren > 0:
             if x[0] != self.shape[0] and x[1] != self.shape[1]:
                 raise OMXIncompatibleShape(
-                    "this omx has shape {!s} but you want to set {!s}".format(
-                        self.shape, x
-                    )
+                    f"this omx has shape {self.shape!s} but you want to set {x!s}"
                 )
         if self.data._v_nchildren == 0:
             shp = numpy.empty(2, dtype=int)
@@ -221,15 +219,11 @@ class OMX(_omx_base_class):
             return
         if shape0 > start0:
             raise TypeError(
-                "crop must shrink the shape, but {} > {} in first dimension".format(
-                    shape0, start0
-                )
+                f"crop must shrink the shape, but {shape0} > {start0} in first dimension"
             )
         if shape1 > start1:
             raise TypeError(
-                "crop must shrink the shape, but {} > {} in first dimension".format(
-                    shape1, start1
-                )
+                f"crop must shrink the shape, but {shape1} > {start1} in first dimension"
             )
         if shape0 != shape1 and start0 == start1:
             raise TypeError(
@@ -312,16 +306,12 @@ class OMX(_omx_base_class):
                     self.shape = (shape, shape)
                 else:
                     raise OMXIncompatibleShape(
-                        "this omx has shape {!s} but you want to set {!s}".format(
-                            self.shape, shape
-                        )
+                        f"this omx has shape {self.shape!s} but you want to set {shape!s}"
                     )
         else:
             if self.shape[0] != self.shape[1]:
                 raise OMXIncompatibleShape(
-                    "this omx has shape {!s} but you did not pick one".format(
-                        self.shape
-                    )
+                    f"this omx has shape {self.shape!s} but you did not pick one"
                 )
             shape = self.shape[0]
         return self.create_carray(
@@ -373,9 +363,7 @@ class OMX(_omx_base_class):
         if shape is not None:
             if shape[:2] != self.shape:
                 raise OMXIncompatibleShape(
-                    "this omx has shape {!s} but you want to set {!s}".format(
-                        self.shape, shape[:2]
-                    )
+                    f"this omx has shape {self.shape!s} but you want to set {shape[:2]!s}"
                 )
         else:
             shape = self.shape
@@ -433,9 +421,7 @@ class OMX(_omx_base_class):
             if self.data._v_nchildren > 0:
                 if obj.shape != self.shape:
                     raise OMXIncompatibleShape(
-                        "this omx has shape {!s} but you want to add {!s}".format(
-                            self.shape, obj.shape
-                        )
+                        f"this omx has shape {self.shape!s} but you want to add {obj.shape!s}"
                     )
         if self.data._v_nchildren == 0:
             shp = numpy.empty(2, dtype=int)
@@ -443,7 +429,7 @@ class OMX(_omx_base_class):
             shp[1] = obj.shape[1]
             self.root._v_attrs.SHAPE = shp
         if name in self.data._v_children and not overwrite:
-            raise TypeError("{} exists".format(name))
+            raise TypeError(f"{name} exists")
         if name in self.data._v_children:
             self.remove_node(self.data, name)
         return self.create_carray(
@@ -508,7 +494,7 @@ class OMX(_omx_base_class):
                 "don't add lookup to omx with no data and no shape"
             )
         if name in self.lookup._v_children and not overwrite:
-            raise TypeError("{} exists".format(name))
+            raise TypeError(f"{name} exists")
         if name in self.lookup._v_children:
             self.remove_node(self.lookup, name)
         return self.create_carray(
@@ -522,11 +508,11 @@ class OMX(_omx_base_class):
     def change_all_atoms_of_type(self, oldatom, newatom):
         for name in self.data._v_children:
             if self.data._v_children[name].dtype == oldatom:
-                print("changing matrix {} from {} to {}".format(name, oldatom, newatom))
+                print(f"changing matrix {name} from {oldatom} to {newatom}")
                 self.change_atom_type(name, newatom, matrix=True, lookup=False)
         for name in self.lookup._v_children:
             if self.lookup._v_children[name].dtype == oldatom:
-                print("changing lookup {} from {} to {}".format(name, oldatom, newatom))
+                print(f"changing lookup {name} from {oldatom} to {newatom}")
                 self.change_atom_type(name, newatom, matrix=False, lookup=True)
 
     def change_atom_type(
@@ -544,9 +530,7 @@ class OMX(_omx_base_class):
                     neww[i] = orig[i]
                 if require_smaller and neww.size_on_disk >= orig.size_on_disk:
                     warnings.warn(
-                        "abort change_atom_type on {}, {} > {}".format(
-                            name, neww.size_on_disk, orig.size_on_disk
-                        )
+                        f"abort change_atom_type on {name}, {neww.size_on_disk} > {orig.size_on_disk}"
                     )
                     neww._f_remove()
                 else:
@@ -559,9 +543,7 @@ class OMX(_omx_base_class):
                     neww[i] = orig[i]
                 if require_smaller and neww.size_on_disk >= orig.size_on_disk:
                     warnings.warn(
-                        "abort change_atom_type on {}, {} > {}".format(
-                            name, neww.size_on_disk, orig.size_on_disk
-                        )
+                        f"abort change_atom_type on {name}, {neww.size_on_disk} > {orig.size_on_disk}"
                     )
                     neww._f_remove()
                 else:
@@ -612,9 +594,7 @@ class OMX(_omx_base_class):
         uniq_labels, uniq_indexes = numpy.unique(labels, return_inverse=True)
         if len(uniq_labels) != len(labels):
             raise OMXNonUniqueLookup(
-                "lookup '{}' does not have unique labels for each item".format(
-                    lookupname
-                )
+                f"lookup '{lookupname}' does not have unique labels for each item"
             )
         index_malordered = numpy.digitize(arr, uniq_labels, right=True)
         return uniq_indexes[index_malordered]
@@ -781,7 +761,7 @@ class OMX(_omx_base_class):
 
         for n, chunk in enumerate(reader):
             if log is not None:
-                log("PROCESSING CHUNK {} [{}]".format(n, sfr.progress()))
+                log(f"PROCESSING CHUNK {n} [{sfr.progress()}]")
             r = chunk.iloc[:, 0].values - offset
             c = chunk.iloc[:, 1].values - offset
 
@@ -795,12 +775,12 @@ class OMX(_omx_base_class):
                     self.data._v_children[column_map[col]][r, c] = chunk[col].values
                     self.data._v_children[column_map[col]].flush()
             if log is not None:
-                log("finished processing chunk {} [{}]".format(n, sfr.progress()))
+                log(f"finished processing chunk {n} [{sfr.progress()}]")
 
             self.flush()
 
         if log is not None:
-            log("import_datatable({}) complete".format(filepath))
+            log(f"import_datatable({filepath}) complete")
 
     def import_datatable_3d(
         self,
@@ -861,7 +841,7 @@ class OMX(_omx_base_class):
 
         for n, chunk in enumerate(reader):
             if log is not None:
-                log("PROCESSING CHUNK {} [{}]".format(n, sfr.progress()))
+                log(f"PROCESSING CHUNK {n} [{sfr.progress()}]")
             r = chunk.iloc[:, 0].values - offset
             c = chunk.iloc[:, 1].values - offset
 
@@ -872,7 +852,7 @@ class OMX(_omx_base_class):
 
             temp_slug[r, c] = chunk.values[:, 2:]
             if log is not None:
-                log("finished processing chunk {} [{}]".format(n, sfr.progress()))
+                log(f"finished processing chunk {n} [{sfr.progress()}]")
 
             self.flush()
 
@@ -881,7 +861,7 @@ class OMX(_omx_base_class):
             self.data._v_children[colname][:] = temp_slug[:, :, cn]
 
         if log is not None:
-            log("import_datatable({}) complete".format(filepath))
+            log(f"import_datatable({filepath}) complete")
 
     @classmethod
     def import_dbf(cls, dbffile, omxfile, shape, o, d, cols, smallest_zone_number=1):
@@ -906,12 +886,12 @@ class OMX(_omx_base_class):
         if isinstance(key, str):
             if key in self.data._v_children:
                 if key in self.lookup._v_children:
-                    raise KeyError("key {} found in both data and lookup".format(key))
+                    raise KeyError(f"key {key} found in both data and lookup")
                 else:
                     return self.data._v_children[key]
             if key in self.lookup._v_children:
                 return self.lookup._v_children[key]
-            raise KeyError("matrix named {} not found".format(key))
+            raise KeyError(f"matrix named {key} not found")
         raise TypeError("OMX matrix access must be by name (str)")
 
     def __setitem__(self, key, value):
@@ -943,10 +923,10 @@ class OMX(_omx_base_class):
             if key not in self.lookup._v_children:
                 return self.data._v_children[key]
             else:
-                raise AttributeError("key {} found in both data and lookup".format(key))
+                raise AttributeError(f"key {key} found in both data and lookup")
         if key in self.lookup._v_children:
             return self.lookup._v_children[key]
-        raise AttributeError("key {} not found".format(key))
+        raise AttributeError(f"key {key} not found")
 
     def get_dataframe(self, matrix, index=None, columns=None):
         """
@@ -1313,7 +1293,7 @@ class OMX(_omx_base_class):
         return self
 
     def _remake_command(self, cmd, selector=None, receiver=None):
-        from tokenize import NAME, OP, STRING, tokenize, untokenize
+        from tokenize import NAME, OP, tokenize, untokenize
 
         DOT = (OP, ".")
         COLON = (OP, ":")
@@ -1432,26 +1412,7 @@ class OMX(_omx_base_class):
             receiver="receiver" if receiver is not None else None,
         )
         # important globals
-        from numpy import (
-            absolute,
-            cos,
-            exp,
-            fabs,
-            fmax,
-            fmin,
-            isfinite,
-            isnan,
-            log,
-            log1p,
-            logaddexp,
-            nan_to_num,
-            pi,
-            sin,
-            sqrt,
-        )
 
-        from .util.aster import inXd
-        from .util.common_functions import boolean, hard_sigmoid, normalize, piece
 
         try:
             if receiver is not None:
@@ -1464,23 +1425,21 @@ class OMX(_omx_base_class):
                 arg0 = ""
             else:
                 arg0 = args[0]
-            arg0 = arg0 + '\nwithin parsed command: "{!s}"'.format(cmd)
-            arg0 = arg0 + '\nwithin re-parsed command: "{!s}"'.format(j_plain)
+            arg0 = arg0 + f'\nwithin parsed command: "{cmd!s}"'
+            arg0 = arg0 + f'\nwithin re-parsed command: "{j_plain!s}"'
             if selector is not None:
-                arg0 = arg0 + '\nwith selector: "{!s}"'.format(selector)
+                arg0 = arg0 + f'\nwith selector: "{selector!s}"'
             if "max" in cmd:
                 arg0 = (
                     arg0
                     + '\n(note to get the maximum of arrays use "fmax" not "max")'.format(
-                        cmd
-                    )
+                        )
                 )
             if "min" in cmd:
                 arg0 = (
                     arg0
                     + '\n(note to get the minimum of arrays use "fmin" not "min")'.format(
-                        cmd
-                    )
+                        )
                 )
             if isinstance(exc, NameError):
                 badname = str(exc).split("'")[1]
@@ -1495,7 +1454,7 @@ class OMX(_omx_base_class):
                         arg0
                         + "\n"
                         + "did you mean {}?".format(
-                            " or ".join("'{}'".format(s) for s in did_you_mean_list)
+                            " or ".join(f"'{s}'" for s in did_you_mean_list)
                         )
                     )
             exc.args = (arg0,) + args[1:]

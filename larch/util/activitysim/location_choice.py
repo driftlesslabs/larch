@@ -57,7 +57,7 @@ def location_choice_model(
     size_spec = _read_csv(size_spec_file)
 
     settings_file = settings_file.format(model_selector=model_selector)
-    with open(os.path.join(edb_directory, settings_file), "r") as yf:
+    with open(os.path.join(edb_directory, settings_file)) as yf:
         settings = yaml.load(
             yf,
             Loader=yaml.SafeLoader,

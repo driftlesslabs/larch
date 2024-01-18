@@ -29,7 +29,7 @@ def rip():
     os.makedirs(generator_dest, exist_ok=True)
     print(f"generator_dest={generator_dest}")
 
-    with open(os.path.join(generator_dest, ".gitignore"), "wt", encoding="utf8") as f:
+    with open(os.path.join(generator_dest, ".gitignore"), "w", encoding="utf8") as f:
         f.write(".gitignore\n*.py")
 
     import_stmts = []
@@ -42,7 +42,7 @@ def rip():
             example = example.replace("-", "_")
             print(f"  example={example}")
             with open(
-                os.path.join(generator_dest, f"_{example}.py"), "wt", encoding="utf8"
+                os.path.join(generator_dest, f"_{example}.py"), "w", encoding="utf8"
             ) as f:
                 f.write("def example(extract='m', estimate=False):\n")
                 with open(examplefile, encoding="utf8") as s:
@@ -96,7 +96,7 @@ def rip():
             assign_stmts.append(f"ex[{ex_n!r}] = _{example}")
 
     with open(
-        os.path.join(generator_dest, "__init__.py"), "wt", encoding="utf8"
+        os.path.join(generator_dest, "__init__.py"), "w", encoding="utf8"
     ) as gen:
         gen.write(
             textwrap.dedent(

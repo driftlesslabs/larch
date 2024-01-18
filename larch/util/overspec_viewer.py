@@ -205,13 +205,16 @@ class OverspecView(Styler):
         vmax : float, optional
                 Maximum data value that corresponds to colormap maximum value.
                 When None (default): the maximum value of the data will be used.
+
         Returns
         -------
         self : Styler
+
         Raises
         ------
         ValueError
                 If ``text_color_threshold`` is not a value from 0 to 1.
+
         Notes
         -----
         Set ``text_color_threshold`` or tune ``low`` and ``high`` to keep the
@@ -270,9 +273,11 @@ class OverspecView(Styler):
                 Calculate relative luminance of a color.
                 The calculation adheres to the W3C standards
                 (https://www.w3.org/WAI/GL/wiki/Relative_luminance)
+
                 Parameters
                 ----------
                 color : rgb or rgba tuple
+
                 Returns
                 -------
                 float

@@ -15,8 +15,8 @@ class SignalDict(
     @staticmethod  # because this doesn't make sense as a global function.
     def _process_args(mapping=(), **kwargs):
         if hasattr(mapping, "items"):
-            mapping = getattr(mapping, "items")()
-        return ((k, v) for k, v in chain(mapping, getattr(kwargs, "items")()))
+            mapping = mapping.items()
+        return ((k, v) for k, v in chain(mapping, kwargs.items()))
 
     def __init__(
         self, getitem_callback, setitem_callback, delitem_callback, mapping=(), **kwargs
@@ -62,4 +62,4 @@ class SignalDict(
         return type(self)(self)
 
     def __repr__(self):
-        return "{0}({1})".format(type(self).__name__, super().__repr__())
+        return f"{type(self).__name__}({super().__repr__()})"

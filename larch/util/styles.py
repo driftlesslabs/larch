@@ -12,12 +12,12 @@ def load_css(filename):
     if filename is None or not isinstance(filename, str):
         return None
     if os.path.exists(filename):
-        with open(filename, "r") as f:
+        with open(filename) as f:
             css = f.read()
         return css
-    f0 = "{}.css".format(filename)
+    f0 = f"{filename}.css"
     if os.path.exists(f0):
-        with open(f0, "r") as f:
+        with open(f0) as f:
             css = f.read()
         return css
     try:
@@ -27,12 +27,12 @@ def load_css(filename):
     else:
         f1 = os.path.join(platformdirs.user_config_dir("Larch"), filename)
         if os.path.exists(f1):
-            with open(f1, "r") as f:
+            with open(f1) as f:
                 css = f.read()
             return css
-        f2 = "{}.css".format(f1)
+        f2 = f"{f1}.css"
         if os.path.exists(f2):
-            with open(f2, "r") as f:
+            with open(f2) as f:
                 css = f.read()
             return css
     if "{" in filename and "}" in filename:
@@ -222,9 +222,7 @@ from .display import HTML, display_html
 from .xhtml import tooltipped_style
 
 css = HTML(
-    "<style>{}\n\n{}</style>".format(
-        _default_css_jupyter, tooltipped_style().tostring()
-    )
+    f"<style>{_default_css_jupyter}\n\n{tooltipped_style().tostring()}</style>"
 )
 
 

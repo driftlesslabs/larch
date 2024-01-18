@@ -19,7 +19,7 @@ camsyslogo_white = "iVBORw0KGgoAAAANSUhEUgAAAnMAAAEzBAMAAACoLpjMAAAABGdBTUEAALGP
 georgiatechlogo_element = Elem(
     "img",
     {
-        "src": "data:image/png;base64,{}".format(georgiatechlogo),
+        "src": f"data:image/png;base64,{georgiatechlogo}",
         "style": "float:right;max-height:40px;margin-top:0;margin-right:20px;margin-left:20px",
     },
 )
@@ -27,7 +27,7 @@ georgiatechlogo_element = Elem(
 camsyslogo_element = Elem(
     "img",
     {
-        "src": "data:image/png;base64,{}".format(camsyslogo),
+        "src": f"data:image/png;base64,{camsyslogo}",
         "style": "float:right;max-height:44px;margin-top:0",
     },
 )

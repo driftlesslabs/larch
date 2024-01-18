@@ -46,7 +46,6 @@ def case_insensitive_close_matches(word, possibilities, n=3, cutoff=0.6, excpt=N
     >>> case_insensitive_close_matches("NonLocal", keyword.kwlist)
     ['nonlocal']
     """
-
     if not n > 0:
         raise ValueError("n must be > 0: %r" % (n,))
     if not 0.0 <= cutoff <= 1.0:
@@ -70,7 +69,7 @@ def case_insensitive_close_matches(word, possibilities, n=3, cutoff=0.6, excpt=N
     ret = [x for score, x in result]
     if excpt is not None:
         did_you_mean = "'{}' not found, did you mean {}?".format(
-            word, " or ".join("'{}'".format(s) for s in ret)
+            word, " or ".join(f"'{s}'" for s in ret)
         )
         raise excpt(did_you_mean)
     return ret

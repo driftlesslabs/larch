@@ -15,12 +15,12 @@ import logging
 import pathlib
 import uuid
 import warnings
-from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
+from ..dataset import DataTree
 from ..exceptions import MissingDataError
 from .constraints import ParametricConstraintList
 from .linear import DictOfAlts, DictOfLinearFunction, LinearFunction
@@ -28,8 +28,6 @@ from .mixtures import MixtureList
 from .param_core import ParameterBucket
 from .single_parameter import SingleParameter
 from .tree import NestingTree
-
-from ..dataset import DataTree
 
 logger = logging.getLogger("larch.model")
 
@@ -1220,7 +1218,7 @@ class BaseModel:
 
     @availability_co_vars.setter
     def availability_co_vars(self, x):
-        from typing import Mapping
+        from collections.abc import Mapping
 
         if x is None:
             if self._availability_co_vars:
@@ -1511,9 +1509,9 @@ class BaseModel:
         if mostrecent is not None:
             tr = tbody.put("tr")
             tr.put("td", text="Log Likelihood at Convergence")
-            tr.put("td", text="{:.2f}".format(mostrecent.loglike))
+            tr.put("td", text=f"{mostrecent.loglike:.2f}")
             if ncases:
-                tr.put("td", text="{:.2f}".format(mostrecent.loglike / ncases))
+                tr.put("td", text=f"{mostrecent.loglike / ncases:.2f}")
             else:
                 tr.put("td", text="na")
 
@@ -1529,16 +1527,16 @@ class BaseModel:
         if ll_z:
             tr = tbody.put("tr")
             tr.put("td", text="Log Likelihood at Null Parameters")
-            tr.put("td", text="{:.2f}".format(ll_z))
+            tr.put("td", text=f"{ll_z:.2f}")
             if ncases:
-                tr.put("td", text="{:.2f}".format(ll_z / ncases))
+                tr.put("td", text=f"{ll_z / ncases:.2f}")
             else:
                 tr.put("td", text="na")
             if mostrecent is not None:
                 tr = tbody.put("tr")
                 tr.put("td", text="Rho Squared w.r.t. Null Parameters")
                 rsz = 1.0 - (mostrecent.loglike / ll_z)
-                tr.put("td", text="{:.3f}".format(rsz), colspan="2")
+                tr.put("td", text=f"{rsz:.3f}", colspan="2")
 
         try:
             ll_nil = self._cached_loglike_nil
@@ -1547,16 +1545,16 @@ class BaseModel:
         if ll_nil:
             tr = tbody.put("tr")
             tr.put("td", text="Log Likelihood with No Model")
-            tr.put("td", text="{:.2f}".format(ll_nil))
+            tr.put("td", text=f"{ll_nil:.2f}")
             if ncases:
-                tr.put("td", text="{:.2f}".format(ll_nil / ncases))
+                tr.put("td", text=f"{ll_nil / ncases:.2f}")
             else:
                 tr.put("td", text="na")
             if mostrecent is not None:
                 tr = tbody.put("tr")
                 tr.put("td", text="Rho Squared w.r.t. No Model")
                 rsz = 1.0 - (mostrecent.loglike / ll_nil)
-                tr.put("td", text="{:.3f}".format(rsz), colspan="2")
+                tr.put("td", text=f"{rsz:.3f}", colspan="2")
 
         try:
             ll_c = self._cached_loglike_constants_only
@@ -1565,15 +1563,15 @@ class BaseModel:
         if ll_c:
             tr = tbody.put("tr")
             tr.put("td", text="Log Likelihood at Constants Only")
-            tr.put("td", text="{:.2f}".format(ll_c))
+            tr.put("td", text=f"{ll_c:.2f}")
             if ncases:
-                tr.put("td", text="{:.2f}".format(ll_c / ncases))
+                tr.put("td", text=f"{ll_c / ncases:.2f}")
             else:
                 tr.put("td", text="na")
             if mostrecent is not None:
                 tr = tbody.put("tr")
                 tr.put("td", text="Rho Squared w.r.t. Constants Only")
                 rsc = 1.0 - (mostrecent.loglike / ll_c)
-                tr.put("td", text="{:.3f}".format(rsc), colspan="2")
+                tr.put("td", text=f"{rsc:.3f}", colspan="2")
 
         return div

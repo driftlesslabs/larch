@@ -238,13 +238,13 @@ class OrderingBound(ParametricConstraint):
         self.i_more = 0
         if p_more is None:
             if "<=" in p_less:
-                p_less, p_more = [_.strip() for _ in p_less.split("<=", 1)]
+                p_less, p_more = (_.strip() for _ in p_less.split("<=", 1))
             elif "<" in p_less:
-                p_less, p_more = [_.strip() for _ in p_less.split("<", 1)]
+                p_less, p_more = (_.strip() for _ in p_less.split("<", 1))
             elif ">=" in p_less:
-                p_more, p_less = [_.strip() for _ in p_less.split(">=", 1)]
+                p_more, p_less = (_.strip() for _ in p_less.split(">=", 1))
             elif ">" in p_less:
-                p_more, p_less = [_.strip() for _ in p_less.split(">", 1)]
+                p_more, p_less = (_.strip() for _ in p_less.split(">", 1))
             else:
                 raise ValueError(f"cannot interpret {p_less} as ordering")
         super().__init__(binding_tol=binding_tol)

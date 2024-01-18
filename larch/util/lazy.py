@@ -31,7 +31,7 @@
 import functools
 
 
-class lazy(object):
+class lazy:
     """lazy descriptor
     Used as a decorator to create lazy attributes. Lazy attributes
     are evaluated on first use.

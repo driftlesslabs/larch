@@ -110,7 +110,7 @@ def test_mtc_17(compute_engine):
         + X("ovtt/dist * (altid <= 4)") * P("motorized_ovtbydist")
     )
     for a in [4, 5, 6]:
-        m.utility_co[a] += X("hhinc") * P("hhinc#{}".format(a))
+        m.utility_co[a] += X("hhinc") * P(f"hhinc#{a}")
     for i in d["alt_names"][1:3]:
         name = str(i.values)
         a = int(i.altid)

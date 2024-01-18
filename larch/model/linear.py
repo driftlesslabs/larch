@@ -65,9 +65,9 @@ class ParameterRef(UnicodeRef):
 
     def __repr__(self):
         if _re.match("[_A-Za-z][_a-zA-Z0-9]*$", self) and not _keyword.iskeyword(self):
-            return "{}.{}".format(_ParameterRef_C_repr_txt, self)
+            return f"{_ParameterRef_C_repr_txt}.{self}"
         else:
-            return "{}('{}')".format(_ParameterRef_C_repr_txt, self)
+            return f"{_ParameterRef_C_repr_txt}('{self}')"
 
     def __eq__(self, other):
         if isinstance(other, str) and not isinstance(other, DataRef):
@@ -132,7 +132,7 @@ class ParameterRef(UnicodeRef):
                 return LinearComponent(param=str(self), data=str(other))
             if isinstance(other, _Number):
                 #  return LinearComponent(param=str(self), data=str(other))
-                return LinearComponent(param=str(self), data=str("1"), scale=other)
+                return LinearComponent(param=str(self), data="1", scale=other)
             if isinstance(other, ParameterRef):
                 if self == _null_:
                     return other
@@ -156,7 +156,7 @@ class ParameterRef(UnicodeRef):
                 return LinearComponent(param=str(other), data=str(self))
             if isinstance(self, _Number):
                 # return LinearComponent(param=str(other), data=str(self))
-                return LinearComponent(param=str(other), data=str("1"), scale=self)
+                return LinearComponent(param=str(other), data="1", scale=self)
         return NotImplemented  # raise NotImplementedError(f"{_what_is(self)} * {_what_is(other)}")
 
     def __truediv__(self, other):
@@ -166,7 +166,7 @@ class ParameterRef(UnicodeRef):
 
                 return ParameterDivide(self, other)
             elif isinstance(other, _Number):
-                return LinearComponent(param=str(self), data=str("1"), scale=1 / other)
+                return LinearComponent(param=str(self), data="1", scale=1 / other)
             elif isinstance(other, DataRef):
                 return LinearComponent(param=str(self), data=str(1 / other), scale=1)
         elif isinstance(other, ParameterRef):
@@ -211,7 +211,7 @@ class ParameterRef(UnicodeRef):
         str
         """
         if self._formatting is None:
-            return "{:.3g}".format(self.value(m))
+            return f"{self.value(m):.3g}"
         else:
             return self._formatting.format(self.value(m))
 
@@ -264,9 +264,9 @@ class ParameterRef(UnicodeRef):
 class DataRef(UnicodeRef):
     def __repr__(self):
         if _re.match("[_A-Za-z][_a-zA-Z0-9]*$", self) and not _keyword.iskeyword(self):
-            return "{}.{}".format(_DataRef_repr_txt, self)
+            return f"{_DataRef_repr_txt}.{self}"
         else:
-            return "{}('{}')".format(_DataRef_repr_txt, self)
+            return f"{_DataRef_repr_txt}('{self}')"
 
     def __eq__(self, other):
         if isinstance(other, str) and not isinstance(other, ParameterRef):
@@ -293,10 +293,10 @@ class DataRef(UnicodeRef):
                 return self
             # Double zero is trapped here as it is used to flag duplicate terms in a utility function.
             if self == "00":
-                return DataRef("0+{}".format(parenthize(self), ))
+                return DataRef(f"0+{parenthize(self)}")
             if other == "00":
-                return DataRef("{}+0".format(parenthize(self), ))
-            return DataRef("{}+{}".format(parenthize(self), parenthize(other, True)))
+                return DataRef(f"{parenthize(self)}+0")
+            return DataRef(f"{parenthize(self)}+{parenthize(other, True)}")
         if isinstance(self, DataRef) and isinstance(other, ParameterRef):
             return P(_null_) * self + other
 
@@ -321,7 +321,7 @@ class DataRef(UnicodeRef):
         if isinstance(self, (DataRef, _Number)) and isinstance(
             other, (DataRef, _Number)
         ):
-            return DataRef("{}-{}".format(parenthize(self), parenthize(other, True)))
+            return DataRef(f"{parenthize(self)}-{parenthize(other, True)}")
         if isinstance(self, DataRef) and isinstance(other, ParameterRef):
             return P(_null_) * self - other
         return NotImplemented  # raise NotImplementedError(f"{_what_is(self)} - {_what_is(other)}")
@@ -353,7 +353,7 @@ class DataRef(UnicodeRef):
                                 if boolmatch1.group(2) != boolmatch2.group(2):
                                     return DataRef("0")
                 return DataRef(
-                    "{}*{}".format(parenthize(self), parenthize(other, True))
+                    f"{parenthize(self)}*{parenthize(other, True)}"
                 )
             if isinstance(other, ParameterRef):
                 return LinearComponent(param=str(other), data=str(self))
@@ -374,7 +374,7 @@ class DataRef(UnicodeRef):
                 if isinstance(self, _Number):
                     return P(_null_) * self * other
                 return DataRef(
-                    "{}*{}".format(parenthize(self), parenthize(other, True))
+                    f"{parenthize(self)}*{parenthize(other, True)}"
                 )
             if isinstance(self, ParameterRef):
                 return LinearComponent(param=str(self), data=str(other))
@@ -390,37 +390,37 @@ class DataRef(UnicodeRef):
         if isinstance(self, (DataRef, _Number)) and isinstance(
             other, (DataRef, _Number)
         ):
-            return DataRef("{}/{}".format(parenthize(self), parenthize(other, True)))
+            return DataRef(f"{parenthize(self)}/{parenthize(other, True)}")
         if isinstance(self, ParameterRef) and isinstance(other, (DataRef, _Number)):
-            return self * DataRef("1/{}".format(parenthize(other, True)))
+            return self * DataRef(f"1/{parenthize(other, True)}")
         return NotImplemented  # raise NotImplementedError(f"{_what_is(self)} / {_what_is(other)}")
 
     def __and__(self, other):
         if isinstance(self, (DataRef, _Number)) and isinstance(
             other, (DataRef, _Number)
         ):
-            return DataRef("{}&{}".format(parenthize(self), parenthize(other, True)))
+            return DataRef(f"{parenthize(self)}&{parenthize(other, True)}")
         return NotImplemented  # raise NotImplementedError(f"{_what_is(self)} & {_what_is(other)}")
 
     def __or__(self, other):
         if isinstance(self, (DataRef, _Number)) and isinstance(
             other, (DataRef, _Number)
         ):
-            return DataRef("{}|{}".format(parenthize(self), parenthize(other, True)))
+            return DataRef(f"{parenthize(self)}|{parenthize(other, True)}")
         return NotImplemented  # raise NotImplementedError(f"{_what_is(self)} | {_what_is(other)}")
 
     def __xor__(self, other):
         if isinstance(self, (DataRef, _Number)) and isinstance(
             other, (DataRef, _Number)
         ):
-            return DataRef("{}^{}".format(parenthize(self), parenthize(other, True)))
+            return DataRef(f"{parenthize(self)}^{parenthize(other, True)}")
         return NotImplemented  # raise NotImplementedError(f"{_what_is(self)} ^ {_what_is(other)}")
 
     def __floordiv__(self, other):
         if isinstance(self, (DataRef, _Number)) and isinstance(
             other, (DataRef, _Number)
         ):
-            return DataRef("{}//{}".format(parenthize(self), parenthize(other, True)))
+            return DataRef(f"{parenthize(self)}//{parenthize(other, True)}")
         return NotImplemented  # raise NotImplementedError(f"{_what_is(self)} // {_what_is(other)}")
 
     def __pow__(self, other, modulo):
@@ -431,14 +431,14 @@ class DataRef(UnicodeRef):
         if isinstance(self, (DataRef, _Number)) and isinstance(
             other, (DataRef, _Number)
         ):
-            return DataRef("{}**{}".format(parenthize(self), parenthize(other, True)))
+            return DataRef(f"{parenthize(self)}**{parenthize(other, True)}")
         return NotImplemented  # raise NotImplementedError(f"{_what_is(self)} ** {_what_is(other)}")
 
     def __invert__(self):
-        return DataRef("~{}".format(parenthize(self, True)))
+        return DataRef(f"~{parenthize(self, True)}")
 
     def __neg__(self):
-        return DataRef("-{}".format(parenthize(self, True)))
+        return DataRef(f"-{parenthize(self, True)}")
 
     def __pos__(self):
         return self
@@ -1061,7 +1061,7 @@ class LinearFunction:
     def extend(self, values):
         for v in values:
             if not isinstance(v, LinearComponent):
-                raise TypeError("cannot add type {} to LinearFunction".format(type(v)))
+                raise TypeError(f"cannot add type {type(v)} to LinearFunction")
         self._func.extend(values)
         _try_mangle(self._instance)
 
@@ -1108,7 +1108,7 @@ class LinearFunction:
         elif isinstance(other, LinearComponent):
             self.append(other)
         else:
-            raise TypeError("cannot add type {} to LinearFunction".format(type(other)))
+            raise TypeError(f"cannot add type {type(other)} to LinearFunction")
         return self
 
     def __pos__(self):
@@ -1613,7 +1613,6 @@ class DictOfAlts(MutableMapping):
         instancetype : class
                 Class of `instance`.
         """
-
         if instance is None:
             return self
         try:
@@ -1689,7 +1688,7 @@ class DictOfAlts(MutableMapping):
         return type(self)(self)
 
     def __repr__(self):
-        return "{0}({1})".format(type(self).__name__, repr(self._map))
+        return f"{type(self).__name__}({repr(self._map)})"
 
     def to_dict(self):
         return dict(self)
@@ -1730,7 +1729,6 @@ class DictOfLinearFunction:
         instancetype : class
                 Class of `instance`.
         """
-
         if instance is None:
             return self
         try:
@@ -1822,7 +1820,7 @@ class DictOfLinearFunction:
         return type(self)(self)
 
     def __repr__(self):
-        return "{0}({1})".format(type(self).__name__, repr(self._map))
+        return f"{type(self).__name__}({repr(self._map)})"
 
     def __xml__(self):
 

@@ -1,5 +1,5 @@
 import logging
-from typing import Mapping
+from collections.abc import Mapping
 
 import numba as nb
 import numpy as np
@@ -64,7 +64,7 @@ class _GenericFlow:
 
     @property
     def CASEID(self):
-        """str : The _caseid_ dimension of this Dataset, if defined."""
+        """Str : The _caseid_ dimension of this Dataset, if defined."""
         result = self._obj.attrs.get(CASEID, None)
         return result
 
@@ -83,7 +83,7 @@ class _GenericFlow:
 
     @property
     def ALTID(self):
-        """str : The _altid_ dimension of this Dataset, if defined."""
+        """Str : The _altid_ dimension of this Dataset, if defined."""
         result = self._obj.attrs.get(ALTID, None)
         return result
 
@@ -93,7 +93,7 @@ class _GenericFlow:
 
     @property
     def CASEALT(self):
-        """str : The _casealt_ dimension of this Dataset, if defined."""
+        """Str : The _casealt_ dimension of this Dataset, if defined."""
         result = self._obj.attrs.get(CASEALT, None)
         return result
 
@@ -103,7 +103,7 @@ class _GenericFlow:
 
     @property
     def ALTIDX(self):
-        """str : The _alt_idx_ dimension of this Dataset, if defined."""
+        """Str : The _alt_idx_ dimension of this Dataset, if defined."""
         result = self._obj.attrs.get(ALTIDX, None)
         return result
 
@@ -113,7 +113,7 @@ class _GenericFlow:
 
     @property
     def CASEPTR(self):
-        """str : The _caseptr_ dimension of this Dataset, if defined."""
+        """Str : The _caseptr_ dimension of this Dataset, if defined."""
         result = self._obj.attrs.get(CASEPTR, None)
         return result
 
@@ -123,7 +123,7 @@ class _GenericFlow:
 
     @property
     def GROUPID(self):
-        """str : The _groupid_ dimension of this Dataset, if defined."""
+        """Str : The _groupid_ dimension of this Dataset, if defined."""
         result = self._obj.attrs.get(GROUPID, None)
         return result
 
@@ -133,7 +133,7 @@ class _GenericFlow:
 
     @property
     def INGROUP(self):
-        """str : The _ingroup_ dimension of this Dataset, if defined."""
+        """Str : The _ingroup_ dimension of this Dataset, if defined."""
         result = self._obj.attrs.get(INGROUP, None)
         return result
 

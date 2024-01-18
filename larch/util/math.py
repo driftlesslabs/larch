@@ -44,7 +44,7 @@ def _approx_fprime_helper(xk, f, epsilon, args=(), f0=None, *, status_widget=Non
         grad[k] = (numpy.nan_to_num(f(*((xk + d,) + args))) - f0) / d[k]
         ei[k] = 0.0
         if status_widget:
-            status_widget("{} / {}".format(k, len(xk)))
+            status_widget(f"{k} / {len(xk)}")
     return grad
 
 
@@ -247,7 +247,7 @@ def check_gradient(
     elif names is not None and len(names) ** 2 == g_a_.size:
         from itertools import product
 
-        f.index = ["{}, {}".format(n1, n2) for n1, n2 in product(names, repeat=2)]
+        f.index = [f"{n1}, {n2}" for n1, n2 in product(names, repeat=2)]
     elif names is not None:
         try:
             f.index = numpy.broadcast_to(names, g_f.shape).reshape(-1)

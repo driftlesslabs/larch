@@ -38,11 +38,9 @@ class ElapsedTimeFormatter(logging.Formatter):
         hours, rem = divmod(duration_milliseconds / 1000, 3600)
         minutes, seconds = divmod(rem, 60)
         if hours:
-            record.elapsedTime = "{:0>2}:{:0>2}:{:07.4f}".format(
-                int(hours), int(minutes), seconds
-            )
+            record.elapsedTime = f"{int(hours):0>2}:{int(minutes):0>2}:{seconds:07.4f}"
         else:
-            record.elapsedTime = "{:0>2}:{:07.4f}".format(int(minutes), seconds)
+            record.elapsedTime = f"{int(minutes):0>2}:{seconds:07.4f}"
         return super(ElapsedTimeFormatter, self).format(record)
 
 

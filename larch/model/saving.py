@@ -1,6 +1,6 @@
 import importlib
 import os.path
-from typing import Mapping
+from collections.abc import Mapping
 
 import numpy as np
 from addicty import Dict

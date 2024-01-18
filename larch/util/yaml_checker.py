@@ -59,7 +59,7 @@ rules:
 """
 
 
-class Format(object):
+class Format:
     @staticmethod
     def parsable(problem, filename):
         return "%(file)s:%(line)s:%(column)s: [%(level)s] %(message)s" % {
@@ -121,7 +121,7 @@ def yaml_check(file, config_file=None, logger=None, encoding="utf-8"):
         first = True
         any_errors = False
         max_level = 0
-        with open(filepath, "r", encoding=encoding) as f:
+        with open(filepath, encoding=encoding) as f:
             for problem in linter.run(f, conf, filepath):
                 if first:
                     log(f"FOUND YAML ERRORS IN {file}")

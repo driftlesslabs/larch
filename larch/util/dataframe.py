@@ -1,4 +1,4 @@
-from typing import Mapping
+from collections.abc import Mapping
 
 import numpy
 import pandas
@@ -33,7 +33,7 @@ class DataFrameViewer(pandas.DataFrame):
                     cell_content = cell.__xml__()
                 except AttributeError:
                     if isinstance(cell, float):
-                        row.put("td", text="{0:.6g}".format(cell))
+                        row.put("td", text=f"{cell:.6g}")
                     else:
                         row.put("td", text=str(cell))
                 else:
@@ -149,7 +149,6 @@ def _get_str_fallback(d, key):
 
 def columnize(df, name, inplace=True, dtype=None, debug=False, backing=None):
     """Add a computed column to a DataFrame."""
-
     datanames = None
     from ..roles import LinearFunction  # import here to prevent circular imports
 
@@ -311,7 +310,7 @@ def columnize(df, name, inplace=True, dtype=None, debug=False, backing=None):
             arg0 = ""
         else:
             arg0 = args[0]
-        arg0 = arg0 + '\nwithin parsed command: "{!s}"'.format(name)
+        arg0 = arg0 + f'\nwithin parsed command: "{name!s}"'
         if "max" in name:
             arg0 = (
                 arg0
@@ -356,7 +355,7 @@ def columnize(df, name, inplace=True, dtype=None, debug=False, backing=None):
                     arg0
                     + "\n"
                     + "did you mean {}?".format(
-                        " or ".join("'{}'".format(s) for s in did_you_mean_list)
+                        " or ".join(f"'{s}'" for s in did_you_mean_list)
                     )
                 )
         exc.args = (arg0,) + args[1:]
@@ -452,15 +451,15 @@ def counts_and_shares(
 
     def pct_or_thousands(x):
         if x < 0.0:
-            return "{:.1%}".format(-x)
+            return f"{-x:.1%}"
         else:
-            return "{:,.0f}".format(x)
+            return f"{x:,.0f}"
 
     def hide_nan_else_pct(x):
         if pandas.isnull(x):
             return ""
         else:
-            return "{:.2%}".format(x)
+            return f"{x:.2%}"
 
     if stack:
         result = pandas.concat(

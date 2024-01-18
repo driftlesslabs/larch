@@ -131,7 +131,6 @@ def distribution_figure(
     Elem or Axes
             Returns `ax` if given as an argument, otherwise returns a rendering as an Elem
     """
-
     _coincidence_ratio = None
 
     if xlabel is None:
@@ -571,7 +570,6 @@ def distribution_on_idca_variable(
     Elem or Axes
             Returns `ax` if given as an argument, otherwise returns a rendering as an Elem
     """
-
     if model is None:
         return lambda mdl: distribution_on_idca_variable(
             mdl,
@@ -904,7 +902,6 @@ def share_figure(
     -------
     Figure, DataFrame, or Elem
     """
-
     if style not in {"stacked", "dataframe", "many"}:
         raise ValueError("style must be in {'stacked', 'dataframe', 'many'}")
 
@@ -1279,7 +1276,6 @@ def distribution_on_idco_variable(
     -------
     Figure, DataFrame, or Elem
     """
-
     if style not in {"stacked", "dataframe", "many"}:
         raise ValueError("style must be in {'stacked', 'dataframe', 'many'}")
 

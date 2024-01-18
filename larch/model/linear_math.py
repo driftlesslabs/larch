@@ -50,7 +50,7 @@ class _ParameterOp:
         str
         """
         if self._formatting is None:
-            return "{:.3g}".format(self.value(m))
+            return f"{self.value(m):.3g}"
         else:
             return self._formatting.format(self.value(m))
 
@@ -150,10 +150,7 @@ class _ParameterUnaryOp(_ParameterOp):
         return self._operand.valid(m)
 
     def __repr__(self):
-        return "{}{}".format(
-            self._op,
-            _parenthize_repr(self._operand, self._precedence),
-        )
+        return f"{self._op}{_parenthize_repr(self._operand, self._precedence)}"
 
 
 class _ParameterBinaryOp(_ParameterOp):

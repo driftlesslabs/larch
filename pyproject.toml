@@ -61,20 +61,25 @@ testpaths = [
 ]
 
 [tool.ruff]
-ignore-init-module-imports = true
-
-[tool.ruff.lint]
 select = [
-    # Pyflakes
-    "F",
-    # Pycodestyle
-    "E",
-    "W",
-    # isort
-    "I001",
-    # docstrings
-    "D",
+    "F", # Pyflakes
+    "E", # Pycodestyle Errors
+    "W", # Pycodestyle Warnings
+    "I", # isort
+    "UP", # pyupgrade
+    "D", # pydocstyle
+    "B", # flake8-bugbear
 ]
+ignore-init-module-imports = true
+fix = true
+line-length = 88
+ignore = ["B905", "D1"]
+target-version = "py311"
+extend-include = ["*.ipynb"]
+per-file-ignores = { "*.ipynb" = [
+    "E402", # allow imports to appear anywhere in Jupyter Notebooks
+    "E501", # allow long lines in Jupyter Notebooks
+] }
 
 [tool.ruff.lint.isort]
 known-first-party = ["larch"]

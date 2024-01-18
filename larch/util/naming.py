@@ -13,7 +13,7 @@ def make_valid_identifier(x, suppress_warnings=False):
         y = "_" + x
         if not suppress_warnings:
             warnings.warn(
-                "name {0} is a python keyword, converting to {1}".format(x, y),
+                f"name {x} is a python keyword, converting to {y}",
                 stacklevel=2,
             )
     else:
@@ -25,9 +25,7 @@ def make_valid_identifier(x, suppress_warnings=False):
     if y != x:
         if not suppress_warnings:
             warnings.warn(
-                "name {0} is not a valid python identifier, converting to {1}".format(
-                    x, y
-                ),
+                f"name {x} is not a valid python identifier, converting to {y}",
                 stacklevel=2,
                 category=NotAPythonIdentifier,
             )
@@ -42,9 +40,9 @@ def valid_identifier_or_parenthized_string(x, leading_dot=True):
         return x
     else:
         if "'" in x and '"' not in x:
-            return '("{}")'.format(x)
+            return f'("{x}")'
         if "'" not in x and '"' in x:
-            return "('{}')".format(x)
+            return f"('{x}')"
         raise NotImplementedError("cannot handle strings with both quote types")
 
 
@@ -72,5 +70,5 @@ def parenthize(x, signs_qualify=False):
             )
         if numeric.search(x):
             return x
-        return "({})".format(x)
+        return f"({x})"
     return x

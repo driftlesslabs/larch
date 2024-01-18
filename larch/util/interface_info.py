@@ -36,9 +36,7 @@ class Info:
     def _repr_html_(self):
         from ..util.styles import _default_css_jupyter, _tooltipped_style_css
 
-        style_prefix = "<style>{}\n\n{}</style>\n".format(
-            _default_css_jupyter, _tooltipped_style_css
-        )
+        style_prefix = f"<style>{_default_css_jupyter}\n\n{_tooltipped_style_css}</style>\n"
         from xmle import Elem
 
         xsign = Elem("div", {"class": "larch_head_tag"})
@@ -50,7 +48,7 @@ class Info:
             {
                 "width": "32",
                 "height": "32",
-                "src": "data:image/png;base64,{}".format(favicon),
+                "src": f"data:image/png;base64,{favicon}",
                 "style": "float:left;position:relative;top:-3px;padding-right:0.2em;",
             },
             tail=f" {self.appname} ",

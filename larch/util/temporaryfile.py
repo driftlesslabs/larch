@@ -91,9 +91,9 @@ def TemporaryHtml(style=None, *, nohead=False, mode="wb+", content=None, **taghe
     if not nohead and (style or len(tagheads) > 0):
         t.write("<head>")
         if style:
-            t.write("<style>{}</style>".format(style))
+            t.write(f"<style>{style}</style>")
         for tag, content in tagheads.items():
-            t.write("<{0}>{1}</{0}>".format(tag.lower(), content))
+            t.write(f"<{tag.lower()}>{content}</{tag.lower()}>")
         t.write("</head>")
     if content is not None:
         t.write(content)
@@ -145,7 +145,7 @@ def TemporaryCopy(sourcefile, spool=True):
         while os.path.exists(os.path.join(tdir, vbasename)):
             n += 1
             basename_ = os.path.splitext(basename)
-            vbasename = "{0}.{2}{1}".format(basename_[0], basename_[1], n)
+            vbasename = f"{basename_[0]}.{n}{basename_[1]}"
         shutil.copy2(sourcefile, os.path.join(tdir, vbasename))
         return os.path.join(tdir, vbasename)
     else:

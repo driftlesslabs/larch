@@ -36,7 +36,7 @@ def interaction_simulate_data(
         return pd.read_csv(os.path.join(edb_directory, filename), **kwargs)
 
     settings_file = settings_file.format(name=name)
-    with open(os.path.join(edb_directory, settings_file), "r") as yf:
+    with open(os.path.join(edb_directory, settings_file)) as yf:
         settings = yaml.load(
             yf,
             Loader=yaml.SafeLoader,

@@ -64,7 +64,7 @@ class Dict(_Dict):
                 yaml_check(
                     filename, logger=logging.getLogger("") if logger is None else logger
                 )
-                with open(filename, "r", encoding=encoding) as f:
+                with open(filename, encoding=encoding) as f:
                     return cls(yaml.load(f, *(args[1:]), Loader=Loader, **kwargs))
             except Exception:
                 print("~" * 40)

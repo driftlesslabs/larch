@@ -1,21 +1,23 @@
 import logging
 import pathlib
 import warnings
-from collections.abc import Mapping
-from typing import (
-    TYPE_CHECKING,
-    Any,
+from collections.abc import (
     Callable,
     Collection,
-    DefaultDict,
-    Dict,
     Hashable,
     Iterable,
     Iterator,
-    List,
+    Mapping,
     MutableMapping,
-    Optional,
     Sequence,
+)
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    DefaultDict,
+    Dict,
+    List,
+    Optional,
     Set,
     Tuple,
     Union,
@@ -222,7 +224,7 @@ class DataTree(_sharrow_DataTree):
 
     @property
     def CASEID(self):
-        """str : The _caseid_ dimension of the root Dataset."""
+        """Str : The _caseid_ dimension of the root Dataset."""
         result = self.root_dataset.dc.CASEID
         if result is None:
             warnings.warn("no defined CASEID")
@@ -231,7 +233,7 @@ class DataTree(_sharrow_DataTree):
 
     @property
     def ALTID(self):
-        """str : The _altid_ dimension of the root Dataset."""
+        """Str : The _altid_ dimension of the root Dataset."""
         result = self.root_dataset.dc.ALTID
         if result is None:
             warnings.warn("no defined ALTID")
@@ -240,30 +242,30 @@ class DataTree(_sharrow_DataTree):
 
     @property
     def CASEALT(self):
-        """str : The _casealt_ dimension of the root Dataset, if defined."""
+        """Str : The _casealt_ dimension of the root Dataset, if defined."""
         result = self.root_dataset.attrs.get(_CASEALT, None)
         return result
 
     @property
     def ALTIDX(self):
-        """str : The _alt_idx_ dimension of the root Dataset, if defined."""
+        """Str : The _alt_idx_ dimension of the root Dataset, if defined."""
         result = self.root_dataset.attrs.get(_ALTIDX, None)
         return result
 
     @property
     def CASEPTR(self):
-        """str : The _caseptr_ dimension of the root Dataset, if defined."""
+        """Str : The _caseptr_ dimension of the root Dataset, if defined."""
         result = self.root_dataset.attrs.get(_CASEPTR, None)
         return result
 
     @property
     def n_cases(self):
-        """int : The size of the _caseid_ dimension of the root Dataset."""
+        """Int : The size of the _caseid_ dimension of the root Dataset."""
         return self.root_dataset.dims[self.CASEID]
 
     @property
     def n_alts(self):
-        """int : The size of the _altid_ dimension of the root Dataset."""
+        """Int : The size of the _altid_ dimension of the root Dataset."""
         return self.root_dataset.dims[self.ALTID]
 
     def query_cases(self, *args, **kwargs):

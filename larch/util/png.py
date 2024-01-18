@@ -87,9 +87,7 @@ def make_png(
     if output.lower() == "elem":
         result = Elem(
             tag="img",
-            src="data:image/png;base64,{}".format(
-                base64.standard_b64encode(_bytes_io.getvalue()).decode()
-            ),
+            src=f"data:image/png;base64,{base64.standard_b64encode(_bytes_io.getvalue()).decode()}",
         )
     elif output.lower() == "bytesio":
         result = _bytes_io

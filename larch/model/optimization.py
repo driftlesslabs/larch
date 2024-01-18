@@ -445,9 +445,9 @@ def maximize_loglike(
         raise
     finally:
         if _initial_constraint_intensity is not None:
-            setattr(model, "constraint_intensity", _initial_constraint_intensity)
+            model.constraint_intensity = _initial_constraint_intensity
         if _initial_constraint_sharpness is not None:
-            setattr(model, "constraint_sharpness", _initial_constraint_sharpness)
+            model.constraint_sharpness = _initial_constraint_sharpness
 
 
 def propose_direction(bhhh, dloglike, freedoms):
@@ -550,9 +550,7 @@ def fit_bhhh(
             )
         if printer is not None:
             printer(
-                "simple step bhhh {} to gain {}".format(
-                    steplen, proposed_ll - current_ll
-                )
+                f"simple step bhhh {steplen} to gain {proposed_ll - current_ll}"
             )
         steps.append(steplen)
 

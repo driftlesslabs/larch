@@ -1,7 +1,7 @@
 import logging
 import os
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Mapping
 
 import numpy as np
 import pandas as pd
@@ -39,7 +39,6 @@ def cv_to_ca(alt_values, dtype="float64"):
         idca format, with one row per chooser (case) and
         alternative, and one column per variable.
     """
-
     # Read the source file, converting to a tall stack of
     # data with a 3 level multiindex
     x_ca_tall = alt_values.stack()
@@ -461,7 +460,7 @@ def simple_simulate_data(
     )
 
     settings_file = settings_file.format(name=name)
-    with open(os.path.join(edb_directory, settings_file), "r") as yf:
+    with open(os.path.join(edb_directory, settings_file)) as yf:
         settings = yaml.load(
             yf,
             Loader=yaml.SafeLoader,
