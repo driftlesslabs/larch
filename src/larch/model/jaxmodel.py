@@ -86,14 +86,11 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
     def compute_engine(self):
         engine = self._compute_engine
         if engine is None:
-            engine = "jax"
+            if not jax:
+                engine = "numba"
+            else:
+                engine = "jax"
         return engine
-
-    @compute_engine.setter
-    def compute_engine(self, engine):
-        if engine not in {"numba", "jax", None}:
-            raise ValueError("invalid compute engine")
-        self._compute_engine = engine
 
     prerolled_draws = MangleOnChange(bool)
     common_draws = MangleOnChange(bool)
