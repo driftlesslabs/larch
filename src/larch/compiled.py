@@ -1,4 +1,4 @@
-import jax
+from ._optional import jax
 
 
 def reset_compiled_methods(obj):

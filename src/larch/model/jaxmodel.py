@@ -1,11 +1,10 @@
 import logging
 
-import jax
-import jax.numpy as jnp
 import numpy as np
 import pandas as pd
 from xarray import Dataset
 
+from .._optional import jax, jnp
 from ..compiled import compiledmethod, jitmethod, reset_compiled_methods
 from ..folding import fold_dataset
 from ..optimize import OptimizeMixin

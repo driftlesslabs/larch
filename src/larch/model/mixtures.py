@@ -1,9 +1,6 @@
 from collections.abc import MutableSequence
 
-import jax
-import jax.numpy as jnp
-import jax.scipy as js
-
+from .._optional import jax, jnp, js
 from .param_core import ParameterBucket
 
 

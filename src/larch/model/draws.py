@@ -1,5 +1,4 @@
-import jax
-import jax.numpy as jnp
+from .._optional import jax, jnp
 
 
 def lhs_draw_maker(n_draws, n_cols):

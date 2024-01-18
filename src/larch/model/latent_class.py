@@ -1,9 +1,8 @@
-import jax
-import jax.numpy as jnp
 import numpy as np
 import pandas as pd
 import xarray as xr
 
+from .._optional import jax, jnp
 from ..compiled import jitmethod, reset_compiled_methods
 from ..dataset import Dataset, DataTree
 from ..exceptions import MissingDataError

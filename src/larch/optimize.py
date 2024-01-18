@@ -1,13 +1,12 @@
 import logging
 from abc import ABC, abstractmethod
 
-import jax
-import jax.numpy as jnp
 import numpy as np
 from rich.table import Table
 from scipy.optimize import Bounds, minimize
 from xarray import Dataset
 
+from ._optional import jax, jnp
 from .compiled import jitmethod
 
 
