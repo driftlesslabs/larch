@@ -5,6 +5,9 @@ class Nothing:
     def __call__(self, *args, **kwargs):
         return Nothing()
 
+    def __bool__(self):
+        return False
+
 
 # optional import: JAX
 try:

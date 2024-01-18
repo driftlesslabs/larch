@@ -177,8 +177,8 @@ class DataTree(_sharrow_DataTree):
         )
         dim_order = []
         c = self.root_dataset.dc.CASEID
-        if c is None and len(self.root_dataset.dims) == 1:
-            self.root_dataset.dc.CASEID = list(self.root_dataset.dims.keys())[0]
+        if c is None and len(self.root_dataset.sizes) == 1:
+            self.root_dataset.dc.CASEID = list(self.root_dataset.sizes.keys())[0]
         c = self.root_dataset.dc.CASEID
         if c is not None:
             dim_order.append(c)
@@ -235,12 +235,12 @@ class DataTree(_sharrow_DataTree):
     @property
     def n_cases(self):
         """Int : The size of the _caseid_ dimension of the root Dataset."""
-        return self.root_dataset.dims[self.CASEID]
+        return self.root_dataset.sizes[self.CASEID]
 
     @property
     def n_alts(self):
         """Int : The size of the _altid_ dimension of the root Dataset."""
-        return self.root_dataset.dims[self.ALTID]
+        return self.root_dataset.sizes[self.ALTID]
 
     def query_cases(self, *args, **kwargs):
         """

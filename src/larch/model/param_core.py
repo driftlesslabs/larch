@@ -150,11 +150,11 @@ class ParameterBucket:
         if isinstance(other, ParameterBucket):
             other = other._params
         if isinstance(other, xr.Dataset):
-            if "param_name_2" in other.dims:
+            if "param_name_2" in other.sizes:
                 other = other.drop_dims("param_name_2")  # TODO, keep 2nd dim
-            if len(other.dims) != 1:
+            if len(other.sizes) != 1:
                 raise ValueError("expected parameters to be a 1-d vector")
-            other_dim = iter(other.dims).__next__()
+            other_dim = iter(other.sizes).__next__()
             joint_names = set(self.pnames) | set(other.coords[other_dim].data)
         else:
             joint_names = set(self.pnames) | set(other.pnames)
@@ -229,7 +229,7 @@ class ParameterBucket:
 
     @property
     def n_params(self):
-        return self._params.dims[self.index_name]
+        return self._params.sizes[self.index_name]
 
     @property
     def pvals(self):
@@ -553,7 +553,7 @@ class ParameterBucket:
 
         params = self._params
         rich_table = Table()
-        idx_name, n = next(iter(params.dims.items()))
+        idx_name, n = next(iter(params.sizes.items()))
         for column in params.variables:
             rich_table.add_column(
                 str(column), width=name_width if column == self.index_name else None

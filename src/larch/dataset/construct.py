@@ -25,7 +25,7 @@ def _initialize_for_larch(obj, caseid=None, alts=None):
     Parameters
     ----------
     obj : Dataset
-        The dataaset being initialized.
+        The dataset being initialized.
     caseid : str, optional
         The name of a dimension referencing cases.
     alts : Mapping or str or array-like, optional
@@ -39,7 +39,7 @@ def _initialize_for_larch(obj, caseid=None, alts=None):
     Dataset
     """
     if caseid is not None:
-        if caseid not in obj.dims:
+        if caseid not in obj.sizes:
             raise ValueError(f"no dim named '{caseid}' to make into {CASEID}")
         obj.attrs[CASEID] = caseid
     if isinstance(alts, pd.Series):

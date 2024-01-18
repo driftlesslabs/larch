@@ -268,7 +268,7 @@ class _GenericFlow:
 
         if self.CASEPTR is not None:
             case_index = case_ptr_to_indexes(
-                self._obj.dims[self.CASEALT], self[self.CASEPTR].values
+                self._obj.sizes[self.CASEALT], self[self.CASEPTR].values
             )
             obj = self._obj.assign(
                 {"_case_index_": xr.DataArray(case_index, dims=(self.CASEALT))}
@@ -344,32 +344,34 @@ class _GenericFlow:
     @property
     def n_cases(self):
         try:
-            return self.dims[self.CASEID]
+            return self.sizes[self.CASEID]
         except KeyError:
             try:
-                return self.dims[self.GROUPID] * self.dims[self.INGROUP]
+                return self.sizes[self.GROUPID] * self.sizes[self.INGROUP]
             except KeyError:
                 pass
-            logging.getLogger().error(f"missing {self.CASEID!r} among dims {self.dims}")
+            logging.getLogger().error(
+                f"missing {self.CASEID!r} among dims {self.sizes}"
+            )
             raise
 
     @property
     def n_panels(self):
         try:
-            return self.dims[self.GROUPID]
+            return self.sizes[self.GROUPID]
         except KeyError:
             try:
-                return self.dims[self.CASEID]
+                return self.sizes[self.CASEID]
             except KeyError:
                 pass
             logging.getLogger().error(
-                f"missing {self.GROUPID!r} and {self.CASEID!r} among dims {self.dims}"
+                f"missing {self.GROUPID!r} and {self.CASEID!r} among dims {self.sizes}"
             )
             raise
 
     @property
     def n_in_panel(self):
-        return self.dims[self.INGROUP]
+        return self.sizes[self.INGROUP]
 
     def transfer_dimension_attrs(self, target):
         if not isinstance(target, xr.DataArray | xr.Dataset):
@@ -471,8 +473,8 @@ class _DataArrayDC(_GenericFlow):
 
     @property
     def n_alts(self):
-        if self.ALTID in self._obj.dims:
-            return self._obj.shape[self.dims.index(self.ALTID)]
+        if self.ALTID in self._obj.sizes:
+            return self._obj.shape[self.sizes.index(self.ALTID)]
         if "n_alts" in self._obj.attrs:
             return self._obj.attrs["n_alts"]
         raise ValueError("no n_alts set")
@@ -496,8 +498,8 @@ class _DatasetDC(_GenericFlow):
 
     @property
     def n_alts(self):
-        if self.ALTID in self._obj.dims:
-            return self._obj.dims[self.ALTID]
+        if self.ALTID in self._obj.sizes:
+            return self._obj.sizes[self.ALTID]
         if "n_alts" in self._obj.attrs:
             return self._obj.attrs["n_alts"]
         raise ValueError("no n_alts set")

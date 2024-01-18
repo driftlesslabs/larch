@@ -438,8 +438,8 @@ def _prep_ca(
         ):
             proposal = shared_data_ca.root_dataset[vars_ca]
             if (
-                shared_data_ca.CASEID in proposal.dims
-                and shared_data_ca.ALTID in proposal.dims
+                shared_data_ca.CASEID in proposal.sizes
+                and shared_data_ca.ALTID in proposal.sizes
             ):
                 proposal = proposal.drop(list(proposal.coords)).rename(tag)
                 return model_dataset.merge(proposal), vars_ca
@@ -460,8 +460,8 @@ def _prep_ca(
     altid_dim = shared_data_ca.ALTID
     if preserve_vars or len(vars_ca) > 1:
         arr = arr.reshape(
-            model_dataset.dims.get(caseid_dim),
-            model_dataset.dims.get(altid_dim),
+            model_dataset.sizes.get(caseid_dim),
+            model_dataset.sizes.get(altid_dim),
             -1,
         )
         da = DataArray(
@@ -476,8 +476,8 @@ def _prep_ca(
         )
     else:
         arr = arr.reshape(
-            model_dataset.dims.get(caseid_dim),
-            model_dataset.dims.get(altid_dim),
+            model_dataset.sizes.get(caseid_dim),
+            model_dataset.sizes.get(altid_dim),
         )
         da = DataArray(
             arr,
@@ -509,7 +509,7 @@ def _prep_ce(
     if isinstance(vars_ca, str):
         if not preserve_vars and vars_ca in datatree.root_dataset:
             proposal = datatree.root_dataset[vars_ca]
-            if datatree.CASEALT in proposal.dims:
+            if datatree.CASEALT in proposal.sizes:
                 proposal = proposal.drop(list(proposal.coords)).rename(f"{s_tag}_data")
                 return model_dataset.merge(proposal), flow
     if isinstance(vars_ca, str):
@@ -526,7 +526,7 @@ def _prep_ce(
     casealt_dim = datatree.CASEALT
     if preserve_vars or len(vars_ca) > 1:
         arr = arr.reshape(
-            model_dataset.dims.get(casealt_dim),
+            model_dataset.sizes.get(casealt_dim),
             -1,
         )
         da = DataArray(
@@ -604,7 +604,7 @@ def _prep_co(
         if dim_name is None:
             dim_name = f"var_{tag}"
         arr = arr.reshape(
-            model_dataset.dims.get(caseid_dim),
+            model_dataset.sizes.get(caseid_dim),
             -1,
         )
         da = DataArray(
@@ -618,7 +618,7 @@ def _prep_co(
         )
     else:
         arr = arr.reshape(
-            model_dataset.dims.get(caseid_dim),
+            model_dataset.sizes.get(caseid_dim),
         )
         da = DataArray(
             arr,

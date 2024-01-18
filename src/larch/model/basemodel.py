@@ -20,6 +20,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from .._optional import jax
 from ..dataset import DataTree
 from ..exceptions import MissingDataError
 from .constraints import ParametricConstraintList
@@ -202,6 +203,12 @@ class BaseModel:
         if engine not in {"numba", "jax", None}:
             raise ValueError("invalid compute engine")
         self._compute_engine = engine
+        if self._compute_engine == "jax" and not jax:
+            warnings.warn(
+                "jax is not installed, falling back to numba",
+                stacklevel=2,
+            )
+            self._compute_engine = "numba"
         if self._compute_engine == "jax" and self.use_streaming:
             warnings.warn(
                 "setting use_streaming to False, jax is not yet compatible",
