@@ -441,7 +441,7 @@ def _prep_ca(
                 shared_data_ca.CASEID in proposal.sizes
                 and shared_data_ca.ALTID in proposal.sizes
             ):
-                proposal = proposal.drop(list(proposal.coords)).rename(tag)
+                proposal = proposal.drop_vars(list(proposal.coords)).rename(tag)
                 return model_dataset.merge(proposal), vars_ca
     if isinstance(vars_ca, str):
         vars_ca = {vars_ca: vars_ca}
@@ -510,7 +510,9 @@ def _prep_ce(
         if not preserve_vars and vars_ca in datatree.root_dataset:
             proposal = datatree.root_dataset[vars_ca]
             if datatree.CASEALT in proposal.sizes:
-                proposal = proposal.drop(list(proposal.coords)).rename(f"{s_tag}_data")
+                proposal = proposal.drop_vars(list(proposal.coords)).rename(
+                    f"{s_tag}_data"
+                )
                 return model_dataset.merge(proposal), flow
     if isinstance(vars_ca, str):
         vars_ca = {vars_ca: vars_ca}
