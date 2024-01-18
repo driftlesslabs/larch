@@ -334,7 +334,7 @@ class _GenericFlow:
 
     @property
     def alts_mapping(self):
-        """Dict[int,str] : Mapping of alternative codes to names"""
+        """Dict[int,str] : Mapping of alternative codes to names."""
         a = self._obj.coords[self.ALTID]
         if "alt_names" in a.coords:
             return dict(zip(a.values, a.coords["alt_names"].values))
@@ -372,7 +372,7 @@ class _GenericFlow:
         return self.dims[self.INGROUP]
 
     def transfer_dimension_attrs(self, target):
-        if not isinstance(target, (xr.DataArray, xr.Dataset)):
+        if not isinstance(target, xr.DataArray | xr.Dataset):
             return target
         updates = {}
         for i in [CASEID, ALTID, GROUPID, INGROUP, CASEALT, CASEPTR]:

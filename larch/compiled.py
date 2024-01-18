@@ -8,9 +8,7 @@ def reset_compiled_methods(obj):
 
 
 class compiledmethod:
-    """
-    Decorator for a class method that returns a compiled function.
-    """
+    """Decorator for a class method that returns a compiled function."""
 
     def __init__(self, compiler):
         # self : compiledmethod
@@ -52,9 +50,7 @@ class compiledmethod:
 
 
 class jitmethod:
-    """
-    Decorator for a class method that returns a compiled function.
-    """
+    """Decorator for a class method that returns a compiled function."""
 
     def __init__(self, wrapped_method=None, **kwargs):
         """

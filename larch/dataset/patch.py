@@ -87,7 +87,7 @@ def set_dtypes(self, dtypes, inplace=False, on_error="warn"):
             obj[k] = obj[k].astype(dtypes[k])
         except Exception as err:
             if on_error == "warn":
-                warnings.warn(f"{err!r} on converting {k}")
+                warnings.warn(f"{err!r} on converting {k}", stacklevel=2)
             elif on_error == "raise":
                 raise
     return obj

@@ -117,81 +117,83 @@ def fold_dataset(
     try:
         out.dc.GROUPID = group_dim
         out.dc.INGROUP = ingroup_dim
-    except:
+    except Exception:
         pass
     return out
 
 
-def folder(cls, ds, fold_on, crack=True, avail="_avail_", fill_missing=None):
-    """
-    Construct a Dataset from an idca-format DataFrame.
-
-    This method loads the data as dense arrays.
-
-    Parameters
-    ----------
-    ds : Dataset
-        The input data should be an idca-format or idce-format DataFrame,
-        with the caseid's and altid's in a two-level pandas MultiIndex.
-    crack : bool, default True
-        If True, the `dissolve_zero_variance` method is applied before
-        repairing dtypes, to ensure that missing value are handled
-        properly.
-    avail : str, default '_avail_'
-        When the imported data is sparse then
-        an availability indicator is computed and given this name.
-    fill_missing : scalar or Mapping, optional
-        Fill values to use for missing values when imported data is
-        sparse.  Give a single value to use
-        globally, or a mapping of {variable: value} or {dtype: value}.
-
-    Returns
-    -------
-    Dataset
-
-    """
-    # if df.index.nlevels != 2:
-    #     raise ValueError("source idca dataframe must have a two "
-    #                      "level MultiIndex giving case and alt id's")
-    # caseidname, altidname = df.index.names
-
-    # check altids are integers, if they are not then fix it
-    # if df.index.levels[1].dtype.kind != 'i':
-    #     if altnames is None:
-    #         altnames = df.index.levels[1]
-    #         df.index = df.index.set_levels(np.arange(1, len(altnames) + 1), level=1)
-    #     else:
-    #         new_index = df.index.get_level_values(1).astype(pd.CategoricalDtype(altnames))
-    #         df.index = df.index.set_codes(new_index.codes, level=1).set_levels(np.arange(1, len(altnames) + 1), level=1)
-
-    ds = cls()(df, caseid=caseidname, alts=altidname)
-    if crack:
-        ds = ds.dc.dissolve_zero_variance()
-    ds = ds.set_dtypes(df)
-    if altnames is not None:
-        ds = ds.dc.set_altnames(altnames)
-    if avail not in ds and len(df) < ds.dc.n_cases * ds.dc.n_alts:
-        av = (
-            xr.DataArray.from_series(pd.Series(1, index=df.index))
-            .fillna(0)
-            .astype(np.int8)
-        )
-        ds[avail] = av
-        if fill_missing is not None:
-            if isinstance(fill_missing, Mapping):
-                for k, i in ds.items():
-                    if ds.dc.ALTID not in i.dims:
-                        continue
-                    if k not in fill_missing and i.dtype not in fill_missing:
-                        continue
-                    filler = fill_missing.get(k, fill_missing[i.dtype])
-                    ds[k] = i.where(ds["_avail_"] != 0, filler)
-            else:
-                for k, i in ds.items():
-                    if ds.dc.ALTID not in i.dims:
-                        continue
-                    ds[k] = i.where(ds["_avail_"] != 0, fill_missing)
-    return ds
+# def folder(cls, ds, fold_on, crack=True, avail="_avail_", fill_missing=None):
+#     """
+#     Construct a Dataset from an idca-format DataFrame.
+#
+#     This method loads the data as dense arrays.
+#
+#     Parameters
+#     ----------
+#     ds : Dataset
+#         The input data should be an idca-format or idce-format DataFrame,
+#         with the caseid's and altid's in a two-level pandas MultiIndex.
+#     crack : bool, default True
+#         If True, the `dissolve_zero_variance` method is applied before
+#         repairing dtypes, to ensure that missing value are handled
+#         properly.
+#     avail : str, default '_avail_'
+#         When the imported data is sparse then
+#         an availability indicator is computed and given this name.
+#     fill_missing : scalar or Mapping, optional
+#         Fill values to use for missing values when imported data is
+#         sparse.  Give a single value to use
+#         globally, or a mapping of {variable: value} or {dtype: value}.
+#
+#     Returns
+#     -------
+#     Dataset
+#
+#     """
+#     # if df.index.nlevels != 2:
+#     #     raise ValueError("source idca dataframe must have a two "
+#     #                      "level MultiIndex giving case and alt id's")
+#     # caseidname, altidname = df.index.names
+#
+#     # check altids are integers, if they are not then fix it
+#     # if df.index.levels[1].dtype.kind != 'i':
+#     #     if altnames is None:
+#     #         altnames = df.index.levels[1]
+#     #         df.index = df.index.set_levels(np.arange(1, len(altnames) + 1), level=1)
+#     #     else:
+#     #         new_index = df.index.get_level_values(1).astype(pd.CategoricalDtype(altnames))
+#     #         df.index = df.index.set_codes(
+#     #             new_index.codes, level=1
+#     #         ).set_levels(np.arange(1, len(altnames) + 1), level=1)
+#
+#     ds = cls()(df, caseid=caseidname, alts=altidname)
+#     if crack:
+#         ds = ds.dc.dissolve_zero_variance()
+#     ds = ds.set_dtypes(df)
+#     if altnames is not None:
+#         ds = ds.dc.set_altnames(altnames)
+#     if avail not in ds and len(df) < ds.dc.n_cases * ds.dc.n_alts:
+#         av = (
+#             xr.DataArray.from_series(pd.Series(1, index=df.index))
+#             .fillna(0)
+#             .astype(np.int8)
+#         )
+#         ds[avail] = av
+#         if fill_missing is not None:
+#             if isinstance(fill_missing, Mapping):
+#                 for k, i in ds.items():
+#                     if ds.dc.ALTID not in i.dims:
+#                         continue
+#                     if k not in fill_missing and i.dtype not in fill_missing:
+#                         continue
+#                     filler = fill_missing.get(k, fill_missing[i.dtype])
+#                     ds[k] = i.where(ds["_avail_"] != 0, filler)
+#             else:
+#                 for k, i in ds.items():
+#                     if ds.dc.ALTID not in i.dims:
+#                         continue
+#                     ds[k] = i.where(ds["_avail_"] != 0, fill_missing)
+#     return ds
 
 
 def dissolve_zero_variance(self, dim, mask=None, inplace=False):

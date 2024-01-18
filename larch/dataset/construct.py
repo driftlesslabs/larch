@@ -20,6 +20,7 @@ def _steal(func):
 
 def _initialize_for_larch(obj, caseid=None, alts=None):
     """
+    Initialize a Dataset for use with larch.
 
     Parameters
     ----------
@@ -102,7 +103,7 @@ class _DatasetConstruct:
     @classmethod
     def __call__(cls, source, caseid=None, alts=None):
         """
-        A generic constructor for creating Datasets from various similar objects.
+        Construct a Dataset from various similar objects.
 
         Parameters
         ----------

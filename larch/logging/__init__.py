@@ -41,7 +41,7 @@ class ElapsedTimeFormatter(logging.Formatter):
             record.elapsedTime = f"{int(hours):0>2}:{int(minutes):0>2}:{seconds:07.4f}"
         else:
             record.elapsedTime = f"{int(minutes):0>2}:{seconds:07.4f}"
-        return super(ElapsedTimeFormatter, self).format(record)
+        return super().format(record)
 
 
 def log_to_console(level=None):

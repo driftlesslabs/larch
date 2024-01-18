@@ -71,15 +71,15 @@ def idca_statistics_data(
     else:
         wgt = np.asarray(wgt)
     n_alts = var.n_alts
-    n = np.prod(var.shape)
-    if bw_method == "scott":
-        bandwidth = scotts_factor(n, 1)
-    elif bw_method == "silverman":
-        bandwidth = scotts_factor(n, 1)
-    elif np.isscalar(bw_method) and not isinstance(bw_method, str):
-        bandwidth = bw_method
-    else:
-        raise ValueError("`bw_method` should be 'scott', 'silverman', or a scalar")
+    # n = np.prod(var.shape)
+    # if bw_method == "scott":
+    #     bandwidth = scotts_factor(n, 1)
+    # elif bw_method == "silverman":
+    #     bandwidth = scotts_factor(n, 1)
+    # elif np.isscalar(bw_method) and not isinstance(bw_method, str):
+    #     bandwidth = bw_method
+    # else:
+    #     raise ValueError("`bw_method` should be 'scott', 'silverman', or a scalar")
     stats = Dataset(
         {
             "mean": var.mean(var.CASEID),
@@ -217,7 +217,9 @@ def idca_statistics(
     # A dropdown filter
     # options = [None] + list(str(i.data) for i in var['alt_names'])
     # options_dropdown = alt.binding_select(options=options)
-    # options_select = alt.selection_single(fields=['Alternative'], bind=options_dropdown, name="Alternative", empty="all")
+    # options_select = alt.selection_single(fields=['Alternative'],
+    #       bind=options_dropdown, name="Alternative", empty="all"
+    #   )
 
     frequency = (
         ax.mark_line(

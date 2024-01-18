@@ -2226,7 +2226,7 @@ class NumbaModel(_BaseModel):
         -------
         pandas.DataFrame
         """
-        from ..dataset import choice_avail_summary
+        from ..dataset.choice_avail_reporting import choice_avail_summary
 
         self.unmangle()
         graph = self.graph

@@ -23,5 +23,28 @@ try:
     import setuptools_scm
 
     __version__ = setuptools_scm.get_version(os.path.dirname(top_package.__path__[0]))
-except:
+except Exception:
     __version__ = _install_version
+
+__all__ = [
+"NumberedCaption", "Reporter",
+    "read_metadata",
+    "examples",
+    "example",
+    "example_file",
+    "DataArray",
+    "Dataset",
+    "DataTree",
+    "mixtures",
+    "BaseModel",
+    "Model",
+    "LatentClass",
+    "MixedLatentClass",
+    "ParameterBucket",
+    "load_model",
+    "NestingTree",
+    "PX",
+    "P",
+    "X",
+    "figures",
+    ]

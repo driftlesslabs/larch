@@ -1,46 +1,22 @@
-import logging
-import pathlib
 import warnings
-from collections.abc import (
-    Callable,
-    Collection,
-    Hashable,
-    Iterable,
-    Iterator,
-    Mapping,
-    MutableMapping,
-    Sequence,
-)
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    DefaultDict,
-    Dict,
-    List,
-    Optional,
-    Set,
-    Tuple,
-    Union,
-    cast,
-    overload,
-)
 
-import numba as nb
 import numpy as np
 import pandas as pd
 import xarray as xr
 from xarray.core import dtypes
 
-from . import construct, flow, patch
-from .choice_avail_reporting import choice_avail_summary
+from . import construct as construct
+from . import flow as flow
+from . import patch as patch
 from .dim_names import ALTID as _ALTID
 from .dim_names import ALTIDX as _ALTIDX
 from .dim_names import CASEALT as _CASEALT
 from .dim_names import CASEID as _CASEID
 from .dim_names import CASEPTR as _CASEPTR
-from .dim_names import GROUPID as _GROUPID
-from .dim_names import INGROUP as _INGROUP
 from .patch import register_dataarray_classmethod
+
+# from .dim_names import GROUPID as _GROUPID
+# from .dim_names import INGROUP as _INGROUP
 
 try:
     from sharrow import DataArray as _sharrow_DataArray
@@ -48,7 +24,7 @@ try:
     from sharrow import DataTree as _sharrow_DataTree
     from sharrow.accessors import register_dataarray_method
 except ImportError:
-    warnings.warn("larch.dataset requires the sharrow library")
+    warnings.warn("larch.dataset requires the sharrow library", stacklevel=2)
 
     class _noclass:
         pass
@@ -227,7 +203,7 @@ class DataTree(_sharrow_DataTree):
         """Str : The _caseid_ dimension of the root Dataset."""
         result = self.root_dataset.dc.CASEID
         if result is None:
-            warnings.warn("no defined CASEID")
+            warnings.warn("no defined CASEID", stacklevel=2)
             return _CASEID
         return result
 
@@ -236,7 +212,7 @@ class DataTree(_sharrow_DataTree):
         """Str : The _altid_ dimension of the root Dataset."""
         result = self.root_dataset.dc.ALTID
         if result is None:
-            warnings.warn("no defined ALTID")
+            warnings.warn("no defined ALTID", stacklevel=2)
             return _ALTID
         return result
 
@@ -313,23 +289,23 @@ class DataTree(_sharrow_DataTree):
             {self.root_node_name: self.root_dataset.isel({self.CASEID: case_slice})}
         )
 
-    def caseids(self):
+    def caseids(self) -> pd.Index:
         """
         Access the caseids coordinates as an index.
 
         Returns
         -------
-        pd.Index
+        pandas.Index
         """
         try:
             return self.root_dataset.indexes[self.CASEID]
         except KeyError:
-            for k, v in self.subspaces.items():
+            for _k, v in self.subspaces.items():
                 if self.CASEID in v.indexes:
                     return v.indexes[self.CASEID]
             raise
 
-    def altids(self):
+    def altids(self) -> pd.Index:
         """
         Access the altids coordinates as an index.
 
@@ -340,7 +316,7 @@ class DataTree(_sharrow_DataTree):
         try:
             return self.root_dataset.indexes[self.ALTID]
         except KeyError:
-            for k, v in self.subspaces.items():
+            for _k, v in self.subspaces.items():
                 if self.ALTID in v.indexes:
                     return v.indexes[self.ALTID]
             raise
@@ -370,7 +346,7 @@ class DataTree(_sharrow_DataTree):
 
         Parameters
         ----------
-        definition_spec : Dict[str,str]
+        definition_spec : dict[str,str]
             Gives the names and expressions that define the variables to
             create in this new `Flow`.
         cache_dir : Path-like, optional
