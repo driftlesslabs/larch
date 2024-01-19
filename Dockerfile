@@ -40,7 +40,7 @@ RUN micromamba install -y -n base -c conda-forge \
     && \
     micromamba clean --all --yes \
     && \
-    python -m pip install jax jaxlib xlogit --no-cache-dir
+    python -m pip install build jax jaxlib xlogit --no-cache-dir
 
 ENV PYTHONUNBUFFERED=1
 
@@ -51,10 +51,10 @@ ARG CACHEBUST=1
 COPY --chown=$MAMBA_USER:$MAMBA_USER . /tmp/larix/larch
 
 # Compile wheel
-RUN python -m pip wheel --wheel-dir=/tmp/wheelhouse --no-deps -v /tmp/larix/larch
+RUN python -m build --outdir=/tmp/wheelhouse /tmp/larix/larch
 
 # Install from wheel
-RUN python -m pip install --no-index --find-links=/tmp/wheelhouse larch
+RUN python -m pip install --no-index --find-links=/tmp/wheelhouse larch6
 
 # Run tests
 RUN python -m pytest -v /tmp/larix/larch --ignore=/tmp/larix/larch/sandbox
