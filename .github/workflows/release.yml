@@ -9,6 +9,8 @@ jobs:
   docs-publish:
     name: publish docs
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -32,6 +34,8 @@ jobs:
           jb build .
       - name: Set version major-minor
         run: echo "VERSION_MINOR=$(cut -d '.' -f 1,2 <<< ${{ github.ref_name }})" >> $GITHUB_OUTPUT
+      - name: Confirm version major-minor
+        run: echo "VERSION_MINOR is ${{ env.VERSION_MINOR }}"
       - name: Push to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
