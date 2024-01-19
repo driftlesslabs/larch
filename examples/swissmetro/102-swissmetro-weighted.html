@@ -1,0 +1,1296 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>102: Swissmetro Weighted MNL Mode Choice &#8212; .</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="icon" sizes="32x32" type="image/png" href="../../_static/_img/larch_favicon.png" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/swissmetro/102-swissmetro-weighted';</script>
+    <link rel="shortcut icon" href="../../_static/larch_favicon.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search these docs..."
+         aria-label="Search these docs..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt=". - Home"/>
+    <script>document.write(`<img src="../../_static/larch-logo.png" class="logo__image only-dark" alt=". - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Users Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installing Larch</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../user-guide/choice-models.html">Choice Models</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../user-guide/data-fundamentals.html">Data Fundamentals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user-guide/linear-funcs.html">Linear Functions</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../api/~data.html">Data</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/dataset.html">Dataset</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Dataset.html">larch.Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Dataset.construct.from_idca.html">larch.Dataset.construct.from_idca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Dataset.construct.from_idce.html">larch.Dataset.construct.from_idce</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Dataset.construct.from_idco.html">larch.Dataset.construct.from_idco</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Dataset.construct.html">larch.Dataset.construct</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Dataset.dims.html">larch.Dataset.dims</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Dataset.sizes.html">larch.Dataset.sizes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Dataset.data_vars.html">larch.Dataset.data_vars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Dataset.coords.html">larch.Dataset.coords</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Dataset.attrs.html">larch.Dataset.attrs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Dataset.encoding.html">larch.Dataset.encoding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Dataset.indexes.html">larch.Dataset.indexes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Dataset.chunks.html">larch.Dataset.chunks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Dataset.chunksizes.html">larch.Dataset.chunksizes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Dataset.nbytes.html">larch.Dataset.nbytes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Dataset.set_dtypes.html">larch.Dataset.set_dtypes</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/datatree.html">DataTree</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.DataTree.html">larch.DataTree</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.DataTree.root_node_name.html">larch.DataTree.root_node_name</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.DataTree.subspaces.html">larch.DataTree.subspaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.DataTree.relationships_are_digitized.html">larch.DataTree.relationships_are_digitized</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.DataTree.n_cases.html">larch.DataTree.n_cases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.DataTree.n_alts.html">larch.DataTree.n_alts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.DataTree.CASEID.html">larch.DataTree.CASEID</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.DataTree.ALTID.html">larch.DataTree.ALTID</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.DataTree.add_dataset.html">larch.DataTree.add_dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.DataTree.add_relationship.html">larch.DataTree.add_relationship</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.DataTree.digitize_relationships.html">larch.DataTree.digitize_relationships</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.DataTree.query_cases.html">larch.DataTree.query_cases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.DataTree.replace_datasets.html">larch.DataTree.replace_datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.DataTree.setup_flow.html">larch.DataTree.setup_flow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../api/~models.html">Models</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/model.html">Model</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.html">larch.Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.datatree.html">larch.Model.datatree</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.dataset.html">larch.Model.dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.n_cases.html">larch.Model.n_cases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.choice_ca_var.html">larch.Model.choice_ca_var</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.choice_co_vars.html">larch.Model.choice_co_vars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.choice_co_code.html">larch.Model.choice_co_code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.availability_ca_var.html">larch.Model.availability_ca_var</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.availability_co_vars.html">larch.Model.availability_co_vars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.utility_ca.html">larch.Model.utility_ca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.utility_co.html">larch.Model.utility_co</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.quantity_ca.html">larch.Model.quantity_ca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.pf.html">larch.Model.pf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.most_recent_estimation_result.html">larch.Model.most_recent_estimation_result</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.possible_overspecification.html">larch.Model.possible_overspecification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.set_values.html">larch.Model.set_values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.lock_value.html">larch.Model.lock_value</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.set_cap.html">larch.Model.set_cap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.remove_unused_parameters.html">larch.Model.remove_unused_parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.maximize_loglike.html">larch.Model.maximize_loglike</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.calculate_parameter_covariance.html">larch.Model.calculate_parameter_covariance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.loglike_null.html">larch.Model.loglike_null</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.parameter_summary.html">larch.Model.parameter_summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.estimation_statistics.html">larch.Model.estimation_statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.bhhh.html">larch.Model.bhhh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.d_loglike.html">larch.Model.d_loglike</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.d_loglike_casewise.html">larch.Model.d_loglike_casewise</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.loglike.html">larch.Model.loglike</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.loglike_casewise.html">larch.Model.loglike_casewise</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.logsums.html">larch.Model.logsums</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.probability.html">larch.Model.probability</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.quantity.html">larch.Model.quantity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.total_weight.html">larch.Model.total_weight</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.Model.utility.html">larch.Model.utility</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/linear.html">Linear Functions</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/nesting.html">NestingTree</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.NestingTree.html">larch.NestingTree</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.NestingTree.new_node.html">larch.NestingTree.new_node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.NestingTree.add_node.html">larch.NestingTree.add_node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.NestingTree.remove_node.html">larch.NestingTree.remove_node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.NestingTree.add_edge.html">larch.NestingTree.add_edge</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/larch.NestingTree.remove_edge.html">larch.NestingTree.remove_edge</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../mtc/index.html">MTC Mode Choice</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/001_mnl.html">1: MTC MNL Mode Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/017_mnl.html">17: MTC Expanded MNL Mode Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/022_nl.html">22: MTC Motorized and Non-Motorized Nested Mode Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/030_mnl_constrain.html">1: MTC MNL Constrained Mode Choice</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../exampville/index.html">Exampville</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../exampville/200_exampville.html">200: Exampville Simulated Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../exampville/201_exville_mode_choice.html">201: Exampville Mode Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../exampville/202_exville_mc_logsums.html">202: Exampville Mode Choice Logsums</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../exampville/203_exville_dest.html">203: Exampville Destination Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../exampville/204_exville_dest_only.html">204: Exampville Destination Choice without Logsums</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/driftlesslabs/larch" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/driftlesslabs/larch/issues/new?title=Issue%20on%20page%20%2Fexamples/swissmetro/102-swissmetro-weighted.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/examples/swissmetro/102-swissmetro-weighted.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>102: Swissmetro Weighted MNL Mode Choice</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="swissmetro-weighted-mnl-mode-choice">
+<h1>102: Swissmetro Weighted MNL Mode Choice<a class="headerlink" href="#swissmetro-weighted-mnl-mode-choice" title="Permalink to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">larch</span> <span class="k">as</span> <span class="nn">lx</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This example is a mode choice model built using the Swissmetro example dataset.
+First we create the Dataset and Model objects:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">raw_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">lx</span><span class="o">.</span><span class="n">example_file</span><span class="p">(</span><span class="s2">&quot;swissmetro.csv.gz&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s2">&quot;CASEID&quot;</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">construct</span><span class="o">.</span><span class="n">from_idco</span><span class="p">(</span><span class="n">raw_data</span><span class="p">,</span> <span class="n">alts</span><span class="o">=</span><span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;Train&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;SM&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;Car&quot;</span><span class="p">})</span>
+<span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body[data-theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-index-preview {
+  grid-column: 2 / 5;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data,
+.xr-index-data-in:checked ~ .xr-index-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-index-name div,
+.xr-index-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2,
+.xr-no-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt;
+Dimensions:    (CASEID: 10728, _altid_: 3)
+Coordinates:
+  * CASEID     (CASEID) int64 0 1 2 3 4 5 ... 10723 10724 10725 10726 10727
+  * _altid_    (_altid_) int64 1 2 3
+    alt_names  (_altid_) &lt;U5 &#x27;Train&#x27; &#x27;SM&#x27; &#x27;Car&#x27;
+Data variables: (12/28)
+    GROUP      (CASEID) int64 2 2 2 2 2 2 2 2 2 2 2 2 ... 3 3 3 3 3 3 3 3 3 3 3
+    SURVEY     (CASEID) int64 0 0 0 0 0 0 0 0 0 0 0 0 ... 1 1 1 1 1 1 1 1 1 1 1
+    SP         (CASEID) int64 1 1 1 1 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1 1 1 1
+    ID         (CASEID) int64 1 1 1 1 1 1 1 ... 1192 1192 1192 1192 1192 1192
+    PURPOSE    (CASEID) int64 1 1 1 1 1 1 1 1 1 1 1 1 ... 4 4 4 4 4 4 4 4 4 4 4
+    FIRST      (CASEID) int64 0 0 0 0 0 0 0 0 0 0 0 0 ... 1 1 1 1 1 1 1 1 1 1 1
+    ...         ...
+    SM_CO      (CASEID) int64 52 49 58 52 42 49 58 43 ... 21 21 17 16 16 17 21
+    SM_HE      (CASEID) int64 20 10 30 20 20 10 10 30 ... 20 30 30 10 20 30 30
+    SM_SEATS   (CASEID) int64 0 0 0 0 0 0 0 0 0 0 0 0 ... 0 0 0 0 0 0 0 0 0 0 0
+    CAR_TT     (CASEID) int64 117 117 117 72 90 90 72 ... 96 156 96 96 96 120
+    CAR_CO     (CASEID) int64 65 84 52 52 84 52 65 65 ... 70 91 56 70 56 91 70
+    CHOICE     (CASEID) int64 2 2 2 2 2 2 2 1 2 2 2 2 ... 3 3 3 2 2 3 2 3 3 2 3
+Attributes:
+    _caseid_:  CASEID
+    _altid_:   _altid_</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-0821206d-bf36-4776-af7a-a51ce3f79a69' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-0821206d-bf36-4776-af7a-a51ce3f79a69' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>CASEID</span>: 10728</li><li><span class='xr-has-index'>_altid_</span>: 3</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-04ac8601-a919-421a-bda6-bac2daed9c82' class='xr-section-summary-in' type='checkbox'  checked><label for='section-04ac8601-a919-421a-bda6-bac2daed9c82' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>CASEID</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 ... 10724 10725 10726 10727</div><input id='attrs-20fca52a-90c1-4a7f-9f30-5618bfb1e68d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-20fca52a-90c1-4a7f-9f30-5618bfb1e68d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7d868df0-4f52-440a-b5bb-010c25608907' class='xr-var-data-in' type='checkbox'><label for='data-7d868df0-4f52-440a-b5bb-010c25608907' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([    0,     1,     2, ..., 10725, 10726, 10727])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>_altid_</span></div><div class='xr-var-dims'>(_altid_)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2 3</div><input id='attrs-58bf4959-8b4f-43fa-8634-a528e49e6b0f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-58bf4959-8b4f-43fa-8634-a528e49e6b0f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-983b6f8c-679d-4200-b90f-23b025dd8ae9' class='xr-var-data-in' type='checkbox'><label for='data-983b6f8c-679d-4200-b90f-23b025dd8ae9' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2, 3])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>alt_names</span></div><div class='xr-var-dims'>(_altid_)</div><div class='xr-var-dtype'>&lt;U5</div><div class='xr-var-preview xr-preview'>&#x27;Train&#x27; &#x27;SM&#x27; &#x27;Car&#x27;</div><input id='attrs-3575948f-ece0-4b80-9eeb-11a497feba95' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3575948f-ece0-4b80-9eeb-11a497feba95' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0d9fec3b-5867-42d4-8ba5-329477d2d0b1' class='xr-var-data-in' type='checkbox'><label for='data-0d9fec3b-5867-42d4-8ba5-329477d2d0b1' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;Train&#x27;, &#x27;SM&#x27;, &#x27;Car&#x27;], dtype=&#x27;&lt;U5&#x27;)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-bcfd692c-513e-407e-aa5c-9ce53184f995' class='xr-section-summary-in' type='checkbox'  ><label for='section-bcfd692c-513e-407e-aa5c-9ce53184f995' class='xr-section-summary' >Data variables: <span>(28)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>GROUP</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2 2 2 2 2 2 2 2 ... 3 3 3 3 3 3 3 3</div><input id='attrs-16714013-b421-4a79-8b40-7493cf6128d9' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-16714013-b421-4a79-8b40-7493cf6128d9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0b519929-26b3-408a-b5ac-bcc56800309c' class='xr-var-data-in' type='checkbox'><label for='data-0b519929-26b3-408a-b5ac-bcc56800309c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([2, 2, 2, ..., 3, 3, 3])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SURVEY</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 1 1 1 1 1 1 1 1</div><input id='attrs-48d7184b-704d-45b9-be0a-752e677a52d4' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-48d7184b-704d-45b9-be0a-752e677a52d4' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-02ec6991-b59d-4e61-bc4a-9722a42fb48f' class='xr-var-data-in' type='checkbox'><label for='data-02ec6991-b59d-4e61-bc4a-9722a42fb48f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SP</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-8bd09ce9-26cc-44d3-a91f-8a4c04d19319' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8bd09ce9-26cc-44d3-a91f-8a4c04d19319' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-cd939ab9-03d9-43a8-9dff-6b38e92e4bff' class='xr-var-data-in' type='checkbox'><label for='data-cd939ab9-03d9-43a8-9dff-6b38e92e4bff' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>ID</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 ... 1192 1192 1192 1192</div><input id='attrs-b55b972c-4b29-4bcd-b5c0-87b296b5542d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b55b972c-4b29-4bcd-b5c0-87b296b5542d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7aa88738-8a9f-4606-9756-86e427a12776' class='xr-var-data-in' type='checkbox'><label for='data-7aa88738-8a9f-4606-9756-86e427a12776' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   1,    1,    1, ..., 1192, 1192, 1192])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>PURPOSE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 4 4 4 4 4 4 4 4</div><input id='attrs-482fc79e-c597-4d8d-987b-379474e08fc8' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-482fc79e-c597-4d8d-987b-379474e08fc8' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-41cc7eb2-b68e-4ace-a252-43b24a75f4fa' class='xr-var-data-in' type='checkbox'><label for='data-41cc7eb2-b68e-4ace-a252-43b24a75f4fa' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 4, 4, 4])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>FIRST</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 1 1 1 1 1 1 1 1</div><input id='attrs-e982ad98-41bd-4f8c-868e-36e0444a7852' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e982ad98-41bd-4f8c-868e-36e0444a7852' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-fe575140-fe48-4fb6-9424-f6464d752272' class='xr-var-data-in' type='checkbox'><label for='data-fe575140-fe48-4fb6-9424-f6464d752272' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>TICKET</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 7 7 7 7 7 7 7 7</div><input id='attrs-857798de-6337-4406-8af6-e52847bff627' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-857798de-6337-4406-8af6-e52847bff627' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f39d502c-c021-49ad-93b6-8f1f26ed459a' class='xr-var-data-in' type='checkbox'><label for='data-f39d502c-c021-49ad-93b6-8f1f26ed459a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 7, 7, 7])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>WHO</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-8e5bf1dd-4a87-428b-8bd1-d6c0d01ceee6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8e5bf1dd-4a87-428b-8bd1-d6c0d01ceee6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d4e0a6d1-bd0f-4a99-a47c-5f642fde44d4' class='xr-var-data-in' type='checkbox'><label for='data-d4e0a6d1-bd0f-4a99-a47c-5f642fde44d4' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>LUGGAGE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 0 0 0 0 0 0 0 0</div><input id='attrs-d803733a-9765-4968-a198-74839a33b9fe' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-d803733a-9765-4968-a198-74839a33b9fe' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-59ab2fa2-a221-437e-a18c-65e7ad92ddcb' class='xr-var-data-in' type='checkbox'><label for='data-59ab2fa2-a221-437e-a18c-65e7ad92ddcb' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>AGE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>3 3 3 3 3 3 3 3 ... 5 5 5 5 5 5 5 5</div><input id='attrs-5e741fb6-6a97-40ee-b61e-3e9cbd882953' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-5e741fb6-6a97-40ee-b61e-3e9cbd882953' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f2da4b7d-3c8d-4327-8dda-64cb66253708' class='xr-var-data-in' type='checkbox'><label for='data-f2da4b7d-3c8d-4327-8dda-64cb66253708' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([3, 3, 3, ..., 5, 5, 5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>MALE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 1 1 1 1 1 1 1 1</div><input id='attrs-6d4575ee-93d9-4999-a8fb-13fbc440ea72' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-6d4575ee-93d9-4999-a8fb-13fbc440ea72' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a39ac1af-8cdd-4e83-a03b-e4a42be7165d' class='xr-var-data-in' type='checkbox'><label for='data-a39ac1af-8cdd-4e83-a03b-e4a42be7165d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>INCOME</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2 2 2 2 2 2 2 2 ... 3 3 3 3 3 3 3 3</div><input id='attrs-15d792fc-785e-42b1-b4b2-56e07b466808' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-15d792fc-785e-42b1-b4b2-56e07b466808' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-59329732-ab5a-425a-9da3-5f2b193a0a7b' class='xr-var-data-in' type='checkbox'><label for='data-59329732-ab5a-425a-9da3-5f2b193a0a7b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([2, 2, 2, ..., 3, 3, 3])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>GA</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 0 0 0 0 0 0 0 0</div><input id='attrs-c7aae3f0-fb10-4834-b423-3f3665b67174' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c7aae3f0-fb10-4834-b423-3f3665b67174' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-bfadc396-2335-48cf-8fb9-035a0702a796' class='xr-var-data-in' type='checkbox'><label for='data-bfadc396-2335-48cf-8fb9-035a0702a796' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>ORIGIN</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2 2 2 2 2 2 2 2 ... 2 2 2 2 2 2 2 2</div><input id='attrs-c5dfce36-859b-4ad2-a86c-c8273240ec7a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c5dfce36-859b-4ad2-a86c-c8273240ec7a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e745c40b-bced-4000-aaf6-d9706fcb0c2b' class='xr-var-data-in' type='checkbox'><label for='data-e745c40b-bced-4000-aaf6-d9706fcb0c2b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([2, 2, 2, ..., 2, 2, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>DEST</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 ... 20 20 20 20 20 20</div><input id='attrs-cb946344-f18d-4b62-bdc5-37ec05cebc2a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-cb946344-f18d-4b62-bdc5-37ec05cebc2a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b35b3879-2380-4b9f-bc5c-5c1deedf830e' class='xr-var-data-in' type='checkbox'><label for='data-b35b3879-2380-4b9f-bc5c-5c1deedf830e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1,  1,  1, ..., 20, 20, 20])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>TRAIN_AV</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-b88711ad-82bf-404d-8e0a-2c62f74644f4' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b88711ad-82bf-404d-8e0a-2c62f74644f4' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-438421ba-d3ee-4c36-a8a8-22eef96a58a7' class='xr-var-data-in' type='checkbox'><label for='data-438421ba-d3ee-4c36-a8a8-22eef96a58a7' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>CAR_AV</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-901a9c67-2264-4a35-bb47-9f05cca6e057' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-901a9c67-2264-4a35-bb47-9f05cca6e057' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-83bded17-2d5b-4503-a184-9a6b06c7e8a1' class='xr-var-data-in' type='checkbox'><label for='data-83bded17-2d5b-4503-a184-9a6b06c7e8a1' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SM_AV</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-a4abb2e9-6de9-4d7f-8c42-9626ae36f456' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a4abb2e9-6de9-4d7f-8c42-9626ae36f456' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-92273625-3c75-4d2e-b11e-b3b10cce1930' class='xr-var-data-in' type='checkbox'><label for='data-92273625-3c75-4d2e-b11e-b3b10cce1930' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>TRAIN_TT</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>112 103 130 103 ... 148 148 178 148</div><input id='attrs-c13d934d-1c26-4628-a8b5-a4267ae1ef5e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c13d934d-1c26-4628-a8b5-a4267ae1ef5e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f8056495-c17f-482e-ada5-1c20aa24c0c4' class='xr-var-data-in' type='checkbox'><label for='data-f8056495-c17f-482e-ada5-1c20aa24c0c4' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([112, 103, 130, ..., 148, 178, 148])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>TRAIN_CO</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>48 48 48 40 36 ... 13 12 16 16 13</div><input id='attrs-b57f1faf-1ff2-49e7-8e16-48b6cbfc0ccb' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b57f1faf-1ff2-49e7-8e16-48b6cbfc0ccb' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-69dc4d61-3e6d-4817-bd44-6dcf2152e532' class='xr-var-data-in' type='checkbox'><label for='data-69dc4d61-3e6d-4817-bd44-6dcf2152e532' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([48, 48, 48, ..., 16, 16, 13])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>TRAIN_HE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>120 30 60 30 60 ... 30 30 60 30 60</div><input id='attrs-e24e0014-63f3-42b4-ad99-bb9ba3a86b04' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e24e0014-63f3-42b4-ad99-bb9ba3a86b04' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5b27cbf5-568a-401b-b6cd-13d17dfbfe99' class='xr-var-data-in' type='checkbox'><label for='data-5b27cbf5-568a-401b-b6cd-13d17dfbfe99' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([120,  30,  60, ...,  60,  30,  60])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SM_TT</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>63 60 67 63 63 ... 93 96 93 96 96</div><input id='attrs-01619ca7-709b-46dc-b86c-ef21b04ca0a9' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-01619ca7-709b-46dc-b86c-ef21b04ca0a9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-80a92e93-5f9a-4001-a6dc-513a80a59020' class='xr-var-data-in' type='checkbox'><label for='data-80a92e93-5f9a-4001-a6dc-513a80a59020' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([63, 60, 67, ..., 93, 96, 96])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SM_CO</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>52 49 58 52 42 ... 17 16 16 17 21</div><input id='attrs-e7354a52-ae90-42f0-9b41-34dfe8d328d0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e7354a52-ae90-42f0-9b41-34dfe8d328d0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9f19c367-2efa-4929-bbe2-dbb81994544c' class='xr-var-data-in' type='checkbox'><label for='data-9f19c367-2efa-4929-bbe2-dbb81994544c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([52, 49, 58, ..., 16, 17, 21])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SM_HE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>20 10 30 20 20 ... 30 10 20 30 30</div><input id='attrs-eb58957a-a4fc-470d-a24a-4d7c52e5bbb6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-eb58957a-a4fc-470d-a24a-4d7c52e5bbb6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8b122cc4-0dc9-4199-8817-30f430b0f75c' class='xr-var-data-in' type='checkbox'><label for='data-8b122cc4-0dc9-4199-8817-30f430b0f75c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([20, 10, 30, ..., 20, 30, 30])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SM_SEATS</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 0 0 0 0 0 0 0 0</div><input id='attrs-2905892c-a499-482e-a026-76cedff96993' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2905892c-a499-482e-a026-76cedff96993' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-bf314510-1375-4f01-9dc7-57e00f59f78e' class='xr-var-data-in' type='checkbox'><label for='data-bf314510-1375-4f01-9dc7-57e00f59f78e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>CAR_TT</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>117 117 117 72 90 ... 96 96 96 120</div><input id='attrs-e78a5e01-e072-4d13-9ced-5c81f55f17fd' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e78a5e01-e072-4d13-9ced-5c81f55f17fd' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-617b3a58-8879-473f-887c-f9563f342da4' class='xr-var-data-in' type='checkbox'><label for='data-617b3a58-8879-473f-887c-f9563f342da4' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([117, 117, 117, ...,  96,  96, 120])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>CAR_CO</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>65 84 52 52 84 ... 56 70 56 91 70</div><input id='attrs-8d40b413-4ffc-4465-a53b-c2ddffb3041c' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8d40b413-4ffc-4465-a53b-c2ddffb3041c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-81e427b3-db83-4870-8e88-2af7b5400f07' class='xr-var-data-in' type='checkbox'><label for='data-81e427b3-db83-4870-8e88-2af7b5400f07' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([65, 84, 52, ..., 56, 91, 70])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>CHOICE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2 2 2 2 2 2 2 1 ... 2 2 3 2 3 3 2 3</div><input id='attrs-2387849b-4f7b-486f-9f11-5c77865e1e06' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2387849b-4f7b-486f-9f11-5c77865e1e06' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-746389a4-3d71-43f0-a11e-7182c86b05c3' class='xr-var-data-in' type='checkbox'><label for='data-746389a4-3d71-43f0-a11e-7182c86b05c3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([2, 2, 2, ..., 3, 2, 3])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-3026b4a5-b557-4e0b-9b7e-cedc370b4364' class='xr-section-summary-in' type='checkbox'  ><label for='section-3026b4a5-b557-4e0b-9b7e-cedc370b4364' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>CASEID</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-69000fc1-daf9-4006-9dd5-23837583006e' class='xr-index-data-in' type='checkbox'/><label for='index-69000fc1-daf9-4006-9dd5-23837583006e' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,
+       ...
+       10718, 10719, 10720, 10721, 10722, 10723, 10724, 10725, 10726, 10727],
+      dtype=&#x27;int64&#x27;, name=&#x27;CASEID&#x27;, length=10728))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>_altid_</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-4df6e9ee-5a34-4505-81ae-366bb72f9575' class='xr-index-data-in' type='checkbox'/><label for='index-4df6e9ee-5a34-4505-81ae-366bb72f9575' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1, 2, 3], dtype=&#x27;int64&#x27;, name=&#x27;_altid_&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-d412c949-eca5-4449-b2a0-b2c96798b3f7' class='xr-section-summary-in' type='checkbox'  checked><label for='section-d412c949-eca5-4449-b2a0-b2c96798b3f7' class='xr-section-summary' >Attributes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>_caseid_ :</span></dt><dd>CASEID</dd><dt><span>_altid_ :</span></dt><dd>_altid_</dd></dl></div></li></ul></div></div></div></div>
+</div>
+<p>The swissmetro example models exclude some observations.  We can use the
+<code class="docutils literal notranslate"><span class="pre">Dataset.query_cases</span></code> method to identify the observations we would like to keep.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">query_cases</span><span class="p">(</span><span class="s2">&quot;PURPOSE in (1,3) and CHOICE != 0&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can attach a title to the model. The title does not affect the calculations
+as all; it is merely used in various output report styles.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;swissmetro example 02 (weighted logit)&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We need to identify the availability and choice variables.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">availability_co_vars</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;TRAIN_AV * (SP!=0)&quot;</span><span class="p">,</span>
+    <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;SM_AV&quot;</span><span class="p">,</span>
+    <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;CAR_AV * (SP!=0)&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">m</span><span class="o">.</span><span class="n">choice_co_code</span> <span class="o">=</span> <span class="s2">&quot;CHOICE&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This model adds a weighting factor.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">weight_co_var</span> <span class="o">=</span> <span class="s2">&quot;1.0*(GROUP==2)+1.2*(GROUP==3)&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The swissmetro dataset, as with all Biogeme data, is only in <code class="docutils literal notranslate"><span class="pre">co</span></code> format.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">larch</span> <span class="kn">import</span> <span class="n">P</span><span class="p">,</span> <span class="n">X</span>
+
+<span class="n">m</span><span class="o">.</span><span class="n">utility_co</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="s2">&quot;ASC_TRAIN&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">utility_co</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">m</span><span class="o">.</span><span class="n">utility_co</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="s2">&quot;ASC_CAR&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">utility_co</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">X</span><span class="p">(</span><span class="s2">&quot;TRAIN_TT&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">P</span><span class="p">(</span><span class="s2">&quot;B_TIME&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">utility_co</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">X</span><span class="p">(</span><span class="s2">&quot;SM_TT&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">P</span><span class="p">(</span><span class="s2">&quot;B_TIME&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">utility_co</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+=</span> <span class="n">X</span><span class="p">(</span><span class="s2">&quot;CAR_TT&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">P</span><span class="p">(</span><span class="s2">&quot;B_TIME&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">utility_co</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">X</span><span class="p">(</span><span class="s2">&quot;TRAIN_CO*(GA==0)&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">P</span><span class="p">(</span><span class="s2">&quot;B_COST&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">utility_co</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">X</span><span class="p">(</span><span class="s2">&quot;SM_CO*(GA==0)&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">P</span><span class="p">(</span><span class="s2">&quot;B_COST&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">utility_co</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+=</span> <span class="n">X</span><span class="p">(</span><span class="s2">&quot;CAR_CO&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">P</span><span class="p">(</span><span class="s2">&quot;B_COST&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Larch will find all the parameters in the model, but we’d like to output them in
+a rational order.  We can use the ordering method to do this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">ordering</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span>
+        <span class="s2">&quot;ASCs&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ASC.*&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="p">(</span>
+        <span class="s2">&quot;LOS&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;B_.*&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can estimate the models and check the results match up with those given by Biogeme:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">set_cap</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">maximize_loglike</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;SLSQP&quot;</span><span class="p">)</span>
+<span class="n">result</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/sharrow/relationships.py:958: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+  for name, length in v.dims.items():
+/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/_collections_abc.py:911: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+  yield (key, self._mapping[key])
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/sharrow/relationships.py:958: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+  for name, length in v.dims.items():
+/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/_collections_abc.py:911: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+  yield (key, self._mapping[key])
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/sharrow/relationships.py:958: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+  for name, length in v.dims.items():
+/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/_collections_abc.py:911: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+  yield (key, self._mapping[key])
+</pre></div>
+</div>
+<div class="output text_html"><h3>Iteration 014 [Optimization terminated successfully] </h3></div><div class="output text_html"><p>Best LL = -5931.5577606136885</p></div><div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>value</th>
+      <th>best</th>
+      <th>initvalue</th>
+      <th>minimum</th>
+      <th>maximum</th>
+      <th>nullvalue</th>
+    </tr>
+    <tr>
+      <th>param_name</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ASC_CAR</th>
+      <td>-0.115</td>
+      <td>-0.115</td>
+      <td>0.0</td>
+      <td>-15.0</td>
+      <td>15.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>ASC_TRAIN</th>
+      <td>-0.757</td>
+      <td>-0.757</td>
+      <td>0.0</td>
+      <td>-15.0</td>
+      <td>15.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>B_COST</th>
+      <td>-0.011</td>
+      <td>-0.011</td>
+      <td>0.0</td>
+      <td>-15.0</td>
+      <td>15.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>B_TIME</th>
+      <td>-0.013</td>
+      <td>-0.013</td>
+      <td>0.0</td>
+      <td>-15.0</td>
+      <td>15.0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output text_html"><div><table style="margin-top:1px;"><tr><th>key</th><th style="text-align:left;">value</th></tr><tr><td>x</td><td style="text-align:left;"><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ASC_CAR</th>
+      <td>-0.115</td>
+    </tr>
+    <tr>
+      <th>ASC_TRAIN</th>
+      <td>-0.757</td>
+    </tr>
+    <tr>
+      <th>B_COST</th>
+      <td>-0.011</td>
+    </tr>
+    <tr>
+      <th>B_TIME</th>
+      <td>-0.013</td>
+    </tr>
+  </tbody>
+</table></td></tr><tr><td>logloss</td><td style="text-align:left;">0.7792172776087977</td></tr><tr><td>d_logloss</td><td style="text-align:left;"><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ASC_CAR</th>
+      <td>3.660e-05</td>
+    </tr>
+    <tr>
+      <th>ASC_TRAIN</th>
+      <td>2.603e-06</td>
+    </tr>
+    <tr>
+      <th>B_COST</th>
+      <td>1.201e-04</td>
+    </tr>
+    <tr>
+      <th>B_TIME</th>
+      <td>-3.068e-04</td>
+    </tr>
+  </tbody>
+</table></td></tr><tr><td>nit</td><td style="text-align:left;">14</td></tr><tr><td>nfev</td><td style="text-align:left;">24</td></tr><tr><td>njev</td><td style="text-align:left;">14</td></tr><tr><td>status</td><td style="text-align:left;">0</td></tr><tr><td>message</td><td style="text-align:left;">'Optimization terminated successfully'</td></tr><tr><td>success</td><td style="text-align:left;">True</td></tr><tr><td>elapsed_time</td><td style="text-align:left;">0:00:00.163718</td></tr><tr><td>method</td><td style="text-align:left;">'SLSQP'</td></tr><tr><td>n_cases</td><td style="text-align:left;">6768</td></tr><tr><td>iteration_number</td><td style="text-align:left;">14</td></tr><tr><td>loglike</td><td style="text-align:left;">-5931.5577606136885</td></tr></table></div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">calculate_parameter_covariance</span><span class="p">()</span>
+<span class="n">m</span><span class="o">.</span><span class="n">parameter_summary</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+#T_bf1ad th {
+  vertical-align: top;
+  text-align: left;
+}
+#T_bf1ad td {
+  vertical-align: top;
+  text-align: left;
+}
+#T_bf1ad_row0_col0, #T_bf1ad_row0_col1, #T_bf1ad_row0_col2, #T_bf1ad_row0_col3, #T_bf1ad_row0_col4, #T_bf1ad_row1_col0, #T_bf1ad_row1_col1, #T_bf1ad_row1_col2, #T_bf1ad_row1_col3, #T_bf1ad_row1_col4, #T_bf1ad_row2_col0, #T_bf1ad_row2_col1, #T_bf1ad_row2_col2, #T_bf1ad_row2_col3, #T_bf1ad_row2_col4, #T_bf1ad_row3_col0, #T_bf1ad_row3_col1, #T_bf1ad_row3_col2, #T_bf1ad_row3_col3, #T_bf1ad_row3_col4 {
+  font-family: monospace;
+}
+</style>
+<table id="T_bf1ad">
+  <thead>
+    <tr>
+      <th class="blank" >&nbsp;</th>
+      <th class="blank level0" >&nbsp;</th>
+      <th id="T_bf1ad_level0_col0" class="col_heading level0 col0" >Value</th>
+      <th id="T_bf1ad_level0_col1" class="col_heading level0 col1" >Std Err</th>
+      <th id="T_bf1ad_level0_col2" class="col_heading level0 col2" >t Stat</th>
+      <th id="T_bf1ad_level0_col3" class="col_heading level0 col3" >Signif</th>
+      <th id="T_bf1ad_level0_col4" class="col_heading level0 col4" >Null Value</th>
+    </tr>
+    <tr>
+      <th class="index_name level0" >Category</th>
+      <th class="index_name level1" >Parameter</th>
+      <th class="blank col0" >&nbsp;</th>
+      <th class="blank col1" >&nbsp;</th>
+      <th class="blank col2" >&nbsp;</th>
+      <th class="blank col3" >&nbsp;</th>
+      <th class="blank col4" >&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_bf1ad_level0_row0" class="row_heading level0 row0" rowspan="2">ASCs</th>
+      <th id="T_bf1ad_level1_row0" class="row_heading level1 row0" >ASC_CAR</th>
+      <td id="T_bf1ad_row0_col0" class="data row0 col0" >-0.115</td>
+      <td id="T_bf1ad_row0_col1" class="data row0 col1" > 0.0407</td>
+      <td id="T_bf1ad_row0_col2" class="data row0 col2" >-2.82</td>
+      <td id="T_bf1ad_row0_col3" class="data row0 col3" >**</td>
+      <td id="T_bf1ad_row0_col4" class="data row0 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_bf1ad_level1_row1" class="row_heading level1 row1" >ASC_TRAIN</th>
+      <td id="T_bf1ad_row1_col0" class="data row1 col0" >-0.757</td>
+      <td id="T_bf1ad_row1_col1" class="data row1 col1" > 0.0528</td>
+      <td id="T_bf1ad_row1_col2" class="data row1 col2" >-14.33</td>
+      <td id="T_bf1ad_row1_col3" class="data row1 col3" >***</td>
+      <td id="T_bf1ad_row1_col4" class="data row1 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_bf1ad_level0_row2" class="row_heading level0 row2" rowspan="2">LOS</th>
+      <th id="T_bf1ad_level1_row2" class="row_heading level1 row2" >B_COST</th>
+      <td id="T_bf1ad_row2_col0" class="data row2 col0" >-0.0112</td>
+      <td id="T_bf1ad_row2_col1" class="data row2 col1" > 0.000490</td>
+      <td id="T_bf1ad_row2_col2" class="data row2 col2" >-22.83</td>
+      <td id="T_bf1ad_row2_col3" class="data row2 col3" >***</td>
+      <td id="T_bf1ad_row2_col4" class="data row2 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_bf1ad_level1_row3" class="row_heading level1 row3" >B_TIME</th>
+      <td id="T_bf1ad_row3_col0" class="data row3 col0" >-0.0132</td>
+      <td id="T_bf1ad_row3_col1" class="data row3 col1" > 0.000537</td>
+      <td id="T_bf1ad_row3_col2" class="data row3 col2" >-24.61</td>
+      <td id="T_bf1ad_row3_col3" class="data row3 col3" >***</td>
+      <td id="T_bf1ad_row3_col4" class="data row3 col4" > 0.00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Looks good!</p>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./examples/swissmetro"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jeffrey Newman
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
