@@ -11,10 +11,10 @@ notebooks = glob(
 
 # Text to look for in adding tags
 text_search_dict = {
-    "# TEST": "remove_cell",  # Remove the whole cell
-    "# HIDDEN": "hide_cell",  # Hide the whole cell
-    "# NO CODE": "remove_input",  # Remove only the input
-    "# HIDE CODE": "hide_input",  # Hide the input w/ a button to show
+    "# TEST": "remove-cell",  # Remove the whole cell
+    "# HIDDEN": "hide-cell",  # Hide the whole cell
+    "# NO CODE": "remove-input",  # Remove only the input
+    "# HIDE CODE": "hide-input",  # Hide the input w/ a button to show
 }
 
 # Search through each notebook and look for th text, add a tag if necessary
