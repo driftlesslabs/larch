@@ -28,6 +28,7 @@ mamba create -p ../.env/DOCBUILD "python=3.11" \
   nbformat \
   "jax[cpu]" \
   ruamel.yaml \
+  geopandas \
   -c conda-forge \
   --yes
 
