@@ -5,6 +5,39 @@ on:
     types: [published]
 
 jobs:
+
+  docs-publish:
+    name: publish docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Build wheel
+        run: |
+          python tools/rip_examples.py
+          python -m pip install build
+          python -m build .
+      - name: Build documentation
+        run: |
+          python -m pip install jupyter-book nbformat jax
+          python -m pip install dist/*.whl
+          cd docs
+          python _scripts/hide_test_cells.py
+          jb build .
+            - name: Push to GitHub Pages
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Token is created automatically by Github Actions, no other config needed
+          publish_dir: ./docs/_build/html
+          destination_dir: ${{ github.ref_name }}
+
   pypi-publish:
     name: upload release to PyPI
     runs-on: ubuntu-latest

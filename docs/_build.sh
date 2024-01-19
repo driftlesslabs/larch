@@ -7,34 +7,34 @@ set -e
 cd "$(dirname "$0")"
 
 # create a new conda environment for the docs build
-#mamba create -p ../.env/DOCBUILD "python=3.11" \
-#  pip \
-#  addicty \
-#  dask \
-#  filelock \
-#  networkx \
-#  numba \
-#  numexpr \
-#  numpy \
-#  pandas \
-#  pyarrow \
-#  rich \
-#  scipy \
-#  sharrow \
-#  sparse \
-#  xarray \
-#  xmle \
-#  jupyter-book \
-#  nbformat \
-#  jax \
-#  -c conda-forge \
-#  --yes
+mamba create -p ../.env/DOCBUILD "python=3.11" \
+  pip \
+  addicty \
+  dask \
+  filelock \
+  networkx \
+  numba \
+  numexpr \
+  numpy \
+  pandas \
+  pyarrow \
+  rich \
+  scipy \
+  sharrow \
+  sparse \
+  xarray \
+  xmle \
+  jupyter-book \
+  nbformat \
+  jax \
+  -c conda-forge \
+  --yes
 
 # activate the new environment
 eval "$(conda shell.bash hook)"
 conda activate ../.env/DOCBUILD
 
- install larch
+# install larch
 python -m pip install ..
 
 conda info
