@@ -33,16 +33,18 @@ jobs:
           python _scripts/hide_test_cells.py
           jb build .
       - name: Set version major-minor
-        run: echo "VERSION_MINOR=$(cut -d '.' -f 1,2 <<< ${{ github.ref_name }})" >> $GITHUB_OUTPUT
-      - name: Confirm version major-minor
-        run: echo "VERSION_MINOR is ${{ env.VERSION_MINOR }}"
+        id: version-major-minor
+        run: |
+          VERSION_MINOR=$(cut -d '.' -f 1,2 <<< ${{ github.ref_name }})
+          echo "VERSION_MINOR=$VERSION_MINOR"
+          echo "VERSION_MINOR=$VERSION_MINOR" >> $GITHUB_OUTPUT
       - name: Push to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # Token is created automatically by Github Actions, no other config needed
           publish_dir: ./docs/_build/html
-          destination_dir: ${{ env.VERSION_MINOR }}
+          destination_dir: ${{ steps.version-major-minor.outputs.VERSION_MINOR }}
 
   pypi-publish:
     name: upload release to PyPI
