@@ -26,7 +26,8 @@ mamba create -p ../.env/DOCBUILD "python=3.11" \
   xmle \
   jupyter-book \
   nbformat \
-  jax \
+  "jax[cpu]" \
+  ruamel.yaml \
   -c conda-forge \
   --yes
 
@@ -43,6 +44,7 @@ conda list
 
 # hide all jupyter notebook cells tagged with "TEST"
 python _scripts/hide_test_cells.py
+python _scripts/developer_doc_title.py
 
 # build the docs
 jb build .

@@ -56,8 +56,8 @@ def rip():
                     if (
                         i["cell_type"] == "code"
                         and not i["metadata"].get("doc_only", False)
-                        and not i["metadata"].get("remove_cell", False)
-                        and "remove_cell" not in i.get("metadata", {}).get("tags", [])
+                        and not i["metadata"].get("remove-cell", False)
+                        and "remove-cell" not in i.get("metadata", {}).get("tags", [])
                     ):
                         s = "".join(i["source"])
                         if ".maximize_loglike(" in s:
