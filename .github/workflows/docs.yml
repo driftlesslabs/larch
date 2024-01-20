@@ -1,0 +1,52 @@
+name: larch release
+
+on:
+  release:
+    types: [published]
+  push:
+    branches: [ docs ]
+
+jobs:
+
+  docs-publish:
+    name: publish docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Build wheel
+        run: |
+          python tools/rip_examples.py
+          python -m pip install build
+          python -m build .
+      - name: Install stuff
+        run: |
+          python -m pip install docutils Jinja2 nbformat "jax[cpu]" geopandas \
+            myst-nb pyyaml sphinx sphinx-comments sphinx-copybutton \
+            sphinx-design sphinx-thebe sphinx_togglebutton sphinxcontrib-bibtex \
+            pydata_sphinx_theme
+          python -m pip install dist/*.whl
+          cd docs
+          python _scripts/hide_test_cells.py
+          sphinx-build -b html . _build/html
+      - name: Set version major-minor
+        id: version-major-minor
+        run: |
+          VERSION_MINOR=$(cut -d '.' -f 1,2 <<< ${{ github.ref_name }})
+          echo "VERSION_MINOR=$VERSION_MINOR"
+          echo "VERSION_MINOR=$VERSION_MINOR" >> $GITHUB_OUTPUT
+      - name: Push to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Token is created automatically by Github Actions, no other config needed
+          publish_dir: ./docs/_build/html
+          destination_dir: ${{ steps.version-major-minor.outputs.VERSION_MINOR }}
