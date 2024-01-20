@@ -13,3 +13,16 @@ This project is very much under development.  There are plenty of undocumented f
 and features; use them at your own risk.  Undocumented features may be non-functional,
 not rigorously tested, deprecated or removed without notice in a future update.
 :::
+
+## User Guide
+
+Information about using Larch, and more generally about working with discrete
+choice models.
+
+```{toctree}
+:maxdepth: 2
+
+user-guide/index
+api/index
+examples/index
+```
