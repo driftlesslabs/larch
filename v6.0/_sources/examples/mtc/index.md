@@ -18,5 +18,8 @@ individual and household socio-demographic information.
 You can use this data to reproduce the example models in that
 document, and several examples are provided here to do so.
 
-```{tableofcontents}
+```{toctree}
+:glob:
+
+0*
 ```
