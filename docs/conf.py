@@ -4,7 +4,11 @@
 # re-generate this one.
 ###############################################################################
 
+import packaging.version
+
 import larch
+
+lx_version = packaging.version.parse(larch.__version__)
 
 html_static_path = ["_static"]
 
@@ -60,6 +64,11 @@ html_theme_options = {
         "image_light": "_img/larch-logo.png",
         "image_dark": "_img/larch-logo.png",
     },
+    "switcher": {
+        "json_url": "https://raw.githubusercontent.com/driftlesslabs/larch/main/docs/switcher.json",
+        "version_match": f"{lx_version.major}.{lx_version.minor}",
+    },
+    "navbar_start": ["navbar-logo", "version-switcher"],
 }
 html_title = f"v{larch.__version__}"
 latex_engine = "pdflatex"
