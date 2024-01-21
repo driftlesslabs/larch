@@ -34,13 +34,19 @@ jobs:
             sphinx-design sphinx-thebe sphinx_togglebutton sphinxcontrib-bibtex \
             pydata_sphinx_theme linkify-it-py
           python -m pip install dist/*.whl
+      - name: Get Larch version
+        run: |
+          python tools/get_version.py LARCH_VERSION.txt
+          cat LARCH_VERSION.txt >> $GITHUB_ENV
+      - name: Build documentation
+        run: |
           cd docs
           python _scripts/hide_test_cells.py
           sphinx-build -b html . _build/html
       - name: Set version major-minor
         id: version-major-minor
         run: |
-          VERSION_MINOR=$(cut -d '.' -f 1,2 <<< ${{ github.ref_name }})
+          VERSION_MINOR=$(cut -d '.' -f 1,2 <<< ${LARCH_VERSION})
           echo "VERSION_MINOR=$VERSION_MINOR"
           echo "VERSION_MINOR=$VERSION_MINOR" >> $GITHUB_OUTPUT
       - name: Push to GitHub Pages
