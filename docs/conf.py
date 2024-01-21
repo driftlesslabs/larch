@@ -52,7 +52,7 @@ extensions = [
 html_baseurl = ""
 html_favicon = "_img/larch_favicon.png"
 # html_logo = "_img/larch-logo.png"
-html_show_copyright = False
+# html_show_copyright = False
 html_sourcelink_suffix = ""
 html_theme = "pydata_sphinx_theme"
 html_theme_options = {
@@ -60,15 +60,16 @@ html_theme_options = {
     "favicons": [{"rel": "icon", "sizes": "32x32", "href": "_img/larch_favicon.png"}],
     "navigation_with_keys": True,
     "logo": {
-        "text": f"v{larch.__version__}",
+        # "text": f"v{larch.__version__}",
         "image_light": "_img/larch-logo.png",
         "image_dark": "_img/larch-logo.png",
     },
     "switcher": {
-        "json_url": "https://raw.githubusercontent.com/driftlesslabs/larch/main/docs/switcher.json",
+        "json_url": "https://raw.githubusercontent.com/driftlesslabs/larch/docs/docs/switcher.json",
         "version_match": f"{lx_version.major}.{lx_version.minor}",
     },
     "navbar_start": ["navbar-logo", "version-switcher"],
+    "footer_start": ["copyright"],
 }
 html_title = f"v{larch.__version__}"
 latex_engine = "pdflatex"
