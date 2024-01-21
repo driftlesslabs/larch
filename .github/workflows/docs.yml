@@ -17,7 +17,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -55,4 +55,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # Token is created automatically by Github Actions, no other config needed
           publish_dir: ./docs/_build/html
-          destination_dir: ${{ steps.version-major-minor.outputs.VERSION_MINOR }}
+          destination_dir: v${{ steps.version-major-minor.outputs.VERSION_MINOR }}
