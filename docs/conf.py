@@ -29,14 +29,10 @@ extensions = [
     "sphinx_togglebutton",
     "sphinx_copybutton",
     "myst_nb",
-    # "jupyter_book",
-    "pydata_sphinx_theme",
-    "sphinx_thebe",
+    # "sphinx_thebe",
     "sphinx_comments",
-    # "sphinx_external_toc",
     "sphinx.ext.intersphinx",
     "sphinx_design",
-    # "sphinx_book_theme",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
@@ -45,11 +41,12 @@ extensions = [
     "sphinx.ext.graphviz",
     "sphinx.ext.viewcode",
     "sphinxcontrib.bibtex",
-    # "sphinx_jupyterbook_latex",
+    # "pydata_sphinx_theme",
 ]
 # external_toc_exclude_missing = False
 # external_toc_path = "_toc.yml"
 html_baseurl = ""
+html_context = {"LARCH_VERSION": f"Larch v{larch.__version__}"}
 html_favicon = "_img/larch_favicon.png"
 # html_logo = "_img/larch-logo.png"
 # html_show_copyright = False
@@ -69,7 +66,7 @@ html_theme_options = {
         "version_match": f"{lx_version.major}.{lx_version.minor}",
     },
     "navbar_start": ["navbar-logo", "version-switcher"],
-    "footer_start": ["copyright"],
+    "footer_start": ["this-version"],
 }
 html_title = f"v{larch.__version__}"
 latex_engine = "pdflatex"
@@ -95,5 +92,8 @@ rst_epilog = (
     ".. |idca| replace:: :ref:`idca <idca>`\n.. |idco| replace:: :ref:`idco <idco>`\n"
 )
 suppress_warnings = ["myst.domains"]
+templates_path = [
+    "_templates",
+]
 use_jupyterbook_latex = True
 use_multitoc_numbering = True
