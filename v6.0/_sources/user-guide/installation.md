@@ -38,7 +38,7 @@ MiniForge installed, you can create an environment for using Larch with the
 following command:
 
 ```shell
-mamba env create -p ./ARBORETUM -f https://raw.githubusercontent.com/driftlesslabs/larch/main/envs/arboretum.yml
+mamba env create -p ./ARBORETUM -f https://larch.driftless.xyz/arboretum.yml
 ```
 
 This will create a new environment called `arboretum` with Larch and all of its
