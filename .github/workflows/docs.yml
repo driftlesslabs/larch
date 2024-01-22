@@ -4,11 +4,12 @@ on:
   release:
     types: [published]
   push:
-    branches: [ docs ]
+    branches: [ main, develop ]
 
 jobs:
 
   docs-publish:
+    if: "contains(github.event.head_commit.message, '[makedocs]') || (github.event_name == 'release')"
     name: publish docs
     runs-on: ubuntu-latest
     permissions:
