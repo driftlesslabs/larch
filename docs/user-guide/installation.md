@@ -11,6 +11,11 @@ the default "Larch" for most users, and must be installed as the `larch6` packag
 python -m pip install larch6
 ```
 
+This will install the package and all of its required dependencies.  Note that
+while the installation name (using pip) is "larch6", the package import name
+(from within Python) is still just "larch", and you cannot install both
+Larch v5 and Larch v6 in the same environment.
+
 Once installed, use larch as you normally would, import it in Python as just `larch`:
 
 ```python
