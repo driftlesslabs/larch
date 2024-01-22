@@ -24,7 +24,10 @@ mamba create -p ../.env/DOCBUILD "python=3.11" \
   sparse \
   xarray \
   xmle \
-  jupyter-book \
+  "sphinx>=7.0" \
+  myst-nb pyyaml sphinx sphinx-comments sphinx-copybutton \
+  sphinx-design sphinx-thebe sphinxcontrib-bibtex \
+  linkify-it-py sphinx-togglebutton pydata-sphinx-theme \
   nbformat \
   "jax[cpu]" \
   ruamel.yaml \
@@ -44,8 +47,10 @@ conda info
 conda list
 
 # hide all jupyter notebook cells tagged with "TEST"
-python _scripts/hide_test_cells.py
-python _scripts/developer_doc_title.py
+#python _scripts/hide_test_cells.py
 
 # build the docs
-jb build .
+#jb build .
+#jb config sphinx . >> CONF.py
+
+sphinx-build -b html . _build/html
