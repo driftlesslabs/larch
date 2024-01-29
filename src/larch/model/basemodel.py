@@ -9,6 +9,7 @@ for the model subtype.
 The `BaseModel` class is designed to be subclassed by other model classes that
 implement specific types of discrete choice models.
 """
+from __future__ import annotations
 
 import base64
 import logging

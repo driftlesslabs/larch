@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .display import HTML, display_html
 from .xhtml import tooltipped_style
 

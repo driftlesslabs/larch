@@ -1,4 +1,5 @@
 # Errors
+from __future__ import annotations
 
 
 class MissingDataError(ValueError):

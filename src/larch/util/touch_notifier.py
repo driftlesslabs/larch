@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class TouchNotify:
     """A mixin to execute a callback when a mutate-possible command is called."""
 

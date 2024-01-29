@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ... import DataFrames, Model
 from .. import Dict
 from .general import (

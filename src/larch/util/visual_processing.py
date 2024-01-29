@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 try:
     from PIL import Image, ImageChops, ImageDraw
     from selenium import webdriver

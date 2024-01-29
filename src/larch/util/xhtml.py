@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import xmle.xhtml
 from xmle import Elem
 

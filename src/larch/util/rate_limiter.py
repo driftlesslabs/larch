@@ -2,6 +2,7 @@
 # https://creativecommons.org/licenses/by-sa/3.0/
 # original source:
 # https://stackoverflow.com/questions/20643184/using-python-threads-to-make-thousands-of-calls-to-a-slow-api-with-a-rate-limit
+from __future__ import annotations
 
 import functools
 import time

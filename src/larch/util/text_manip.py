@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import unicodedata
 from difflib import SequenceMatcher as _SequenceMatcher
 from heapq import nlargest as _nlargest

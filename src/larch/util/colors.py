@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 _color_rgb256 = {}
 _color_rgb256["sky"] = (35, 192, 241)
 _color_rgb256["ocean"] = (29, 139, 204)

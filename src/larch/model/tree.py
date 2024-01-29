@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import heapq
 import warnings
 from collections import OrderedDict

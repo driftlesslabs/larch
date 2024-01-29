@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import keyword as _keyword
 import re
 import re as _re

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from itertools import chain
 
 _RaiseKeyError = object()  # singleton for no-default behavior

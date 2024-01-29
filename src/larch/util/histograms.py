@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import numpy
 import numpy.ma as ma
 import pandas

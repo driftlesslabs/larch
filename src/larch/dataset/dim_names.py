@@ -1,4 +1,6 @@
 # Dense
+from __future__ import annotations
+
 CASEID = "_caseid_"
 ALTID = "_altid_"
 

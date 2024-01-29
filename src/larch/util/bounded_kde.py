@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import numpy as np
 from scipy.stats import gaussian_kde
 from sklearn.neighbors import KernelDensity

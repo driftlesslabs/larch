@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import keyword
 import re
 import warnings

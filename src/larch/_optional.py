@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class Nothing:
     def __getattr__(self, name):
         return Nothing()

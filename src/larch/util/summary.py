@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pandas
 from pandas.io.formats.style import Styler
 

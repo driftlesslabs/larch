@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class SingleParameter:
     def __set_name__(self, owner, name):
         self.name = name

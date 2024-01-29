@@ -1,4 +1,5 @@
 """Provides a cache for requests.get and requests.post."""
+from __future__ import annotations
 
 import requests
 

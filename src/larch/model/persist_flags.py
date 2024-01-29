@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 PERSIST_UTILITY = 0x1
 PERSIST_EXP_UTILITY = 0x2
 PERSIST_PROBABILITY = 0x4

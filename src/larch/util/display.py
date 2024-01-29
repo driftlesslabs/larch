@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .interface_info import ipython_status as _ipython_status
 from .rate_limiter import NonBlockingRateLimiter
 
