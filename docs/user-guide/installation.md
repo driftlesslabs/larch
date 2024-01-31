@@ -36,11 +36,14 @@ perfectly yet, especially for more advanced models.
 ## New Users
 
 Larch is a Python package, so you'll need to also have Python installed.  If you
-don't already have Python installed, we recommend installing the latest version
-via [MiniForge](https://github.com/conda-forge/miniforge#download).  Once you have
-MiniForge installed, you can create an environment for using Larch with the
-following commands you can paste into a Miniforge Prompt (Windows) or just the
-plain old Terminal (Mac/Linux):
+don't already have Python installed, or if you installed Python or Conda more than
+a year or two ago, we recommend installing the latest version via
+[MiniForge](https://github.com/conda-forge/miniforge#download). You can do this
+even if you have Python or Conda installed elsewhere on your computer, and you may
+find a fresh installation to be quite a bit zippier than trying to update an old
+one. Once you have MiniForge installed, you can create an environment for using
+Larch with the following commands you can paste into a Miniforge Prompt (Windows)
+or just the plain old Terminal (Mac/Linux):
 
 ```shell
 mamba env create -p ./ARBORETUM -f https://larch.driftless.xyz/arboretum.yml
