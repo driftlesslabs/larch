@@ -10,6 +10,7 @@ from xarray import Dataset
 
 from ._optional import jax, jnp
 from .compiled import jitmethod
+from .util.simple_attribute import SimpleAttribute
 
 
 class BucketAccess(ABC):
@@ -175,6 +176,8 @@ class OptimizeMixin(BucketAccess):
                 self.add_parameter_array("best", self.pvals)
             else:
                 self.add_parameter_array("best", pvalues)
+
+    dashboard = SimpleAttribute()
 
     def jax_maximize_loglike(
         self,

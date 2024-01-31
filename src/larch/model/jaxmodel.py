@@ -55,7 +55,21 @@ class MangleOnChange:
         self.private_name = "_" + name
 
     def __get__(self, instance, owner):
-        return getattr(instance, self.private_name)
+        if instance is None:
+            return self
+        else:
+            try:
+                result = getattr(instance, self.private_name)
+            except AttributeError:
+                if self.req_type == (bool,):
+                    default = False
+                elif len(self.req_type):
+                    default = self.req_type[0]()
+                else:
+                    default = None
+                setattr(instance, self.private_name, default)
+                result = getattr(instance, self.private_name)
+            return result
 
     def __set__(self, instance, value):
         if self.req_type == (bool,):
@@ -183,7 +197,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                 request=request,
                 float_dtype=self.float_dtype,
                 cache_dir=datatree.cache_dir,
-                flows=getattr(self, "dataflows", None),
+                flows=self.dataflows,
                 make_unused_flows=self.use_streaming,
             )
             if isinstance(self.groupid, str):

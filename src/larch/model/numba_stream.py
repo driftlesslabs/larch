@@ -408,16 +408,16 @@ def _d_loglike_streaming(
 class ModelStreamer:
     def __init__(self, model=None):
         self._model = model
-        if model is None:
-            return
-        if not hasattr(self._model, "_streamfunc"):
-            self._model._streamfunc = init_streamer(model)
-        _fixed_arrays = tuple(self._model._fixed_arrays)
-        _pholdfast = self._model.pholdfast
-
-        self._choice_avail_summary_streamer = init_choice_avail_summary_streamer(
-            self._model
-        )
+        # if model is None:
+        #     return
+        # if not hasattr(self._model, "_streamfunc"):
+        #     self._model._streamfunc = init_streamer(model)
+        # _fixed_arrays = tuple(self._model._fixed_arrays)
+        # _pholdfast = self._model.pholdfast
+        #
+        # self._choice_avail_summary_streamer = init_choice_avail_summary_streamer(
+        #     self._model
+        # )
 
         # def _loglike_func_py(pvals, c, _streamfunc, return_grad=True, return_bhhh=False):
         #     utility, dutility, logprob, probability, bhhh, d_loglike, loglike = _streamfunc(

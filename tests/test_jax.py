@@ -227,7 +227,6 @@ def test_prerolled_common(xlogit_artificial):
     m = xlogit_artificial
     m.n_draws = 100
     m.seed = 42
-    m.prerolled = True
     m.common_draws = True
     m.make_random_draws(engine="jax")
     r = m.jax_maximize_loglike()
@@ -282,7 +281,6 @@ def test_prerolled_notcommon(xlogit_artificial):
     m = xlogit_artificial
     m.n_draws = 100
     m.seed = 42
-    m.prerolled = True
     m.common_draws = False
     m.make_random_draws(engine="jax")
     assert m._draws.shape == (4000, 100, 3)
@@ -301,7 +299,6 @@ def test_prerolled_common_panel(xlogit_artificial):
     m = xlogit_artificial
     m.n_draws = 100
     m.seed = 42
-    m.prerolled = True
     m.common_draws = True
     m.groupid = "panel"
     m.make_random_draws(engine="jax")
@@ -359,7 +356,6 @@ def test_prerolled_notcommon_panel(xlogit_artificial):
     m.mangle()
     m.n_draws = 100
     m.seed = 42
-    m.prerolled = True
     m.common_draws = False
     m.groupid = "panel"
     m.make_random_draws(engine="jax")
@@ -416,7 +412,6 @@ def test_prerolled_common_numpy(xlogit_artificial):
     m = xlogit_artificial
     m.n_draws = 100
     m.seed = 42
-    m.prerolled = True
     m.common_draws = True
     m.make_random_draws(engine="numpy")
     r = m.jax_maximize_loglike()
@@ -472,7 +467,6 @@ def test_prerolled_notcommon_numpy(xlogit_artificial):
     m = xlogit_artificial
     m.n_draws = 100
     m.seed = 42
-    m.prerolled = True
     m.common_draws = False
     m.make_random_draws(engine="numpy")
     assert m._draws.shape == (4000, 100, 3)
@@ -528,7 +522,6 @@ def test_prerolled_common_panel_numpy(xlogit_artificial):
     m = xlogit_artificial
     m.n_draws = 100
     m.seed = 42
-    m.prerolled = True
     m.common_draws = True
     m.groupid = "panel"
     m.make_random_draws(engine="numpy")
@@ -549,7 +542,6 @@ def test_prerolled_notcommon_panel_numpy(xlogit_artificial):
     m.mangle()
     m.n_draws = 100
     m.seed = 42
-    m.prerolled = True
     m.common_draws = False
     m.groupid = "panel"
     m.make_random_draws(engine="numpy")

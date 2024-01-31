@@ -10,6 +10,7 @@ from ..dataset import Dataset, DataTree
 from ..exceptions import MissingDataError
 from ..folding import dissolve_zero_variance, fold_dataset
 from ..optimize import OptimizeMixin
+from ..util.simple_attribute import SimpleAttribute
 from .basemodel import MANGLE_DATA
 from .basemodel import BaseModel as _BaseModel
 from .jaxmodel import PanelMixin, _get_jnp_array
@@ -18,6 +19,8 @@ from .mixtures import MixtureList
 
 class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
     compute_engine = "jax"
+    float_dtype = SimpleAttribute()
+    dataflows = SimpleAttribute(dict)
 
     def __init__(
         self, classmodel, choicemodels, datatree=None, float_dtype=np.float32, **kwargs
@@ -46,7 +49,7 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
             classmodel.datatree = classdata
         else:
             pass
-        self.ident = "latent-class"
+        self._ident = "latent-class"
         super().__init__(
             datatree=datatree,
             submodels=choicemodels,
@@ -329,7 +332,7 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
             request=request,
             float_dtype=np.float32,
             cache_dir=datatree.cache_dir,
-            flows=getattr(self, "dataflows", None),
+            flows=self.dataflows,
         )
         if isinstance(self.groupid, str):
             dataset = fold_dataset(dataset, "group")

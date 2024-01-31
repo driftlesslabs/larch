@@ -18,10 +18,11 @@ from numba import int64 as i64
 from ..dataset import DataArray, Dataset, DataTree
 from ..exceptions import MissingDataError
 from ..util import dictx
+from ..util.simple_attribute import SimpleAttribute
 from .basemodel import BaseModel as _BaseModel
 from .numba_stream import ModelStreamer
 
-warnings.warn(  ## Good news, everyone! This tool might be buggy. ## )
+warnings.warn(  ## Good news, everyone! ##  )
     "\n\n"
     "#### larch v6 is experimental, and not feature-complete ####\n"
     "the first time you import on a new system, this package will\n"
@@ -887,6 +888,8 @@ FixedArrays = namedtuple(
 class NumbaModel(_BaseModel):
     _null_slice = (None, None, None)
     streaming = ModelStreamer()
+    constraint_intensity = SimpleAttribute(float)
+    constraint_sharpness = SimpleAttribute(float)
 
     def __init__(self, *args, float_dtype=np.float64, datatree=None, **kwargs):
         for a in args:
@@ -974,6 +977,8 @@ class NumbaModel(_BaseModel):
         loadthis("weight_normalization")
         return self
 
+    work_arrays = SimpleAttribute()
+
     def mangle(self, data=True, structure=True):
         super().mangle(data, structure)
         if data:
@@ -985,6 +990,7 @@ class NumbaModel(_BaseModel):
         if structure:
             self._constraint_funcs = None
             self._fixed_arrays = None
+            # print("self.streaming", self.streaming)
             self.streaming = None
 
     def is_mnl(self):
@@ -1000,6 +1006,8 @@ class NumbaModel(_BaseModel):
         if len(self._graph) - len(self._graph.elementals) == 1:
             return True
         return False
+
+    dataflows = SimpleAttribute(dict)
 
     def reflow_data_arrays(self):
         """Reload the internal data_arrays so they are consistent with the datatree."""
@@ -1030,7 +1038,7 @@ class NumbaModel(_BaseModel):
                 request=self,
                 float_dtype=self.float_dtype,
                 cache_dir=datatree.cache_dir,
-                flows=getattr(self, "dataflows", None),
+                flows=self.dataflows,
                 make_unused_flows=self.use_streaming,
             )
             if self.use_streaming:

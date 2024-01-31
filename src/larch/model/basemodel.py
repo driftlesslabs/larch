@@ -24,6 +24,7 @@ import xarray as xr
 from .._optional import jax
 from ..dataset import DataTree
 from ..exceptions import MissingDataError
+from ..util.simple_attribute import SimpleAttribute
 from .constraints import ParametricConstraintList
 from .linear import DictOfAlts, DictOfLinearFunction, LinearFunction
 from .mixtures import MixtureList
@@ -128,6 +129,10 @@ class BaseModel:
 
     mixtures = MixtureList()
 
+    title = SimpleAttribute()
+    rename_parameters = SimpleAttribute(dict)
+    ordering = SimpleAttribute()
+
     def __init__(
         self,
         *,
@@ -144,7 +149,6 @@ class BaseModel:
         self._mangled = 0x3
         self._datatree = None
         self.title = title
-        self.rename_parameters = {}
         self._compute_engine = compute_engine
         self._use_streaming = use_streaming
 
@@ -178,7 +182,13 @@ class BaseModel:
         self._availability_co_vars = None
         self._availability_any = True
 
-        self.ordering = None
+    def __setattr__(self, name, value):
+        if name.startswith("_") or hasattr(self, "_" + name) or hasattr(self, name):
+            object.__setattr__(self, name, value)
+        else:
+            raise TypeError(
+                f"Cannot set {name!r} on object of type {self.__class__.__name__}"
+            )
 
     @property
     def ident(self):
@@ -642,7 +652,7 @@ class BaseModel:
         else:
             for a, name in zip(alternative_codes, alternative_names):
                 g.add_node(a, name=name)
-        self.graph = g
+        self._graph = g
 
     @property
     def graph(self):
