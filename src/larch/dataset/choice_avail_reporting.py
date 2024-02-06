@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+from pandas.api.types import is_object_dtype, is_string_dtype
 
 
 def clean_summary(df, root_id=None):
@@ -11,7 +12,7 @@ def clean_summary(df, root_id=None):
     else:
         totals = df.sum()
 
-    for tot in (
+    relevant_totals = (
         "chosen",
         "chosen weighted",
         "chosen unweighted",
@@ -20,14 +21,16 @@ def clean_summary(df, root_id=None):
         "chosen but not available unweighted",
         "chosen thus available",
         "not available so not chosen",
-    ):
+    )
+
+    for tot in relevant_totals:
         if tot in totals:
             df.loc["< Total All Alternatives >", tot] = totals[tot]
 
-    df.loc[
-        "< Total All Alternatives >",
-        pd.isnull(df.loc["< Total All Alternatives >", :]),
-    ] = ""
+    for i in df.columns:
+        if i not in relevant_totals:
+            if is_object_dtype(df[i].dtype) or is_string_dtype(df[i].dtype):
+                df.loc["< Total All Alternatives >", i] = ""
     df.drop("_root_", errors="ignore", inplace=True)
 
     if "availability condition" in df:
@@ -44,9 +47,7 @@ def clean_summary(df, root_id=None):
 
     for i in ("available",):
         if i in df.columns:
-            j = df.columns.get_loc(i)
-            if all(df.iloc[:-1, j] == df.iloc[:-1, j].astype(int)):
-                df.iloc[:-1, j] = df.iloc[:-1, j].astype(int)
+            df[i] = df[i].astype(pd.Int64Dtype())
 
     return df
 
