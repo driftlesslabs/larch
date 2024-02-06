@@ -49,7 +49,7 @@ def valid_identifier_or_parenthized_string(x, leading_dot=True):
 
 
 def parenthize(x, signs_qualify=False):
-    """Wrap a string in parenthesis if needed for unambiguous clarity.
+    """Wrap a string in parentheses if needed for unambiguous clarity.
 
     Parameters
     ----------

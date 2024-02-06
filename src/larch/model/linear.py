@@ -153,12 +153,13 @@ class ParameterRef(UnicodeRef):
                 from .linear_math import ParameterMultiply
 
                 return ParameterMultiply(self, other)
+            if isinstance(other, LinearFunction):
+                return LinearFunction([self * c for c in other])
         elif isinstance(other, ParameterRef):
             if isinstance(self, DataRef):
                 return LinearComponent(param=str(other), data=str(self))
             if isinstance(self, _Number):
-                # return LinearComponent(param=str(other), data=str(self))
-                return LinearComponent(param=str(other), data="1", scale=self)
+                return LinearComponent(param=str(other), data="1", scale=float(self))
         return NotImplemented  # raise NotImplementedError(f"{_what_is(self)} * {_what_is(other)}")
 
     def __truediv__(self, other):
@@ -299,7 +300,9 @@ class DataRef(UnicodeRef):
             if other == "00":
                 return DataRef(f"{parenthize(self)}+0")
             return DataRef(f"{parenthize(self)}+{parenthize(other, True)}")
-        if isinstance(self, DataRef) and isinstance(other, ParameterRef):
+        if isinstance(self, DataRef) and isinstance(
+            other, (ParameterRef, LinearComponent)
+        ):
             return P(_null_) * self + other
 
         # Don't return NotImplemented just raise TypeError when adding a DataRef and a plain string.
@@ -382,6 +385,62 @@ class DataRef(UnicodeRef):
                 )
             if isinstance(self, LinearFunction):
                 return LinearFunction([c * other for c in self])
+        return NotImplemented  # raise NotImplementedError(f"{_what_is(self)} * {_what_is(other)}")
+
+    def __rmul__(self, other):
+        if isinstance(self, DataRef):
+            if isinstance(other, (DataRef, _Number)):
+                if self == "1" or self == "1.0" or self == 1:
+                    return other
+                if other == "1" or other == "1.0" or other == 1:
+                    return self
+                if isinstance(other, _Number):
+                    return P(_null_) * other * self
+                if self == other and self[:8] == "boolean(" and self[-1:] == ")":
+                    # Squaring a boolean does not change it
+                    return self
+                if (
+                    self[:8] == "boolean("
+                    and self[-1:] == ")"
+                    and other[:8] == "boolean("
+                    and other[-1:] == ")"
+                ):
+                    # Check for two mutually exclusive conditions
+                    boolmatch1 = _boolmatch.match(self)
+                    if boolmatch1:
+                        boolmatch2 = _boolmatch.match(other)
+                        if boolmatch2:
+                            if boolmatch1.group(1) == boolmatch2.group(1):
+                                if boolmatch1.group(2) != boolmatch2.group(2):
+                                    return DataRef("0")
+                return DataRef(f"{parenthize(other, True)}*{parenthize(self)}")
+            if isinstance(other, ParameterRef):
+                return LinearComponent(param=str(other), data=str(self))
+            if isinstance(other, LinearComponent):
+                return LinearComponent(
+                    param=str(other.param),
+                    data=str(other.data * self),
+                    scale=other.scale,
+                )
+            if isinstance(other, LinearFunction):
+                return LinearFunction([self * c for c in other])
+        elif isinstance(other, DataRef):
+            if isinstance(self, (DataRef, _Number)):
+                if self == "1" or self == "1.0" or self == 1:
+                    return other
+                if other == "1" or other == "1.0" or other == 1:
+                    return self
+                if isinstance(self, _Number):
+                    return P(_null_) * self * other
+                return DataRef(f"{parenthize(other, True)}*{parenthize(self)}")
+            if isinstance(self, ParameterRef):
+                return LinearComponent(param=str(self), data=str(other))
+            if isinstance(self, LinearComponent):
+                return LinearComponent(
+                    param=str(self.param), data=str(other * self.data)
+                )
+            if isinstance(self, LinearFunction):
+                return LinearFunction([other * c for c in self])
         return NotImplemented  # raise NotImplementedError(f"{_what_is(self)} * {_what_is(other)}")
 
     def __truediv__(self, other):
