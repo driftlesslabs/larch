@@ -95,9 +95,13 @@
       ~Model.choice_co_vars
       ~Model.common_draws
       ~Model.compute_engine
+      ~Model.constraint_intensity
+      ~Model.constraint_sharpness
       ~Model.constraints
+      ~Model.dashboard
       ~Model.data_as_loaded
       ~Model.data_as_possible
+      ~Model.dataflows
       ~Model.dataset
       ~Model.datatree
       ~Model.float_dtype
@@ -120,6 +124,7 @@
       ~Model.n_cases
       ~Model.n_draws
       ~Model.n_params
+      ~Model.ordering
       ~Model.parameters
       ~Model.pbounds
       ~Model.pf
@@ -134,13 +139,16 @@
       ~Model.pvals
       ~Model.quantity_ca
       ~Model.quantity_scale
+      ~Model.rename_parameters
       ~Model.seed
       ~Model.streaming
+      ~Model.title
       ~Model.use_streaming
       ~Model.utility_ca
       ~Model.utility_co
       ~Model.utility_for_nests
       ~Model.weight_co_var
       ~Model.weight_normalization
+      ~Model.work_arrays
    
    
