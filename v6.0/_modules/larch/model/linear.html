@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>larch.model.linear &#8212; v6.0.21.dev1+ge3285bf</title>
+    <title>larch.model.linear &#8212; v6.0.21</title>
   
   
   
@@ -139,8 +139,8 @@
       
     
     
-    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.21.dev1+ge3285bf - Home"/>
-    <script>document.write(`<img src="../../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.21.dev1+ge3285bf - Home"/>`);</script>
+    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.21 - Home"/>
+    <script>document.write(`<img src="../../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.21 - Home"/>`);</script>
   
   
 </a></div>
@@ -847,6 +847,24 @@ document.write(`
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ParameterRef</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="n">DataRef</span><span class="p">,</span> <span class="n">_Number</span><span class="p">)):</span>
             <span class="k">return</span> <span class="bp">self</span> <span class="o">*</span> <span class="n">DataRef</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;1/</span><span class="si">{</span><span class="n">parenthize</span><span class="p">(</span><span class="n">other</span><span class="p">,</span><span class="w"> </span><span class="kc">True</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">NotImplemented</span>  <span class="c1"># raise NotImplementedError(f&quot;{_what_is(self)} / {_what_is(other)}&quot;)</span>
+
+    <span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DataRef</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DataRef</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">DataRef</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">parenthize</span><span class="p">(</span><span class="n">other</span><span class="p">,</span><span class="w"> </span><span class="kc">True</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">parenthize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DataRef</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ParameterRef</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">LinearComponent</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;1/</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DataRef</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">LinearComponent</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">LinearComponent</span><span class="p">(</span>
+                <span class="n">param</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">param</span><span class="p">),</span>
+                <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">parenthize</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="kc">True</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">parenthize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">scale</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DataRef</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">_Number</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">other</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">DataRef</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;1/</span><span class="si">{</span><span class="n">parenthize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="kc">True</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">other</span> <span class="o">*</span> <span class="n">DataRef</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;1/</span><span class="si">{</span><span class="n">parenthize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="kc">True</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">NotImplemented</span>
 
     <span class="k">def</span> <span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="n">DataRef</span><span class="p">,</span> <span class="n">_Number</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
@@ -1659,13 +1677,20 @@ document.write(`
         <span class="kn">from</span> <span class="nn">.linear_math</span> <span class="kn">import</span> <span class="n">ParameterDivide</span><span class="p">,</span> <span class="n">_ParameterOp</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LinearFunction</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
-            <span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="n">ParameterRef</span><span class="p">,</span> <span class="n">_ParameterOp</span><span class="p">,</span> <span class="n">_Number</span><span class="p">)</span>
+            <span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="n">ParameterRef</span><span class="p">,</span> <span class="n">_ParameterOp</span><span class="p">)</span>
         <span class="p">):</span>
             <span class="k">return</span> <span class="n">ParameterDivide</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">as_pmath</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">LinearFunction</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="n">ParameterRef</span><span class="p">,</span> <span class="n">_ParameterOp</span><span class="p">,</span> <span class="n">_Number</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="n">ParameterRef</span><span class="p">,</span> <span class="n">_ParameterOp</span><span class="p">)</span>
         <span class="p">):</span>
             <span class="k">return</span> <span class="n">ParameterDivide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">as_pmath</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LinearFunction</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">_Number</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ParameterDivide</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">as_pmath</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="n">DataRef</span><span class="p">,</span> <span class="n">_Number</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">LinearFunction</span><span class="p">([</span><span class="n">i</span> <span class="o">/</span> <span class="n">other</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
         <span class="k">return</span> <span class="bp">NotImplemented</span>
 
     <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
@@ -2354,7 +2379,7 @@ document.write(`
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-<p class="larch-version">🌳 Larch v6.0.21.dev1+ge3285bf, © Copyright 2024.</p></div>
+<p class="larch-version">🌳 Larch v6.0.21, © Copyright 2024.</p></div>
       
     </div>
   
