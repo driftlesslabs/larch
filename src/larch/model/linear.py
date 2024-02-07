@@ -452,6 +452,24 @@ class DataRef(UnicodeRef):
             return self * DataRef(f"1/{parenthize(other, True)}")
         return NotImplemented  # raise NotImplementedError(f"{_what_is(self)} / {_what_is(other)}")
 
+    def __rtruediv__(self, other):
+        if isinstance(self, DataRef) and isinstance(other, DataRef):
+            return DataRef(f"{parenthize(other, True)}/{parenthize(self)}")
+        if isinstance(self, DataRef) and isinstance(other, ParameterRef):
+            return LinearComponent(param=str(other), data=f"1/{self}")
+        if isinstance(self, DataRef) and isinstance(other, LinearComponent):
+            return LinearComponent(
+                param=str(other.param),
+                data=f"{parenthize(other.data, True)}/{parenthize(self)}",
+                scale=other.scale,
+            )
+        if isinstance(self, DataRef) and isinstance(other, _Number):
+            if other == 1:
+                return DataRef(f"1/{parenthize(self, True)}")
+            else:
+                return other * DataRef(f"1/{parenthize(self, True)}")
+        return NotImplemented
+
     def __and__(self, other):
         if isinstance(self, (DataRef, _Number)) and isinstance(
             other, (DataRef, _Number)
@@ -1262,13 +1280,20 @@ class LinearFunction:
         from .linear_math import ParameterDivide, _ParameterOp
 
         if isinstance(self, LinearFunction) and isinstance(
-            other, (ParameterRef, _ParameterOp, _Number)
+            other, (ParameterRef, _ParameterOp)
         ):
             return ParameterDivide(self.as_pmath(), other)
         if isinstance(other, LinearFunction) and isinstance(
-            self, (ParameterRef, _ParameterOp, _Number)
+            self, (ParameterRef, _ParameterOp)
         ):
             return ParameterDivide(self, other.as_pmath())
+        if isinstance(self, LinearFunction) and isinstance(other, _Number):
+            try:
+                return ParameterDivide(self.as_pmath(), other)
+            except NotImplementedError:
+                pass
+        if isinstance(other, (DataRef, _Number)):
+            return LinearFunction([i / other for i in self])
         return NotImplemented
 
     def __contains__(self, val):

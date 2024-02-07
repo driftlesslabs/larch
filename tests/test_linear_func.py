@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from pytest import approx
+
 from larch import PX, P, X
+from larch.model.linear import DataRef
 
 
 def test_P():
@@ -55,3 +58,59 @@ def test_linear_component_math():
     assert f.param == "Aaa"
     assert f.data == "Bbb"
     assert f.scale == 3.1
+
+    f = P.Aaa / X.Bbb
+    assert f.param == "Aaa"
+    assert f.data == "1/Bbb"
+    assert f.scale == 1
+
+    f = 1 / X.Bbb
+    assert f == "1/Bbb"
+    assert f.__class__ is DataRef
+
+    f = 1.1 / X.Bbb
+    assert f.param == "_"
+    assert f.data == "1/Bbb"
+    assert f.scale == 1.1
+
+    f = P.Aaa * (X.Bbb / X.Ccc)
+    assert f.param == "Aaa"
+    assert f.data == "Bbb/Ccc"
+    assert f.scale == 1
+
+    f = (P.Aaa * X.Bbb) / X.Ccc
+    assert f.param == "Aaa"
+    assert f.data == "Bbb/Ccc"
+    assert f.scale == 1
+
+    f = (P.Aaa * X.Bbb + P.Ccc * X.Ddd) * X.Eee
+    assert len(f) == 2
+    assert f[0].param == "Aaa"
+    assert f[0].data == "Bbb*Eee"
+    assert f[1].param == "Ccc"
+    assert f[1].data == "Ddd*Eee"
+
+    f = (P.Aaa * X.Bbb + P.Ccc * X.Ddd) / X.Eee
+    assert len(f) == 2
+    assert f[0].param == "Aaa"
+    assert f[0].data == "Bbb/Eee"
+    assert f[1].param == "Ccc"
+    assert f[1].data == "Ddd/Eee"
+
+    f = (P.Aaa * X.Bbb + P.Ccc * X.Ddd) * 1.1
+    assert len(f) == 2
+    assert f[0].param == "Aaa"
+    assert f[0].data == "Bbb"
+    assert f[0].scale == 1.1
+    assert f[1].param == "Ccc"
+    assert f[1].data == "Ddd"
+    assert f[1].scale == 1.1
+
+    f = (P.Aaa * X.Bbb + P.Ccc * X.Ddd) / 1.1
+    assert len(f) == 2
+    assert f[0].param == "Aaa"
+    assert f[0].data == "Bbb"
+    assert f[0].scale == approx(1.0 / 1.1)
+    assert f[1].param == "Ccc"
+    assert f[1].data == "Ddd"
+    assert f[1].scale == approx(1.0 / 1.1)
