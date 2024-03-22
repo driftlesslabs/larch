@@ -66,6 +66,15 @@ testpaths = [
 ]
 
 [tool.ruff]
+fix = true
+line-length = 88
+target-version = "py310"
+extend-include = ["*.ipynb"]
+extend-exclude = ["sandbox"]
+
+[tool.ruff.lint]
+ignore = ["B905", "D1", "E731", "UP038"]
+ignore-init-module-imports = true
 select = [
     "F", # Pyflakes
     "E", # Pycodestyle Errors
@@ -75,15 +84,8 @@ select = [
     "D", # pydocstyle
     "B", # flake8-bugbear
 ]
-ignore-init-module-imports = true
-fix = true
-line-length = 88
-ignore = ["B905", "D1", "E731", "UP038"]
-target-version = "py310"
-extend-include = ["*.ipynb"]
-extend-exclude = ["sandbox"]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "*.ipynb" = [
     "E402", # allow imports to appear anywhere in Jupyter Notebooks
     "E501", # allow long lines in Jupyter Notebooks
