@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import time
 import warnings
 from collections.abc import Mapping
 
@@ -1386,3 +1387,179 @@ class OMX(_omx_base_class):
             else:
                 raise OMXIncompatibleShape
         return z
+
+
+def _shrink_bitwidth(v, dtype_shrink=32):
+    if dtype_shrink <= 32:
+        if v.dtype == "float64":
+            v = v.astype("float32")
+        elif (
+            v.dtype == "int64" and v.max() < 2_147_483_648 and v.min() > -2_147_483_648
+        ):
+            v = v.astype("int32")
+    return v
+
+
+def convert_omx(
+    existing_filename,
+    new_filename,
+    complevel=3,
+    complib="blosc2:zstd",
+    dtype_shrink=32,
+    part=0,
+    n_part=1,
+) -> float:
+    """
+    Convert an existing OMX file using different data types and filters.
+
+    This function will read an existing OMX file and write it back out
+    in a new format.  This is useful for updating old OMX files to
+    the new format, which may be more efficient.
+
+    Parameters
+    ----------
+    existing_filename : str
+        The filename of the existing OMX file to convert.
+    new_filename : str
+        The filename of the new OMX file to write.
+    complevel : int, default 1
+        Compression level.
+    complib : str, default 'blosc2:zstd'
+        Compression library.
+    dtype_shrink : int, default 32
+        The maximum bitwidth to use for integer and float types.
+    part : int, default 0
+        The part of the file to start with.
+    n_part : int, default 1
+        The number of partitions to create.
+
+    Returns
+    -------
+    float
+        The time in seconds it took to convert the file.
+    """
+    start = time.time()
+    with OMX(existing_filename, mode="r") as old_omx:
+        if part != 0 or n_part != 1:
+            newbase, nextext = os.path.splitext(new_filename)
+            new_filename = newbase + f".part{part:03d}" + nextext
+        with OMX(new_filename, mode="w") as new_omx:
+            keys = sorted(old_omx.data._v_children)
+            for name in keys[part::n_part]:
+                v = old_omx.data._v_children[name][:]
+                v = _shrink_bitwidth(v, dtype_shrink)
+                new_omx.add_matrix(
+                    name,
+                    v,
+                    complevel=complevel,
+                    complib=complib,
+                )
+            keys = sorted(old_omx.lookup._v_children)
+            for name in keys[part::n_part]:
+                v = old_omx.lookup._v_children[name][:]
+                v = _shrink_bitwidth(v, dtype_shrink)
+                new_omx.add_lookup(
+                    name,
+                    v,
+                    complevel=complevel,
+                    complib=complib,
+                )
+    return time.time() - start
+
+
+def convert_omx_parallel(
+    existing_filename,
+    new_filename,
+    complevel=3,
+    complib="blosc2:zstd",
+    dtype_shrink=32,
+    n_processes=4,
+) -> float:
+    """
+    Convert an existing OMX file using different data types and filters.
+
+    Parameters
+    ----------
+    existing_filename : str
+        The filename of the existing OMX file to convert.
+    new_filename : str
+        The filename of the new OMX file to write.
+    complevel : int, default 1
+        Compression level.
+    complib : str, default 'blosc2:zstd'
+        Compression library.
+    dtype_shrink : int, default 32
+        The maximum bitwidth to use for integer and float types.
+    n_processes : int, default 4
+        The number of processes to use for parallel conversion.
+
+    Returns
+    -------
+    float
+        The time in seconds it took to convert the file.
+    """
+    start = time.time()
+    from multiprocessing import Pool
+
+    # start 4 worker processes
+    with Pool(processes=n_processes) as pool:
+        # launching multiple evaluations asynchronously *may* use more processes
+        multiple_results = [
+            pool.apply_async(
+                convert_omx,
+                (
+                    existing_filename,
+                    new_filename,
+                    complevel,
+                    complib,
+                    dtype_shrink,
+                    i,
+                    n_processes,
+                ),
+            )
+            for i in range(n_processes)
+        ]
+        for res in multiple_results:
+            res.get(timeout=600)
+
+    return time.time() - start
+
+
+def convert_multiple_omx(
+    glob_pattern,
+    complevel=3,
+    complib="blosc2:zstd",
+    dtype_shrink=32,
+    n_processes=4,
+    out_dir=None,
+):
+    """
+    Convert multiple OMX files using different data types and filters.
+
+    Parameters
+    ----------
+    glob_pattern : str
+    complevel : int, default 1
+        Compression level.
+    complib : str, default 'blosc2:zstd'
+        Compression library.
+    dtype_shrink : int, default 32
+        The maximum bitwidth to use for integer and float types.
+    n_processes : int, default 4
+        The number of processes to use for parallel conversion.
+    out_dir : str, default None
+        The directory to write the new OMX files to.  If None, the new files
+        will be written to the same directory as the existing files.
+    """
+    import glob
+
+    for f in glob.glob(glob_pattern):
+        new_filename = f
+        if out_dir:
+            os.makedirs(out_dir, exist_ok=True)
+            new_filename = os.path.join(out_dir, os.path.basename(f))
+        print(f"converting {f} to {new_filename}...")
+        t = convert_omx_parallel(
+            f, new_filename, complevel, complib, dtype_shrink, n_processes
+        )
+        print(f"\rconverted {f} to {new_filename} in {t:.2f} seconds.")
