@@ -9,6 +9,7 @@ for the model subtype.
 The `BaseModel` class is designed to be subclassed by other model classes that
 implement specific types of discrete choice models.
 """
+
 from __future__ import annotations
 
 import base64
@@ -151,6 +152,7 @@ class BaseModel:
         self.title = title
         self._compute_engine = compute_engine
         self._use_streaming = use_streaming
+        self._possible_overspecification = None
 
         if submodels is None:
             submodels = {}
@@ -247,8 +249,12 @@ class BaseModel:
 
     @property
     def possible_overspecification(self):
-        """Not yet implemented."""
-        return None
+        """Possible overspecification of the model."""
+        if self._possible_overspecification is None:
+            return None
+        from ..util.overspec_viewer import OverspecView
+
+        return OverspecView(self._possible_overspecification)
 
     @property
     def datatree(self):
@@ -372,7 +378,12 @@ class BaseModel:
         return self._parameter_bucket.pnames
 
     @property
-    def pholdfast(self):
+    def pholdfast(self) -> np.ndarray[np.int8]:
+        """An array indicating which parameters are marked as holdfast.
+
+        Parameters marked as `holdfast` are not changed during estimation by the
+        likelihood maximization algorithm, but they can be changed by the user.
+        """
         self.unmangle()
         return self._parameter_bucket.pholdfast
 
@@ -449,7 +460,28 @@ class BaseModel:
         self.unmangle()
         self._parameter_bucket.lock(values, **kwargs)
 
-    def get_param_loc(self, name):
+    def get_param_loc(self, name) -> int:
+        """
+        Get the position of a named parameter.
+
+        Parameters in a model are stored in an array, and this method returns
+        the position of a named parameter in that array.
+
+        Parameters
+        ----------
+        name : str
+            Name of parameter to find
+
+        Returns
+        -------
+        int
+            Position of parameter in array
+
+        Raises
+        ------
+        KeyError
+            The parameter is not found
+        """
         self.unmangle()
         return self._parameter_bucket.get_param_loc(name)
 

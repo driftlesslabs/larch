@@ -260,12 +260,12 @@ class OverspecView(Styler):
             msg = "`text_color_threshold` must be a value from 0 to 1."
             raise ValueError(msg)
 
-        with _mpl(Styler.background_gradient) as (plt, colors):
+        with _mpl(Styler.background_gradient) as (plt, matplotlib):
             smin = np.nanmin(np.absolute(s.to_numpy())) if vmin is None else vmin
             smax = np.nanmax(np.absolute(s.to_numpy())) if vmax is None else vmax
             rng = smax - smin
             # extend lower / upper bounds, compresses color range
-            norm = colors.Normalize(smin - (rng * low), smax + (rng * high))
+            norm = matplotlib.colors.Normalize(smin - (rng * low), smax + (rng * high))
             # matplotlib colors.Normalize modifies inplace?
             # https://github.com/matplotlib/matplotlib/issues/5427
             rgbas = plt.cm.get_cmap(cmap)(norm(np.absolute(s.to_numpy(dtype=float))))
@@ -296,7 +296,7 @@ class OverspecView(Styler):
             def css(rgba):
                 dark = relative_luminance(rgba) < text_color_threshold
                 text_color = "#f1f1f1" if dark else "#000000"
-                return f"background-color: {colors.rgb2hex(rgba)};color: {text_color};"
+                return f"background-color: {matplotlib.colors.rgb2hex(rgba)};color: {text_color};"
 
             if s.ndim == 1:
                 return [css(rgba) for rgba in rgbas]

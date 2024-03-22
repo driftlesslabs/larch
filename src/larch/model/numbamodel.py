@@ -17,6 +17,10 @@ from numba import int64 as i64
 
 from ..dataset import DataArray, Dataset, DataTree
 from ..exceptions import MissingDataError
+from ..model.possible_overspec import (
+    PossibleOverspecification,
+    compute_possible_overspecification,
+)
 from ..util import dictx
 from ..util.simple_attribute import SimpleAttribute
 from .basemodel import BaseModel as _BaseModel
@@ -79,9 +83,9 @@ def utility_from_data_co(
             if model_utility_co_data[i] == -1:
                 utility_elem[altindex] += param_value * model_utility_co_param_scale[i]
                 if not param_holdfast:
-                    dutility_elem[
-                        altindex, model_utility_co_param[i]
-                    ] += model_utility_co_param_scale[i]
+                    dutility_elem[altindex, model_utility_co_param[i]] += (
+                        model_utility_co_param_scale[i]
+                    )
             else:
                 _temp = (
                     data_co[model_utility_co_data[i]] * model_utility_co_param_scale[i]
@@ -1605,7 +1609,14 @@ class NumbaModel(_BaseModel):
             result = pd.DataFrame(result, columns=self.pnames, index=self.pnames)
         return result
 
-    def robust_covariance(self):
+    def robust_covariance(self) -> xr.DataArray:
+        """
+        Compute the robust covariance matrix of the parameter estimates.
+
+        Returns
+        -------
+        xarray.DataArray
+        """
         if "robust_covariance_matrix" in self.parameters:
             return self.parameters["robust_covariance_matrix"]
         cov_dataarray = self.parameters["covariance_matrix"]
@@ -1648,7 +1659,7 @@ class NumbaModel(_BaseModel):
 
         self.add_parameter_array("robust_covariance_matrix", robust_covariance_matrix)
         self.add_parameter_array(
-            "robust_std_err", np.sqrt(np.diagonal(robust_covariance_matrix))
+            "robust_std_err", _safe_sqrt(np.diagonal(robust_covariance_matrix))
         )
         return self.parameters["robust_covariance_matrix"]
 
@@ -2361,6 +2372,26 @@ class NumbaModel(_BaseModel):
         return ()
 
     def calculate_parameter_covariance(self, pvals=None, *, robust=False):
+        """
+        Calculate the parameter covariance matrix.
+
+        Parameters
+        ----------
+        pvals : array-like, optional
+            The parameter values to use in the calculation.  If not
+            given, the current parameter values are used.
+        robust : bool, default False
+            Whether to calculate the robust covariance matrix.
+
+        Returns
+        -------
+        se : array
+            The standard errors of the parameter estimates.
+        hess : array
+            The Hessian matrix.
+        ihess : array
+            The inverse of the Hessian matrix.
+        """
         if pvals is None:
             pvals = self.pvals
         locks = np.asarray(self.pholdfast.astype(bool))
@@ -2375,7 +2406,7 @@ class NumbaModel(_BaseModel):
                 ihess = _arr_inflate(ihess_, locks)
             else:
                 ihess = np.linalg.inv(hess)
-            se = np.sqrt(ihess.diagonal())
+            se = _safe_sqrt(ihess.diagonal())
             self.pstderr = se
         hess = np.asarray(hess).copy()
         hess[locks, :] = 0
@@ -2385,6 +2416,22 @@ class NumbaModel(_BaseModel):
         ihess[:, locks] = 0
         self.add_parameter_array("hess", hess)
         self.add_parameter_array("ihess", ihess)
+
+        overspec = compute_possible_overspecification(hess, self.pholdfast)
+        if overspec:
+            warnings.warn(
+                "Model is possibly over-specified (hessian is nearly singular).",
+                category=PossibleOverspecification,
+                stacklevel=2,
+            )
+            possible_overspecification = []
+            for eigval, ox, eigenvec in overspec:
+                if eigval == "LinAlgError":
+                    possible_overspecification.append((eigval, [ox], [""]))
+                else:
+                    paramset = list(np.asarray(self.pnames)[ox])
+                    possible_overspecification.append((eigval, paramset, eigenvec[ox]))
+            self._possible_overspecification = possible_overspecification
 
         # constrained covariance
         if self.constraints:
@@ -2411,7 +2458,7 @@ class NumbaModel(_BaseModel):
                     if den != 0:
                         s = s - (1 / den) * s @ b.reshape(-1, 1) @ b.reshape(1, -1) @ s
             self.add_parameter_array("covariance_matrix", s)
-            self.pstderr = np.sqrt(s.diagonal())
+            self.pstderr = _safe_sqrt(s.diagonal())
 
             # Fix numerical issues on some constraints, add constrained notes
             if binding_constraints or any(self.pholdfast != 0):
@@ -2472,3 +2519,9 @@ def _arr_inflate(arr, locks):
                     j_ += 1
             i_ += 1
     return z
+
+
+def _safe_sqrt(x):
+    result = np.sqrt(np.clip(x, 0, np.inf))
+    result[x < 0] = np.nan
+    return result

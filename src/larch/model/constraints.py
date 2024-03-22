@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from collections.abc import MutableSequence
 
 import numpy as np
+import pandas as pd
 from numba import float32, float64, njit
 from scipy.optimize import LinearConstraint
 
@@ -375,13 +376,19 @@ class FixedBound(ParametricConstraint):
 
     def _min_fun(self, x):
         if self.minimum is not None:
-            return (x[self.i] - self.minimum) * self.scale
+            if isinstance(x, pd.Series):
+                return (x.iloc[self.i] - self.minimum) * self.scale
+            else:
+                return (x[self.i] - self.minimum) * self.scale
         else:
             return np.inf
 
     def _max_fun(self, x):
         if self.maximum is not None:
-            return (self.maximum - x[self.i]) * self.scale
+            if isinstance(x, pd.Series):
+                return (self.maximum - x.iloc[self.i]) * self.scale
+            else:
+                return (self.maximum - x[self.i]) * self.scale
         else:
             return np.inf
 

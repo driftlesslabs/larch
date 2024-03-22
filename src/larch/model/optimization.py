@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -344,16 +345,14 @@ def maximize_loglike(
                     "trust-constr",
                 ):
                     bounds = model.pbounds
-                    if np.any(np.isinf(model.pf.minimum)) or np.any(
-                        np.isinf(model.pf.maximum)
-                    ):
-                        import warnings
-
-                        warnings.warn(  # infinite bounds # )
+                    if np.any(
+                        (model.pholdfast == 0) & np.isinf(model.pminimum)
+                    ) or np.any((model.pholdfast == 0) & np.isinf(model.pmaximum)):
+                        warnings.warn(  # infinite bounds #  )
                             f"{method} may not play nicely with unbounded parameters\n"
                             "if you get poor results, consider setting global bounds "
                             "with model.set_cap()",
-                            stacklevel=2,
+                            stacklevel=1,
                         )
 
                 try:

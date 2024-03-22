@@ -439,7 +439,7 @@ class ParameterBucket:
     def pnames(self):
         return self._params[self.index_name].to_numpy()
 
-    def get_param_loc(self, name):
+    def get_param_loc(self, name) -> int:
         """
         Get the position of a named parameter.
 
