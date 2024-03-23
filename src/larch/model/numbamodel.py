@@ -2402,10 +2402,16 @@ class NumbaModel(_BaseModel):
             if self.parameters["holdfast"].sum():
                 free = self.pholdfast == 0
                 hess_ = hess[free][:, free]
-                ihess_ = np.linalg.inv(hess_)
+                try:
+                    ihess_ = np.linalg.inv(hess_)
+                except np.linalg.LinAlgError:
+                    ihess_ = np.linalg.pinv(hess_)
                 ihess = _arr_inflate(ihess_, locks)
             else:
-                ihess = np.linalg.inv(hess)
+                try:
+                    ihess = np.linalg.inv(hess)
+                except np.linalg.LinAlgError:
+                    ihess = np.linalg.pinv(hess)
             se = _safe_sqrt(ihess.diagonal())
             self.pstderr = se
         hess = np.asarray(hess).copy()

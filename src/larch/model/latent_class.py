@@ -725,7 +725,7 @@ class MixedLatentClass(LatentClass):
         av = _get_jnp_array(self.dataset, "av")
         ch = _get_jnp_array(self.dataset, "ch")
         n_draws = self._n_draws
-        seed = getattr(self, "seed", 42)
+        seed = self.seed or 42
         if av is not None:
             depth = av.ndim - 1
             shape = av.shape[:-1]
@@ -788,7 +788,7 @@ class MixedLatentClass(LatentClass):
                 draws = self._draws
         if draws is None:
             if engine == "numpy":
-                seed = getattr(self, "seed", 0)
+                seed = self.seed or 0
                 if self.common_draws:
                     if n_draws > 0 and n_mixtures > 0:
                         draws, seed = self._make_random_draws_numpy(
@@ -802,7 +802,7 @@ class MixedLatentClass(LatentClass):
                     else:
                         draws = None
             elif engine == "jax":
-                seed = getattr(self, "seed", 0)
+                seed = self.seed or 0
                 rk = jax.random.PRNGKey(seed)
                 if self.common_draws:
                     if n_draws > 0 and n_mixtures > 0:

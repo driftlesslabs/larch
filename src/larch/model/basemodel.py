@@ -456,7 +456,17 @@ class BaseModel:
         self.unmangle()
         return self._parameter_bucket.set_cap(cap=cap)
 
-    def plock(self, values=None, **kwargs):
+    def plock(self, values=None, **kwargs) -> None:
+        """
+        Lock the values of one or more parameters.
+
+        Parameters
+        ----------
+        values : dict, optional
+            A dictionary of parameter names and values to lock.
+        kwargs : dict
+            The parameters to lock can alternatively be given as keyword arguments.
+        """
         self.unmangle()
         self._parameter_bucket.lock(values, **kwargs)
 

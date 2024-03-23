@@ -488,7 +488,18 @@ class ParameterBucket:
             }
         )
 
-    def lock(self, values=None, **kwargs):
+    def lock(self, values=None, **kwargs) -> None:
+        """
+        Lock the values of one or more parameters.
+
+        Parameters
+        ----------
+        values : dict, optional
+            Dictionary of parameters to lock.  The keys are parameter names
+            and the values are the values to set as locked.
+        kwargs : dict
+            Additional parameters to lock.
+        """
         if values is None:
             values = {}
         values.update(kwargs)
