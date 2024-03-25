@@ -490,9 +490,8 @@ class OMX(_omx_base_class):
             if self.data._v_nchildren > 0:
                 if obj.shape[0] not in self.shape:
                     raise OMXIncompatibleShape(
-                        "this omx has shape {!s} but you want to add a lookup with {!s}".format(
-                            self.shape, obj.shape
-                        )
+                        f"this omx has shape {self.shape!s} "
+                        f"but you want to add a lookup with {obj.shape!s}"
                     )
         if self.data._v_nchildren == 0 and self.shape == (0, 0):
             raise OMXIncompatibleShape(
@@ -1525,7 +1524,7 @@ def convert_omx_parallel(
     return time.time() - start
 
 
-def convert_multiple_omx(
+def _old_convert_multiple_omx(
     glob_pattern,
     complevel=3,
     complib="blosc2:zstd",
@@ -1563,3 +1562,60 @@ def convert_multiple_omx(
             f, new_filename, complevel, complib, dtype_shrink, n_processes
         )
         print(f"\rconverted {f} to {new_filename} in {t:.2f} seconds.")
+
+
+def convert_multiple_omx(
+    glob_pattern,
+    complevel=3,
+    complib="blosc2:zstd",
+    dtype_shrink=32,
+    n_processes=8,
+    out_dir=None,
+) -> float:
+    """
+    Convert multiple OMX files using different data types and filters.
+
+    Parameters
+    ----------
+    glob_pattern : str
+    complevel : int, default 1
+        Compression level.
+    complib : str, default 'blosc2:zstd'
+        Compression library.
+    dtype_shrink : int, default 32
+        The maximum bitwidth to use for integer and float types.
+    n_processes : int, default 4
+        The number of processes to use for parallel conversion.
+    out_dir : str, default None
+        The directory to write the new OMX files to.  If None, the new files
+        will be written to the same directory as the existing files.
+
+    Returns
+    -------
+    float
+        The wall clock time it took to convert all the files, in seconds.
+    """
+    start = time.time()
+    import glob
+    from multiprocessing import Pool
+
+    # start worker processes
+    with Pool(processes=n_processes) as pool:
+        multiple_results = []
+
+        for f in glob.glob(glob_pattern):
+            new_filename = f
+            if out_dir:
+                os.makedirs(out_dir, exist_ok=True)
+                new_filename = os.path.join(out_dir, os.path.basename(f))
+            print(f"converting {f} to {new_filename}...")
+            r = pool.apply_async(
+                convert_omx,
+                (f, new_filename, complevel, complib, dtype_shrink),
+            )
+            multiple_results.append((r, f, new_filename))
+        for res, f, new_filename in multiple_results:
+            t = res.get(timeout=600)
+            print(f"\rconverted {f} to {new_filename} in {t:.2f} seconds.")
+
+    return time.time() - start
