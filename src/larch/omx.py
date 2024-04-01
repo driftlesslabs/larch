@@ -1602,6 +1602,7 @@ def convert_multiple_omx(
     # start worker processes
     with Pool(processes=n_processes) as pool:
         multiple_results = []
+        results_outstanding = 0
 
         for f in glob.glob(glob_pattern):
             new_filename = f
@@ -1614,8 +1615,18 @@ def convert_multiple_omx(
                 (f, new_filename, complevel, complib, dtype_shrink),
             )
             multiple_results.append((r, f, new_filename))
-        for res, f, new_filename in multiple_results:
-            t = res.get(timeout=600)
-            print(f"\rconverted {f} to {new_filename} in {t:.2f} seconds.")
+            results_outstanding += 1
 
-    return time.time() - start
+        while results_outstanding > 0:
+            for i, (res, f, new_filename) in enumerate(multiple_results):
+                if res.ready():
+                    t = res.get(timeout=60)
+                    print(f"\rconverted {f} to {new_filename} in {t:.2f} seconds.")
+                    results_outstanding -= 1
+                    del multiple_results[i]
+                    break
+            time.sleep(1)
+
+    wall_time = time.time() - start
+    print(f"converted all files in {wall_time:.2f} seconds.")
+    return wall_time
