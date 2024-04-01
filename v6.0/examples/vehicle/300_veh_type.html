@@ -1,0 +1,934 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Vehicle Choice Mixed Logit &#8212; v6.0.22.dev17+gc12e0c6</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="icon" sizes="32x32" type="image/png" href="../../_static/_img/larch_favicon.png" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=9d77a3fd" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=c73c0f3e"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=36754332"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/vehicle/300_veh_type';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.2';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/driftlesslabs/larch/docs/docs/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '6.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="icon" href="../../_static/larch_favicon.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="Vehicle Choice Examples" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search these docs..."
+         aria-label="Search these docs..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.22.dev17+gc12e0c6 - Home"/>
+    <script>document.write(`<img src="../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.22.dev17+gc12e0c6 - Home"/>`);</script>
+  
+  
+</a></div>
+    
+      <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../mtc/index.html">MTC Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/001_mnl.html">1: MTC MNL Mode Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/002_motorized.html">2: Income Effect on Motorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/009_ttr_4.html">9: Travel Time Ratio of 4.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/010_auto_per_hh.html">10: Number of Automobiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/017_mnl.html">17: MTC Expanded MNL Mode Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/022_nl.html">22: MTC Motorized and Non-Motorized Nested Mode Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/030_mnl_constrain.html">1: MTC MNL Constrained Mode Choice</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../swissmetro/index.html">Swissmetro Examples</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../swissmetro/101_swissmetro_mnl.html">101: Swissmetro MNL Mode Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../swissmetro/102-swissmetro-weighted.html">102: Swissmetro Weighted MNL Mode Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../swissmetro/109-swissmetro-nl.html">109: Swissmetro Nested Logit Mode Choice</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../exampville/index.html">Exampville Simulator</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../exampville/200_exampville.html">200: Exampville Simulated Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../exampville/201_exville_mode_choice.html">201: Exampville Mode Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../exampville/202_exville_mc_logsums.html">202: Exampville Mode Choice Logsums</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../exampville/203_exville_dest.html">203: Exampville Destination Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../exampville/204_exville_dest_only.html">204: Exampville Destination Choice without Logsums</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Vehicle Choice Examples</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Vehicle Choice Mixed Logit</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Examples</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Vehicle Choice Examples</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Vehicle...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="vehicle-choice-mixed-logit">
+<h1>Vehicle Choice Mixed Logit<a class="headerlink" href="#vehicle-choice-mixed-logit" title="Link to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">larch</span> <span class="k">as</span> <span class="nn">lx</span>
+<span class="kn">from</span> <span class="nn">larch</span> <span class="kn">import</span> <span class="n">PX</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>In this example, we will demonstrate the estimatation of parameters for
+mixed logit models.  The examples are based on a problem set originally published by Ken Train.</p>
+<p>To ensure good preformance and ease of use, estimating parameters for a mixed logit model in Larch requires the <code class="docutils literal notranslate"><span class="pre">jax</span></code> library as the compute engine.  Importing it here allows us to confirm that it is available.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jax</span>  <span class="c1"># noqa: F401</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The data represent consumers’ choices among vehicles in stated preference experiments. The data are from a study that he did for Toyota and GM to assist them in their analysis of the potential marketability of electric and hybrid vehicles, back before hybrids were introduced.</p>
+<p>In each choice experiment, the respondent was presented with three vehicles, with the price and other attributes of each vehicle described. The respondent was asked to state which of the three vehicles he/she would buy if the these vehicles were the only ones available in the market. There are 100 respondents in our dataset (which, to reduce estimation time, is a subset of the full dataset which contains 500 respondents.) Each respondent was presented with 15 choice experiments, and most respondents answered all 15. The attributes of the vehicles were varied over experiments, both for a given respondent and over respondents. The attributes are: price, operating cost in dollars per month, engine type (gas, electric, or hybrid), range if electric (in hundreds of miles between recharging), and the performance level of the vehicle (high, medium, or low). The performance level was described in terms of top speed and acceleration, and these descriptions did not vary for each level; for example, “High” performance was described as having a top speed of 100 mpg and 12 seconds to reach 60 mpg, and this description was the same for all “high” performance vehicles.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">raw_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+    <span class="s2">&quot;data.txt&quot;</span><span class="p">,</span>
+    <span class="n">names</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">&quot;person_id&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;case_id&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;chosen&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;price&quot;</span><span class="p">,</span>  <span class="c1"># dollars</span>
+        <span class="s2">&quot;opcost&quot;</span><span class="p">,</span>  <span class="c1"># dollars per month</span>
+        <span class="s2">&quot;max_range&quot;</span><span class="p">,</span>  <span class="c1"># hundreds of miles (0 if not electric)</span>
+        <span class="s2">&quot;ev&quot;</span><span class="p">,</span>  <span class="c1"># bool</span>
+        <span class="s2">&quot;gas&quot;</span><span class="p">,</span>  <span class="c1"># bool</span>
+        <span class="s2">&quot;hybrid&quot;</span><span class="p">,</span>  <span class="c1"># bool</span>
+        <span class="s2">&quot;hiperf&quot;</span><span class="p">,</span>  <span class="c1"># High performance (bool)</span>
+        <span class="s2">&quot;medhiperf&quot;</span><span class="p">,</span>  <span class="c1"># Medium or high performance (bool)</span>
+    <span class="p">],</span>
+    <span class="n">sep</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">raw_data</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>person_id</th>
+      <th>case_id</th>
+      <th>chosen</th>
+      <th>price</th>
+      <th>opcost</th>
+      <th>max_range</th>
+      <th>ev</th>
+      <th>gas</th>
+      <th>hybrid</th>
+      <th>hiperf</th>
+      <th>medhiperf</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>46763</td>
+      <td>47.43</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>57209</td>
+      <td>27.43</td>
+      <td>1.3</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>87960</td>
+      <td>32.41</td>
+      <td>1.2</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>2</td>
+      <td>1</td>
+      <td>33768</td>
+      <td>4.89</td>
+      <td>1.3</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>2</td>
+      <td>0</td>
+      <td>90336</td>
+      <td>30.19</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>4447</th>
+      <td>100</td>
+      <td>1483</td>
+      <td>0</td>
+      <td>28036</td>
+      <td>14.45</td>
+      <td>1.6</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4448</th>
+      <td>100</td>
+      <td>1483</td>
+      <td>0</td>
+      <td>19360</td>
+      <td>54.76</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4449</th>
+      <td>100</td>
+      <td>1484</td>
+      <td>1</td>
+      <td>24054</td>
+      <td>50.57</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4450</th>
+      <td>100</td>
+      <td>1484</td>
+      <td>0</td>
+      <td>52795</td>
+      <td>21.25</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4451</th>
+      <td>100</td>
+      <td>1484</td>
+      <td>0</td>
+      <td>60705</td>
+      <td>25.41</td>
+      <td>1.4</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>4452 rows × 11 columns</p>
+</div></div></div>
+</div>
+<p>Create <code class="docutils literal notranslate"><span class="pre">alt_id</span></code> values for each row within each group, and set
+the index on case and alternative id’s.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">raw_data</span><span class="p">[</span><span class="s2">&quot;alt_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;case_id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">cumcount</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="n">raw_data</span> <span class="o">=</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;case_id&quot;</span><span class="p">,</span> <span class="s2">&quot;alt_id&quot;</span><span class="p">])</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">construct</span><span class="o">.</span><span class="n">from_idca</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="simple-mnl">
+<h2>Simple MNL<a class="headerlink" href="#simple-mnl" title="Link to this heading">#</a></h2>
+<p>Start with a simple MNL model, using all the variable in the dataset without transformations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simple</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">simple</span><span class="o">.</span><span class="n">utility_ca</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">PX</span><span class="p">(</span><span class="s2">&quot;price&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">PX</span><span class="p">(</span><span class="s2">&quot;opcost&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">PX</span><span class="p">(</span><span class="s2">&quot;max_range&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">PX</span><span class="p">(</span><span class="s2">&quot;ev&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">PX</span><span class="p">(</span><span class="s2">&quot;hybrid&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">PX</span><span class="p">(</span><span class="s2">&quot;hiperf&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">PX</span><span class="p">(</span><span class="s2">&quot;medhiperf&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">simple</span><span class="o">.</span><span class="n">choice_ca_var</span> <span class="o">=</span> <span class="s2">&quot;chosen&quot;</span>
+<span class="n">simple</span><span class="o">.</span><span class="n">maximize_loglike</span><span class="p">(</span><span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ftol&quot;</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">});</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style="font-weight: bold"> </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">Larch Model Dashboard</span><span style="font-weight: bold">                                                                        </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ <span style="color: #008000; text-decoration-color: #008000">optimization complete</span>                                                                        │
+│ Log Likelihood <span style="color: #808000; text-decoration-color: #808000">Current =      -1399.193115 </span><span style="color: #008000; text-decoration-color: #008000">Best =      -1399.193115</span>                          │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━┓ │
+│ ┃<span style="font-weight: bold"> Parameter                      </span>┃<span style="font-weight: bold"> Estimate       </span>┃<span style="font-weight: bold"> Std. Error     </span>┃<span style="font-weight: bold"> t-Stat     </span>┃<span style="font-weight: bold"> Null Val </span>┃ │
+│ ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━┩ │
+│ │ ev                             │ -1.3924349     │  0.27664047    │ -5.033     │  0       │ │
+│ │ hiperf                         │  0.10989307    │  0.083823919   │  1.311     │  0       │ │
+│ │ hybrid                         │  0.35545313    │  0.1218119     │  2.918     │  0       │ │
+│ │ max_range                      │  0.4770666     │  0.17648424    │  2.703     │  0       │ │
+│ │ medhiperf                      │  0.38410904    │  0.085451938   │  4.495     │  0       │ │
+│ │ opcost                         │ -0.012881272   │  0.003530849   │ -3.648     │  0       │ │
+│ │ price                          │ -4.1668857e-05 │  3.3159195e-06 │ -12.57     │  0       │ │
+│ └────────────────────────────────┴────────────────┴────────────────┴────────────┴──────────┘ │
+└──────────────────────────────────────────────────────────────────────────────────────────────┘
+</pre>
+</div></div>
+</div>
+</section>
+<section id="mixture-model">
+<h2>Mixture Model<a class="headerlink" href="#mixture-model" title="Link to this heading">#</a></h2>
+<p>To create a mixed logit model, we can start with a copy of the simple model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mixed</span> <span class="o">=</span> <span class="n">simple</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We assign mixtures to various parameters by providing a list of <code class="docutils literal notranslate"><span class="pre">Mixture</span></code> definitions.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mixed</span><span class="o">.</span><span class="n">mixtures</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">lx</span><span class="o">.</span><span class="n">mixtures</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;s_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;opcost&quot;</span><span class="p">,</span> <span class="s2">&quot;max_range&quot;</span><span class="p">,</span> <span class="s2">&quot;ev&quot;</span><span class="p">,</span> <span class="s2">&quot;hybrid&quot;</span><span class="p">,</span> <span class="s2">&quot;hiperf&quot;</span><span class="p">,</span> <span class="s2">&quot;medhiperf&quot;</span><span class="p">]</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The estimation of the mixed logit parameters sometimes performs
+poorly (i.e. may prematurely call itself converged) if you start
+from the MNL solution, so it can be advantageous to start from
+the null parameters instead.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mixed</span><span class="o">.</span><span class="n">pvals</span> <span class="o">=</span> <span class="s2">&quot;null&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>There are several extra settings that can be manipulated on the
+mixed logit model, including the number of draws and a random seed
+for generating draws.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mixed</span><span class="o">.</span><span class="n">n_draws</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">mixed</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="mi">42</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mixed</span><span class="o">.</span><span class="n">maximize_loglike</span><span class="p">(</span><span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ftol&quot;</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">});</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style="font-weight: bold"> </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">Larch Model Dashboard</span><span style="font-weight: bold">                                                                        </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ <span style="color: #008000; text-decoration-color: #008000">optimization complete</span>                                                                        │
+│ Log Likelihood <span style="color: #808000; text-decoration-color: #808000">Current =      -1385.443726 </span><span style="color: #008000; text-decoration-color: #008000">Best =      -1385.443726</span>                          │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━┓ │
+│ ┃<span style="font-weight: bold"> Parameter                      </span>┃<span style="font-weight: bold"> Estimate       </span>┃<span style="font-weight: bold"> Std. Error     </span>┃<span style="font-weight: bold"> t-Stat     </span>┃<span style="font-weight: bold"> Null Val </span>┃ │
+│ ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━┩ │
+│ │ ev                             │ -3.1177151     │  0.83148754    │ -3.75      │  0       │ │
+│ │ hiperf                         │  0.165218      │  0.1284976     │  1.286     │  0       │ │
+│ │ hybrid                         │  0.54689726    │  0.20127445    │  2.717     │  0       │ │
+│ │ max_range                      │  0.89430261    │  0.33252728    │  2.689     │  0       │ │
+│ │ medhiperf                      │  0.74488772    │  0.21818256    │  3.414     │  0       │ │
+│ │ opcost                         │ -0.022322272   │  0.007213864   │ -3.094     │  0       │ │
+│ │ price                          │ -6.5398736e-05 │  1.0994708e-05 │ -5.948     │  0       │ │
+│ │ s_ev                           │  2.8864638     │  0.7871846     │  3.667     │  0       │ │
+│ │ s_hiperf                       │  0.78239564    │  0.83577925    │  0.9361    │  0       │ │
+│ │ s_hybrid                       │ -1.2123279     │  0.6308105     │ -1.922     │  0       │ │
+│ │ s_max_range                    │ -0.099393171   │  1.0038751     │ -0.09901   │  0       │ │
+│ │ s_medhiperf                    │ -1.5381157     │  0.66211957    │ -2.323     │  0       │ │
+│ │ s_opcost                       │  0.048302295   │  0.021195624   │  2.279     │  0       │ │
+│ └────────────────────────────────┴────────────────┴────────────────┴────────────┴──────────┘ │
+└──────────────────────────────────────────────────────────────────────────────────────────────┘
+</pre>
+</div></div>
+</div>
+</section>
+<section id="panel-data">
+<h2>Panel Data<a class="headerlink" href="#panel-data" title="Link to this heading">#</a></h2>
+<p>In the mixed logit model above, we have ignored the fact that
+we have “panel data”, where multiple observations are made by the
+same decision maker who (presumably) has stable preferences with
+respect to the choice attributes.  We can tell Larch which data
+column represents the panel identifiers in the <code class="docutils literal notranslate"><span class="pre">groupid</span></code> attribute,
+(which we set to <code class="docutils literal notranslate"><span class="pre">&quot;person_id&quot;</span></code>) and then
+use that information to build a significantly better model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">panel</span> <span class="o">=</span> <span class="n">mixed</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">panel</span><span class="o">.</span><span class="n">groupid</span> <span class="o">=</span> <span class="s2">&quot;person_id&quot;</span>
+<span class="n">panel</span><span class="o">.</span><span class="n">maximize_loglike</span><span class="p">(</span><span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ftol&quot;</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">});</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style="font-weight: bold"> </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">Larch Model Dashboard</span><span style="font-weight: bold">                                                                        </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ <span style="color: #008000; text-decoration-color: #008000">optimization complete</span>                                                                        │
+│ Log Likelihood <span style="color: #808000; text-decoration-color: #808000">Current =      -1332.504150 </span><span style="color: #008000; text-decoration-color: #008000">Best =      -1332.504150</span>                          │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━┓ │
+│ ┃<span style="font-weight: bold"> Parameter                      </span>┃<span style="font-weight: bold"> Estimate       </span>┃<span style="font-weight: bold"> Std. Error     </span>┃<span style="font-weight: bold"> t-Stat     </span>┃<span style="font-weight: bold"> Null Val </span>┃ │
+│ ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━┩ │
+│ │ ev                             │ -1.7785687     │  0.35166165    │ -5.058     │  0       │ │
+│ │ hiperf                         │  0.1148238     │  0.10081715    │  1.139     │  0       │ │
+│ │ hybrid                         │  0.48756546    │  0.160574      │  3.036     │  0       │ │
+│ │ max_range                      │  0.60701656    │  0.20874274    │  2.908     │  0       │ │
+│ │ medhiperf                      │  0.49883575    │  0.11225921    │  4.444     │  0       │ │
+│ │ opcost                         │ -0.013746882   │  0.005231482   │ -2.628     │  0       │ │
+│ │ price                          │ -4.9261768e-05 │  3.9152678e-06 │ -12.58     │  0       │ │
+│ │ s_ev                           │  1.2140697     │  0.24251817    │  5.006     │  0       │ │
+│ │ s_hiperf                       │  0.33083413    │  0.18644138    │  1.774     │  0       │ │
+│ │ s_hybrid                       │ -0.83149912    │  0.14161648    │ -5.871     │  0       │ │
+│ │ s_max_range                    │ -0.26726177    │  0.24040172    │ -1.112     │  0       │ │
+│ │ s_medhiperf                    │  0.56524134    │  0.14183465    │  3.985     │  0       │ │
+│ │ s_opcost                       │  0.033009232   │  0.0051474194  │  6.413     │  0       │ │
+│ └────────────────────────────────┴────────────────┴────────────────┴────────────┴──────────┘ │
+└──────────────────────────────────────────────────────────────────────────────────────────────┘
+</pre>
+</div></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Vehicle Choice Examples</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simple-mnl">Simple MNL</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mixture-model">Mixture Model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#panel-data">Panel Data</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/examples/vehicle/300_veh_type.ipynb">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item"><!-- This will display the version of the docs -->
+<p class="larch-version">🌳 Larch v6.0.22.dev17+gc12e0c6, © Copyright 2024.</p></div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -13,4 +13,5 @@ datatree
 model
 linear
 nesting
+mixtures
 ```
