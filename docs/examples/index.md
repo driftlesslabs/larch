@@ -6,4 +6,5 @@
 mtc/index
 swissmetro/index
 exampville/index
+vehicle/index
 ```
