@@ -2,12 +2,13 @@
 Mixtures
 ===========
 
-.. currentmodule:: larch
+.. currentmodule:: larch.model.mixtures
 
 
 .. autosummary::
     :toctree: generated/
 
-    mixtures.Normal
-    mixtures.LogNormal
-    mixtures.NegLogNormal
+    Mixture
+    Normal
+    LogNormal
+    NegLogNormal

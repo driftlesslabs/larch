@@ -1,15 +1,24 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from collections.abc import MutableSequence
 
 from .._optional import jax, jnp, js
 from .param_core import ParameterBucket
 
 
-class Mixture:
+class Mixture(ABC):
+    """
+    A mixing distribution for a model parameter.
+
+    This is an abstract base class. Subclasses must implement the `param_names`,
+    `prep`, `roll`, and `to_dict` methods.
+    """
+
     def __init__(self):
         self._parent = None
 
+    @abstractmethod
     def param_names(self):
         """
         Named parameters referenced by this mixture, and their default values.
@@ -20,9 +29,11 @@ class Mixture:
         """
         raise NotImplementedError()
 
+    @abstractmethod
     def prep(self, bucket: ParameterBucket):
         raise NotImplementedError()
 
+    @abstractmethod
     def roll(self, draws: jax.Array, parameters: jax.Array) -> jax.Array:
         """
         Apply this mixing distribution to some random draws.
@@ -43,6 +54,7 @@ class Mixture:
         """
         raise NotImplementedError()
 
+    @abstractmethod
     def to_dict(self):
         raise NotImplementedError()
 
@@ -156,6 +168,8 @@ class MixtureList(MutableSequence):
 
 
 class Normal(Mixture):
+    """A normal distribution applied to a model parameter."""
+
     def __init__(self, mean: str, std: str):
         super().__init__()
         self.mean_ = mean
@@ -203,6 +217,14 @@ class Normal(Mixture):
 
 
 class LogNormal(Normal):
+    """
+    A log-normal distribution applied to a model parameter.
+
+    The "mean" and "std" parameters are the mean and standard deviation of the
+    underlying normal distribution, not the mean and standard deviation of the
+    log-normal distribution.
+    """
+
     def roll(self, draw_vec, parameters):
         assert self.imean >= 0
         assert self.istd >= 0
@@ -214,6 +236,18 @@ class LogNormal(Normal):
 
 
 class NegLogNormal(Normal):
+    """
+    The negative of a log-normal distribution applied to a model parameter.
+
+    This is convenient when it is desired to ensure the parameter must be
+    negative, as expected for coefficients associated with travel time or travel
+    costs.
+
+    The "mean" and "std" parameters are the mean and standard deviation of the
+    underlying normal distribution, not the mean and standard deviation of the
+    log-normal distribution.
+    """
+
     def roll(self, draw_vec, parameters):
         assert self.imean >= 0
         assert self.istd >= 0

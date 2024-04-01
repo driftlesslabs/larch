@@ -64,7 +64,7 @@ Parameters
     :toctree: generated/
 
     Model.pf
-`   Model.pvals
+    Model.pvals
     Model.pnames
     Model.pholdfast
     Model.pnullvals
@@ -72,6 +72,7 @@ Parameters
     Model.pminimum
     Model.pbounds
     Model.pstderr
+    Model.mixtures
 
 Estimation Results
 ------------------
