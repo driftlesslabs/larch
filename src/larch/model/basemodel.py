@@ -17,6 +17,7 @@ import logging
 import pathlib
 import uuid
 import warnings
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
@@ -32,6 +33,9 @@ from .mixtures import MixtureList
 from .param_core import ParameterBucket
 from .single_parameter import SingleParameter
 from .tree import NestingTree
+
+if TYPE_CHECKING:
+    from scipy.optimize import Bounds
 
 logger = logging.getLogger("larch.model")
 
@@ -363,17 +367,38 @@ class BaseModel:
         return self._parameter_bucket.n_params
 
     @property
-    def pvals(self):
+    def pvals(self) -> np.ndarray[np.float64]:
+        """An array of the current parameter values.
+
+        This property is a getter/setter for the current parameter values.  The
+        array is a copy of the current parameter values, and setting the array
+        with a given array (which must be a vector with length equal to the
+        number of parameters in the model) will update the parameter values in
+        the model.
+
+        Values can also be set here using a dictionary of parameter names and
+        values. A warning will be given if any key of the dictionary is not
+        found among the existing named parameters in the parameter frame, and
+        the value associated with that key is ignored.  Any parameters not
+        named by a key in this dictionary are not changed.
+
+        Setting this property also permits the use of shorthand (string) values,
+        including "null", "init", and "best" to set the parameter values to the
+        null, initial, or best values, respectively, as given in the parameter
+        frame.  If the parameter frame does not have these columns, a ValueError
+        exception will be raised.
+        """
         self.unmangle()
         return self._parameter_bucket.pvals
 
     @pvals.setter
-    def pvals(self, x):
+    def pvals(self, x: np.ndarray[np.float64] | dict[str, float] | str):
         self.unmangle()
         self._parameter_bucket.pvals = x
 
     @property
-    def pnames(self):
+    def pnames(self) -> np.ndarray[np.str_]:
+        """An array of the current parameter names."""
         self.unmangle()
         return self._parameter_bucket.pnames
 
@@ -393,7 +418,8 @@ class BaseModel:
         self._parameter_bucket.pholdfast = x
 
     @property
-    def pnullvals(self):
+    def pnullvals(self) -> np.ndarray[np.float64]:
+        """An array of the current parameter null values."""
         self.unmangle()
         return self._parameter_bucket.pnullvals
 
@@ -403,7 +429,12 @@ class BaseModel:
         self._parameter_bucket.pnullvals = x
 
     @property
-    def pmaximum(self):
+    def pmaximum(self) -> np.ndarray[np.float64]:
+        """An array of the current parameter maximum values.
+
+        The maximum values are used to set the upper bounds of the parameters
+        during estimation by the likelihood maximization algorithm.
+        """
         self.unmangle()
         return self._parameter_bucket.pmaximum
 
@@ -413,7 +444,12 @@ class BaseModel:
         self._parameter_bucket.pmaximum = x
 
     @property
-    def pminimum(self):
+    def pminimum(self) -> np.ndarray[np.float64]:
+        """An array of the current parameter minimum values.
+
+        The minimum values are used to set the lower bounds of the parameters
+        during estimation by the likelihood maximization algorithm.
+        """
         self.unmangle()
         return self._parameter_bucket.pminimum
 
@@ -423,7 +459,7 @@ class BaseModel:
         self._parameter_bucket.pminimum = x
 
     @property
-    def pbounds(self):
+    def pbounds(self) -> Bounds:
         """scipy.optimize.Bounds : A copy of the current min-max bounds of the parameters."""
         self.unmangle()
         from scipy.optimize import Bounds
@@ -434,7 +470,8 @@ class BaseModel:
         )
 
     @property
-    def pstderr(self):
+    def pstderr(self) -> np.ndarray[np.float64]:
+        """An array of the current parameter standard errors."""
         self.unmangle()
         return self._parameter_bucket.pstderr
 
@@ -518,7 +555,15 @@ class BaseModel:
                 raise
 
     @property
-    def pf(self):
+    def pf(self) -> pd.DataFrame:
+        """
+        pd.DataFrame: A DataFrame of the model parameters.
+
+        The DataFrame has (potentially) columns for the parameter values, the
+        best values, the initial values, the minimum and maximum values, and the
+        null values.  If any of these are not present (i.e. because they have
+        not been created yet), they are not included.
+        """
         self.unmangle()
         cols = ["value", "best", "initvalue", "minimum", "maximum", "nullvalue"]
         cols = [i for i in cols if i in self._parameter_bucket._params]
