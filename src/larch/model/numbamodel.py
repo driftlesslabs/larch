@@ -4,6 +4,7 @@ import logging
 import pathlib
 import warnings
 from collections import namedtuple
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -26,14 +27,15 @@ from ..util.simple_attribute import SimpleAttribute
 from .basemodel import BaseModel as _BaseModel
 from .numba_stream import ModelStreamer
 
-warnings.warn(  ## Good news, everyone! ##  )
-    "\n\n"
-    "#### larch v6 is experimental, and not feature-complete ####\n"
-    "the first time you import on a new system, this package will\n"
-    "compile optimized binaries for your specific machine,  which\n"
-    "may take a little while, please be patient ...\n",
-    stacklevel=1,
-)
+if not list(Path(__file__).parent.glob("__pycache__/numbamodel.*.nbc")):
+    warnings.warn(  ## Good news, everyone! ##  )
+        "\n\n"
+        "#### larch v6 is experimental, and not feature-complete ####\n"
+        "the first time you import on a new system, this package will\n"
+        "compile optimized binaries for your specific machine,  which\n"
+        "may take a little while, please be patient ...\n",
+        stacklevel=1,
+    )
 
 logger = logging.getLogger(__package__)
 
