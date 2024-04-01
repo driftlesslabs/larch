@@ -2082,6 +2082,7 @@ class NumbaModel(_BaseModel):
             "quantity_ca",
             "quantity_scale",
             "rename_parameters",
+            "seed",
             "title",
             "utility_ca",
             "utility_co",
