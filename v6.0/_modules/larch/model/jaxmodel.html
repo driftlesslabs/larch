@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>larch.model.jaxmodel &#8212; v6.0.21</title>
+    <title>larch.model.jaxmodel &#8212; v6.0.22.dev9+g3b1d410</title>
   
   
   
@@ -139,8 +139,8 @@
       
     
     
-    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.21 - Home"/>
-    <script>document.write(`<img src="../../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.21 - Home"/>`);</script>
+    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.22.dev9+g3b1d410 - Home"/>
+    <script>document.write(`<img src="../../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.22.dev9+g3b1d410 - Home"/>`);</script>
   
   
 </a></div>
@@ -656,7 +656,7 @@ document.write(`
                 <span class="n">draws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draws</span>
         <span class="k">if</span> <span class="n">draws</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;numpy&quot;</span><span class="p">:</span>
-                <span class="n">seed</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="ow">or</span> <span class="mi">0</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">common_draws</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">n_draws</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n_mixtures</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="n">draws</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_random_draws_numpy</span><span class="p">(</span>
@@ -670,7 +670,7 @@ document.write(`
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">draws</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">elif</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;jax&quot;</span><span class="p">:</span>
-                <span class="n">seed</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="ow">or</span> <span class="mi">0</span>
                 <span class="n">rk</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">common_draws</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">n_draws</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n_mixtures</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -1182,7 +1182,7 @@ document.write(`
         <span class="n">av</span> <span class="o">=</span> <span class="n">_as_jnp_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_arrays</span><span class="o">.</span><span class="n">av</span><span class="p">)</span>
         <span class="n">ch</span> <span class="o">=</span> <span class="n">_as_jnp_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_arrays</span><span class="o">.</span><span class="n">ch</span><span class="p">)</span>
         <span class="n">n_draws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_draws</span>
-        <span class="n">seed</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="mi">42</span><span class="p">)</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="ow">or</span> <span class="mi">42</span>
         <span class="k">if</span> <span class="n">av</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">depth</span> <span class="o">=</span> <span class="n">av</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="n">shape</span> <span class="o">=</span> <span class="n">av</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -1277,7 +1277,7 @@ document.write(`
         <span class="n">av</span> <span class="o">=</span> <span class="n">_as_jnp_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_arrays</span><span class="o">.</span><span class="n">av</span><span class="p">)</span>
         <span class="n">ch</span> <span class="o">=</span> <span class="n">_as_jnp_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_arrays</span><span class="o">.</span><span class="n">ch</span><span class="p">)</span>
         <span class="n">n_draws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_draws</span>
-        <span class="n">seed</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="mi">42</span><span class="p">)</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="ow">or</span> <span class="mi">42</span>
         <span class="k">if</span> <span class="n">av</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">depth</span> <span class="o">=</span> <span class="n">av</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="n">shape</span> <span class="o">=</span> <span class="n">av</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -1544,7 +1544,7 @@ document.write(`
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-<p class="larch-version">🌳 Larch v6.0.21, © Copyright 2024.</p></div>
+<p class="larch-version">🌳 Larch v6.0.22.dev9+g3b1d410, © Copyright 2024.</p></div>
       
     </div>
   
