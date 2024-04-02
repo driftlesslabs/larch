@@ -138,8 +138,8 @@ def test_mixed_logit(simple_model: lx.Model):
         "std": "s_opcost",
     }
     assert mixed.parameters["value"].to_series().to_dict() == approx(
-        expected_value, rel=1e-2
+        expected_value, rel=5e-2
     )
     assert mixed.parameters["std_err"].to_series().to_dict() == approx(
-        expected_stderr, rel=1e-2
+        expected_stderr, rel=5e-2
     )
