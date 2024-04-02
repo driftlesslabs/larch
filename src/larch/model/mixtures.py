@@ -256,3 +256,52 @@ class NegLogNormal(Normal):
         )
         parameters = parameters.at[..., self.imean].set(-jnp.exp(v))
         return parameters
+
+
+class Uniform(Mixture):
+    """A uniform distribution applied to a model parameter."""
+
+    def __init__(self, low: str, high: str):
+        super().__init__()
+        self.low_ = low
+        self.high_ = high
+        self.ilow = -1
+        self.ihigh = -1
+        self.default_low = 0.0
+        self.default_high = 1.0
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.low_!r}, {self.high_!r})"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, Uniform)
+            and self.low_ == other.low_
+            and self.high_ == other.high_
+        )
+
+    def param_names(self):
+        return {
+            self.low_: self.default_low,
+            self.high_: self.default_high,
+        }
+
+    def prep(self, bucket: ParameterBucket):
+        self.ilow = bucket.get_param_loc(self.low_)
+        self.ihigh = bucket.get_param_loc(self.high_)
+
+    def roll(self, draw_vec, parameters):
+        assert self.ilow >= 0
+        assert self.ihigh >= 0
+        spread = draw_vec * (parameters[..., self.ihigh] - parameters[..., self.ilow])
+        parameters = parameters.at[..., self.ilow].set(
+            parameters[..., self.ilow] + spread
+        )
+        return parameters
+
+    def to_dict(self):
+        return dict(
+            type=self.__class__.__name__,
+            low=self.low_,
+            high=self.high_,
+        )
