@@ -20,6 +20,7 @@ mamba create -p ../.env/DOCBUILD "python=3.11" \
   pyarrow \
   rich \
   scipy \
+  seaborn \
   sharrow \
   sparse \
   xarray \

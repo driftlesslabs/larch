@@ -1144,3 +1144,37 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             index=self.pnames,
         )
         return result.loc[nonzero_variance].copy()
+
+    def mixture_density(
+        self, param_name: str, limits: tuple[float] | None = (0.01, 0.99), **sns_theme
+    ):
+        """
+        Create a density plot of a mixture parameter.
+
+        This method requires the seaborn package to be installed.
+
+        Parameters
+        ----------
+        param_name : str
+            The name of the parameter to plot.
+        limits : tuple[float], optional
+            The quantiles to use as the limits of the density plot.
+            If None, the limits are not set.
+
+        Returns
+        -------
+        matplotlib.Axes
+        """
+        import seaborn as sns
+
+        sns.set_theme(**sns_theme)
+        i = self.get_param_loc(param_name)
+        random_params = self.jax_random_params(self.pvals)[..., i].flatten()
+        if limits is not None:
+            q01 = jnp.quantile(random_params, limits[0])
+            q99 = jnp.quantile(random_params, limits[1])
+        else:
+            q01 = q99 = None
+        result = sns.kdeplot(random_params, cut=0, clip=(q01, q99))
+        result.set_xlabel(param_name)
+        return result
