@@ -129,6 +129,7 @@ Reporting
 
     Model.parameter_summary
     Model.estimation_statistics
+    Model.mixture_summary
     Model.to_xlsx
 
 

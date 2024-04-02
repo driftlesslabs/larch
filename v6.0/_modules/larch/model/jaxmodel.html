@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>larch.model.jaxmodel &#8212; v6.0.22.dev17+gc12e0c6</title>
+    <title>larch.model.jaxmodel &#8212; v6.0.22.dev21+g3f0eaf8</title>
   
   
   
@@ -139,8 +139,8 @@
       
     
     
-    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.22.dev17+gc12e0c6 - Home"/>
-    <script>document.write(`<img src="../../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.22.dev17+gc12e0c6 - Home"/>`);</script>
+    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.22.dev21+g3f0eaf8 - Home"/>
+    <script>document.write(`<img src="../../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.22.dev21+g3f0eaf8 - Home"/>`);</script>
   
   
 </a></div>
@@ -1502,7 +1502,87 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">check_random_draws</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cached_loglike_null</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jax_loglike</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pnullvals</span><span class="p">))</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_loglike_null</span></div>
-</div>
+
+
+<div class="viewcode-block" id="Model.mixture_summary">
+<a class="viewcode-back" href="../../../api/generated/larch.Model.mixture_summary.html#larch.Model.mixture_summary">[docs]</a>
+    <span class="k">def</span> <span class="nf">mixture_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a summary of the mixture parameters as a pandas DataFrame.</span>
+
+<span class="sd">        For parameters with random distributions, this summarizes</span>
+<span class="sd">        the distribution of the parameters.  The summary includes</span>
+<span class="sd">        the mean, standard deviation, and quartiles of the parameters,</span>
+<span class="sd">        as well as the share of positive, negative, and zero values.</span>
+
+<span class="sd">        The summary is computed statistically from the random draws,</span>
+<span class="sd">        not analytically from the parameter values, and so may be</span>
+<span class="sd">        slightly off from the &quot;true&quot; values if the number of draws</span>
+<span class="sd">        is too small (but the estimation results will also be impacted</span>
+<span class="sd">        in this case).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">random_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jax_random_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pvals</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">random_params</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">means</span> <span class="o">=</span> <span class="n">random_params</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">stds</span> <span class="o">=</span> <span class="n">random_params</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">mins</span> <span class="o">=</span> <span class="n">random_params</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">maxs</span> <span class="o">=</span> <span class="n">random_params</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">positive</span> <span class="o">=</span> <span class="p">(</span><span class="n">random_params</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">negative</span> <span class="o">=</span> <span class="p">(</span><span class="n">random_params</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">zero</span> <span class="o">=</span> <span class="p">(</span><span class="n">random_params</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">q25</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">random_params</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">q50</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">random_params</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">q75</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">random_params</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">nonzero_variance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">((</span><span class="n">maxs</span> <span class="o">-</span> <span class="n">mins</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">means</span><span class="p">,</span>
+                <span class="s2">&quot;std&quot;</span><span class="p">:</span> <span class="n">stds</span><span class="p">,</span>
+                <span class="s2">&quot;share +&quot;</span><span class="p">:</span> <span class="n">positive</span><span class="p">,</span>
+                <span class="s2">&quot;share -&quot;</span><span class="p">:</span> <span class="n">negative</span><span class="p">,</span>
+                <span class="s2">&quot;share ø&quot;</span><span class="p">:</span> <span class="n">zero</span><span class="p">,</span>
+                <span class="s2">&quot;q25&quot;</span><span class="p">:</span> <span class="n">q25</span><span class="p">,</span>
+                <span class="s2">&quot;median&quot;</span><span class="p">:</span> <span class="n">q50</span><span class="p">,</span>
+                <span class="s2">&quot;q75&quot;</span><span class="p">:</span> <span class="n">q75</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pnames</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">nonzero_variance</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">mixture_density</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">param_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">limits</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">),</span> <span class="o">**</span><span class="n">sns_theme</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a density plot of a mixture parameter.</span>
+
+<span class="sd">        This method requires the seaborn package to be installed.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        param_name : str</span>
+<span class="sd">            The name of the parameter to plot.</span>
+<span class="sd">        limits : tuple[float], optional</span>
+<span class="sd">            The quantiles to use as the limits of the density plot.</span>
+<span class="sd">            If None, the limits are not set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        matplotlib.Axes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+        <span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="o">**</span><span class="n">sns_theme</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_param_loc</span><span class="p">(</span><span class="n">param_name</span><span class="p">)</span>
+        <span class="n">random_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jax_random_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pvals</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">limits</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">q01</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">random_params</span><span class="p">,</span> <span class="n">limits</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">q99</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">random_params</span><span class="p">,</span> <span class="n">limits</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">q01</span> <span class="o">=</span> <span class="n">q99</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">random_params</span><span class="p">,</span> <span class="n">cut</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="p">(</span><span class="n">q01</span><span class="p">,</span> <span class="n">q99</span><span class="p">))</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">param_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
 
 </pre></div>
 
@@ -1544,7 +1624,7 @@ document.write(`
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-<p class="larch-version">🌳 Larch v6.0.22.dev17+gc12e0c6, © Copyright 2024.</p></div>
+<p class="larch-version">🌳 Larch v6.0.22.dev21+g3f0eaf8, © Copyright 2024.</p></div>
       
     </div>
   

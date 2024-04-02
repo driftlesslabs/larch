@@ -56,6 +56,8 @@
       ~Model.make_random_draws
       ~Model.mangle
       ~Model.maximize_loglike
+      ~Model.mixture_density
+      ~Model.mixture_summary
       ~Model.neg_d_loglike
       ~Model.neg_loglike
       ~Model.parameter_summary

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Vehicle Choice Mixed Logit &#8212; v6.0.22.dev17+gc12e0c6</title>
+    <title>Vehicle Choice Mixed Logit &#8212; v6.0.22.dev21+g3f0eaf8</title>
   
   
   
@@ -141,8 +141,8 @@
       
     
     
-    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.22.dev17+gc12e0c6 - Home"/>
-    <script>document.write(`<img src="../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.22.dev17+gc12e0c6 - Home"/>`);</script>
+    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.22.dev21+g3f0eaf8 - Home"/>
+    <script>document.write(`<img src="../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.22.dev21+g3f0eaf8 - Home"/>`);</script>
   
   
 </a></div>
@@ -667,6 +667,8 @@ the index on case and alternative id’s.</p>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">raw_data</span><span class="p">[</span><span class="s2">&quot;alt_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;case_id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">cumcount</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
 <span class="n">raw_data</span> <span class="o">=</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;case_id&quot;</span><span class="p">,</span> <span class="s2">&quot;alt_id&quot;</span><span class="p">])</span>
+<span class="n">raw_data</span><span class="p">[</span><span class="s2">&quot;price_scaled&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="s2">&quot;price&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10000</span>
+<span class="n">raw_data</span><span class="p">[</span><span class="s2">&quot;opcost_scaled&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="s2">&quot;opcost&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">construct</span><span class="o">.</span><span class="n">from_idca</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -679,8 +681,8 @@ the index on case and alternative id’s.</p>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simple</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="n">simple</span><span class="o">.</span><span class="n">utility_ca</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">PX</span><span class="p">(</span><span class="s2">&quot;price&quot;</span><span class="p">)</span>
-    <span class="o">+</span> <span class="n">PX</span><span class="p">(</span><span class="s2">&quot;opcost&quot;</span><span class="p">)</span>
+    <span class="n">PX</span><span class="p">(</span><span class="s2">&quot;price_scaled&quot;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="n">PX</span><span class="p">(</span><span class="s2">&quot;opcost_scaled&quot;</span><span class="p">)</span>
     <span class="o">+</span> <span class="n">PX</span><span class="p">(</span><span class="s2">&quot;max_range&quot;</span><span class="p">)</span>
     <span class="o">+</span> <span class="n">PX</span><span class="p">(</span><span class="s2">&quot;ev&quot;</span><span class="p">)</span>
     <span class="o">+</span> <span class="n">PX</span><span class="p">(</span><span class="s2">&quot;hybrid&quot;</span><span class="p">)</span>
@@ -701,13 +703,13 @@ the index on case and alternative id’s.</p>
 │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━┓ │
 │ ┃<span style="font-weight: bold"> Parameter                      </span>┃<span style="font-weight: bold"> Estimate       </span>┃<span style="font-weight: bold"> Std. Error     </span>┃<span style="font-weight: bold"> t-Stat     </span>┃<span style="font-weight: bold"> Null Val </span>┃ │
 │ ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━┩ │
-│ │ ev                             │ -1.3924349     │  0.27664047    │ -5.033     │  0       │ │
-│ │ hiperf                         │  0.10989307    │  0.083823919   │  1.311     │  0       │ │
-│ │ hybrid                         │  0.35545313    │  0.1218119     │  2.918     │  0       │ │
-│ │ max_range                      │  0.4770666     │  0.17648424    │  2.703     │  0       │ │
-│ │ medhiperf                      │  0.38410904    │  0.085451938   │  4.495     │  0       │ │
-│ │ opcost                         │ -0.012881272   │  0.003530849   │ -3.648     │  0       │ │
-│ │ price                          │ -4.1668857e-05 │  3.3159195e-06 │ -12.57     │  0       │ │
+│ │ ev                             │ -1.3941457     │  0.27667809    │ -5.039     │  0       │ │
+│ │ hiperf                         │  0.10999294    │  0.083826654   │  1.312     │  0       │ │
+│ │ hybrid                         │  0.35535701    │  0.12181664    │  2.917     │  0       │ │
+│ │ max_range                      │  0.47840485    │  0.17650166    │  2.71      │  0       │ │
+│ │ medhiperf                      │  0.38431996    │  0.085456528   │  4.497     │  0       │ │
+│ │ opcost_scaled                  │ -0.12876957    │  0.035309706   │ -3.647     │  0       │ │
+│ │ price_scaled                   │ -0.4168321     │  0.033163231   │ -12.57     │  0       │ │
 │ └────────────────────────────────┴────────────────┴────────────────┴────────────┴──────────┘ │
 └──────────────────────────────────────────────────────────────────────────────────────────────┘
 </pre>
@@ -729,7 +731,7 @@ the index on case and alternative id’s.</p>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mixed</span><span class="o">.</span><span class="n">mixtures</span> <span class="o">=</span> <span class="p">[</span>
     <span class="n">lx</span><span class="o">.</span><span class="n">mixtures</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;s_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;opcost&quot;</span><span class="p">,</span> <span class="s2">&quot;max_range&quot;</span><span class="p">,</span> <span class="s2">&quot;ev&quot;</span><span class="p">,</span> <span class="s2">&quot;hybrid&quot;</span><span class="p">,</span> <span class="s2">&quot;hiperf&quot;</span><span class="p">,</span> <span class="s2">&quot;medhiperf&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;opcost_scaled&quot;</span><span class="p">,</span> <span class="s2">&quot;max_range&quot;</span><span class="p">,</span> <span class="s2">&quot;ev&quot;</span><span class="p">,</span> <span class="s2">&quot;hybrid&quot;</span><span class="p">,</span> <span class="s2">&quot;hiperf&quot;</span><span class="p">,</span> <span class="s2">&quot;medhiperf&quot;</span><span class="p">]</span>
 <span class="p">]</span>
 </pre></div>
 </div>
@@ -768,23 +770,23 @@ for generating draws.</p>
 ┃<span style="font-weight: bold"> </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">Larch Model Dashboard</span><span style="font-weight: bold">                                                                        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
 │ <span style="color: #008000; text-decoration-color: #008000">optimization complete</span>                                                                        │
-│ Log Likelihood <span style="color: #808000; text-decoration-color: #808000">Current =      -1385.443726 </span><span style="color: #008000; text-decoration-color: #008000">Best =      -1385.443726</span>                          │
+│ Log Likelihood <span style="color: #808000; text-decoration-color: #808000">Current =      -1385.494385 </span><span style="color: #008000; text-decoration-color: #008000">Best =      -1385.494385</span>                          │
 │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━┓ │
 │ ┃<span style="font-weight: bold"> Parameter                      </span>┃<span style="font-weight: bold"> Estimate       </span>┃<span style="font-weight: bold"> Std. Error     </span>┃<span style="font-weight: bold"> t-Stat     </span>┃<span style="font-weight: bold"> Null Val </span>┃ │
 │ ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━┩ │
-│ │ ev                             │ -3.1177151     │  0.83148754    │ -3.75      │  0       │ │
-│ │ hiperf                         │  0.165218      │  0.1284976     │  1.286     │  0       │ │
-│ │ hybrid                         │  0.54689726    │  0.20127445    │  2.717     │  0       │ │
-│ │ max_range                      │  0.89430261    │  0.33252728    │  2.689     │  0       │ │
-│ │ medhiperf                      │  0.74488772    │  0.21818256    │  3.414     │  0       │ │
-│ │ opcost                         │ -0.022322272   │  0.007213864   │ -3.094     │  0       │ │
-│ │ price                          │ -6.5398736e-05 │  1.0994708e-05 │ -5.948     │  0       │ │
-│ │ s_ev                           │  2.8864638     │  0.7871846     │  3.667     │  0       │ │
-│ │ s_hiperf                       │  0.78239564    │  0.83577925    │  0.9361    │  0       │ │
-│ │ s_hybrid                       │ -1.2123279     │  0.6308105     │ -1.922     │  0       │ │
-│ │ s_max_range                    │ -0.099393171   │  1.0038751     │ -0.09901   │  0       │ │
-│ │ s_medhiperf                    │ -1.5381157     │  0.66211957    │ -2.323     │  0       │ │
-│ │ s_opcost                       │  0.048302295   │  0.021195624   │  2.279     │  0       │ │
+│ │ ev                             │ -3.0322506     │  0.7801218     │ -3.887     │  0       │ │
+│ │ hiperf                         │  0.17637113    │  0.12484043    │  1.413     │  0       │ │
+│ │ hybrid                         │  0.54619954    │  0.19360508    │  2.821     │  0       │ │
+│ │ max_range                      │  0.88870054    │  0.32432312    │  2.74      │  0       │ │
+│ │ medhiperf                      │  0.73252344    │  0.20886621    │  3.507     │  0       │ │
+│ │ opcost_scaled                  │ -0.21988615    │  0.071590096   │ -3.071     │  0       │ │
+│ │ price_scaled                   │ -0.64785463    │  0.10207462    │ -6.347     │  0       │ │
+│ │ s_ev                           │ -2.8045244     │  0.75729358    │ -3.703     │  0       │ │
+│ │ s_hiperf                       │ -0.52182169    │  0.87339067    │ -0.5975    │  0       │ │
+│ │ s_hybrid                       │  1.1432632     │  0.66008461    │  1.732     │  0       │ │
+│ │ s_max_range                    │ -0.13063325    │  0.99431258    │ -0.1314    │  0       │ │
+│ │ s_medhiperf                    │  1.5746654     │  0.61265993    │  2.57      │  0       │ │
+│ │ s_opcost_scaled                │  0.52047976    │  0.18554579    │  2.805     │  0       │ │
 │ └────────────────────────────────┴────────────────┴────────────────┴────────────┴──────────┘ │
 └──────────────────────────────────────────────────────────────────────────────────────────────┘
 </pre>
@@ -813,27 +815,304 @@ use that information to build a significantly better model.</p>
 ┃<span style="font-weight: bold"> </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">Larch Model Dashboard</span><span style="font-weight: bold">                                                                        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
 │ <span style="color: #008000; text-decoration-color: #008000">optimization complete</span>                                                                        │
-│ Log Likelihood <span style="color: #808000; text-decoration-color: #808000">Current =      -1332.504150 </span><span style="color: #008000; text-decoration-color: #008000">Best =      -1332.504150</span>                          │
+│ Log Likelihood <span style="color: #808000; text-decoration-color: #808000">Current =      -1330.442993 </span><span style="color: #008000; text-decoration-color: #008000">Best =      -1330.442993</span>                          │
 │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━┓ │
 │ ┃<span style="font-weight: bold"> Parameter                      </span>┃<span style="font-weight: bold"> Estimate       </span>┃<span style="font-weight: bold"> Std. Error     </span>┃<span style="font-weight: bold"> t-Stat     </span>┃<span style="font-weight: bold"> Null Val </span>┃ │
 │ ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━┩ │
-│ │ ev                             │ -1.7785687     │  0.35166165    │ -5.058     │  0       │ │
-│ │ hiperf                         │  0.1148238     │  0.10081715    │  1.139     │  0       │ │
-│ │ hybrid                         │  0.48756546    │  0.160574      │  3.036     │  0       │ │
-│ │ max_range                      │  0.60701656    │  0.20874274    │  2.908     │  0       │ │
-│ │ medhiperf                      │  0.49883575    │  0.11225921    │  4.444     │  0       │ │
-│ │ opcost                         │ -0.013746882   │  0.005231482   │ -2.628     │  0       │ │
-│ │ price                          │ -4.9261768e-05 │  3.9152678e-06 │ -12.58     │  0       │ │
-│ │ s_ev                           │  1.2140697     │  0.24251817    │  5.006     │  0       │ │
-│ │ s_hiperf                       │  0.33083413    │  0.18644138    │  1.774     │  0       │ │
-│ │ s_hybrid                       │ -0.83149912    │  0.14161648    │ -5.871     │  0       │ │
-│ │ s_max_range                    │ -0.26726177    │  0.24040172    │ -1.112     │  0       │ │
-│ │ s_medhiperf                    │  0.56524134    │  0.14183465    │  3.985     │  0       │ │
-│ │ s_opcost                       │  0.033009232   │  0.0051474194  │  6.413     │  0       │ │
+│ │ ev                             │ -1.7050113     │  0.3432321     │ -4.968     │  0       │ │
+│ │ hiperf                         │  0.091742458   │  0.10427189    │  0.8798    │  0       │ │
+│ │ hybrid                         │  0.46835125    │  0.16412839    │  2.854     │  0       │ │
+│ │ max_range                      │  0.46332386    │  0.22783878    │  2.034     │  0       │ │
+│ │ medhiperf                      │  0.50916921    │  0.11355063    │  4.484     │  0       │ │
+│ │ opcost_scaled                  │ -0.13902397    │  0.052866723   │ -2.63      │  0       │ │
+│ │ price_scaled                   │ -0.50152996    │  0.03968304    │ -12.64     │  0       │ │
+│ │ s_ev                           │ -0.92263968    │  0.22150198    │ -4.165     │  0       │ │
+│ │ s_hiperf                       │ -0.41947566    │  0.14358853    │ -2.921     │  0       │ │
+│ │ s_hybrid                       │  0.84510775    │  0.13324419    │  6.343     │  0       │ │
+│ │ s_max_range                    │  0.70989372    │  0.18730681    │  3.79      │  0       │ │
+│ │ s_medhiperf                    │  0.60294008    │  0.14174795    │  4.254     │  0       │ │
+│ │ s_opcost_scaled                │ -0.34688195    │  0.04932259    │ -7.033     │  0       │ │
 │ └────────────────────────────────┴────────────────┴────────────────┴────────────┴──────────┘ │
 └──────────────────────────────────────────────────────────────────────────────────────────────┘
 </pre>
 </div></div>
+</div>
+<p>We can review summary statistics about the distibution of the mixed parameters:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">panel</span><span class="o">.</span><span class="n">mixture_summary</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>std</th>
+      <th>share +</th>
+      <th>share -</th>
+      <th>share ø</th>
+      <th>q25</th>
+      <th>median</th>
+      <th>q75</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ev</th>
+      <td>-1.705026</td>
+      <td>0.922268</td>
+      <td>0.03225</td>
+      <td>0.96775</td>
+      <td>0.0</td>
+      <td>-2.327147</td>
+      <td>-1.705063</td>
+      <td>-1.082776</td>
+    </tr>
+    <tr>
+      <th>hiperf</th>
+      <td>0.091796</td>
+      <td>0.419672</td>
+      <td>0.58640</td>
+      <td>0.41360</td>
+      <td>0.0</td>
+      <td>-0.191181</td>
+      <td>0.091732</td>
+      <td>0.374541</td>
+    </tr>
+    <tr>
+      <th>hybrid</th>
+      <td>0.468471</td>
+      <td>0.846144</td>
+      <td>0.71005</td>
+      <td>0.28995</td>
+      <td>0.0</td>
+      <td>-0.101567</td>
+      <td>0.468297</td>
+      <td>1.038186</td>
+    </tr>
+    <tr>
+      <th>max_range</th>
+      <td>0.463412</td>
+      <td>0.710182</td>
+      <td>0.74290</td>
+      <td>0.25710</td>
+      <td>0.0</td>
+      <td>-0.015530</td>
+      <td>0.463328</td>
+      <td>0.942118</td>
+    </tr>
+    <tr>
+      <th>medhiperf</th>
+      <td>0.509207</td>
+      <td>0.603215</td>
+      <td>0.80070</td>
+      <td>0.19930</td>
+      <td>0.0</td>
+      <td>0.102598</td>
+      <td>0.509241</td>
+      <td>0.915826</td>
+    </tr>
+    <tr>
+      <th>opcost_scaled</th>
+      <td>-0.138996</td>
+      <td>0.346820</td>
+      <td>0.34410</td>
+      <td>0.65590</td>
+      <td>0.0</td>
+      <td>-0.372998</td>
+      <td>-0.138984</td>
+      <td>0.094937</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The “share” columns show the share of random simulations with positive, negative, or
+zero values for each model parameter. This summary shows that about a third of people
+show a positive parameter on operating costs, i.e. they prefer higher costs.  That’s
+probably not reasonable.</p>
+</section>
+<section id="log-normal-parameter">
+<h2>Log-Normal Parameter<a class="headerlink" href="#log-normal-parameter" title="Link to this heading">#</a></h2>
+<p>Let’s change the operating cost parameter to have a negative log-normal distribution.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">panel2</span> <span class="o">=</span> <span class="n">panel</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">panel2</span><span class="o">.</span><span class="n">mixtures</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">mixtures</span><span class="o">.</span><span class="n">NegLogNormal</span><span class="p">(</span><span class="s2">&quot;opcost_scaled&quot;</span><span class="p">,</span> <span class="s2">&quot;s_opcost_scaled&quot;</span><span class="p">)</span>
+<span class="n">panel2</span><span class="o">.</span><span class="n">pvals</span> <span class="o">=</span> <span class="s2">&quot;null&quot;</span>
+<span class="n">panel2</span><span class="o">.</span><span class="n">maximize_loglike</span><span class="p">(</span><span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ftol&quot;</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">});</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style="font-weight: bold"> </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">Larch Model Dashboard</span><span style="font-weight: bold">                                                                        </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ <span style="color: #008000; text-decoration-color: #008000">optimization complete</span>                                                                        │
+│ Log Likelihood <span style="color: #808000; text-decoration-color: #808000">Current =      -1333.019287 </span><span style="color: #008000; text-decoration-color: #008000">Best =      -1333.019287</span>                          │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━┓ │
+│ ┃<span style="font-weight: bold"> Parameter                      </span>┃<span style="font-weight: bold"> Estimate       </span>┃<span style="font-weight: bold"> Std. Error     </span>┃<span style="font-weight: bold"> t-Stat     </span>┃<span style="font-weight: bold"> Null Val </span>┃ │
+│ ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━┩ │
+│ │ ev                             │ -1.7599219     │  0.3447586     │ -5.105     │  0       │ │
+│ │ hiperf                         │  0.075736252   │  0.10359703    │  0.7311    │  0       │ │
+│ │ hybrid                         │  0.39593437    │  0.15411338    │  2.569     │  0       │ │
+│ │ max_range                      │  0.51554964    │  0.21852201    │  2.359     │  0       │ │
+│ │ medhiperf                      │  0.51073699    │  0.11601695    │  4.402     │  0       │ │
+│ │ opcost_scaled                  │ -2.8274997     │  0.5602268     │ -5.047     │  0       │ │
+│ │ price_scaled                   │ -0.48391254    │  0.038662452   │ -12.52     │  0       │ │
+│ │ s_ev                           │ -1.0344379     │  0.25947049    │ -3.987     │  0       │ │
+│ │ s_hiperf                       │ -0.39622593    │  0.1311695     │ -3.021     │  0       │ │
+│ │ s_hybrid                       │  0.8452531     │  0.13241999    │  6.383     │  0       │ │
+│ │ s_max_range                    │ -0.47925562    │  0.17035732    │ -2.813     │  0       │ │
+│ │ s_medhiperf                    │ -0.65314215    │  0.14296451    │ -4.569     │  0       │ │
+│ │ s_opcost_scaled                │  1.7194859     │  0.30755299    │  5.591     │  0       │ │
+│ └────────────────────────────────┴────────────────┴────────────────┴────────────┴──────────┘ │
+└──────────────────────────────────────────────────────────────────────────────────────────────┘
+</pre>
+</div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">panel2</span><span class="o">.</span><span class="n">mixture_summary</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>std</th>
+      <th>share +</th>
+      <th>share -</th>
+      <th>share ø</th>
+      <th>q25</th>
+      <th>median</th>
+      <th>q75</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ev</th>
+      <td>-1.759939</td>
+      <td>1.034021</td>
+      <td>0.04455</td>
+      <td>0.95545</td>
+      <td>0.0</td>
+      <td>-2.457444</td>
+      <td>-1.759980</td>
+      <td>-1.062289</td>
+    </tr>
+    <tr>
+      <th>hiperf</th>
+      <td>0.075787</td>
+      <td>0.396412</td>
+      <td>0.57590</td>
+      <td>0.42410</td>
+      <td>0.0</td>
+      <td>-0.191506</td>
+      <td>0.075726</td>
+      <td>0.342860</td>
+    </tr>
+    <tr>
+      <th>hybrid</th>
+      <td>0.396054</td>
+      <td>0.846289</td>
+      <td>0.68030</td>
+      <td>0.31970</td>
+      <td>0.0</td>
+      <td>-0.174081</td>
+      <td>0.395880</td>
+      <td>0.965867</td>
+    </tr>
+    <tr>
+      <th>max_range</th>
+      <td>0.515490</td>
+      <td>0.479450</td>
+      <td>0.85870</td>
+      <td>0.14130</td>
+      <td>0.0</td>
+      <td>0.192311</td>
+      <td>0.515547</td>
+      <td>0.838828</td>
+    </tr>
+    <tr>
+      <th>medhiperf</th>
+      <td>0.510696</td>
+      <td>0.653440</td>
+      <td>0.78285</td>
+      <td>0.21715</td>
+      <td>0.0</td>
+      <td>0.070221</td>
+      <td>0.510659</td>
+      <td>0.951161</td>
+    </tr>
+    <tr>
+      <th>opcost_scaled</th>
+      <td>-0.258051</td>
+      <td>1.027933</td>
+      <td>0.00000</td>
+      <td>1.00000</td>
+      <td>0.0</td>
+      <td>-0.188681</td>
+      <td>-0.059149</td>
+      <td>-0.018551</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">panel2</span><span class="o">.</span><span class="n">mixture_density</span><span class="p">(</span><span class="s2">&quot;opcost_scaled&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/04d1b4f7ac36c8cd8d22677e6121cbdeea9590d77e132c28a0d29d14dc4e5c0e.png" src="../../_images/04d1b4f7ac36c8cd8d22677e6121cbdeea9590d77e132c28a0d29d14dc4e5c0e.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">panel2</span><span class="o">.</span><span class="n">mixture_density</span><span class="p">(</span><span class="s2">&quot;hybrid&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/9c2e761aa9d7fc1b0d4ce0580aa2274033771ba2738d079a203c5b49c4d0c7cb.png" src="../../_images/9c2e761aa9d7fc1b0d4ce0580aa2274033771ba2738d079a203c5b49c4d0c7cb.png" />
+</div>
 </div>
 </section>
 </section>
@@ -878,6 +1157,7 @@ use that information to build a significantly better model.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simple-mnl">Simple MNL</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mixture-model">Mixture Model</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#panel-data">Panel Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#log-normal-parameter">Log-Normal Parameter</a></li>
 </ul>
   </nav></div>
 
@@ -912,7 +1192,7 @@ use that information to build a significantly better model.</p>
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-<p class="larch-version">🌳 Larch v6.0.22.dev17+gc12e0c6, © Copyright 2024.</p></div>
+<p class="larch-version">🌳 Larch v6.0.22.dev21+g3f0eaf8, © Copyright 2024.</p></div>
       
     </div>
   
