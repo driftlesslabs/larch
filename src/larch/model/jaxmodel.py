@@ -1101,3 +1101,46 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             self.check_random_draws()
             self._cached_loglike_null = float(self.jax_loglike(self.pnullvals))
             return self._cached_loglike_null
+
+    def mixture_summary(self) -> pd.DataFrame:
+        """
+        Create a summary of the mixture parameters as a pandas DataFrame.
+
+        For parameters with random distributions, this summarizes
+        the distribution of the parameters.  The summary includes
+        the mean, standard deviation, and quartiles of the parameters,
+        as well as the share of positive, negative, and zero values.
+
+        The summary is computed statistically from the random draws,
+        not analytically from the parameter values, and so may be
+        slightly off from the "true" values if the number of draws
+        is too small (but the estimation results will also be impacted
+        in this case).
+        """
+        random_params = self.jax_random_params(self.pvals)
+        x = np.arange(random_params.ndim - 1)
+        means = random_params.mean(x)
+        stds = random_params.std(x)
+        mins = random_params.min(x)
+        maxs = random_params.max(x)
+        positive = (random_params > 0).mean(x)
+        negative = (random_params < 0).mean(x)
+        zero = (random_params == 0).mean(x)
+        q25 = jnp.quantile(random_params, 0.25, tuple(x))
+        q50 = jnp.quantile(random_params, 0.5, tuple(x))
+        q75 = jnp.quantile(random_params, 0.75, tuple(x))
+        nonzero_variance = np.asarray((maxs - mins) > 0)
+        result = pd.DataFrame(
+            {
+                "mean": means,
+                "std": stds,
+                "share +": positive,
+                "share -": negative,
+                "share ø": zero,
+                "q25": q25,
+                "median": q50,
+                "q75": q75,
+            },
+            index=self.pnames,
+        )
+        return result.loc[nonzero_variance].copy()

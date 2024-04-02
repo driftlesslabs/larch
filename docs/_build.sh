@@ -23,6 +23,7 @@ mamba create -p ../.env/DOCBUILD "python=3.11" \
   sharrow \
   sparse \
   xarray \
+  xlsxwriter \
   xmle \
   "sphinx>=7.0" \
   myst-nb pyyaml sphinx sphinx-comments sphinx-copybutton \
