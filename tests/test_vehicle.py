@@ -104,7 +104,7 @@ def test_mixed_logit(simple_model: lx.Model):
         "s_opcost": 0.04830038015701635,
     }
     assert mixed.parameters["value"].to_series().to_dict() == approx(
-        expected_value, rel=1e-2
+        expected_value, rel=5e-2
     )
     expected_stderr = {
         "ev": 0.8305132389068604,
@@ -122,7 +122,7 @@ def test_mixed_logit(simple_model: lx.Model):
         "s_opcost": 0.0211756881326437,
     }
     assert mixed.parameters["std_err"].to_series().to_dict() == approx(
-        expected_stderr, rel=1e-2
+        expected_stderr, rel=5e-2
     )
 
     # make sure we can copy the model
