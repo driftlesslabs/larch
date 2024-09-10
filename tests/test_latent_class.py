@@ -16,7 +16,7 @@ def swissmetro_data():
     raw["TRAIN_COST_SCALED"] = raw["TRAIN_COST"] / 100
     raw["TRAIN_TT_SCALED"] = raw["TRAIN_TT"] / 100
 
-    raw["SM_COST_SCALED"] = raw.eval("SM_COST / 100")
+    raw["SM_COST_SCALED"] = raw["SM_COST"] / 100
     raw["SM_TT_SCALED"] = raw["SM_TT"] / 100
 
     raw["CAR_CO_SCALED"] = raw["CAR_CO"] / 100
