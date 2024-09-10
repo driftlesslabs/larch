@@ -1558,7 +1558,13 @@ class BaseModel:
         return (
             result.style.set_table_styles(styles)
             .format({"Null Value": "{: .2f}"})
-            .map(lambda x: "font-family:monospace", subset=monospace_cols)
+            .apply(
+                lambda x: ["font-family:monospace" for _ in x],
+                axis="columns",
+                subset=monospace_cols,
+            )
+            # newer versions of pandas will allow the following instead of the above line:
+            # .map(lambda x: "font-family:monospace", subset=monospace_cols)
         )
 
     def estimation_statistics(self, compute_loglike_null=True):
