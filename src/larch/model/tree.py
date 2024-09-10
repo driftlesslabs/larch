@@ -35,6 +35,13 @@ class NestingTree(nx.DiGraph):
     node_dict_factory = OrderedDict
     adjlist_dict_factory = OrderedDict
 
+    def copy(self, as_view=False):
+        # copy operation needs to also copy the root_id and suggested_elemental_order
+        result = super().copy(as_view=as_view)
+        result._root_id = self._root_id
+        result._suggested_elemental_order = self._suggested_elemental_order
+        return result
+
     def __get__(self, instance, owner):
         # self : SubkeyStore
         # instance : instance of parent class that has `self` as a member, or None

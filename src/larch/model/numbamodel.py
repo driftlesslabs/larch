@@ -918,6 +918,17 @@ class NumbaModel(_BaseModel):
             cache_dir.mkdir(exist_ok=True)
             self.datatree.cache_dir = cache_dir
 
+        # when the alternative codes are set, and include zero, we need to
+        # make change the root node id to be not zero.
+        if isinstance(self.datatree, (DataTree, Dataset)):
+            if 0 in self.datatree.dc.altids():
+                # check that -1 is not in the altids
+                if -1 in self.datatree.dc.altids():
+                    raise ValueError(
+                        "Cannot have both -1 and 0 as alternative codes"
+                    )
+                self.initialize_graph(root_id=-1)
+
     def save(self, filename, format="yaml", overwrite=False):
         from .saving import save_model
 
