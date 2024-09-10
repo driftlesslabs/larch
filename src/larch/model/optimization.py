@@ -6,7 +6,7 @@ import warnings
 import numpy as np
 import pandas as pd
 
-from ..exceptions import BHHHSimpleStepFailure
+from ..exceptions import BHHHSimpleStepFailure, MissingDataError
 
 logger = logging.getLogger(__name__)
 
@@ -125,7 +125,7 @@ def maximize_loglike(
                 getattr(model, "data_as_loaded", None) is None
                 and not model.use_streaming
             ):
-                raise ValueError("you must load data first -- try Model.load_data()")
+                raise MissingDataError("no data attached to model")
 
         if prior_result is not None:
             dashboard = dashboard or prior_result.get("dashboard", None)

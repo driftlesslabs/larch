@@ -65,7 +65,7 @@ gh repo clone driftlesslabs/sharrow
 
 # install the mamba development environment
 mkdir -p .env/LARIX
-mamba env update -p .env/LARIX -f larch/envs/development.yaml
+conda env update -p .env/LARIX -f larch/envs/development.yaml
 conda activate .env/LARIX
 
 # make this environment available to jupyter

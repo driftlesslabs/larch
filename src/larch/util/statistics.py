@@ -9,7 +9,7 @@ import pandas
 from .. import warning
 from . import dictx
 from .arraytools import scalarize
-from .common_functions import parse_piece
+from .data_expansion import parse_piece
 from .histograms import seems_like_discrete_data, sizable_histogram_figure
 
 

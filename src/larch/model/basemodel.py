@@ -58,7 +58,7 @@ class BaseModel:
     """DictOfLinearFunction : The portion of the utility function computed from |idco| data.
 
     The keys of this mapping are alternative codes for the applicable elemental
-    alteratives, and the values are linear functions to compute for the indicated
+    alternatives, and the values are linear functions to compute for the indicated
     alternative.  Each alternative that has any idco utility components must have
     a unique linear function given.
 

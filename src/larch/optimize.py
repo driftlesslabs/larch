@@ -2,15 +2,19 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 import numpy as np
 from rich.table import Table
 from scipy.optimize import Bounds, minimize
-from xarray import Dataset
 
 from ._optional import jax, jnp
 from .compiled import jitmethod
 from .util.simple_attribute import SimpleAttribute
+from .exceptions import MissingDataError
+
+if TYPE_CHECKING:
+    from xarray import Dataset
 
 
 class BucketAccess(ABC):
@@ -179,6 +183,11 @@ class OptimizeMixin(BucketAccess):
 
     dashboard = SimpleAttribute()
 
+    @property
+    @abstractmethod
+    def dataset(self) -> Dataset:
+        raise NotImplementedError
+
     def jax_maximize_loglike(
         self,
         method="slsqp",
@@ -188,6 +197,9 @@ class OptimizeMixin(BucketAccess):
         **kwargs,
     ):
         from .model.dashboard import Dashboard
+
+        if self.dataset is None:
+            raise MissingDataError("No dataset attached to model")
 
         self._latest_gradient = np.full_like(self.pvals, np.nan)
         self.dashboard = Dashboard(
