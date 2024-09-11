@@ -10,7 +10,6 @@ import pandas as pd
 import yaml
 
 from larch import P, X
-from larch.model.abstract_model import AbstractChoiceModel
 from larch.model.tree import NestingTree
 from larch.util import Dict
 
@@ -259,7 +258,7 @@ def apply_coefficients(coefficients, model, minimum=None, maximum=None):
         assert isinstance(coefficients, pd.DataFrame)
         assert all(coefficients.columns == ["value", "constrain"])
         assert coefficients.index.name == "coefficient_name"
-        assert isinstance(model, AbstractChoiceModel)
+        # assert isinstance(model, AbstractChoiceModel)
         explicit_value_parameters(model)
         for i in coefficients.itertuples():
             if i.Index in model:

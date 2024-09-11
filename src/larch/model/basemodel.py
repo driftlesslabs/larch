@@ -268,23 +268,6 @@ class BaseModel:
     @datatree.setter
     def datatree(self, tree):
         self.swap_datatree(tree, True)
-        # from ..dataset import DataTree
-        #
-        # if tree is self.datatree:
-        #     return
-        # if isinstance(tree, DataTree) or tree is None:
-        #     self._datatree = tree
-        #     self.mangle(structure=False)
-        # elif isinstance(tree, xr.Dataset):
-        #     self._datatree = tree.dc.as_tree()
-        #     self.mangle(structure=False)
-        # else:
-        #     try:
-        #         self._datatree = DataTree(main=xr.Dataset.construct(tree))
-        #     except Exception as err:
-        #         raise TypeError(f"datatree must be DataTree not {type(tree)}") from err
-        #     else:
-        #         self.mangle(structure=False)
 
     def swap_datatree(self, tree: DataTree | xr.Dataset, should_mangle=False) -> None:
         """
@@ -348,6 +331,53 @@ class BaseModel:
             else:
                 if should_mangle:
                     self.mangle(structure=False)
+
+    def load_data(self, *args, **kwargs) -> None:
+        """
+        No-op.
+
+        This method is deprecated since version 6, as data is automatically
+        prepared as needed.  Use the `datatree` property to set the data source.
+        """
+        warnings.warn(
+            "Model.load_data() is deprecated, this method is no longer needed",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
+    def doctor(
+        self,
+        repair_ch_av="?",
+        repair_ch_zq=None,
+        repair_asc=None,
+        repair_noch_nowt=None,
+        repair_nan_wt=None,
+        repair_nan_data_co=None,
+        verbose=3,
+    ):
+        self.unmangle(True)
+        from .troubleshooting import doctor
+
+        result = doctor(
+            self,
+            repair_ch_av=repair_ch_av,
+            repair_ch_zq=repair_ch_zq,
+            repair_asc=repair_asc,
+            repair_noch_nowt=repair_noch_nowt,
+            repair_nan_wt=repair_nan_wt,
+            repair_nan_data_co=repair_nan_data_co,
+            verbose=verbose,
+        )
+        if (
+            repair_ch_av
+            or repair_ch_zq
+            or repair_asc
+            or repair_noch_nowt
+            or repair_nan_wt
+            or repair_nan_data_co
+        ):
+            self.mangle()
+        return result
 
     @property
     def parameters(self):
@@ -569,9 +599,63 @@ class BaseModel:
         cols = [i for i in cols if i in self._parameter_bucket._params]
         return self._parameter_bucket._params[cols].to_dataframe()
 
+    def set_value(
+        self,
+        name,
+        value: float | None = None,
+        *,
+        initvalue: float | None = None,
+        nullvalue: float | None = None,
+        minimum: float | None = None,
+        maximum: float | None = None,
+        holdfast: int | None = None,
+    ):
+        """
+        Set the value one or more attributes of a single parameter.
+
+        Parameters
+        ----------
+        name : str
+            The name of the parameter to set.
+        value : float, optional
+            The value to set for the parameter. If not given, the value is not
+            changed.
+        initvalue : float, optional
+            The initial value to set for the parameter. If not given, the
+            initial value is not changed.
+        nullvalue : float, optional
+            The null value to set for the parameter. If not given, the value is
+            not changed.
+        minimum : float, optional
+            The minimum value to set for the parameter. If not given, the value
+            is not changed.
+        maximum : float, optional
+            The maximum value to set for the parameter. If not given, the value
+            is not changed.
+        holdfast : int, optional
+            The holdfast value to set for the parameter. If not given, the value
+            is not changed.
+        """
+        self.unmangle()
+        if value is not None:
+            self._parameter_bucket._assign("value", name, value)
+        if initvalue is not None:
+            self._parameter_bucket._assign("initvalue", name, initvalue)
+        if nullvalue is not None:
+            self._parameter_bucket._assign("nullvalue", name, nullvalue)
+        if minimum is not None:
+            self._parameter_bucket._assign("minimum", name, minimum)
+        if maximum is not None:
+            self._parameter_bucket._assign("maximum", name, maximum)
+        if holdfast is not None:
+            self._parameter_bucket._assign("holdfast", name, holdfast)
+
     def set_values(self, values=None, **kwargs):
         """
         Set the parameter values for one or more parameters.
+
+        This method is deprecated since version 6.
+        Use the `pvals` property instead.
 
         Parameters
         ----------
