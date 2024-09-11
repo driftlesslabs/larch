@@ -1381,7 +1381,15 @@ class BaseModel:
 
     @weight_co_var.setter
     def weight_co_var(self, x):
+        if self._weight_co_var != x:
+            self.mangle()
         self._weight_co_var = x
+
+    @weight_co_var.deleter
+    def weight_co_var(self):
+        if self._weight_co_var is not None:
+            self.mangle()
+        self._weight_co_var = None
 
     @property
     def availability_ca_var(self):
