@@ -57,9 +57,34 @@ def test_chosen_but_not_available_minus(ref_model: lx.Model):
     m.dataset["ch"][:3, :] = 0
     m.dataset["ch"][:3, -1] = 1
 
-    m, problems = m.doctor(repair_ch_av="-")
+    m, problems = m.doctor(repair_ch_av="-", repair_noch_nzwt=None)
     assert (m.dataset["av"][:3, -1] == 0).all()
     assert (m.dataset["ch"][:3, -1] == 0).all()
     ll = m.loglike_casewise()
     assert ll[:3] == approx([0, 0, 0])
     assert m.loglike() == approx(-7304.995801563645)
+
+
+def test_nothing_chosen_but_nonzero_weight(ref_model: lx.Model):
+    m = ref_model
+    m.weight_co_var = "famtype"
+
+    # change first 3 observations to no choice
+    m.dataset["ch"][:3, :] = 0
+
+    m, problems = m.doctor(repair_noch_nzwt="?")
+    assert "nothing_chosen_but_nonzero_weight" in problems
+
+
+def test_nothing_chosen_but_nonzero_weight_minus(ref_model: lx.Model):
+    m = ref_model
+    m.weight_co_var = "famtype"
+
+    # change first 3 observations to no choice
+    m.dataset["ch"][:3, :] = 0
+
+    m, problems = m.doctor(repair_noch_nzwt="-")
+    assert "nothing_chosen_but_nonzero_weight" in problems
+    assert (m.dataset["wt"][:3] == 0).all()
+    ll = m.loglike_casewise()
+    assert ll[:3] == approx([0, 0, 0])

@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from ..util import dictx
-from .basemodel import BaseModel as Model
+from .numbamodel import NumbaModel as Model
 
 if TYPE_CHECKING:
     from .data_arrays import DataArrays
@@ -17,10 +17,10 @@ logger = logging.getLogger(__name__)
 
 def doctor(
     model: Model,
-    repair_ch_av="?",
+    repair_ch_av: Literal["?", "+", "-", None] = "?",
     repair_ch_zq=None,
     repair_asc=None,
-    repair_noch_nowt=None,
+    repair_noch_nzwt: Literal["?", "+", "-", None] = "?",
     repair_nan_wt=None,
     repair_nan_data_co=None,
     verbose=3,
@@ -42,28 +42,22 @@ def doctor(
     #     )
     #     problems["chosen_but_zero_quantity"] = diagnosis
 
-    logger.info("checking for chosen-but-not-available")
-    model, diagnosis = chosen_but_not_available(
-        model, repair=repair_ch_av, verbose=verbose
-    )
-    if diagnosis is not None:
-        logger.warning(
-            f"problem: chosen-but-not-available ({len(diagnosis)} issues)",
-            stacklevel=warning_stacklevel + 1,
-        )
-        problems["chosen_but_not_available"] = diagnosis
-    #
-    # logger.info("checking for nothing-chosen-but-nonzero-weight")
-    # model, diagnosis = nothing_chosen_but_nonzero_weight(
-    #     model, repair=repair_noch_nowt, verbose=verbose
-    # )
-    # if diagnosis is not None:
-    #     logger.warning(
-    #         f"problem: nothing-chosen-but-nonzero-weight ({len(diagnosis)} issues)",
-    #         stacklevel=warning_stacklevel + 1,
-    #     )
-    #     problems["nothing_chosen_but_nonzero_weight"] = diagnosis
-    #
+    def apply_repair(repair, repair_func):
+        nonlocal model, problems, verbose
+        if repair is None:
+            return
+        logger.info(f"checking for {repair_func.__name__}")
+        model, diagnosis = repair_func(model, repair=repair, verbose=verbose)
+        if diagnosis is not None:
+            logger.warning(
+                f"problem: {repair_func.__name__} has ({len(diagnosis)} issues)",
+                stacklevel=warning_stacklevel + 2,
+            )
+            problems[repair_func.__name__] = diagnosis
+
+    apply_repair(repair_ch_av, chosen_but_not_available)
+    apply_repair(repair_noch_nzwt, nothing_chosen_but_nonzero_weight)
+
     # logger.info("checking for nan-weight")
     # model, diagnosis = nan_weight(model, repair=repair_nan_wt, verbose=verbose)
     # if diagnosis is not None:
@@ -239,14 +233,16 @@ def chosen_but_zero_quantity(
         return m, diagnosis
 
 
-def nothing_chosen_but_nonzero_weight(dataset, repair=None, verbose=3):
+def nothing_chosen_but_nonzero_weight(
+    model, repair: Literal["?", "-", "*"] = "?", verbose=3
+):
     """
     Check if some observations have no choice but have some weight.
 
     Parameters
     ----------
-    dataset : DataFrames or Model
-        The data to check
+    model : BaseModel
+        The model to check.
     repair : {None, '-', '*'}
         How to repair the data.
         Minus will make the weight zero when there is no choice. Star will
@@ -257,28 +253,20 @@ def nothing_chosen_but_nonzero_weight(dataset, repair=None, verbose=3):
 
     Returns
     -------
-    dfs : DataFrames
+    model : BaseModel
         The revised dataframe
     diagnosis : pd.DataFrame
         The number of bad instances, by alternative, and some example rows.
 
     """
-    if isinstance(dataset, Model):
-        m = dataset
-        dataset = m.dataframes
-    else:
-        m = None
-
     diagnosis = None
-
-    if dataset is None:
+    data_arrays: DataArrays = model._data_arrays
+    if data_arrays is None:
         raise ValueError("data not loaded")
 
-    if dataset.data_wt is not None and dataset.data_ch is not None:
-        nothing_chosen = dataset.array_ch().sum(1) == 0
-        nothing_chosen_some_weight = nothing_chosen & (
-            dataset.array_wt().reshape(-1) > 0
-        )
+    if data_arrays.wt is not None and data_arrays.ch is not None:
+        nothing_chosen = data_arrays.ch.sum(1) == 0
+        nothing_chosen_some_weight = nothing_chosen & (data_arrays.wt.reshape(-1) > 0)
         if nothing_chosen_some_weight.sum() > 0:
             i1 = np.where(nothing_chosen_some_weight)[0]
 
@@ -299,17 +287,14 @@ def nothing_chosen_but_nonzero_weight(dataset, repair=None, verbose=3):
             )
             if repair == "+":
                 raise ValueError(
-                    "cannot resolve chosen_but_zero_quantity by assuming some choice"
+                    "cannot resolve nothing_chosen_but_nonzero_weight by assuming some choice"
                 )
             elif repair == "-":
-                dataset.array_wt()[nothing_chosen] = 0
+                model.dataset["wt"].data[nothing_chosen] = 0
             elif repair == "*":
-                dataset.array_wt()[nothing_chosen] = 0
-                dataset.autoscale_weights()
-    if m is None:
-        return dataset, diagnosis
-    else:
-        return m, diagnosis
+                model.dataset["wt"].data[nothing_chosen] = 0
+                model.dataset.dc.autoscale_weights()
+    return model, diagnosis
 
 
 def nan_weight(dataset, repair=None, verbose=3):

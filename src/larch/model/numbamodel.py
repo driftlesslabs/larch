@@ -5,6 +5,7 @@ import pathlib
 import warnings
 from collections import namedtuple
 from pathlib import Path
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -924,9 +925,7 @@ class NumbaModel(_BaseModel):
             if 0 in self.datatree.dc.altids():
                 # check that -1 is not in the altids
                 if -1 in self.datatree.dc.altids():
-                    raise ValueError(
-                        "Cannot have both -1 and 0 as alternative codes"
-                    )
+                    raise ValueError("Cannot have both -1 and 0 as alternative codes")
                 self.initialize_graph(root_id=-1)
 
     def save(self, filename, format="yaml", overwrite=False):
@@ -1026,7 +1025,7 @@ class NumbaModel(_BaseModel):
 
     dataflows = SimpleAttribute(dict)
 
-    def reflow_data_arrays(self):
+    def reflow_data_arrays(self) -> None:
         """Reload the internal data_arrays so they are consistent with the datatree."""
         if self.graph is None:
             self._data_arrays = None
@@ -1065,12 +1064,17 @@ class NumbaModel(_BaseModel):
                 self._dataset = None
                 self._data_arrays = None
             else:
-                self._data_arrays = self.dataset.dc.to_arrays(
-                    self.graph,
-                    float_dtype=self.float_dtype,
-                )
+                if self.autoscale_weights:
+                    self.dataset.dc.autoscale_weights()
+                self._rebuild_data_arrays()
                 if self.work_arrays is not None:
                     self._rebuild_work_arrays()
+
+    def _rebuild_data_arrays(self):
+        self._data_arrays = self.dataset.dc.to_arrays(
+            self.graph,
+            float_dtype=self.float_dtype,
+        )
 
     def _rebuild_work_arrays(
         self, n_cases=None, n_nodes=None, n_params=None, on_missing_data="silent"
@@ -1154,6 +1158,32 @@ class NumbaModel(_BaseModel):
             )
         else:
             self._fixed_arrays = None
+
+    def doctor(
+        self,
+        repair_ch_av: Literal["?", "+", "-", None] = "?",
+        repair_ch_zq=None,
+        repair_asc=None,
+        repair_noch_nzwt: Literal["?", "+", "-", None] = None,
+        repair_nan_wt=None,
+        repair_nan_data_co=None,
+        verbose=3,
+    ):
+        self.unmangle(True)
+        from .troubleshooting import doctor
+
+        result = doctor(
+            self,
+            repair_ch_av=repair_ch_av,
+            repair_ch_zq=repair_ch_zq,
+            repair_asc=repair_asc,
+            repair_noch_nzwt=repair_noch_nzwt,
+            repair_nan_wt=repair_nan_wt,
+            repair_nan_data_co=repair_nan_data_co,
+            verbose=verbose,
+        )
+        self._rebuild_data_arrays()
+        return result
 
     def unmangle(self, force=False, structure_only=False):
         if not self._mangled and not force:
@@ -2196,7 +2226,7 @@ class NumbaModel(_BaseModel):
         raise MissingDataError("no data_arrays are set")
 
     @property
-    def dataset(self):
+    def dataset(self) -> Dataset | None:
         """larch.Dataset : Data arrays as loaded for model computation."""
         super().unmangle()
         if self._dataset is None:
@@ -2207,16 +2237,11 @@ class NumbaModel(_BaseModel):
             return None
 
     @dataset.setter
-    def dataset(self, dataset):
+    def dataset(self, dataset: Dataset):
         if dataset is self._dataset:
             return
-        from xarray import Dataset as _Dataset
-
         if isinstance(dataset, Dataset):
             self._dataset = dataset
-            self._data_arrays = None
-        elif isinstance(dataset, _Dataset):
-            self._dataset = Dataset(dataset)
             self._data_arrays = None
         else:
             raise TypeError(f"dataset must be Dataset not {type(dataset)}")

@@ -148,6 +148,7 @@ class BaseModel:
         named_submodels=None,
         use_streaming=False,
         cache_dir=None,
+        autoscale_weights=False,
     ):
         if not hasattr(self, "_ident"):
             self._ident = _unique_ident()
@@ -156,6 +157,7 @@ class BaseModel:
         self.title = title
         self._compute_engine = compute_engine
         self._use_streaming = use_streaming
+        self._autoscale_weights = autoscale_weights
         self._possible_overspecification = None
 
         if submodels is None:
@@ -245,6 +247,18 @@ class BaseModel:
                 "streaming is currently only compatible with the numba compute engine"
             )
         self._use_streaming = should
+
+    @property
+    def autoscale_weights(self) -> bool:
+        """Whether to automatically scale case weights."""
+        return self._autoscale_weights
+
+    @autoscale_weights.setter
+    def autoscale_weights(self, should: bool) -> None:
+        temp = bool(should)
+        if temp != self._autoscale_weights:
+            self.mangle(data=True, structure=False)
+        self._autoscale_weights = temp
 
     @property
     def most_recent_estimation_result(self):
@@ -350,7 +364,7 @@ class BaseModel:
         repair_ch_av="?",
         repair_ch_zq=None,
         repair_asc=None,
-        repair_noch_nowt=None,
+        repair_noch_nzwt=None,
         repair_nan_wt=None,
         repair_nan_data_co=None,
         verbose=3,
@@ -363,20 +377,11 @@ class BaseModel:
             repair_ch_av=repair_ch_av,
             repair_ch_zq=repair_ch_zq,
             repair_asc=repair_asc,
-            repair_noch_nowt=repair_noch_nowt,
+            repair_noch_nzwt=repair_noch_nzwt,
             repair_nan_wt=repair_nan_wt,
             repair_nan_data_co=repair_nan_data_co,
             verbose=verbose,
         )
-        if (
-            repair_ch_av
-            or repair_ch_zq
-            or repair_asc
-            or repair_noch_nowt
-            or repair_nan_wt
-            or repair_nan_data_co
-        ):
-            self.mangle()
         return result
 
     @property

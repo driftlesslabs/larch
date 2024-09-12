@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import logging
+import warnings
 from collections.abc import Mapping
 
 import numba as nb
 import numpy as np
 import xarray as xr
+
+from larch.warning import WeightRescaleWarning
 
 from .dim_names import ALTID, ALTIDX, CASEALT, CASEID, CASEPTR, GROUPID, INGROUP
 
@@ -16,6 +19,17 @@ def case_ptr_to_indexes(n_casealts, case_ptrs):
     for c in range(case_ptrs.shape[0] - 1):
         case_index[case_ptrs[c] : case_ptrs[c + 1]] = c
     return case_index
+
+
+@nb.njit
+def any_row_sums_to_not_one(arr):
+    for i in range(arr.shape[0]):
+        row_sum = 0
+        for j in range(arr.shape[1]):
+            row_sum += arr[i, j]
+        if row_sum < 0.99999999 or row_sum > 1.00000001:
+            return True
+    return False
 
 
 @nb.njit
@@ -622,6 +636,72 @@ class _DatasetDC(_GenericFlow):
                 )
 
         return DataArrays(ch, av, wt, co, ca, ce_data, ce_altidx, ce_caseptr)
+
+    def autoscale_weights(self) -> float:
+        """
+        Scale the weights so the average weight is 1.
+
+        If weights are embedded in the choice variable,
+        they are extracted (so the total choice in each case
+        is 0.0 or 1.0, and the weight is isolated in the
+        data_wt terms) before any scaling is applied.
+
+        Returns
+        -------
+        scale : float
+        """
+        need_to_extract_wgt_from_ch = any_row_sums_to_not_one(self._obj["ch"].values)
+
+        if need_to_extract_wgt_from_ch and "wt" not in self._obj:
+            self._obj["wt"] = xr.DataArray(
+                data=1.0,
+                coords={self.CASEID: self._obj[self.CASEID]},
+                dims=(self.CASEID),
+            )
+
+        if need_to_extract_wgt_from_ch:
+            wgt_from_ch = self._obj["ch"].sum(self.ALTID)
+            wgt_from_ch = wgt_from_ch.where(wgt_from_ch > 0, 1)
+            self._obj["ch"] /= wgt_from_ch
+            self._obj["wt"] *= wgt_from_ch
+
+        if "wt" not in self._obj:
+            return 1.0
+
+        total_weight = self._obj["wt"].sum()
+        scale_level = float(total_weight) / self.n_cases
+
+        normalization = self._obj["wt"].attrs.get("normalization", 1.0)
+        normalization *= scale_level
+        self._obj["wt"].attrs["normalization"] = normalization
+
+        if scale_level != 0:
+            self._obj["wt"] /= scale_level
+
+        if scale_level < 0.99999 or scale_level > 1.00001:
+            warnings.warn(
+                f"rescaled array of weights by a factor of {scale_level}",
+                WeightRescaleWarning,
+                stacklevel=2,
+            )
+
+        return scale_level
+
+    def unscale_weights(self) -> float:
+        """
+        Unscale the weights, restoring the original values.
+
+        This method is the inverse of `autoscale_weights`.
+
+        Returns
+        -------
+        scale : float
+        """
+        scale_level = self._obj["wt"].attrs.get("normalization", 1.0)
+        if scale_level != 0:
+            self._obj["wt"] *= scale_level
+        self._obj["wt"].attrs["normalization"] = 1.0
+        return scale_level
 
 
 @xr.register_dataset_accessor("icase")

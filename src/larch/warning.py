@@ -11,8 +11,16 @@ def ignore_warnings():
         yield
 
 
-class NoDefaultValueWarning(Warning):
+class LarchWarning(Warning):
+    """Base class for all Larch warnings."""
+
+
+class NoDefaultValueWarning(LarchWarning):
     pass
+
+
+class WeightRescaleWarning(Warning):
+    """Warning issued when weights are rescaled."""
 
 
 def no_default_value(message):
