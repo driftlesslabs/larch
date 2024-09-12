@@ -1,16 +1,14 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 import numpy as np
 import pandas as pd
+import xarray as xr
 
 from ..util import dictx
 from .numbamodel import NumbaModel as Model
-
-if TYPE_CHECKING:
-    from .data_arrays import DataArrays
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +20,7 @@ def doctor(
     repair_asc=None,
     repair_noch_nzwt: Literal["?", "+", "-", None] = "?",
     repair_nan_wt=None,
-    repair_nan_data_co=None,
+    repair_nan_data_co: Literal["?", True, "!", None] = "?",
     verbose=3,
     warning_stacklevel=2,
 ):
@@ -57,6 +55,7 @@ def doctor(
 
     apply_repair(repair_ch_av, chosen_but_not_available)
     apply_repair(repair_noch_nzwt, nothing_chosen_but_nonzero_weight)
+    apply_repair(repair_nan_data_co, nan_data_co)
 
     # logger.info("checking for nan-weight")
     # model, diagnosis = nan_weight(model, repair=repair_nan_wt, verbose=verbose)
@@ -85,43 +84,42 @@ def doctor(
     return model, problems
 
 
-def chosen_but_not_available(model, repair: Literal["?", "+", "-"] = "?", verbose=3):
+def chosen_but_not_available(
+    model: Model, repair: Literal["?", "+", "-", "!"] = "?", verbose: int = 3
+) -> tuple[Model, pd.DataFrame | None]:
     """
     Check if some observations are chosen but not available.
 
     Parameters
     ----------
-    model : BaseModel
+    model : larch.Model
         The model to check.
     repair : {None, '+', '-'}
         How to repair the data.
         Plus will make the conflicting alternatives available.
         Minus will make them not chosen (possibly leaving no chosen alternative).
-        A question mark effects no repair, and simply emits a warning.
+        A question mark effects no repair, and simply emits a warning. An exclamation
+        mark will raise an error if there are any conflicts.
     verbose : int, default 3
         The number of example rows to list for each problem.
 
     Returns
     -------
-    model : BaseModel
-        The model with revised data attached.
+    model : larch.Model
+        The model with revised dataset attached.
     diagnosis : pd.DataFrame
         The number of bad instances, by alternative, and some example rows.
 
     """
-    data_arrays: DataArrays = model._data_arrays
-    if data_arrays is None:
+    dataset = model.dataset
+    if dataset is None:
         raise ValueError("data not loaded")
+    assert isinstance(dataset, xr.Dataset)
 
-    _not_avail = data_arrays.av == 0
-    _chosen = data_arrays.ch > 0
-
-    chosen_but_not_available = pd.DataFrame(
-        data=_not_avail & _chosen,
-        index=model.dataset.dc.caseids(),
-        columns=model.graph.standard_sort,
-    )
-    chosen_but_not_available_sum = chosen_but_not_available.sum(0)
+    not_avail = dataset["av"] == 0
+    chosen = dataset["ch"] > 0
+    chosen_but_not_available = not_avail & chosen
+    chosen_but_not_available_sum = chosen_but_not_available.sum(dataset.dc.CASEID)
 
     diagnosis = None
     if chosen_but_not_available_sum.sum() > 0:
@@ -134,9 +132,11 @@ def chosen_but_not_available(model, repair: Literal["?", "+", "-"] = "?", verbos
             ],
         )
 
-        for colnum, colname in enumerate(chosen_but_not_available.columns):
-            if chosen_but_not_available_sum[colname] > 0:
-                diagnosis.loc[colname, "example rows"] = ", ".join(
+        for colnum, colname in enumerate(
+            chosen_but_not_available.coords[dataset.dc.ALTID]
+        ):
+            if chosen_but_not_available_sum[colnum] > 0:
+                diagnosis.loc[str(colname), "example rows"] = ", ".join(
                     str(j) for j in i1[i2 == colnum][:verbose]
                 )
 
@@ -144,12 +144,10 @@ def chosen_but_not_available(model, repair: Literal["?", "+", "-"] = "?", verbos
             model.dataset["av"].data[
                 chosen_but_not_available.values[:, : model.dataset["av"].shape[1]]
             ] = 1
-            data_arrays.av[chosen_but_not_available.values] = 1
         elif repair == "-":
             model.dataset["ch"].data[
                 chosen_but_not_available.values[:, : model.dataset["ch"].shape[1]]
             ] = 0
-            data_arrays.ch[chosen_but_not_available.values] = 0
         elif repair == "!":
             raise ValueError("some observed choices are not available")
 
@@ -260,13 +258,14 @@ def nothing_chosen_but_nonzero_weight(
 
     """
     diagnosis = None
-    data_arrays: DataArrays = model._data_arrays
-    if data_arrays is None:
+    dataset = model.dataset
+    if dataset is None:
         raise ValueError("data not loaded")
+    assert isinstance(dataset, xr.Dataset)
 
-    if data_arrays.wt is not None and data_arrays.ch is not None:
-        nothing_chosen = data_arrays.ch.sum(1) == 0
-        nothing_chosen_some_weight = nothing_chosen & (data_arrays.wt.reshape(-1) > 0)
+    if "wt" in dataset and "ch" in dataset:
+        nothing_chosen = dataset["ch"].sum(dataset.dc.ALTID) == 0
+        nothing_chosen_some_weight = nothing_chosen & (dataset["wt"] > 0)
         if nothing_chosen_some_weight.sum() > 0:
             i1 = np.where(nothing_chosen_some_weight)[0]
 
@@ -352,47 +351,55 @@ def nan_weight(dataset, repair=None, verbose=3):
         return m, diagnosis
 
 
-def nan_data_co(dataset, repair=None, verbose=3):
+def nan_data_co(
+    model: Model, repair: Literal["?", True, "!"] = "?", verbose: int = 3
+) -> tuple[Model, pd.DataFrame | None]:
     """
     Check if some data_co values are NaN.
 
     Parameters
     ----------
-    dataset : DataFrames or Model
-            The data to check
-    repair : None or bool
-            Whether to repair the data.
-            Any true value will make NaN values in data_co zero.
-            None effects no repair, and simply emits a warning.
+    model : larch.Model
+        The model to check.
+    repair : {"?", True}
+        Whether to repair the data. Any true value other than "?" or "!" will make
+        NaN values in data_co zero. The question mark simply emits a warning
+        if there are NaN values found, while the exclamation mark will raise an error.
     verbose : int, default 3
-            The number of example columns to list for each problem.
+        The number of example columns to list for each problem.
 
     Returns
     -------
-    dfs : DataFrames
-            The revised dataframe
+    model : larch.Model
+        The model with revised dataset attached.
     diagnosis : pd.DataFrame
-            The number of bad instances, and some example rows.
-
+        The number of bad instances, and some example rows.
     """
-    if isinstance(dataset, Model):
-        m = dataset
-        dataset = m.dataframes
-    else:
-        m = None
+    dataset = model.dataset
+    if dataset is None:
+        raise ValueError("data not loaded")
+    assert isinstance(dataset, xr.Dataset)
 
     diagnosis = None
-    if dataset.data_co is not None:
-        nan_dat = np.isnan(dataset.data_co).sum()
+    if "co" in dataset:
+        nan_dat = np.isnan(dataset["co"]).sum(dataset.dc.CASEID)
         if nan_dat.sum():
-            diagnosis = pd.DataFrame(nan_dat[nan_dat > 0].iloc[:verbose])
-        if repair:
-            dataset.data_co.fillna(0, inplace=True)
+            diagnosis = (
+                nan_dat[nan_dat > 0]
+                .iloc[:verbose]
+                .to_pandas()
+                .rename("n_nan")
+                .to_frame()
+            )
+            n = int(nan_dat.sum())
+            if repair == "?":
+                logger.warning(f"nan_data_co: {n} instances have NaN values")
+            elif repair == "!":
+                raise ValueError(f"nan_data_co: {n} instances have NaN values")
+            if repair and repair != "?":
+                dataset["co"] = dataset["co"].fillna(0)
 
-    if m is None:
-        return dataset, diagnosis
-    else:
-        return m, diagnosis
+    return model, diagnosis
 
 
 def low_variance_data_co(dataset, repair=None, verbose=3):

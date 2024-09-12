@@ -1071,10 +1071,13 @@ class NumbaModel(_BaseModel):
                     self._rebuild_work_arrays()
 
     def _rebuild_data_arrays(self):
-        self._data_arrays = self.dataset.dc.to_arrays(
-            self.graph,
-            float_dtype=self.float_dtype,
-        )
+        if self._dataset is None:
+            self.reflow_data_arrays()  # create the dataset from the datatree
+        else:
+            self._data_arrays = self._dataset.dc.to_arrays(
+                self.graph,
+                float_dtype=self.float_dtype,
+            )
 
     def _rebuild_work_arrays(
         self, n_cases=None, n_nodes=None, n_params=None, on_missing_data="silent"
@@ -1166,10 +1169,9 @@ class NumbaModel(_BaseModel):
         repair_asc=None,
         repair_noch_nzwt: Literal["?", "+", "-", None] = None,
         repair_nan_wt=None,
-        repair_nan_data_co=None,
+        repair_nan_data_co: Literal["?", True, "!", None] = None,
         verbose=3,
     ):
-        self.unmangle(True)
         from .troubleshooting import doctor
 
         result = doctor(
