@@ -1170,6 +1170,7 @@ class NumbaModel(_BaseModel):
         repair_noch_nzwt: Literal["?", "+", "-", None] = None,
         repair_nan_wt=None,
         repair_nan_data_co: Literal["?", True, "!", None] = None,
+        check_low_variance_data_co: Literal["?", "!", None] = None,
         verbose=3,
     ):
         from .troubleshooting import doctor
@@ -1182,6 +1183,7 @@ class NumbaModel(_BaseModel):
             repair_noch_nzwt=repair_noch_nzwt,
             repair_nan_wt=repair_nan_wt,
             repair_nan_data_co=repair_nan_data_co,
+            check_low_variance_data_co=check_low_variance_data_co,
             verbose=verbose,
         )
         self._rebuild_data_arrays()

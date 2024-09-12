@@ -115,3 +115,21 @@ def test_nan_in_data_co(ref_model: lx.Model):
     m, problems = m.doctor(repair_nan_data_co="?")
     assert len(problems) == 1
     assert "nan_data_co" in problems
+
+
+def test_low_variance_data_co(ref_model: lx.Model):
+    m = ref_model
+
+    # change first 3 observations to have NaN for income
+    m.dataset = m.dataset.assign(co=m.dataset["co"].copy())
+    m.dataset["co"][:, 0] = 42.0
+    m._rebuild_data_arrays()
+
+    # test raising error
+    with pytest.raises(ValueError):
+        m, problems = m.doctor(check_low_variance_data_co="!")
+
+    # test just checking
+    m, problems = m.doctor(check_low_variance_data_co="?")
+    assert len(problems) == 1
+    assert "low_variance_data_co" in problems

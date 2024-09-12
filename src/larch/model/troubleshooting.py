@@ -21,6 +21,7 @@ def doctor(
     repair_noch_nzwt: Literal["?", "+", "-", None] = "?",
     repair_nan_wt=None,
     repair_nan_data_co: Literal["?", True, "!", None] = "?",
+    check_low_variance_data_co: Literal["?", "!", None] = None,
     verbose=3,
     warning_stacklevel=2,
 ):
@@ -56,6 +57,7 @@ def doctor(
     apply_repair(repair_ch_av, chosen_but_not_available)
     apply_repair(repair_noch_nzwt, nothing_chosen_but_nonzero_weight)
     apply_repair(repair_nan_data_co, nan_data_co)
+    apply_repair(check_low_variance_data_co, low_variance_data_co)
 
     # logger.info("checking for nan-weight")
     # model, diagnosis = nan_weight(model, repair=repair_nan_wt, verbose=verbose)
@@ -361,7 +363,7 @@ def nan_data_co(
     ----------
     model : larch.Model
         The model to check.
-    repair : {"?", True}
+    repair : {"?", "!", True}
         Whether to repair the data. Any true value other than "?" or "!" will make
         NaN values in data_co zero. The question mark simply emits a warning
         if there are NaN values found, while the exclamation mark will raise an error.
@@ -402,51 +404,47 @@ def nan_data_co(
     return model, diagnosis
 
 
-def low_variance_data_co(dataset, repair=None, verbose=3):
+def low_variance_data_co(
+    model: Model, repair: Literal["?", "!"] = "?", verbose: int = 3
+):
     """
     Check if any data_co columns have very low variance.
 
     Parameters
     ----------
-    dataset : DataFrames or Model
-            The data to check
-    repair : None
-            Not implemented.
+    model : larch.Model
+        The model to check.
+    repair : {"?", "!"}
+        No repairs are available for this check. The question mark simply emits
+        a warning if there are issues found, while the exclamation mark will
+        raise an error.
     verbose : int, default 3
-            The number of example columns to list if
-            there is a problem.
+        The number of example columns to list if there is a problem.
 
     Returns
     -------
-    dfs : DataFrames
-            The revised dataframe
+    model : larch.Model
+        The model with revised dataset attached.
     diagnosis : pd.DataFrame
-            The number of bad instances, and some example rows.
-
+        The number of bad instances, and some example rows.
     """
-    if isinstance(dataset, Model):
-        m = dataset
-        dataset = m.dataframes
-    else:
-        m = None
+    dataset = model.dataset
+    if dataset is None:
+        raise ValueError("data not loaded")
+    assert isinstance(dataset, xr.Dataset)
 
     diagnosis = None
-    if dataset.data_co is not None:
-        variance = dataset.data_co.var()
+    if "co" in dataset:
+        variance = dataset["co"].var(dataset.dc.CASEID).to_pandas().rename("variance")
         if variance.min() < 1e-3:
-            i = np.where(variance < 1e-3)[0]
+            diagnosis = variance[variance < 1e-3].to_frame()
+            if repair == "?":
+                logger.warning(
+                    f"low_variance_data_co: {len(diagnosis)} columns have low variance"
+                )
+            elif repair == "!":
+                raise ValueError(
+                    f"low_variance_data_co: {len(diagnosis)} columns have low variance"
+                )
 
-            diagnosis = pd.DataFrame(
-                data=[[len(i), ""]],
-                columns=["n", "example cols"],
-                index=["low_variance_co"],
-            )
-
-            diagnosis.loc["low_variance_co", "example cols"] = ", ".join(
-                str(dataset.data_co.columns[j]) for j in i[:verbose]
-            )
-
-    if m is None:
-        return dataset, diagnosis
-    else:
-        return m, diagnosis
+    return model, diagnosis
