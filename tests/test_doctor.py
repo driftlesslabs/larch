@@ -133,3 +133,25 @@ def test_low_variance_data_co(ref_model: lx.Model):
     m, problems = m.doctor(check_low_variance_data_co="?")
     assert len(problems) == 1
     assert "low_variance_data_co" in problems
+
+
+def test_nan_in_weight(ref_model: lx.Model):
+    m = ref_model
+    m.weight_co_var = "famtype"
+
+    # change some observations to have NaN for weight
+    m.dataset = m.dataset.assign(wt=m.dataset["wt"].copy())
+    m.dataset["wt"][3:9] = np.nan
+    m._rebuild_data_arrays()
+
+    assert np.isnan(m.dataset["wt"][3:9]).all()
+    assert np.isnan(m.loglike())
+
+    # test raising error
+    with pytest.raises(ValueError):
+        m, problems = m.doctor(repair_nan_wt="!")
+
+    # test just checking
+    m, problems = m.doctor(repair_nan_wt="?")
+    assert len(problems) == 1
+    assert "nan_weight" in problems

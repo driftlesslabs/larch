@@ -19,7 +19,7 @@ def doctor(
     repair_ch_zq=None,
     repair_asc=None,
     repair_noch_nzwt: Literal["?", "+", "-", None] = "?",
-    repair_nan_wt=None,
+    repair_nan_wt: Literal["?", True, "!", None] = "?",
     repair_nan_data_co: Literal["?", True, "!", None] = "?",
     check_low_variance_data_co: Literal["?", "!", None] = None,
     verbose=3,
@@ -57,6 +57,7 @@ def doctor(
     apply_repair(repair_ch_av, chosen_but_not_available)
     apply_repair(repair_noch_nzwt, nothing_chosen_but_nonzero_weight)
     apply_repair(repair_nan_data_co, nan_data_co)
+    apply_repair(repair_nan_wt, nan_weight)
     apply_repair(check_low_variance_data_co, low_variance_data_co)
 
     # logger.info("checking for nan-weight")
@@ -298,61 +299,6 @@ def nothing_chosen_but_nonzero_weight(
     return model, diagnosis
 
 
-def nan_weight(dataset, repair=None, verbose=3):
-    """
-    Check if some observations are chosen but not available.
-
-    Parameters
-    ----------
-    dataset : DataFrames or Model
-            The data to check
-    repair : None or bool
-            Whether to repair the data.
-            Any true value will make NaN values in the weight zero.
-            None effects no repair, and simply emits a warning.
-    verbose : int, default 3
-            The number of example rows to list for each problem.
-
-    Returns
-    -------
-    dfs : DataFrames
-            The revised dataframe
-    diagnosis : pd.DataFrame
-            The number of bad instances, and some example rows.
-
-    """
-    if isinstance(dataset, Model):
-        m = dataset
-        dataset = m.dataframes
-    else:
-        m = None
-
-    diagnosis = None
-    if dataset.data_wt is not None:
-        nan_wgt = np.isnan(dataset.data_wt.iloc[:, 0])
-
-        if nan_wgt.sum():
-            i = np.where(nan_wgt)[0]
-
-            diagnosis = pd.DataFrame(
-                data=[[nan_wgt.sum(), ""]],
-                columns=["n", "example rows"],
-                index=["nan_weight"],
-            )
-
-            diagnosis.loc["nan_weight", "example rows"] = ", ".join(
-                str(j) for j in i[:verbose]
-            )
-
-        if repair:
-            dataset.data_wt.fillna(0, inplace=True)
-
-    if m is None:
-        return dataset, diagnosis
-    else:
-        return m, diagnosis
-
-
 def nan_data_co(
     model: Model, repair: Literal["?", True, "!"] = "?", verbose: int = 3
 ) -> tuple[Model, pd.DataFrame | None]:
@@ -400,6 +346,55 @@ def nan_data_co(
                 raise ValueError(f"nan_data_co: {n} instances have NaN values")
             if repair and repair != "?":
                 dataset["co"] = dataset["co"].fillna(0)
+
+    return model, diagnosis
+
+
+def nan_weight(
+    model: Model, repair: Literal["?", True, "!"] = "?", verbose: int = 3
+) -> tuple[Model, pd.DataFrame | None]:
+    """
+    Check if some weight values are NaN.
+
+    Parameters
+    ----------
+    model : larch.Model
+        The model to check.
+    repair : {"?", "!", True}
+        Whether to repair the data. Any true value other than "?" or "!" will make
+        NaN values in weight zero. The question mark simply emits a warning
+        if there are NaN values found, while the exclamation mark will raise an error.
+    verbose : int, default 3
+        The number of example columns to list for each problem.
+
+    Returns
+    -------
+    model : larch.Model
+        The model with revised dataset attached.
+    diagnosis : pd.DataFrame
+        The number of bad instances, and some example rows.
+    """
+    dataset = model.dataset
+    if dataset is None:
+        raise ValueError("data not loaded")
+    assert isinstance(dataset, xr.Dataset)
+
+    diagnosis = None
+    if "wt" in dataset:
+        nan_wt = int(np.isnan(dataset["wt"]).sum())
+        if nan_wt:
+            diagnosis = (
+                dataset["wt"][np.isnan(dataset["wt"])]
+                .iloc[:verbose]
+                .to_pandas()
+                .to_frame()
+            )
+            if repair == "?":
+                logger.warning(f"nan_weight: {nan_wt} instances have NaN values")
+            elif repair == "!":
+                raise ValueError(f"nan_weight: {nan_wt} instances have NaN values")
+            if repair and repair != "?":
+                dataset["wt"] = dataset["wt"].fillna(0)
 
     return model, diagnosis
 

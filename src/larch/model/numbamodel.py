@@ -1168,7 +1168,7 @@ class NumbaModel(_BaseModel):
         repair_ch_zq=None,
         repair_asc=None,
         repair_noch_nzwt: Literal["?", "+", "-", None] = None,
-        repair_nan_wt=None,
+        repair_nan_wt: Literal["?", True, "!", None] = None,
         repair_nan_data_co: Literal["?", True, "!", None] = None,
         check_low_variance_data_co: Literal["?", "!", None] = None,
         verbose=3,
