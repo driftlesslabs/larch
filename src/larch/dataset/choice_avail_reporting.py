@@ -98,11 +98,11 @@ def choice_avail_summary(
     arr_wt = dataset.get("wt")
     if arr_wt is not None:
         if ch_ is not None:
-            ch_w = pd.Series((ch_ * arr_wt.values).sum(0))
+            ch_w = pd.Series((ch_ * arr_wt.values.reshape(-1, 1)).sum(0))
         else:
             ch_w = None
         if av_ is not None:
-            av_w = pd.Series((av_ * arr_wt.values).sum(0))
+            av_w = pd.Series((av_ * arr_wt.values.reshape(-1, 1)).sum(0))
         else:
             av_w = None
         show_wt = np.any(ch != ch_w)
