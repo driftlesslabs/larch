@@ -249,6 +249,49 @@ class _DatasetConstruct:
         return ds
 
     @classmethod
+    def new_idca(self, caseids, altids, altnames=None):
+        """
+        Create an empty idca Dataset by populating it with case and alt ids.
+
+        Parameters
+        ----------
+        caseids : array-like
+            The case ids to use.
+        altids : array-like
+            The alternative ids to use.
+        altnames : Mapping, optional
+            If given as a mapping, links alternative codes to names.
+            An array or list of strings gives names for the alternatives,
+            sorted in the same order as the codes.
+
+        Returns
+        -------
+        Dataset
+        """
+        objs = {}
+        try:
+            caseid_name = caseids.name or "caseid"
+        except AttributeError:
+            caseid_name = "caseid"
+        objs[caseid_name] = (
+            caseids if not isinstance(caseids, pd.Series) else caseids.values
+        )
+
+        try:
+            altid_name = altids.name or "altid"
+        except AttributeError:
+            altid_name = "altid"
+        objs[altid_name] = (
+            altids if not isinstance(altids, pd.Series) else altids.values
+        )
+
+        result = xr.Dataset(objs)
+        _initialize_for_larch(result, caseid_name, altid_name)
+        if altnames is not None:
+            result = result.dc.set_altnames(altnames)
+        return result
+
+    @classmethod
     def from_idce(
         cls,
         df,

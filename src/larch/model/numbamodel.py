@@ -1165,7 +1165,7 @@ class NumbaModel(_BaseModel):
     def doctor(
         self,
         repair_ch_av: Literal["?", "+", "-", None] = "?",
-        repair_ch_zq=None,
+        repair_ch_zq: Literal["?", "-", "!"] | None = None,
         repair_asc=None,
         repair_noch_nzwt: Literal["?", "+", "-", None] = None,
         repair_nan_wt: Literal["?", True, "!", None] = None,
@@ -1713,22 +1713,22 @@ class NumbaModel(_BaseModel):
     def _wrap_as_dataframe(
         self,
         arr,
-        return_dataframe,
+        return_type: Literal["dataframe", "names", "idce", "idca", "dataarray", None],
         start_case=None,
         stop_case=None,
         step_case=None,
     ):
-        if return_dataframe:
+        if return_type:
             idx = self.datatree.caseids()
             if idx is not None:
                 idx = idx[start_case:stop_case:step_case]
-            if return_dataframe == "names":
+            if return_type == "names":
                 return pd.DataFrame(
                     data=arr,
                     columns=self.graph.standard_sort_names[: arr.shape[1]],
                     index=idx,
                 )
-            if return_dataframe == "dataarray":
+            if return_type == "dataarray":
                 return DataArray(
                     arr,
                     coords={
@@ -1745,9 +1745,9 @@ class NumbaModel(_BaseModel):
                 columns=self.graph.standard_sort[: arr.shape[1]],
                 index=idx,
             )
-            if return_dataframe == "idce":
+            if return_type == "idce":
                 raise NotImplementedError
-            elif return_dataframe == "idca":
+            elif return_type == "idca":
                 return result.stack()
             else:
                 return result
@@ -1847,7 +1847,9 @@ class NumbaModel(_BaseModel):
         start_case=None,
         stop_case=None,
         step_case=None,
-        return_dataframe=None,
+        return_type: Literal[
+            "dataframe", "names", "idce", "idca", "dataarray", None
+        ] = None,
     ):
         result_arrays, penalty = self._loglike_runner(
             x,
@@ -1858,7 +1860,7 @@ class NumbaModel(_BaseModel):
         )
         return self._wrap_as_dataframe(
             result_arrays.utility,
-            return_dataframe,
+            return_type,
         )
 
     def logsums(

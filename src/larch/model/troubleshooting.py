@@ -15,13 +15,13 @@ logger = logging.getLogger(__name__)
 
 def doctor(
     model: Model,
-    repair_ch_av: Literal["?", "+", "-", None] = "?",
-    repair_ch_zq=None,
+    repair_ch_av: Literal["?", "+", "-", "!"] | None = "?",
+    repair_ch_zq: Literal["?", "-", "!"] | None = None,
     repair_asc=None,
-    repair_noch_nzwt: Literal["?", "+", "-", None] = "?",
-    repair_nan_wt: Literal["?", True, "!", None] = "?",
-    repair_nan_data_co: Literal["?", True, "!", None] = "?",
-    check_low_variance_data_co: Literal["?", "!", None] = None,
+    repair_noch_nzwt: Literal["?", "+", "-"] | None = "?",
+    repair_nan_wt: Literal["?", True, "!"] | None = "?",
+    repair_nan_data_co: Literal["?", True, "!"] | None = "?",
+    check_low_variance_data_co: Literal["?", "!"] | None = None,
     verbose=3,
     warning_stacklevel=2,
 ):
@@ -29,17 +29,6 @@ def doctor(
 
     if not isinstance(model, Model):
         raise TypeError("the doctor requires a Model instance to diagnose")
-
-    # logger.info("checking for chosen-but-zero-quantity")
-    # model, diagnosis = chosen_but_zero_quantity(
-    #     model, repair=repair_ch_zq, verbose=verbose
-    # )
-    # if diagnosis is not None:
-    #     logger.warning(
-    #         f"problem: chosen-but-zero-quantity ({len(diagnosis)} issues)",
-    #         stacklevel=warning_stacklevel + 1,
-    #     )
-    #     problems["chosen_but_zero_quantity"] = diagnosis
 
     def apply_repair(repair, repair_func):
         nonlocal model, problems, verbose
@@ -59,30 +48,7 @@ def doctor(
     apply_repair(repair_nan_data_co, nan_data_co)
     apply_repair(repair_nan_wt, nan_weight)
     apply_repair(check_low_variance_data_co, low_variance_data_co)
-
-    # logger.info("checking for nan-weight")
-    # model, diagnosis = nan_weight(model, repair=repair_nan_wt, verbose=verbose)
-    # if diagnosis is not None:
-    #     logger.warning(
-    #         f"problem: nan-weight ({len(diagnosis)} issues)",
-    #         stacklevel=warning_stacklevel + 1,
-    #     )
-    #     problems["nan_weight"] = diagnosis
-    #
-    # logger.info("checking for nan-data_co")
-    # model, diagnosis = nan_data_co(model, repair=repair_nan_data_co, verbose=verbose)
-    # if diagnosis is not None:
-    #     logger.warning("problem: nan-data_co", stacklevel=warning_stacklevel + 1)
-    #     problems["nan_data_co"] = diagnosis
-    #
-    # logger.info("checking for low-variance-data-co")
-    # model, diagnosis = low_variance_data_co(model, repair=None, verbose=verbose)
-    # if diagnosis is not None:
-    #     logger.warning(
-    #         f"problem: low-variance-data-co ({len(diagnosis)} issues)",
-    #         stacklevel=warning_stacklevel + 1,
-    #     )
-    #     problems["low_variance_data_co"] = diagnosis
+    apply_repair(repair_ch_zq, chosen_but_zero_quantity)
 
     return model, problems
 
@@ -158,7 +124,7 @@ def chosen_but_not_available(
 
 
 def chosen_but_zero_quantity(
-    model, repair: Literal[None, "-"] = None, verbose: int = 3
+    model: Model, repair: Literal["?", "-", "!"] | None = None, verbose: int = 3
 ):
     """
     Check if some observations are chosen but have zero quantity.
@@ -167,7 +133,7 @@ def chosen_but_zero_quantity(
     ----------
     model : BaseModel
         The model to check
-    repair : {None, '-', }
+    repair : {None, '-', '?', '!'}
         How to repair the data.
         Minus will make them not chosen (possibly leaving no chosen alternative).
         None effects no repair, and simply emits a warning.
@@ -182,56 +148,55 @@ def chosen_but_zero_quantity(
         The number of bad instances, by alternative, and some example rows.
 
     """
-    if repair not in ("-", None):
+    if repair not in ("?", "-", "!", None):
         raise ValueError(f'invalid repair setting "{repair}"')
 
-    if isinstance(model, Model):
-        m = model
-        model = m.dataframes
-    else:
-        m = None
+    quant = model.quantity()
+    zero_quantity = np.asarray(quant[:, : model.graph.n_elementals()] == 0)
 
-    try:
-        zero_q = model.get_zero_quantity_ca()
-    except ValueError:
-        diagnosis = None
+    dataset = model.dataset
+    if dataset is None:
+        raise ValueError("data not loaded")
+    assert isinstance(dataset, xr.Dataset)
 
-    else:
-        _zero_q = (zero_q > 0).values
-        _chosen = (model.data_ch > 0).values
-        _wid = min(_zero_q.shape[1], _chosen.shape[1])
-
-        chosen_but_zero_quantity = pd.DataFrame(
-            data=_zero_q[:, :_wid] & _chosen[:, :_wid],
-            index=model.data_av.index,
-            columns=model.data_av.columns[:_wid],
+    ch_and_zero_quantity = (dataset["ch"] > 0) & zero_quantity
+    ch_and_zero_quantity_sum = ch_and_zero_quantity.sum(dataset.dc.CASEID)
+    diagnosis = None
+    if ch_and_zero_quantity.sum() > 0:
+        i1, i2 = np.where(ch_and_zero_quantity)
+        diagnosis = (
+            ch_and_zero_quantity_sum[ch_and_zero_quantity_sum > 0]
+            .to_pandas()
+            .rename("n")
+            .to_frame()
         )
-        chosen_but_zero_quantity_sum = chosen_but_zero_quantity.sum(0)
 
-        diagnosis = None
-        if chosen_but_zero_quantity_sum.sum() > 0:
-            i1, i2 = np.where(chosen_but_zero_quantity)
+        for colnum, colname in enumerate(dataset.dc.altids()):
+            if ch_and_zero_quantity_sum[colnum] > 0:
+                diagnosis.loc[colname, "example rows"] = ", ".join(
+                    str(j) for j in i1[i2 == colnum][:verbose]
+                )
 
-            diagnosis = pd.DataFrame(
-                chosen_but_zero_quantity_sum[chosen_but_zero_quantity_sum > 0],
-                columns=[
-                    "n",
-                ],
+        msg = "chosen_but_zero_quantity: some observed choices have zero quantity.\n"
+        try:
+            from tabulate import tabulate
+        except ImportError:
+            msg += diagnosis.to_string()
+        else:
+            msg += tabulate(diagnosis, headers="keys", tablefmt="fancy_outline")
+        if repair == "!":
+            raise ValueError(msg)
+        elif repair == "?":
+            logger.warning(msg)
+        elif repair == "-":
+            logger.warning(
+                msg.replace(
+                    "some observed choices", "zeroing out observed choices that"
+                )
             )
+            model.dataset["ch"].values[ch_and_zero_quantity] = 0
 
-            for colnum, colname in enumerate(chosen_but_zero_quantity.columns):
-                if chosen_but_zero_quantity_sum[colname] > 0:
-                    diagnosis.loc[colname, "example rows"] = ", ".join(
-                        str(j) for j in i1[i2 == colnum][:verbose]
-                    )
-
-            if repair == "-":
-                model.data_ch.values[chosen_but_zero_quantity] = 0
-
-    if m is None:
-        return model, diagnosis
-    else:
-        return m, diagnosis
+    return model, diagnosis
 
 
 def nothing_chosen_but_nonzero_weight(
