@@ -940,7 +940,14 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         return (self.jax_loglike_casewise(params) * wt).sum()
 
     def loglike(
-        self, x=None, *, start_case=None, stop_case=None, step_case=None, **kwargs
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        check_if_best=True,
+        **kwargs,
     ):
         if self.compute_engine != "jax":
             return super().loglike(
@@ -962,7 +969,12 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             self.pvals = x
         self.check_random_draws()
         result = float(self.jax_loglike(self.pvals))
-        if start_case is None and stop_case is None and step_case is None:
+        if (
+            check_if_best
+            and start_case is None
+            and stop_case is None
+            and step_case is None
+        ):
             self._check_if_best(result)
         return result
 

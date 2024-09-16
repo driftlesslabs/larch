@@ -2,13 +2,18 @@ from __future__ import annotations
 
 import logging
 import warnings
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
 
 from ..exceptions import BHHHSimpleStepFailure, MissingDataError
+from ..util import dictx
 
 logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    pass
 
 
 class ModelDashboard:
@@ -18,7 +23,7 @@ class ModelDashboard:
     This dashboard is displayed on creation.
     """
 
-    def __init__(self, throttle=2, visible=True, *, tags=None):
+    def __init__(self, throttle: float = 2, visible=True, *, tags=None):
         from ..util.display import display_head, display_nothing, display_p
         from ..util.rate_limiter import NonBlockingRateLimiter
 
@@ -360,11 +365,11 @@ def maximize_loglike(
                 except Exception:
                     constraints = ()
 
-                args = getattr(model, "_null_slice", (0, -1, 1))
+                # args = getattr(model, "_null_slice", (0, -1, 1))
                 raw_result = minimize(
                     model.logloss,
                     model.pvals,
-                    args=args,
+                    # args=args,
                     method=method,
                     jac=model.d_logloss,
                     bounds=bounds,
@@ -404,8 +409,6 @@ def maximize_loglike(
             raw_result = {}
         # if check_for_overspecification:
         # 	model.check_for_possible_overspecification()
-
-        from ..util import dictx
 
         result = dictx()
         for k, v in raw_result.items():

@@ -36,6 +36,7 @@ from .tree import NestingTree
 
 if TYPE_CHECKING:
     from scipy.optimize import Bounds
+    from xarray import Dataset
 
 logger = logging.getLogger("larch.model")
 
@@ -234,6 +235,11 @@ class BaseModel:
                 stacklevel=2,
             )
             self.use_streaming = False
+
+    @property
+    def dataset(self) -> Dataset | None:
+        """xarray.Dataset : Data arrays as loaded for model computation."""
+        raise NotImplementedError("the BaseModel class does not include a dataset")
 
     @property
     def use_streaming(self):
@@ -1170,7 +1176,7 @@ class BaseModel:
     def is_mangled(self):
         return self._mangled
 
-    def mangle(self, data=True, structure=True):
+    def mangle(self, data=True, structure=True) -> None:
         if data and not (self._mangled & 0x1):
             logger.debug(f"mangling data for {self.title}")
             self._mangled |= MANGLE_DATA
@@ -1246,7 +1252,7 @@ class BaseModel:
         if self.logsum_parameter is not None:
             nameset.add(self.__p_rename(self.logsum_parameter))
         self._ensure_names(
-            nameset, value=1, nullvalue=1, initvalue=1, minimum=0.001, maximum=1
+            nameset, value=1, nullvalue=1, initvalue=1, minimum=0.01, maximum=1
         )
 
     def _scan_mixtures_ensure_names(self):

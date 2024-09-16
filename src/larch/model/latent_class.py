@@ -183,7 +183,14 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
         return self.jax_loglike_casewise(params).sum()
 
     def loglike(
-        self, x=None, *, start_case=None, stop_case=None, step_case=None, **kwargs
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        check_if_best=True,
+        **kwargs,
     ):
         if self.compute_engine != "jax":
             raise NotImplementedError(f"latent class with engine={self.compute_engine}")
@@ -197,8 +204,13 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
         if x is not None:
             self.pvals = x
         result = float(self.jax_loglike(self.pvals))
-        # if start_case is None and stop_case is None and step_case is None:
-        #     self._check_if_best(result)
+        if (
+            check_if_best
+            and start_case is None
+            and stop_case is None
+            and step_case is None
+        ):
+            self._check_if_best(result)
         return result
 
     def neg_loglike(
@@ -464,12 +476,14 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
     def logloss(
         self,
         x=None,
+        *,
         start_case=None,
         stop_case=None,
         step_case=None,
         leave_out=-1,
         keep_only=-1,
         subsample=-1,
+        check_if_best=True,
     ):
         result = self.loglike(
             x,
@@ -479,6 +493,7 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
             leave_out=leave_out,
             keep_only=keep_only,
             subsample=subsample,
+            check_if_best=check_if_best,
         )
         return -result / self.total_weight()
 

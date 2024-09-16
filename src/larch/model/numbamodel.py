@@ -995,7 +995,7 @@ class NumbaModel(_BaseModel):
 
     work_arrays = SimpleAttribute()
 
-    def mangle(self, data=True, structure=True):
+    def mangle(self, data=True, structure=True) -> None:
         super().mangle(data, structure)
         if data:
             self._dataset = None
@@ -1229,7 +1229,7 @@ class NumbaModel(_BaseModel):
         if self.logsum_parameter is not None:
             nameset.add(str(self.logsum_parameter))
         self._ensure_names(
-            nameset, value=1, nullvalue=1, initvalue=1, minimum=0.001, maximum=1
+            nameset, value=1, nullvalue=1, initvalue=1, minimum=0.01, maximum=1
         )
 
     def __prepare_for_compute(
@@ -1490,7 +1490,14 @@ class NumbaModel(_BaseModel):
         pass  # TODO
 
     def loglike(
-        self, x=None, *, start_case=None, stop_case=None, step_case=None, **kwargs
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        check_if_best=True,
+        **kwargs,
     ):
         """
         Compute the log likelihood of the model.
@@ -1516,6 +1523,10 @@ class NumbaModel(_BaseModel):
             The step size of the case iterator to use in likelihood
             calculation.  This is processed as usual for Python slicing
             and iterating.  To include all cases, step by 1 (the default).
+        check_if_best : bool, default True
+            If True, check if the current log likelihood is the best
+            found so far, and if so, update the cached best log likelihood
+            and cached best parameters.
 
         Returns
         -------
@@ -2018,12 +2029,14 @@ class NumbaModel(_BaseModel):
     def logloss(
         self,
         x=None,
+        *,
         start_case=None,
         stop_case=None,
         step_case=None,
         leave_out=-1,
         keep_only=-1,
         subsample=-1,
+        check_if_best=True,
     ):
         result = self.loglike(
             x,
@@ -2033,6 +2046,7 @@ class NumbaModel(_BaseModel):
             leave_out=leave_out,
             keep_only=keep_only,
             subsample=subsample,
+            check_if_best=check_if_best,
         )
         return -result / self.total_weight()
 

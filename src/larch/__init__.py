@@ -13,6 +13,7 @@ from .model import mixtures
 from .model.basemodel import BaseModel
 from .model.jaxmodel import Model
 from .model.latent_class import LatentClass, MixedLatentClass
+from .model.model_group import ModelGroup
 from .model.param_core import ParameterBucket
 from .model.saving import load_model
 from .model.tree import NestingTree
@@ -41,6 +42,7 @@ __all__ = [
     "mixtures",
     "BaseModel",
     "Model",
+    "ModelGroup",
     "LatentClass",
     "MixedLatentClass",
     "ParameterBucket",

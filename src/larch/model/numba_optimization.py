@@ -252,9 +252,12 @@ def fit_bhhh(
             current_ll = current_result.ll
             current_dll = current_result.dll
             current_bhhh = current_result.bhhh
-            logger.debug(
-                f"  constrained convergence tolerance {model.constraint_converge_tolerance()}"
-            )
+            try:
+                cct = model.constraint_converge_tolerance()
+            except AttributeError:
+                pass
+            else:
+                logger.debug(f"  constrained convergence tolerance {cct}")
 
         direction, tolerance = find_direction(current_dll, current_bhhh)
         logger.debug(f"  convergence tolerance {tolerance}")
