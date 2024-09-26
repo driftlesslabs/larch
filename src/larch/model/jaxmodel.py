@@ -947,7 +947,6 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         stop_case=None,
         step_case=None,
         check_if_best=True,
-        **kwargs,
     ):
         if self.compute_engine != "jax":
             return super().loglike(
@@ -955,7 +954,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                 start_case=start_case,
                 stop_case=stop_case,
                 step_case=step_case,
-                **kwargs,
+                check_if_best=check_if_best,
             )
         if start_case is not None:
             raise NotImplementedError("start_case with engine=jax")
@@ -986,7 +985,6 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         stop_case=None,
         step_case=None,
         return_series=False,
-        **kwargs,
     ):
         if self.compute_engine != "jax":
             return super().d_loglike(
@@ -995,7 +993,6 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                 stop_case=stop_case,
                 step_case=step_case,
                 return_series=return_series,
-                **kwargs,
             )
         if start_case is not None:
             raise NotImplementedError("start_case with engine=jax")

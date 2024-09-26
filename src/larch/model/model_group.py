@@ -233,9 +233,6 @@ class ModelGroup(ConstrainedModel, MutableSequence):
                 stop_case=None,
                 step_case=None,
                 persist=0,
-                leave_out=-1,
-                keep_only=-1,
-                subsample=-1,
             )
             for k, v in t.items():
                 if k in result:

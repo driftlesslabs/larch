@@ -219,18 +219,12 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
         start_case=None,
         stop_case=None,
         step_case=None,
-        leave_out=-1,
-        keep_only=-1,
-        subsample=-1,
     ):
         result = self.loglike(
             x,
             start_case=start_case,
             stop_case=stop_case,
             step_case=step_case,
-            leave_out=leave_out,
-            keep_only=keep_only,
-            subsample=subsample,
         )
         return -result
 
@@ -480,9 +474,6 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
         start_case=None,
         stop_case=None,
         step_case=None,
-        leave_out=-1,
-        keep_only=-1,
-        subsample=-1,
         check_if_best=True,
     ):
         result = self.loglike(
@@ -490,9 +481,6 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
             start_case=start_case,
             stop_case=stop_case,
             step_case=step_case,
-            leave_out=leave_out,
-            keep_only=keep_only,
-            subsample=subsample,
             check_if_best=check_if_best,
         )
         return -result / self.total_weight()

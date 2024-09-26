@@ -1903,9 +1903,6 @@ class NumbaModel(_BaseModel):
         stop_case=None,
         step_case=None,
         persist=0,
-        leave_out=-1,
-        keep_only=-1,
-        subsample=-1,
         return_series=True,
         probability_only=False,
     ):
@@ -1938,9 +1935,6 @@ class NumbaModel(_BaseModel):
         stop_case=None,
         step_case=None,
         persist=0,
-        leave_out=-1,
-        keep_only=-1,
-        subsample=-1,
     ):
         result_arrays, penalty = self._loglike_runner(
             x,
@@ -1984,9 +1978,6 @@ class NumbaModel(_BaseModel):
         start_case=None,
         stop_case=None,
         step_case=None,
-        leave_out=-1,
-        keep_only=-1,
-        subsample=-1,
     ):
         if x is None:
             x = self.pvals.copy()
@@ -1999,9 +1990,6 @@ class NumbaModel(_BaseModel):
                 start_case=start_case,
                 stop_case=stop_case,
                 step_case=step_case,
-                leave_out=leave_out,
-                keep_only=keep_only,
-                subsample=subsample,
             ),
         )
 
@@ -2011,18 +1999,12 @@ class NumbaModel(_BaseModel):
         start_case=None,
         stop_case=None,
         step_case=None,
-        leave_out=-1,
-        keep_only=-1,
-        subsample=-1,
     ):
         result = self.loglike(
             x,
             start_case=start_case,
             stop_case=stop_case,
             step_case=step_case,
-            leave_out=leave_out,
-            keep_only=keep_only,
-            subsample=subsample,
         )
         return -result
 
@@ -2033,9 +2015,6 @@ class NumbaModel(_BaseModel):
         start_case=None,
         stop_case=None,
         step_case=None,
-        leave_out=-1,
-        keep_only=-1,
-        subsample=-1,
         check_if_best=True,
     ):
         result = self.loglike(
@@ -2043,9 +2022,6 @@ class NumbaModel(_BaseModel):
             start_case=start_case,
             stop_case=stop_case,
             step_case=step_case,
-            leave_out=leave_out,
-            keep_only=keep_only,
-            subsample=subsample,
             check_if_best=check_if_best,
         )
         return -result / self.total_weight()
@@ -2067,9 +2043,6 @@ class NumbaModel(_BaseModel):
         steplen=0.5,
         jumpstart=0,
         jumpstart_split=5,
-        leave_out=-1,
-        keep_only=-1,
-        subsample=-1,
         logger=None,
     ):
         """
@@ -2102,9 +2075,6 @@ class NumbaModel(_BaseModel):
                 result = self.loglike2_bhhh(
                     start_case=j0,
                     step_case=jumpstart_split,
-                    leave_out=leave_out,
-                    keep_only=keep_only,
-                    subsample=subsample,
                 )
                 current_dll = result.dll
                 current_bhhh = result.bhhh

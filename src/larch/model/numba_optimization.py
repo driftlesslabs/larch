@@ -32,9 +32,6 @@ def fit_bhhh(
     callback=None,
     minimum_steplen=0.0001,
     maximum_steplen=1.0,
-    leave_out=-1,
-    keep_only=-1,
-    subsample=-1,
     initial_constraint_intensity=None,
     step_constraint_intensity=1.5,
     max_constraint_intensity=1e6,
@@ -73,11 +70,7 @@ def fit_bhhh(
         model.constraint_sharpness = initial_constraint_sharpness
 
     if jumpstart:
-        current_result = model.loglike2_bhhh(
-            leave_out=leave_out,
-            keep_only=keep_only,
-            subsample=subsample,
-        )
+        current_result = model.loglike2_bhhh()
         current_ll = current_result.ll
         logger.debug(f"before jumpstart loglike {current_ll}")
 
@@ -89,11 +82,7 @@ def fit_bhhh(
         iter += jumpstart
 
     current_pvals = model.pvals.copy()
-    current_result = model.loglike2_bhhh(
-        leave_out=leave_out,
-        keep_only=keep_only,
-        subsample=subsample,
-    )
+    current_result = model.loglike2_bhhh()
     current_ll = current_result.ll
     current_dll = current_result.dll
     current_bhhh = current_result.bhhh
@@ -147,11 +136,7 @@ def fit_bhhh(
             )
         while True:
             model.pvals = current_pvals + direction * steplen
-            proposed = model.loglike2_bhhh(
-                leave_out=leave_out,
-                keep_only=keep_only,
-                subsample=subsample,
-            )
+            proposed = model.loglike2_bhhh()
             proposed_ll = proposed.ll
             if proposed_ll > current_ll:
                 break
@@ -183,11 +168,7 @@ def fit_bhhh(
                             model.constraint_sharpness, max_constraint_sharpness
                         )
                         logger.debug(f"-- sharpness to ({model.constraint_sharpness})")
-                        proposed = model.loglike2_bhhh(
-                            leave_out=leave_out,
-                            keep_only=keep_only,
-                            subsample=subsample,
-                        )
+                        proposed = model.loglike2_bhhh()
                         proposed_ll = proposed.ll
                         logger.debug(
                             f"   penalty is ({proposed.penalty * model.n_cases})"
@@ -244,11 +225,7 @@ def fit_bhhh(
                 model.constraint_sharpness, max_constraint_sharpness
             )
             # recompute value with updated penalties
-            current_result = model.loglike2_bhhh(
-                leave_out=leave_out,
-                keep_only=keep_only,
-                subsample=subsample,
-            )
+            current_result = model.loglike2_bhhh()
             current_ll = current_result.ll
             current_dll = current_result.dll
             current_bhhh = current_result.bhhh

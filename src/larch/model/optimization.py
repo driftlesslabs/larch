@@ -72,9 +72,6 @@ def maximize_loglike(
     bhhh_start=0,
     jumpstart=0,
     jumpstart_split=5,
-    leave_out=-1,
-    keep_only=-1,
-    subsample=-1,
     return_dashboard=False,
     dashboard=None,
     prior_result=None,
@@ -234,9 +231,6 @@ def maximize_loglike(
                     callback=callback,
                     minimum_steplen=0.0001,
                     maximum_steplen=1.0,
-                    leave_out=-1,
-                    keep_only=-1,
-                    subsample=-1,
                     initial_constraint_intensity=1.0,
                     step_constraint_intensity=1.5,
                     max_constraint_intensity=1e6,
@@ -280,15 +274,6 @@ def maximize_loglike(
                         ctol=stopping_tol,
                         maxiter=max_iter,
                         callback=callback,
-                        leave_out=leave_out,
-                        keep_only=keep_only,
-                        subsample=subsample,
-                        # initial_constraint_intensity=1.0,
-                        # step_constraint_intensity=1.5,
-                        # max_constraint_intensity=1e6,
-                        # initial_constraint_sharpness=1.0,
-                        # step_constraint_sharpness=1.5,
-                        # max_constraint_sharpness=1e6,
                     )
                 else:
                     (
@@ -303,9 +288,6 @@ def maximize_loglike(
                         callback=callback,
                         jumpstart=jumpstart,
                         jumpstart_split=jumpstart_split,
-                        leave_out=leave_out,
-                        keep_only=keep_only,
-                        subsample=subsample,
                     )
                 raw_result = {
                     "loglike": current_ll,
@@ -485,9 +467,6 @@ def fit_bhhh(
     jumpstart_split=5,
     minimum_steplen=0.0001,
     maximum_steplen=1.0,
-    leave_out=-1,
-    keep_only=-1,
-    subsample=-1,
     initial_constraint_intensity=None,
     step_constraint_intensity=1.5,
     initial_constraint_sharpness=None,
@@ -518,11 +497,7 @@ def fit_bhhh(
     #     model.jumpstart_bhhh(jumpstart=jumpstart, jumpstart_split=jumpstart_split)
     #     iter += jumpstart
 
-    current_ll, current_dll, current_bhhh = model._loglike2_bhhh_tuple(
-        leave_out=leave_out,
-        keep_only=keep_only,
-        subsample=subsample,
-    )
+    current_ll, current_dll, current_bhhh = model._loglike2_bhhh_tuple()
 
     def find_direction(current_dll, current_bhhh):
         freedoms = model.pholdfast == 0
@@ -540,11 +515,7 @@ def fit_bhhh(
             )
         while True:
             model.pvals = current_pvals + direction * steplen
-            proposed_ll, proposed_dll, proposed_bhhh = model._loglike2_bhhh_tuple(
-                leave_out=leave_out,
-                keep_only=keep_only,
-                subsample=subsample,
-            )
+            proposed_ll, proposed_dll, proposed_bhhh = model._loglike2_bhhh_tuple()
             if proposed_ll > current_ll:
                 break
             steplen *= 0.5
