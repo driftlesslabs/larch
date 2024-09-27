@@ -47,6 +47,7 @@
       ~Dataset.diff
       ~Dataset.differentiate
       ~Dataset.drop
+      ~Dataset.drop_attrs
       ~Dataset.drop_dims
       ~Dataset.drop_duplicates
       ~Dataset.drop_encoding

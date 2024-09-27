@@ -31,6 +31,7 @@
       ~Model.d_logloss
       ~Model.distribution_on_idca_variable
       ~Model.distribution_on_idco_variable
+      ~Model.doctor
       ~Model.dumps
       ~Model.estimation_statistics
       ~Model.fit_bhhh
@@ -45,6 +46,7 @@
       ~Model.jax_neg_loglike
       ~Model.jax_param_cov
       ~Model.jumpstart_bhhh
+      ~Model.load_data
       ~Model.lock_value
       ~Model.loglike
       ~Model.loglike2
@@ -71,6 +73,7 @@
       ~Model.robust_covariance
       ~Model.save
       ~Model.set_cap
+      ~Model.set_value
       ~Model.set_values
       ~Model.should_preload_data
       ~Model.swap_datatree
@@ -88,6 +91,7 @@
 
    .. autosummary::
    
+      ~Model.autoscale_weights
       ~Model.availability_any
       ~Model.availability_ca_var
       ~Model.availability_co_vars

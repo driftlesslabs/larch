@@ -6,6 +6,7 @@
 
 installation
 choice-models
+compute-engines
 ```
 
 ```{toctree}

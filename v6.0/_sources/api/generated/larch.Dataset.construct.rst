@@ -19,6 +19,7 @@
       ~Dataset.construct.from_idco
       ~Dataset.construct.from_omx
       ~Dataset.construct.from_omx_3d
+      ~Dataset.construct.new_idca
    
    
 
