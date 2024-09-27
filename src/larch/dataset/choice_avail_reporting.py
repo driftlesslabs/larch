@@ -160,7 +160,7 @@ def choice_avail_summary(
         od["availability condition"] = pd.Series(
             availability_co_vars.values(),
             index=availability_co_vars.keys(),
-            dtype=np.unicode_,
+            dtype=np.str_,
         )
 
     result = pd.DataFrame.from_dict(od)
