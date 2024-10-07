@@ -3,6 +3,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 import pytest
+import xarray as xr
+from numpy import random
 from pytest import approx
 
 import larch as lx
@@ -84,3 +86,69 @@ def test_destination_only(compute_engine, use_streaming):
         np.array([0.145749, 0.052355, 0.0, 0.0, 0.009012, 0.003812]),
         rel=1e-2,
     )
+
+
+@pytest.mark.parametrize("compute_engine", ["jax", "numba"])
+def test_destination_some_zero_q(compute_engine):
+    hh, pp, tour, skims, emp = lx.example(200, ["hh", "pp", "tour", "skims", "emp"])
+    tour = tour.join(hh[["HHID", "HOMETAZ"]].set_index("HHID"), on="HHID")
+    emp["samp_prob"] = emp.TOTAL_EMP / emp.TOTAL_EMP.sum()
+    distance = xr.DataArray(
+        skims["AUTO_DIST"][:],
+        dims=["otaz", "dtaz"],
+        coords={"otaz": skims["TAZ_ID"][:], "dtaz": skims["TAZ_ID"][:]},
+    )
+    rng = random.default_rng(42)
+    samps = {}
+    for i, dtaz in zip(tour.index, tour.DTAZ):
+        samp = rng.choice(emp.index, 10, replace=True, p=emp["samp_prob"])
+        samp[0] = dtaz
+        samps[i] = pd.Series(samp)
+    df = (
+        pd.concat(samps, axis=0, names=["tour_id", "samp_id"])
+        .rename("sampled_taz")
+        .reset_index()
+    )
+    df["fake_data"] = rng.normal(size=len(df))
+    df = df.set_index(["tour_id", "samp_id"])
+    df = df.join(emp, on="sampled_taz")
+    df = df.join(tour[["TOURID", "HOMETAZ"]].set_index("TOURID"), on="tour_id")
+    distances = []
+    for i in range(len(df)):
+        distances.append(
+            distance.data[df.HOMETAZ.iloc[i] - 1, df.sampled_taz.iloc[i] - 1]
+        )
+    df["distance"] = pd.Series(distances, index=df.index)
+    ds = lx.Dataset.construct.from_idca(df)
+    m = lx.Model(ds, compute_engine="jax")
+    m.quantity_ca = (
+        +P.RETAIL_EMP * X("RETAIL_EMP")
+        # + P.NONRETAIL_EMP * X('NONRETAIL_EMP')
+    )
+    m.lock_value(P.RETAIL_EMP, 0)
+    m.quantity_scale = P.Theta
+    m.utility_ca = m.utility_ca = +P.fake_data * X.fake_data + P.distance * X.distance
+    m.choice_ca_var = "samp_id == 0"
+    assert m.probability().sum(0) == approx(
+        [
+            1981.24053581,
+            2089.47147447,
+            2121.30911427,
+            2053.22970856,
+            2045.50005845,
+            2078.48652599,
+            2084.46825967,
+            2057.77903425,
+            2106.36456315,
+            2121.15072539,
+        ]
+    )
+
+    m.doctor(repair_ch_zq="-")
+    # some cases the choice is a zone with zero quantity
+    # this is intentional, and we need to repair the model for it
+
+    assert m.d_loglike() == approx([0.0, -31148.736, -22003.318, 84.19797])
+    assert m.loglike() == approx(-62083.82421875)
+    result = m.maximize_loglike()
+    assert result.loglike == approx(-39720.1015625)

@@ -682,6 +682,27 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             f = jax.vmap(f, in_axes=(None, 0))
         return f(params, {"ca": ca, "co": co, "av": av})
 
+    def quantity(
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+        return_type=None,
+    ):
+        if self.compute_engine != "jax":
+            return super().quantity(
+                x=x,
+                start_case=start_case,
+                stop_case=stop_case,
+                step_case=step_case,
+                return_type=return_type,
+            )
+        if x is not None:
+            self.pvals = x
+        return self.jax_quantity(self.pvals)
+
     def utility(
         self,
         x=None,

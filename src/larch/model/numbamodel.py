@@ -405,7 +405,9 @@ def _numba_utility_to_loglike(
                     if up_mu_slot >= 0:
                         # FIXME: alpha slots to appear here if cross-nesting is activated
                         dutility[up, up_mu_slot] -= cond_prob * (utility[dn])
-                    dutility[up, :] += cond_prob * dutility[dn, :]
+                    dutility[up, :] += np.where(
+                        cond_prob, cond_prob * dutility[dn, :], 0
+                    )
 
             # d probability
             # scratch = np.zeros_like(parameter_arr)
@@ -454,9 +456,10 @@ def _numba_utility_to_loglike(
                         else:
                             scratch_ = 0
                         scratch_ += d_probability[up, p]
-                        d_probability[dn, p] += (
-                            scratch_ * conditional_probability[dn]
-                        )  # FIXME: for CNL, use edge not dn
+                        if conditional_probability[dn]:
+                            d_probability[dn, p] += (
+                                scratch_ * conditional_probability[dn]
+                            )  # FIXME: for CNL, use edge not dn
 
             if return_bhhh:
                 bhhh[:] = 0.0
@@ -1437,12 +1440,16 @@ class NumbaModel(_BaseModel):
 
                 if self.constraint_intensity:
                     penalty, dpenalty, dpenalty_binding = self.constraint_penalty()
-                    self.work_arrays.loglike[caseslice] += penalty
-                    self.work_arrays.d_loglike[caseslice] += np.expand_dims(dpenalty, 0)
-                    self.work_arrays.bhhh[caseslice] = np.einsum(
-                        "ij,ik->ijk",
-                        self.work_arrays.d_loglike[caseslice],
-                        self.work_arrays.d_loglike[caseslice],
+                    self.work_arrays.loglike[caseslice] += np.nan_to_num(penalty)
+                    self.work_arrays.d_loglike[caseslice] += np.nan_to_num(
+                        np.expand_dims(dpenalty, 0)
+                    )
+                    self.work_arrays.bhhh[caseslice] = np.nan_to_num(
+                        np.einsum(
+                            "ij,ik->ijk",
+                            self.work_arrays.d_loglike[caseslice],
+                            self.work_arrays.d_loglike[caseslice],
+                        )
                     )
                 else:
                     penalty = 0.0
