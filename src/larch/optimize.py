@@ -10,8 +10,8 @@ from scipy.optimize import Bounds, minimize
 
 from ._optional import jax, jnp
 from .compiled import jitmethod
-from .util.simple_attribute import SimpleAttribute
 from .exceptions import MissingDataError
+from .util.simple_attribute import SimpleAttribute
 
 if TYPE_CHECKING:
     from xarray import Dataset
