@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>larch.model.jaxmodel &#8212; v6.0.23</title>
+    <title>larch.model.jaxmodel &#8212; v6.0.25</title>
   
   
   
@@ -141,8 +141,8 @@
       
     
     
-    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.23 - Home"/>
-    <script>document.write(`<img src="../../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.23 - Home"/>`);</script>
+    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.25 - Home"/>
+    <script>document.write(`<img src="../../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.25 - Home"/>`);</script>
   
   
 </a></div>
@@ -1071,6 +1071,30 @@ document.write(`
             <span class="n">f</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;ca&quot;</span><span class="p">:</span> <span class="n">ca</span><span class="p">,</span> <span class="s2">&quot;co&quot;</span><span class="p">:</span> <span class="n">co</span><span class="p">,</span> <span class="s2">&quot;av&quot;</span><span class="p">:</span> <span class="n">av</span><span class="p">})</span>
 
+<div class="viewcode-block" id="Model.quantity">
+<a class="viewcode-back" href="../../../api/generated/larch.Model.quantity.html#larch.Model.quantity">[docs]</a>
+    <span class="k">def</span> <span class="nf">quantity</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">start_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">stop_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">step_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">return_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_engine</span> <span class="o">!=</span> <span class="s2">&quot;jax&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">quantity</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+                <span class="n">start_case</span><span class="o">=</span><span class="n">start_case</span><span class="p">,</span>
+                <span class="n">stop_case</span><span class="o">=</span><span class="n">stop_case</span><span class="p">,</span>
+                <span class="n">step_case</span><span class="o">=</span><span class="n">step_case</span><span class="p">,</span>
+                <span class="n">return_type</span><span class="o">=</span><span class="n">return_type</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pvals</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">jax_quantity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pvals</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="Model.utility">
 <a class="viewcode-back" href="../../../api/generated/larch.Model.utility.html#larch.Model.utility">[docs]</a>
     <span class="k">def</span> <span class="nf">utility</span><span class="p">(</span>
@@ -1636,7 +1660,7 @@ document.write(`
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-<p class="larch-version">🌳 Larch v6.0.23, © Copyright 2024.</p></div>
+<p class="larch-version">🌳 Larch v6.0.25, © Copyright 2024.</p></div>
       
     </div>
   
