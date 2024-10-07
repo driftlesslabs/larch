@@ -3,8 +3,8 @@ from __future__ import annotations
 import numpy
 import pandas
 
-from ..shorts import P, X
 from ..model.linear import LinearFunction
+from ..shorts import P, X
 
 # duplicate these here for legacy compatibility
 

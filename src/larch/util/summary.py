@@ -110,27 +110,27 @@ def joint_parameter_summary(
             except Exception:
                 pass
             else:
-                summary.loc[
-                    ("Log Likelihood", "Converged"), (model.title, "Param")
-                ] = f"{ll:,.2f}"
+                summary.loc[("Log Likelihood", "Converged"), (model.title, "Param")] = (
+                    f"{ll:,.2f}"
+                )
 
             try:
                 ll_null = model.loglike_null(-1)
             except Exception:
                 pass
             else:
-                summary.loc[
-                    ("Log Likelihood", "Null"), (model.title, "Param")
-                ] = f"{ll_null:,.2f}"
+                summary.loc[("Log Likelihood", "Null"), (model.title, "Param")] = (
+                    f"{ll_null:,.2f}"
+                )
 
             try:
                 ll_nil = model.loglike_nil(-1)
             except Exception:
                 pass
             else:
-                summary.loc[
-                    ("Log Likelihood", "Nil"), (model.title, "Param")
-                ] = f"{ll_nil:,.2f}"
+                summary.loc[("Log Likelihood", "Nil"), (model.title, "Param")] = (
+                    f"{ll_nil:,.2f}"
+                )
 
             for b in bases:
                 try:
@@ -138,9 +138,9 @@ def joint_parameter_summary(
                 except Exception:
                     pass
                 else:
-                    summary.loc[
-                        ("Log Likelihood", b.title), (model.title, "Param")
-                    ] = f"{ll:,.2f}"
+                    summary.loc[("Log Likelihood", b.title), (model.title, "Param")] = (
+                        f"{ll:,.2f}"
+                    )
 
     if rhosq:
         for model in models:
@@ -149,18 +149,18 @@ def joint_parameter_summary(
             except Exception:
                 pass
             else:
-                summary.loc[
-                    ("Rho Squared", "vs Null"), (model.title, "Param")
-                ] = f"{rho:,.4f}"
+                summary.loc[("Rho Squared", "vs Null"), (model.title, "Param")] = (
+                    f"{rho:,.4f}"
+                )
 
             try:
                 rho_nil = model.rho_sq_nil(use_cache=-1)
             except Exception:
                 pass
             else:
-                summary.loc[
-                    ("Rho Squared", "vs Nil"), (model.title, "Param")
-                ] = f"{rho_nil:,.4f}"
+                summary.loc[("Rho Squared", "vs Nil"), (model.title, "Param")] = (
+                    f"{rho_nil:,.4f}"
+                )
 
             for b in bases:
                 try:

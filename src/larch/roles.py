@@ -13,9 +13,9 @@ from .model.linear import LinearComponent, LinearFunction
 from .util.naming import parenthize
 from .util.touch_notifier import TouchNotify
 
-_chi = "\u03C7"
-_beta = "\u03B2"
-_hahook = "\u04FC"
+_chi = "\u03c7"
+_beta = "\u03b2"
+_hahook = "\u04fc"
 
 _ParameterRef_repr_txt = "P"
 _DataRef_repr_txt = "X"
