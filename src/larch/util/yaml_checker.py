@@ -74,7 +74,7 @@ class Format:
         line += max(21 - len(line), 0) * " "
         line += problem.desc
         if problem.rule:
-            line += "  (%s)" % problem.rule
+            line += f"  ({problem.rule:s})"
         return line
 
     @staticmethod
@@ -82,13 +82,13 @@ class Format:
         line = "  \033[2m%d:%d\033[0m" % (problem.line, problem.column)
         line += max(20 - len(line), 0) * " "
         if problem.level == "warning":
-            line += "\033[33m%s\033[0m" % problem.level
+            line += f"\033[33m{problem.level}\033[0m"
         else:
-            line += "\033[31m%s\033[0m" % problem.level
+            line += f"\033[31m{problem.level}\033[0m"
         line += max(38 - len(line), 0) * " "
         line += problem.desc
         if problem.rule:
-            line += "  \033[2m(%s)\033[0m" % problem.rule
+            line += f"  \033[2m({problem.rule})\033[0m"
         return line
 
 

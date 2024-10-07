@@ -49,13 +49,13 @@ class DataFrameViewer(pandas.DataFrame):
 
     def __getitem__(self, item):
         result = super().__getitem__(item)
-        if type(result) == pandas.DataFrame:
+        if type(result) is pandas.DataFrame:
             result.__class__ = DataFrameViewer
         return result
 
     def drop(self, *args, **kwargs):
         result = super().drop(*args, **kwargs)
-        if type(result) == pandas.DataFrame:
+        if type(result) is pandas.DataFrame:
             result.__class__ = DataFrameViewer
         return result
 
@@ -72,7 +72,7 @@ def global_background_gradient(s, m, M, cmap=None, low=0, high=0):
     norm = colors.Normalize(m - (rng * low), M + (rng * high))
     normed = norm(s.values)
     c = [colors.rgb2hex(x) for x in cmap(normed)]
-    return ["background-color: %s" % color for color in c]
+    return [f"background-color: {color}" for color in c]
 
 
 def apply_global_background_gradient(

@@ -138,7 +138,7 @@ def maximize_loglike(
         if _doctest_mode_:
             from ..model import Model
 
-            if type(model) == Model:
+            if type(model) is Model:
                 model.unmangle()
                 model._frame.sort_index(inplace=True)
                 model.unmangle(True)

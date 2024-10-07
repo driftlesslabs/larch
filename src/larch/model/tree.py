@@ -689,7 +689,7 @@ class NestingTree(nx.DiGraph):
                 )
             else:
                 P = pydot.Dot(
-                    '"%s"' % name,
+                    f'"{name}"',
                     graph_type=graph_type,
                     strict=strict,
                     **graph_defaults,

@@ -176,10 +176,18 @@ class _ParameterBinaryOp(_ParameterOp):
         return x
 
     def __repr__(self):
-        return f"{_parenthize_repr(self._left, self._precedence)} {self._op} {_parenthize_repr(self._right, self._precedence)}"
+        return (
+            f"{_parenthize_repr(self._left, self._precedence)} "
+            f"{self._op} "
+            f"{_parenthize_repr(self._right, self._precedence)}"
+        )
 
     def __str__(self):
-        return f"{_parenthize_repr(self._left, self._precedence)} {self._op} {_parenthize_repr(self._right, self._precedence)}"
+        return (
+            f"{_parenthize_repr(self._left, self._precedence)} "
+            f"{self._op} "
+            f"{_parenthize_repr(self._right, self._precedence)}"
+        )
 
 
 class ParameterAdd(_ParameterBinaryOp):

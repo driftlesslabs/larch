@@ -12,8 +12,7 @@ from pandas.io.formats.style import Styler
 from xmle import Elem
 
 from .. import Model, __version__
-
-# from ..model.jaxmodel.model_group import ModelGroup
+from ..model.model_group import ModelGroup
 from .png import make_png
 
 logger = logging.getLogger("Larch.Excel")
