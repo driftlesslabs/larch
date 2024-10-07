@@ -371,6 +371,7 @@ def histogram_on_idca_variable(
     obs_label="Observed",
     span=None,
     filter_co=None,
+    raw_df: bool = False,
 ):
     """
     Generate a figure of observed and modeled choices over a range of variable values.
@@ -482,6 +483,8 @@ def histogram_on_idca_variable(
             pd.DataFrame(d2),
         ]
     )
+    if raw_df:
+        return fig_data
 
     return (
         alt.Chart(fig_data)
@@ -491,7 +494,7 @@ def histogram_on_idca_variable(
         )
         .encode(
             x=x_label,
-            y=alt.Y(y_label, axis=alt.Axis(labels=False)),
+            y=alt.Y(y_label, axis=alt.Axis(labels=False)).stack(False),
             color="source",
             fillOpacity=alt.FillOpacity("fillOpacity", scale=None),
             strokeOpacity=alt.StrokeOpacity("strokeOpacity", scale=None),
