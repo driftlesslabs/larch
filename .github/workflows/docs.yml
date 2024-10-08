@@ -58,10 +58,19 @@ jobs:
           VERSION_MINOR=$(cut -d '.' -f 1,2 <<< ${LARCH_VERSION})
           echo "VERSION_MINOR=$VERSION_MINOR"
           echo "VERSION_MINOR=$VERSION_MINOR" >> $GITHUB_OUTPUT
-      - name: Push to GitHub Pages
+      - name: Push Release Docs to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
+        if: "github.event_name == 'release'"
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # Token is created automatically by Github Actions, no other config needed
           publish_dir: ./docs/_build/html
           destination_dir: v${{ steps.version-major-minor.outputs.VERSION_MINOR }}
+      - name: Push Dev Docs to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: "github.event_name != 'release'"
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Token is created automatically by Github Actions, no other config needed
+          publish_dir: ./docs/_build/html
+          destination_dir: dev
