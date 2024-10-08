@@ -1,0 +1,1569 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>201: Exampville Mode Choice &#8212; v6.0.26.dev2+g135c0b8</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=9d77a3fd" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=c73c0f3e"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/exampville/201_exville_mode_choice';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/driftlesslabs/larch/docs/docs/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '6.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="icon" href="../../_static/larch_favicon.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="202: Exampville Mode Choice Logsums" href="202_exville_mc_logsums.html" />
+    <link rel="prev" title="200: Exampville Simulated Data" href="200_exampville.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search these docs..."
+         aria-label="Search these docs..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.26.dev2+g135c0b8 - Home"/>
+    <script>document.write(`<img src="../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.26.dev2+g135c0b8 - Home"/>`);</script>
+  
+  
+</a></div>
+    
+      <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user-guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Examples
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user-guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Examples
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../mtc/index.html">MTC Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/001_mnl.html">1: MTC MNL Mode Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/002_motorized.html">2: Income Effect on Motorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/003_zeroed_shared.html">3: Income Effect only on Non-Car</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/005_motorized_travel_time.html">5: Motorized Travel Time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/006_motorized_times.html">6: Motorized IVTT and OVTT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/007_ovtt_by_distance.html">7: Diminishing OVTT by Distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/008_ttr.html">8: Constrained Travel Time Ratio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/009_ttr_4.html">9: Travel Time Ratio of 4.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/010_auto_per_hh.html">10: Number of Automobiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/011_veh_per_worker.html">11: Vehicles per Worker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/012_autos_per_adult.html">12: Vehicles per Adult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/013_cbd.html">13: Destination in CBD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/014_work_zone_density.html">14: Work Zone Density</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/015_cbd_and_work_density.html">15: CBD and Work Zone Density</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/016_cost_by_income.html">16: Cost by Income</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/017A_market_seg.html">17A: Market Segmentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/017B_alt_segmentation.html">17B: Alternative Segmentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/017C_segmentation_males.html">17C: Gender Segmentation (Male)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/017D_segmentation_female.html">17D: Gender Segmentation (Female)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/017_mnl.html">17: MTC Expanded MNL Mode Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/022_nl.html">22: MTC Motorized and Non-Motorized Nested Mode Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mtc/030_mnl_constrain.html">30: MTC MNL Constrained Mode Choice</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../swissmetro/index.html">Swissmetro Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../swissmetro/101_swissmetro_mnl.html">101: Swissmetro MNL Mode Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../swissmetro/102-swissmetro-weighted.html">102: Swissmetro Weighted MNL Mode Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../swissmetro/109-swissmetro-nl.html">109: Swissmetro Nested Logit Mode Choice</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Exampville Simulator</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="200_exampville.html">200: Exampville Simulated Data</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">201: Exampville Mode Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="202_exville_mc_logsums.html">202: Exampville Mode Choice Logsums</a></li>
+<li class="toctree-l2"><a class="reference internal" href="203_exville_dest.html">203: Exampville Destination Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="204_exville_dest_only.html">204: Exampville Destination Choice without Logsums</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../vehicle/index.html">Vehicle Choice Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../vehicle/300_veh_type.html">Vehicle Choice Mixed Logit</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Examples</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Exampville Simulator</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">201:...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="exampville-mode-choice">
+<h1>201: Exampville Mode Choice<a class="headerlink" href="#exampville-mode-choice" title="Link to this heading">#</a></h1>
+<p>Welcome to Exampville, the best simulated town in this here part of the internet!</p>
+<p>Exampville is a demonstration provided with Larch that walks through some of the
+data and tools that a transportation planner might use when building a travel model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">larch</span> <span class="k">as</span> <span class="nn">lx</span>
+<span class="kn">from</span> <span class="nn">larch</span> <span class="kn">import</span> <span class="n">P</span><span class="p">,</span> <span class="n">X</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>In this example notebook, we will walk through the creation of a tour mode choice model.</p>
+<p>To begin, we’ll re-load the tours and skims data from the
+data setup example.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hh</span><span class="p">,</span> <span class="n">pp</span><span class="p">,</span> <span class="n">tour</span><span class="p">,</span> <span class="n">skims</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">example</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;hh&quot;</span><span class="p">,</span> <span class="s2">&quot;pp&quot;</span><span class="p">,</span> <span class="s2">&quot;tour&quot;</span><span class="p">,</span> <span class="s2">&quot;skims&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="preprocessing">
+<h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Link to this heading">#</a></h2>
+<p>The Exampville data output contains a set of files similar to what we might
+find for a real travel survey: network skims, and tables of households, persons,
+and tours.  We’ll need to connect these tables together to create a composite dataset
+for mode choice model estimation, using the DataTree structure.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">addicty</span> <span class="kn">import</span> <span class="n">Dict</span>
+
+<span class="n">Mode</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">(</span>
+    <span class="n">DA</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">SR</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">Walk</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">Bike</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">Transit</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">freeze</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tour_dataset</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">construct</span><span class="o">.</span><span class="n">from_idco</span><span class="p">(</span><span class="n">tour</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;TOURID&quot;</span><span class="p">),</span> <span class="n">alts</span><span class="o">=</span><span class="n">Mode</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">od_skims</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">construct</span><span class="o">.</span><span class="n">from_omx</span><span class="p">(</span><span class="n">skims</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dt</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">DataTree</span><span class="p">(</span>
+    <span class="n">tour</span><span class="o">=</span><span class="n">tour_dataset</span><span class="p">,</span>
+    <span class="n">hh</span><span class="o">=</span><span class="n">hh</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;HHID&quot;</span><span class="p">),</span>
+    <span class="n">person</span><span class="o">=</span><span class="n">pp</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;PERSONID&quot;</span><span class="p">),</span>
+    <span class="n">od</span><span class="o">=</span><span class="n">od_skims</span><span class="p">,</span>
+    <span class="n">do</span><span class="o">=</span><span class="n">od_skims</span><span class="p">,</span>
+    <span class="n">relationships</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;tours.HHID @ hh.HHID&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tours.PERSONID @ person.PERSONID&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hh.HOMETAZ @ od.otaz&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tours.DTAZ @ od.dtaz&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hh.HOMETAZ @ do.dtaz&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tours.DTAZ @ do.otaz&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>In Exampville, there are only two kinds of trips:</p>
+<ul class="simple">
+<li><p>work (purpose=1) and</p></li>
+<li><p>non-work (purpose=2).</p></li>
+</ul>
+<p>We want to estimate a mode choice model for work trips,
+so we’ll begin by excluding all the other trips:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dt_work</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">query_cases</span><span class="p">(</span><span class="s2">&quot;TOURPURP == 1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="model-definition">
+<h2>Model Definition<a class="headerlink" href="#model-definition" title="Link to this heading">#</a></h2>
+<p>And then we are ready to create our model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">datatree</span><span class="o">=</span><span class="n">dt_work</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Exampville Work Tour Mode Choice v1&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We will explicitly define the set of utility functions
+we want to use.  Because the DataFrames we are using to
+serve data to this model contains exclusively <code class="docutils literal notranslate"><span class="pre">idco</span></code> format
+data, we’ll use only the <code class="docutils literal notranslate"><span class="pre">utility_co</span></code> mapping to define
+a unique utility function for each alternative.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">utility_co</span><span class="p">[</span><span class="n">Mode</span><span class="o">.</span><span class="n">DA</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="o">+</span><span class="n">P</span><span class="o">.</span><span class="n">InVehTime</span> <span class="o">*</span> <span class="n">X</span><span class="o">.</span><span class="n">AUTO_TIME</span> <span class="o">+</span> <span class="n">P</span><span class="o">.</span><span class="n">Cost</span> <span class="o">*</span> <span class="n">X</span><span class="o">.</span><span class="n">AUTO_COST</span>  <span class="c1"># dollars per mile</span>
+<span class="p">)</span>
+
+<span class="n">m</span><span class="o">.</span><span class="n">utility_co</span><span class="p">[</span><span class="n">Mode</span><span class="o">.</span><span class="n">SR</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="o">+</span><span class="n">P</span><span class="o">.</span><span class="n">ASC_SR</span>
+    <span class="o">+</span> <span class="n">P</span><span class="o">.</span><span class="n">InVehTime</span> <span class="o">*</span> <span class="n">X</span><span class="o">.</span><span class="n">AUTO_TIME</span>
+    <span class="o">+</span> <span class="n">P</span><span class="o">.</span><span class="n">Cost</span> <span class="o">*</span> <span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">AUTO_COST</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">)</span>  <span class="c1"># dollars per mile, half share</span>
+    <span class="o">+</span> <span class="n">P</span><span class="p">(</span><span class="s2">&quot;LogIncome:SR&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">X</span><span class="p">(</span><span class="s2">&quot;log(INCOME)&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">m</span><span class="o">.</span><span class="n">utility_co</span><span class="p">[</span><span class="n">Mode</span><span class="o">.</span><span class="n">Walk</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="o">+</span><span class="n">P</span><span class="o">.</span><span class="n">ASC_Walk</span> <span class="o">+</span> <span class="n">P</span><span class="o">.</span><span class="n">NonMotorTime</span> <span class="o">*</span> <span class="n">X</span><span class="o">.</span><span class="n">WALK_TIME</span> <span class="o">+</span> <span class="n">P</span><span class="p">(</span><span class="s2">&quot;LogIncome:Walk&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">X</span><span class="p">(</span><span class="s2">&quot;log(INCOME)&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">m</span><span class="o">.</span><span class="n">utility_co</span><span class="p">[</span><span class="n">Mode</span><span class="o">.</span><span class="n">Bike</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="o">+</span><span class="n">P</span><span class="o">.</span><span class="n">ASC_Bike</span> <span class="o">+</span> <span class="n">P</span><span class="o">.</span><span class="n">NonMotorTime</span> <span class="o">*</span> <span class="n">X</span><span class="o">.</span><span class="n">BIKE_TIME</span> <span class="o">+</span> <span class="n">P</span><span class="p">(</span><span class="s2">&quot;LogIncome:Bike&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">X</span><span class="p">(</span><span class="s2">&quot;log(INCOME)&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">m</span><span class="o">.</span><span class="n">utility_co</span><span class="p">[</span><span class="n">Mode</span><span class="o">.</span><span class="n">Transit</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="o">+</span><span class="n">P</span><span class="o">.</span><span class="n">ASC_Transit</span>
+    <span class="o">+</span> <span class="n">P</span><span class="o">.</span><span class="n">InVehTime</span> <span class="o">*</span> <span class="n">X</span><span class="o">.</span><span class="n">TRANSIT_IVTT</span>
+    <span class="o">+</span> <span class="n">P</span><span class="o">.</span><span class="n">OutVehTime</span> <span class="o">*</span> <span class="n">X</span><span class="o">.</span><span class="n">TRANSIT_OVTT</span>
+    <span class="o">+</span> <span class="n">P</span><span class="o">.</span><span class="n">Cost</span> <span class="o">*</span> <span class="n">X</span><span class="o">.</span><span class="n">TRANSIT_FARE</span>
+    <span class="o">+</span> <span class="n">P</span><span class="p">(</span><span class="s2">&quot;LogIncome:Transit&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">X</span><span class="p">(</span><span class="s2">&quot;log(INCOME)&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>To write a nested logit mode, we’ll attach some nesting nodes to the
+model’s <code class="docutils literal notranslate"><span class="pre">graph</span></code>.  Each <code class="docutils literal notranslate"><span class="pre">new_node</span></code> allows us to define the set of
+codes for the child nodes (elemental alternatives, or lower level nests)
+as well as giving the new nest a name and assigning a logsum parameter.
+The return value of this method is the node code for the newly created
+nest, which then can potenially be used as a child code when creating
+a higher level nest.  We do this below, adding the ‘Car’ nest into the
+‘Motor’ nest.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Car</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">new_node</span><span class="p">(</span><span class="n">parameter</span><span class="o">=</span><span class="s2">&quot;Mu:Car&quot;</span><span class="p">,</span> <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">Mode</span><span class="o">.</span><span class="n">DA</span><span class="p">,</span> <span class="n">Mode</span><span class="o">.</span><span class="n">SR</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Car&quot;</span><span class="p">)</span>
+<span class="n">NonMotor</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">new_node</span><span class="p">(</span>
+    <span class="n">parameter</span><span class="o">=</span><span class="s2">&quot;Mu:NonMotor&quot;</span><span class="p">,</span> <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">Mode</span><span class="o">.</span><span class="n">Walk</span><span class="p">,</span> <span class="n">Mode</span><span class="o">.</span><span class="n">Bike</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;NonMotor&quot;</span>
+<span class="p">)</span>
+<span class="n">Motor</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">new_node</span><span class="p">(</span>
+    <span class="n">parameter</span><span class="o">=</span><span class="s2">&quot;Mu:Motor&quot;</span><span class="p">,</span> <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">Car</span><span class="p">,</span> <span class="n">Mode</span><span class="o">.</span><span class="n">Transit</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Motor&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s visually check on the nesting structure.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">graph</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div xmlns="http://www.w3.org/2000/svg"><svg width="460pt" height="288pt" viewBox="0.00 0.00 460.41 288.00">
+<g id="graph0" class="graph" transform="scale(0.96 0.96) rotate(0) translate(4 295)">
+<title>Tree</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-295 474,-295 474,4 -4,4"></polygon>
+<g id="clust1" class="cluster">
+<title>cluster_elemental</title>
+<path fill="#eeeeee" stroke="#cccccc" d="M20,-8C20,-8 450,-8 450,-8 456,-8 462,-14 462,-20 462,-20 462,-71 462,-71 462,-77 456,-83 450,-83 450,-83 20,-83 20,-83 14,-83 8,-77 8,-71 8,-71 8,-20 8,-20 8,-14 14,-8 20,-8"></path>
+<text text-anchor="middle" x="235" y="-15.8" font-family="Times,serif" font-size="14.00">Elemental Alternatives</text>
+</g>
+
+<g id="node1" class="node">
+<title>1</title>
+<path fill="none" stroke="black" d="M362,-75C362,-75 324,-75 324,-75 318,-75 312,-69 312,-63 312,-63 312,-51 312,-51 312,-45 318,-39 324,-39 324,-39 362,-39 362,-39 368,-39 374,-45 374,-51 374,-51 374,-63 374,-63 374,-69 368,-75 362,-75"></path>
+<text text-anchor="start" x="320" y="-54.3" font-family="Times,serif" font-size="14.00">DA </text>
+<text text-anchor="start" x="346" y="-54.3" font-family="Times,serif" font-size="14.00" fill="#999999">(1)</text>
+</g>
+
+<g id="node2" class="node">
+<title>2</title>
+<path fill="none" stroke="black" d="M441.5,-75C441.5,-75 404.5,-75 404.5,-75 398.5,-75 392.5,-69 392.5,-63 392.5,-63 392.5,-51 392.5,-51 392.5,-45 398.5,-39 404.5,-39 404.5,-39 441.5,-39 441.5,-39 447.5,-39 453.5,-45 453.5,-51 453.5,-51 453.5,-63 453.5,-63 453.5,-69 447.5,-75 441.5,-75"></path>
+<text text-anchor="start" x="400.5" y="-54.3" font-family="Times,serif" font-size="14.00">SR </text>
+<text text-anchor="start" x="425.5" y="-54.3" font-family="Times,serif" font-size="14.00" fill="#999999">(2)</text>
+</g>
+
+<g id="node3" class="node">
+<title>3</title>
+<path fill="none" stroke="black" d="M172,-75C172,-75 120,-75 120,-75 114,-75 108,-69 108,-63 108,-63 108,-51 108,-51 108,-45 114,-39 120,-39 120,-39 172,-39 172,-39 178,-39 184,-45 184,-51 184,-51 184,-63 184,-63 184,-69 178,-75 172,-75"></path>
+<text text-anchor="start" x="116" y="-54.3" font-family="Times,serif" font-size="14.00">Walk </text>
+<text text-anchor="start" x="156" y="-54.3" font-family="Times,serif" font-size="14.00" fill="#999999">(3)</text>
+</g>
+
+<g id="node4" class="node">
+<title>4</title>
+<path fill="none" stroke="black" d="M77.5,-75C77.5,-75 28.5,-75 28.5,-75 22.5,-75 16.5,-69 16.5,-63 16.5,-63 16.5,-51 16.5,-51 16.5,-45 22.5,-39 28.5,-39 28.5,-39 77.5,-39 77.5,-39 83.5,-39 89.5,-45 89.5,-51 89.5,-51 89.5,-63 89.5,-63 89.5,-69 83.5,-75 77.5,-75"></path>
+<text text-anchor="start" x="24.5" y="-54.3" font-family="Times,serif" font-size="14.00">Bike </text>
+<text text-anchor="start" x="61.5" y="-54.3" font-family="Times,serif" font-size="14.00" fill="#999999">(4)</text>
+</g>
+
+<g id="node5" class="node">
+<title>5</title>
+<path fill="none" stroke="black" d="M282,-75C282,-75 214,-75 214,-75 208,-75 202,-69 202,-63 202,-63 202,-51 202,-51 202,-45 208,-39 214,-39 214,-39 282,-39 282,-39 288,-39 294,-45 294,-51 294,-51 294,-63 294,-63 294,-69 288,-75 282,-75"></path>
+<text text-anchor="start" x="210" y="-54.3" font-family="Times,serif" font-size="14.00">Transit </text>
+<text text-anchor="start" x="266" y="-54.3" font-family="Times,serif" font-size="14.00" fill="#999999">(5)</text>
+</g>
+
+<g id="node6" class="node">
+<title>0</title>
+<path fill="none" stroke="black" d="M212,-291C212,-291 182,-291 182,-291 176,-291 170,-285 170,-279 170,-279 170,-267 170,-267 170,-261 176,-255 182,-255 182,-255 212,-255 212,-255 218,-255 224,-261 224,-267 224,-267 224,-279 224,-279 224,-285 218,-291 212,-291"></path>
+<text text-anchor="middle" x="197" y="-269.3" font-family="Times,serif" font-size="14.00">Root</text>
+</g>
+
+<g id="node7" class="node">
+<title>7</title>
+<path fill="none" stroke="black" d="M191,-147C191,-147 101,-147 101,-147 95,-147 89,-141 89,-135 89,-135 89,-123 89,-123 89,-117 95,-111 101,-111 101,-111 191,-111 191,-111 197,-111 203,-117 203,-123 203,-123 203,-135 203,-135 203,-141 197,-147 191,-147"></path>
+<text text-anchor="start" x="97" y="-126.3" font-family="Times,serif" font-size="14.00">NonMotor </text>
+<text text-anchor="start" x="175" y="-126.3" font-family="Times,serif" font-size="14.00" fill="#999999">(7)</text>
+</g>
+
+<g id="edge1" class="edge">
+<title>0-&gt;7</title>
+<path fill="none" stroke="black" d="M190.85,-254.87C182.08,-230.46 165.91,-185.43 155.57,-156.64"></path>
+<polygon fill="black" stroke="black" points="158.85,-155.42 152.17,-147.19 152.26,-157.78 158.85,-155.42"></polygon>
+</g>
+
+<g id="node8" class="node">
+<title>8</title>
+<path fill="none" stroke="black" d="M278.5,-219C278.5,-219 217.5,-219 217.5,-219 211.5,-219 205.5,-213 205.5,-207 205.5,-207 205.5,-195 205.5,-195 205.5,-189 211.5,-183 217.5,-183 217.5,-183 278.5,-183 278.5,-183 284.5,-183 290.5,-189 290.5,-195 290.5,-195 290.5,-207 290.5,-207 290.5,-213 284.5,-219 278.5,-219"></path>
+<text text-anchor="start" x="213.5" y="-198.3" font-family="Times,serif" font-size="14.00">Motor </text>
+<text text-anchor="start" x="262.5" y="-198.3" font-family="Times,serif" font-size="14.00" fill="#999999">(8)</text>
+</g>
+
+<g id="edge2" class="edge">
+<title>0-&gt;8</title>
+<path fill="none" stroke="black" d="M209.61,-254.7C215.6,-246.47 222.88,-236.48 229.48,-227.42"></path>
+<polygon fill="black" stroke="black" points="232.48,-229.25 235.54,-219.1 226.82,-225.13 232.48,-229.25"></polygon>
+</g>
+
+<g id="edge5" class="edge">
+<title>7-&gt;3</title>
+<path fill="none" stroke="black" d="M146,-110.7C146,-102.98 146,-93.71 146,-85.11"></path>
+<polygon fill="black" stroke="black" points="149.5,-85.1 146,-75.1 142.5,-85.1 149.5,-85.1"></polygon>
+</g>
+
+<g id="edge6" class="edge">
+<title>7-&gt;4</title>
+<path fill="none" stroke="black" d="M123.01,-110.7C111.19,-101.8 96.61,-90.82 83.82,-81.2"></path>
+<polygon fill="black" stroke="black" points="85.82,-78.32 75.72,-75.1 81.61,-83.91 85.82,-78.32"></polygon>
+</g>
+
+<g id="edge7" class="edge">
+<title>8-&gt;5</title>
+<path fill="none" stroke="black" d="M248,-182.87C248,-158.67 248,-114.21 248,-85.39"></path>
+<polygon fill="black" stroke="black" points="251.5,-85.19 248,-75.19 244.5,-85.19 251.5,-85.19"></polygon>
+</g>
+
+<g id="node9" class="node">
+<title>6</title>
+<path fill="none" stroke="black" d="M364.5,-147C364.5,-147 321.5,-147 321.5,-147 315.5,-147 309.5,-141 309.5,-135 309.5,-135 309.5,-123 309.5,-123 309.5,-117 315.5,-111 321.5,-111 321.5,-111 364.5,-111 364.5,-111 370.5,-111 376.5,-117 376.5,-123 376.5,-123 376.5,-135 376.5,-135 376.5,-141 370.5,-147 364.5,-147"></path>
+<text text-anchor="start" x="317.5" y="-126.3" font-family="Times,serif" font-size="14.00">Car </text>
+<text text-anchor="start" x="348.5" y="-126.3" font-family="Times,serif" font-size="14.00" fill="#999999">(6)</text>
+</g>
+
+<g id="edge8" class="edge">
+<title>8-&gt;6</title>
+<path fill="none" stroke="black" d="M271.48,-182.7C283.56,-173.8 298.45,-162.82 311.52,-153.2"></path>
+<polygon fill="black" stroke="black" points="313.81,-155.85 319.79,-147.1 309.66,-150.22 313.81,-155.85"></polygon>
+</g>
+
+<g id="edge3" class="edge">
+<title>6-&gt;1</title>
+<path fill="none" stroke="black" d="M343,-110.7C343,-102.98 343,-93.71 343,-85.11"></path>
+<polygon fill="black" stroke="black" points="346.5,-85.1 343,-75.1 339.5,-85.1 346.5,-85.1"></polygon>
+</g>
+
+<g id="edge4" class="edge">
+<title>6-&gt;2</title>
+<path fill="none" stroke="black" d="M362.78,-110.7C372.75,-101.97 385.01,-91.24 395.86,-81.75"></path>
+<polygon fill="black" stroke="black" points="398.23,-84.32 403.45,-75.1 393.62,-79.06 398.23,-84.32"></polygon>
+</g>
+</g>
+</svg></div></div></div>
+</div>
+<p>The tour mode choice model’s choice variable is indicated by
+the code value in ‘TOURMODE’, and this can be
+defined for the model using <code class="docutils literal notranslate"><span class="pre">choice_co_code</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">choice_co_code</span> <span class="o">=</span> <span class="s2">&quot;TOURMODE&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can also give a dictionary of availability conditions based
+on values in the <code class="docutils literal notranslate"><span class="pre">idco</span></code> data, using the <code class="docutils literal notranslate"><span class="pre">availability_co_vars</span></code>
+attribute.  Alternatives that are always available can be indicated
+by setting the criterion to 1.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">availability_co_vars</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">Mode</span><span class="o">.</span><span class="n">DA</span><span class="p">:</span> <span class="s2">&quot;AGE &gt;= 16&quot;</span><span class="p">,</span>
+    <span class="n">Mode</span><span class="o">.</span><span class="n">SR</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">Mode</span><span class="o">.</span><span class="n">Walk</span><span class="p">:</span> <span class="s2">&quot;WALK_TIME &lt; 60&quot;</span><span class="p">,</span>
+    <span class="n">Mode</span><span class="o">.</span><span class="n">Bike</span><span class="p">:</span> <span class="s2">&quot;BIKE_TIME &lt; 60&quot;</span><span class="p">,</span>
+    <span class="n">Mode</span><span class="o">.</span><span class="n">Transit</span><span class="p">:</span> <span class="s2">&quot;TRANSIT_FARE&gt;0&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Then let’s prepare this data for estimation.  Even though the
+data is already in memory, the <code class="docutils literal notranslate"><span class="pre">load_data</span></code> method is used to
+pre-process the data, extracting the required values, pre-computing
+the values of fixed expressions, and assembling the results into
+contiguous arrays suitable for computing the log likelihood values
+efficiently.</p>
+</section>
+<section id="model-estimation">
+<h2>Model Estimation<a class="headerlink" href="#model-estimation" title="Link to this heading">#</a></h2>
+<p>We can check on some important statistics of this loaded data even
+before we estimate the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">choice_avail_summary</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>chosen</th>
+      <th>available</th>
+      <th>availability condition</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>DA</td>
+      <td>6052</td>
+      <td>7564</td>
+      <td>AGE &gt;= 16</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>SR</td>
+      <td>810</td>
+      <td>7564</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Walk</td>
+      <td>196</td>
+      <td>4179</td>
+      <td>WALK_TIME &lt; 60</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Bike</td>
+      <td>72</td>
+      <td>7564</td>
+      <td>BIKE_TIME &lt; 60</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Transit</td>
+      <td>434</td>
+      <td>4199</td>
+      <td>TRANSIT_FARE&gt;0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Car</td>
+      <td>6862</td>
+      <td>7564</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>NonMotor</td>
+      <td>268</td>
+      <td>7564</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Motor</td>
+      <td>7296</td>
+      <td>7564</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>&lt; Total All Alternatives &gt;</th>
+      <td></td>
+      <td>7564</td>
+      <td>&lt;NA&gt;</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>If we are satisfied with the statistics we see above, we
+can go ahead and estimate the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">compute_engine</span> <span class="o">=</span> <span class="s2">&quot;numba&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">maximize_loglike</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;bhhh&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><h3>Iteration 013 [Optimization terminated successfully] </h3></div><div class="output text_html"><p>Best LL = -3493.039733128969</p></div><div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>value</th>
+      <th>best</th>
+      <th>initvalue</th>
+      <th>minimum</th>
+      <th>maximum</th>
+      <th>nullvalue</th>
+    </tr>
+    <tr>
+      <th>param_name</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ASC_Bike</th>
+      <td>-0.257591</td>
+      <td>-0.257591</td>
+      <td>0.0</td>
+      <td>-inf</td>
+      <td>inf</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>ASC_SR</th>
+      <td>1.423583</td>
+      <td>1.423583</td>
+      <td>0.0</td>
+      <td>-inf</td>
+      <td>inf</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>ASC_Transit</th>
+      <td>6.755290</td>
+      <td>6.755290</td>
+      <td>0.0</td>
+      <td>-inf</td>
+      <td>inf</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>ASC_Walk</th>
+      <td>8.621795</td>
+      <td>8.621795</td>
+      <td>0.0</td>
+      <td>-inf</td>
+      <td>inf</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Cost</th>
+      <td>-0.175754</td>
+      <td>-0.175754</td>
+      <td>0.0</td>
+      <td>-inf</td>
+      <td>inf</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>InVehTime</th>
+      <td>-0.123740</td>
+      <td>-0.123740</td>
+      <td>0.0</td>
+      <td>-inf</td>
+      <td>inf</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>LogIncome:Bike</th>
+      <td>-0.197047</td>
+      <td>-0.197047</td>
+      <td>0.0</td>
+      <td>-inf</td>
+      <td>inf</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>LogIncome:SR</th>
+      <td>-0.193897</td>
+      <td>-0.193897</td>
+      <td>0.0</td>
+      <td>-inf</td>
+      <td>inf</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>LogIncome:Transit</th>
+      <td>-0.557215</td>
+      <td>-0.557215</td>
+      <td>0.0</td>
+      <td>-inf</td>
+      <td>inf</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>LogIncome:Walk</th>
+      <td>-0.522820</td>
+      <td>-0.522820</td>
+      <td>0.0</td>
+      <td>-inf</td>
+      <td>inf</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Mu:Car</th>
+      <td>0.259394</td>
+      <td>0.259394</td>
+      <td>1.0</td>
+      <td>0.01</td>
+      <td>1.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>Mu:Motor</th>
+      <td>0.801737</td>
+      <td>0.801737</td>
+      <td>1.0</td>
+      <td>0.01</td>
+      <td>1.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>Mu:NonMotor</th>
+      <td>0.854004</td>
+      <td>0.854004</td>
+      <td>1.0</td>
+      <td>0.01</td>
+      <td>1.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>NonMotorTime</th>
+      <td>-0.265589</td>
+      <td>-0.265589</td>
+      <td>0.0</td>
+      <td>-inf</td>
+      <td>inf</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>OutVehTime</th>
+      <td>-0.254838</td>
+      <td>-0.254838</td>
+      <td>0.0</td>
+      <td>-inf</td>
+      <td>inf</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>After we find the best fitting parameters, we can compute
+some variance-covariance statistics, incuding standard errors of
+the estimates and t statistics, using <code class="docutils literal notranslate"><span class="pre">calculate_parameter_covariance</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">calculate_parameter_covariance</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Then we can review the results in a variety of report tables.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">parameter_summary</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+#T_b6165 th {
+  vertical-align: top;
+  text-align: left;
+}
+#T_b6165 td {
+  vertical-align: top;
+  text-align: left;
+}
+#T_b6165_row0_col0, #T_b6165_row0_col1, #T_b6165_row0_col2, #T_b6165_row0_col3, #T_b6165_row0_col4, #T_b6165_row1_col0, #T_b6165_row1_col1, #T_b6165_row1_col2, #T_b6165_row1_col3, #T_b6165_row1_col4, #T_b6165_row2_col0, #T_b6165_row2_col1, #T_b6165_row2_col2, #T_b6165_row2_col3, #T_b6165_row2_col4, #T_b6165_row3_col0, #T_b6165_row3_col1, #T_b6165_row3_col2, #T_b6165_row3_col3, #T_b6165_row3_col4, #T_b6165_row4_col0, #T_b6165_row4_col1, #T_b6165_row4_col2, #T_b6165_row4_col3, #T_b6165_row4_col4, #T_b6165_row5_col0, #T_b6165_row5_col1, #T_b6165_row5_col2, #T_b6165_row5_col3, #T_b6165_row5_col4, #T_b6165_row6_col0, #T_b6165_row6_col1, #T_b6165_row6_col2, #T_b6165_row6_col3, #T_b6165_row6_col4, #T_b6165_row7_col0, #T_b6165_row7_col1, #T_b6165_row7_col2, #T_b6165_row7_col3, #T_b6165_row7_col4, #T_b6165_row8_col0, #T_b6165_row8_col1, #T_b6165_row8_col2, #T_b6165_row8_col3, #T_b6165_row8_col4, #T_b6165_row9_col0, #T_b6165_row9_col1, #T_b6165_row9_col2, #T_b6165_row9_col3, #T_b6165_row9_col4, #T_b6165_row10_col0, #T_b6165_row10_col1, #T_b6165_row10_col2, #T_b6165_row10_col3, #T_b6165_row10_col4, #T_b6165_row11_col0, #T_b6165_row11_col1, #T_b6165_row11_col2, #T_b6165_row11_col3, #T_b6165_row11_col4, #T_b6165_row12_col0, #T_b6165_row12_col1, #T_b6165_row12_col2, #T_b6165_row12_col3, #T_b6165_row12_col4, #T_b6165_row13_col0, #T_b6165_row13_col1, #T_b6165_row13_col2, #T_b6165_row13_col3, #T_b6165_row13_col4, #T_b6165_row14_col0, #T_b6165_row14_col1, #T_b6165_row14_col2, #T_b6165_row14_col3, #T_b6165_row14_col4 {
+  font-family: monospace;
+}
+</style>
+<table id="T_b6165">
+  <thead>
+    <tr>
+      <th class="blank level0" >&nbsp;</th>
+      <th id="T_b6165_level0_col0" class="col_heading level0 col0" >Value</th>
+      <th id="T_b6165_level0_col1" class="col_heading level0 col1" >Std Err</th>
+      <th id="T_b6165_level0_col2" class="col_heading level0 col2" >t Stat</th>
+      <th id="T_b6165_level0_col3" class="col_heading level0 col3" >Signif</th>
+      <th id="T_b6165_level0_col4" class="col_heading level0 col4" >Null Value</th>
+    </tr>
+    <tr>
+      <th class="index_name level0" >Parameter</th>
+      <th class="blank col0" >&nbsp;</th>
+      <th class="blank col1" >&nbsp;</th>
+      <th class="blank col2" >&nbsp;</th>
+      <th class="blank col3" >&nbsp;</th>
+      <th class="blank col4" >&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_b6165_level0_row0" class="row_heading level0 row0" >ASC_Bike</th>
+      <td id="T_b6165_row0_col0" class="data row0 col0" >-0.258</td>
+      <td id="T_b6165_row0_col1" class="data row0 col1" > 1.34</td>
+      <td id="T_b6165_row0_col2" class="data row0 col2" >-0.19</td>
+      <td id="T_b6165_row0_col3" class="data row0 col3" ></td>
+      <td id="T_b6165_row0_col4" class="data row0 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_b6165_level0_row1" class="row_heading level0 row1" >ASC_SR</th>
+      <td id="T_b6165_row1_col0" class="data row1 col0" > 1.42</td>
+      <td id="T_b6165_row1_col1" class="data row1 col1" > 1.00</td>
+      <td id="T_b6165_row1_col2" class="data row1 col2" > 1.42</td>
+      <td id="T_b6165_row1_col3" class="data row1 col3" ></td>
+      <td id="T_b6165_row1_col4" class="data row1 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_b6165_level0_row2" class="row_heading level0 row2" >ASC_Transit</th>
+      <td id="T_b6165_row2_col0" class="data row2 col0" > 6.76</td>
+      <td id="T_b6165_row2_col1" class="data row2 col1" > 2.06</td>
+      <td id="T_b6165_row2_col2" class="data row2 col2" > 3.27</td>
+      <td id="T_b6165_row2_col3" class="data row2 col3" >**</td>
+      <td id="T_b6165_row2_col4" class="data row2 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_b6165_level0_row3" class="row_heading level0 row3" >ASC_Walk</th>
+      <td id="T_b6165_row3_col0" class="data row3 col0" > 8.62</td>
+      <td id="T_b6165_row3_col1" class="data row3 col1" > 1.14</td>
+      <td id="T_b6165_row3_col2" class="data row3 col2" > 7.57</td>
+      <td id="T_b6165_row3_col3" class="data row3 col3" >***</td>
+      <td id="T_b6165_row3_col4" class="data row3 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_b6165_level0_row4" class="row_heading level0 row4" >Cost</th>
+      <td id="T_b6165_row4_col0" class="data row4 col0" >-0.176</td>
+      <td id="T_b6165_row4_col1" class="data row4 col1" > 0.120</td>
+      <td id="T_b6165_row4_col2" class="data row4 col2" >-1.47</td>
+      <td id="T_b6165_row4_col3" class="data row4 col3" ></td>
+      <td id="T_b6165_row4_col4" class="data row4 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_b6165_level0_row5" class="row_heading level0 row5" >InVehTime</th>
+      <td id="T_b6165_row5_col0" class="data row5 col0" >-0.124</td>
+      <td id="T_b6165_row5_col1" class="data row5 col1" > 0.0292</td>
+      <td id="T_b6165_row5_col2" class="data row5 col2" >-4.24</td>
+      <td id="T_b6165_row5_col3" class="data row5 col3" >***</td>
+      <td id="T_b6165_row5_col4" class="data row5 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_b6165_level0_row6" class="row_heading level0 row6" >LogIncome:Bike</th>
+      <td id="T_b6165_row6_col0" class="data row6 col0" >-0.197</td>
+      <td id="T_b6165_row6_col1" class="data row6 col1" > 0.124</td>
+      <td id="T_b6165_row6_col2" class="data row6 col2" >-1.59</td>
+      <td id="T_b6165_row6_col3" class="data row6 col3" ></td>
+      <td id="T_b6165_row6_col4" class="data row6 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_b6165_level0_row7" class="row_heading level0 row7" >LogIncome:SR</th>
+      <td id="T_b6165_row7_col0" class="data row7 col0" >-0.194</td>
+      <td id="T_b6165_row7_col1" class="data row7 col1" > 0.136</td>
+      <td id="T_b6165_row7_col2" class="data row7 col2" >-1.43</td>
+      <td id="T_b6165_row7_col3" class="data row7 col3" ></td>
+      <td id="T_b6165_row7_col4" class="data row7 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_b6165_level0_row8" class="row_heading level0 row8" >LogIncome:Transit</th>
+      <td id="T_b6165_row8_col0" class="data row8 col0" >-0.557</td>
+      <td id="T_b6165_row8_col1" class="data row8 col1" > 0.169</td>
+      <td id="T_b6165_row8_col2" class="data row8 col2" >-3.29</td>
+      <td id="T_b6165_row8_col3" class="data row8 col3" >***</td>
+      <td id="T_b6165_row8_col4" class="data row8 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_b6165_level0_row9" class="row_heading level0 row9" >LogIncome:Walk</th>
+      <td id="T_b6165_row9_col0" class="data row9 col0" >-0.523</td>
+      <td id="T_b6165_row9_col1" class="data row9 col1" > 0.100</td>
+      <td id="T_b6165_row9_col2" class="data row9 col2" >-5.21</td>
+      <td id="T_b6165_row9_col3" class="data row9 col3" >***</td>
+      <td id="T_b6165_row9_col4" class="data row9 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_b6165_level0_row10" class="row_heading level0 row10" >Mu:Car</th>
+      <td id="T_b6165_row10_col0" class="data row10 col0" > 0.259</td>
+      <td id="T_b6165_row10_col1" class="data row10 col1" > 0.181</td>
+      <td id="T_b6165_row10_col2" class="data row10 col2" >-4.10</td>
+      <td id="T_b6165_row10_col3" class="data row10 col3" >***</td>
+      <td id="T_b6165_row10_col4" class="data row10 col4" > 1.00</td>
+    </tr>
+    <tr>
+      <th id="T_b6165_level0_row11" class="row_heading level0 row11" >Mu:Motor</th>
+      <td id="T_b6165_row11_col0" class="data row11 col0" > 0.802</td>
+      <td id="T_b6165_row11_col1" class="data row11 col1" > 0.201</td>
+      <td id="T_b6165_row11_col2" class="data row11 col2" >-0.99</td>
+      <td id="T_b6165_row11_col3" class="data row11 col3" ></td>
+      <td id="T_b6165_row11_col4" class="data row11 col4" > 1.00</td>
+    </tr>
+    <tr>
+      <th id="T_b6165_level0_row12" class="row_heading level0 row12" >Mu:NonMotor</th>
+      <td id="T_b6165_row12_col0" class="data row12 col0" > 0.854</td>
+      <td id="T_b6165_row12_col1" class="data row12 col1" > 0.112</td>
+      <td id="T_b6165_row12_col2" class="data row12 col2" >-1.30</td>
+      <td id="T_b6165_row12_col3" class="data row12 col3" ></td>
+      <td id="T_b6165_row12_col4" class="data row12 col4" > 1.00</td>
+    </tr>
+    <tr>
+      <th id="T_b6165_level0_row13" class="row_heading level0 row13" >NonMotorTime</th>
+      <td id="T_b6165_row13_col0" class="data row13 col0" >-0.266</td>
+      <td id="T_b6165_row13_col1" class="data row13 col1" > 0.0163</td>
+      <td id="T_b6165_row13_col2" class="data row13 col2" >-16.29</td>
+      <td id="T_b6165_row13_col3" class="data row13 col3" >***</td>
+      <td id="T_b6165_row13_col4" class="data row13 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_b6165_level0_row14" class="row_heading level0 row14" >OutVehTime</th>
+      <td id="T_b6165_row14_col0" class="data row14 col0" >-0.255</td>
+      <td id="T_b6165_row14_col1" class="data row14 col1" > 0.0646</td>
+      <td id="T_b6165_row14_col2" class="data row14 col2" >-3.95</td>
+      <td id="T_b6165_row14_col3" class="data row14 col3" >***</td>
+      <td id="T_b6165_row14_col4" class="data row14 col4" > 0.00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">estimation_statistics</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><table><thead><tr><th>Statistic</th><th>Aggregate</th><th>Per Case</th></tr></thead><tbody><tr><td>Number of Cases</td><td colspan="2">7564</td></tr><tr><td>Log Likelihood at Convergence</td><td>-3493.04</td><td>-0.46</td></tr><tr><td>Log Likelihood at Null Parameters</td><td>-10644.66</td><td>-1.41</td></tr><tr><td>Rho Squared w.r.t. Null Parameters</td><td colspan="2">0.672</td></tr></tbody></table></div></div></div>
+</div>
+</section>
+<section id="save-and-report-model">
+<h2>Save and Report Model<a class="headerlink" href="#save-and-report-model" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">report</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Reporter</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">report</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;# Parameter Summary&quot;</span><span class="p">)</span>
+<span class="n">report</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">parameter_summary</span><span class="p">())</span>
+<span class="n">report</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><h1><a name="rx1" reftxt="Parameter Summary" class="toc" toclevel="1"></a>Parameter Summary</h1><div><style type="text/css">
+#T_99f02 th {
+  vertical-align: top;
+  text-align: left;
+}
+#T_99f02 td {
+  vertical-align: top;
+  text-align: left;
+}
+#T_99f02_row0_col0, #T_99f02_row0_col1, #T_99f02_row0_col2, #T_99f02_row0_col3, #T_99f02_row0_col4, #T_99f02_row1_col0, #T_99f02_row1_col1, #T_99f02_row1_col2, #T_99f02_row1_col3, #T_99f02_row1_col4, #T_99f02_row2_col0, #T_99f02_row2_col1, #T_99f02_row2_col2, #T_99f02_row2_col3, #T_99f02_row2_col4, #T_99f02_row3_col0, #T_99f02_row3_col1, #T_99f02_row3_col2, #T_99f02_row3_col3, #T_99f02_row3_col4, #T_99f02_row4_col0, #T_99f02_row4_col1, #T_99f02_row4_col2, #T_99f02_row4_col3, #T_99f02_row4_col4, #T_99f02_row5_col0, #T_99f02_row5_col1, #T_99f02_row5_col2, #T_99f02_row5_col3, #T_99f02_row5_col4, #T_99f02_row6_col0, #T_99f02_row6_col1, #T_99f02_row6_col2, #T_99f02_row6_col3, #T_99f02_row6_col4, #T_99f02_row7_col0, #T_99f02_row7_col1, #T_99f02_row7_col2, #T_99f02_row7_col3, #T_99f02_row7_col4, #T_99f02_row8_col0, #T_99f02_row8_col1, #T_99f02_row8_col2, #T_99f02_row8_col3, #T_99f02_row8_col4, #T_99f02_row9_col0, #T_99f02_row9_col1, #T_99f02_row9_col2, #T_99f02_row9_col3, #T_99f02_row9_col4, #T_99f02_row10_col0, #T_99f02_row10_col1, #T_99f02_row10_col2, #T_99f02_row10_col3, #T_99f02_row10_col4, #T_99f02_row11_col0, #T_99f02_row11_col1, #T_99f02_row11_col2, #T_99f02_row11_col3, #T_99f02_row11_col4, #T_99f02_row12_col0, #T_99f02_row12_col1, #T_99f02_row12_col2, #T_99f02_row12_col3, #T_99f02_row12_col4, #T_99f02_row13_col0, #T_99f02_row13_col1, #T_99f02_row13_col2, #T_99f02_row13_col3, #T_99f02_row13_col4, #T_99f02_row14_col0, #T_99f02_row14_col1, #T_99f02_row14_col2, #T_99f02_row14_col3, #T_99f02_row14_col4 {
+  font-family: monospace;
+}
+</style>
+<table id="T_99f02">
+  <thead>
+    <tr>
+      <th class="blank level0"> </th>
+      <th id="T_99f02_level0_col0" class="col_heading level0 col0">Value</th>
+      <th id="T_99f02_level0_col1" class="col_heading level0 col1">Std Err</th>
+      <th id="T_99f02_level0_col2" class="col_heading level0 col2">t Stat</th>
+      <th id="T_99f02_level0_col3" class="col_heading level0 col3">Signif</th>
+      <th id="T_99f02_level0_col4" class="col_heading level0 col4">Null Value</th>
+    </tr>
+    <tr>
+      <th class="index_name level0">Parameter</th>
+      <th class="blank col0"> </th>
+      <th class="blank col1"> </th>
+      <th class="blank col2"> </th>
+      <th class="blank col3"> </th>
+      <th class="blank col4"> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_99f02_level0_row0" class="row_heading level0 row0">ASC_Bike</th>
+      <td id="T_99f02_row0_col0" class="data row0 col0">-0.258</td>
+      <td id="T_99f02_row0_col1" class="data row0 col1"> 1.34</td>
+      <td id="T_99f02_row0_col2" class="data row0 col2">-0.19</td>
+      <td id="T_99f02_row0_col3" class="data row0 col3"></td>
+      <td id="T_99f02_row0_col4" class="data row0 col4"> 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_99f02_level0_row1" class="row_heading level0 row1">ASC_SR</th>
+      <td id="T_99f02_row1_col0" class="data row1 col0"> 1.42</td>
+      <td id="T_99f02_row1_col1" class="data row1 col1"> 1.00</td>
+      <td id="T_99f02_row1_col2" class="data row1 col2"> 1.42</td>
+      <td id="T_99f02_row1_col3" class="data row1 col3"></td>
+      <td id="T_99f02_row1_col4" class="data row1 col4"> 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_99f02_level0_row2" class="row_heading level0 row2">ASC_Transit</th>
+      <td id="T_99f02_row2_col0" class="data row2 col0"> 6.76</td>
+      <td id="T_99f02_row2_col1" class="data row2 col1"> 2.06</td>
+      <td id="T_99f02_row2_col2" class="data row2 col2"> 3.27</td>
+      <td id="T_99f02_row2_col3" class="data row2 col3">**</td>
+      <td id="T_99f02_row2_col4" class="data row2 col4"> 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_99f02_level0_row3" class="row_heading level0 row3">ASC_Walk</th>
+      <td id="T_99f02_row3_col0" class="data row3 col0"> 8.62</td>
+      <td id="T_99f02_row3_col1" class="data row3 col1"> 1.14</td>
+      <td id="T_99f02_row3_col2" class="data row3 col2"> 7.57</td>
+      <td id="T_99f02_row3_col3" class="data row3 col3">***</td>
+      <td id="T_99f02_row3_col4" class="data row3 col4"> 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_99f02_level0_row4" class="row_heading level0 row4">Cost</th>
+      <td id="T_99f02_row4_col0" class="data row4 col0">-0.176</td>
+      <td id="T_99f02_row4_col1" class="data row4 col1"> 0.120</td>
+      <td id="T_99f02_row4_col2" class="data row4 col2">-1.47</td>
+      <td id="T_99f02_row4_col3" class="data row4 col3"></td>
+      <td id="T_99f02_row4_col4" class="data row4 col4"> 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_99f02_level0_row5" class="row_heading level0 row5">InVehTime</th>
+      <td id="T_99f02_row5_col0" class="data row5 col0">-0.124</td>
+      <td id="T_99f02_row5_col1" class="data row5 col1"> 0.0292</td>
+      <td id="T_99f02_row5_col2" class="data row5 col2">-4.24</td>
+      <td id="T_99f02_row5_col3" class="data row5 col3">***</td>
+      <td id="T_99f02_row5_col4" class="data row5 col4"> 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_99f02_level0_row6" class="row_heading level0 row6">LogIncome:Bike</th>
+      <td id="T_99f02_row6_col0" class="data row6 col0">-0.197</td>
+      <td id="T_99f02_row6_col1" class="data row6 col1"> 0.124</td>
+      <td id="T_99f02_row6_col2" class="data row6 col2">-1.59</td>
+      <td id="T_99f02_row6_col3" class="data row6 col3"></td>
+      <td id="T_99f02_row6_col4" class="data row6 col4"> 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_99f02_level0_row7" class="row_heading level0 row7">LogIncome:SR</th>
+      <td id="T_99f02_row7_col0" class="data row7 col0">-0.194</td>
+      <td id="T_99f02_row7_col1" class="data row7 col1"> 0.136</td>
+      <td id="T_99f02_row7_col2" class="data row7 col2">-1.43</td>
+      <td id="T_99f02_row7_col3" class="data row7 col3"></td>
+      <td id="T_99f02_row7_col4" class="data row7 col4"> 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_99f02_level0_row8" class="row_heading level0 row8">LogIncome:Transit</th>
+      <td id="T_99f02_row8_col0" class="data row8 col0">-0.557</td>
+      <td id="T_99f02_row8_col1" class="data row8 col1"> 0.169</td>
+      <td id="T_99f02_row8_col2" class="data row8 col2">-3.29</td>
+      <td id="T_99f02_row8_col3" class="data row8 col3">***</td>
+      <td id="T_99f02_row8_col4" class="data row8 col4"> 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_99f02_level0_row9" class="row_heading level0 row9">LogIncome:Walk</th>
+      <td id="T_99f02_row9_col0" class="data row9 col0">-0.523</td>
+      <td id="T_99f02_row9_col1" class="data row9 col1"> 0.100</td>
+      <td id="T_99f02_row9_col2" class="data row9 col2">-5.21</td>
+      <td id="T_99f02_row9_col3" class="data row9 col3">***</td>
+      <td id="T_99f02_row9_col4" class="data row9 col4"> 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_99f02_level0_row10" class="row_heading level0 row10">Mu:Car</th>
+      <td id="T_99f02_row10_col0" class="data row10 col0"> 0.259</td>
+      <td id="T_99f02_row10_col1" class="data row10 col1"> 0.181</td>
+      <td id="T_99f02_row10_col2" class="data row10 col2">-4.10</td>
+      <td id="T_99f02_row10_col3" class="data row10 col3">***</td>
+      <td id="T_99f02_row10_col4" class="data row10 col4"> 1.00</td>
+    </tr>
+    <tr>
+      <th id="T_99f02_level0_row11" class="row_heading level0 row11">Mu:Motor</th>
+      <td id="T_99f02_row11_col0" class="data row11 col0"> 0.802</td>
+      <td id="T_99f02_row11_col1" class="data row11 col1"> 0.201</td>
+      <td id="T_99f02_row11_col2" class="data row11 col2">-0.99</td>
+      <td id="T_99f02_row11_col3" class="data row11 col3"></td>
+      <td id="T_99f02_row11_col4" class="data row11 col4"> 1.00</td>
+    </tr>
+    <tr>
+      <th id="T_99f02_level0_row12" class="row_heading level0 row12">Mu:NonMotor</th>
+      <td id="T_99f02_row12_col0" class="data row12 col0"> 0.854</td>
+      <td id="T_99f02_row12_col1" class="data row12 col1"> 0.112</td>
+      <td id="T_99f02_row12_col2" class="data row12 col2">-1.30</td>
+      <td id="T_99f02_row12_col3" class="data row12 col3"></td>
+      <td id="T_99f02_row12_col4" class="data row12 col4"> 1.00</td>
+    </tr>
+    <tr>
+      <th id="T_99f02_level0_row13" class="row_heading level0 row13">NonMotorTime</th>
+      <td id="T_99f02_row13_col0" class="data row13 col0">-0.266</td>
+      <td id="T_99f02_row13_col1" class="data row13 col1"> 0.0163</td>
+      <td id="T_99f02_row13_col2" class="data row13 col2">-16.29</td>
+      <td id="T_99f02_row13_col3" class="data row13 col3">***</td>
+      <td id="T_99f02_row13_col4" class="data row13 col4"> 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_99f02_level0_row14" class="row_heading level0 row14">OutVehTime</th>
+      <td id="T_99f02_row14_col0" class="data row14 col0">-0.255</td>
+      <td id="T_99f02_row14_col1" class="data row14 col1"> 0.0646</td>
+      <td id="T_99f02_row14_col2" class="data row14 col2">-3.95</td>
+      <td id="T_99f02_row14_col3" class="data row14 col3">***</td>
+      <td id="T_99f02_row14_col4" class="data row14 col4"> 0.00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">report</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;# Estimation Statistics&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">m</span><span class="o">.</span><span class="n">estimation_statistics</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><h1><a name="rx2" reftxt="Estimation Statistics" class="toc" toclevel="1"></a>Estimation Statistics</h1><div><table><thead><tr><th>Statistic</th><th>Aggregate</th><th>Per Case</th></tr></thead><tbody><tr><td>Number of Cases</td><td colspan="2">7564</td></tr><tr><td>Log Likelihood at Convergence</td><td>-3493.04</td><td>-0.46</td></tr><tr><td>Log Likelihood at Null Parameters</td><td>-10644.66</td><td>-1.41</td></tr><tr><td>Rho Squared w.r.t. Null Parameters</td><td colspan="2">0.672</td></tr></tbody></table></div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">report</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;# Utility Functions&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">m</span><span class="o">.</span><span class="n">utility_functions</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><h1><a name="rx3" reftxt="Utility Functions" class="toc" toclevel="1"></a>Utility Functions</h1><div><table class="floatinghead" style="margin-top:1px;"><thead><tr><th>alt</th><th style="text-align:left;">formula</th></tr></thead><tbody><tr><td>1</td><td style="text-align:left;"><div></div> + <span class="LinearFunc_Param">P.InVehTime</span> * <span class="LinearFunc_Data">X.AUTO_TIME</span><br> + <span class="LinearFunc_Param">P.Cost</span> * <span class="LinearFunc_Data">X.AUTO_COST</span></td></tr><tr><td>2</td><td style="text-align:left;"><div></div> + <span class="LinearFunc_Param">P.ASC_SR</span><br> + <span class="LinearFunc_Param">P.InVehTime</span> * <span class="LinearFunc_Data">X.AUTO_TIME</span><br> + <span class="LinearFunc_Param">P.Cost</span> * 0.5 * <span class="LinearFunc_Data">X.AUTO_COST</span><br> + <span class="LinearFunc_Param">P('LogIncome:SR')</span> * <span class="LinearFunc_Data">X('log(INCOME)')</span></td></tr><tr><td>3</td><td style="text-align:left;"><div></div> + <span class="LinearFunc_Param">P.ASC_Walk</span><br> + <span class="LinearFunc_Param">P.NonMotorTime</span> * <span class="LinearFunc_Data">X.WALK_TIME</span><br> + <span class="LinearFunc_Param">P('LogIncome:Walk')</span> * <span class="LinearFunc_Data">X('log(INCOME)')</span></td></tr><tr><td>4</td><td style="text-align:left;"><div></div> + <span class="LinearFunc_Param">P.ASC_Bike</span><br> + <span class="LinearFunc_Param">P.NonMotorTime</span> * <span class="LinearFunc_Data">X.BIKE_TIME</span><br> + <span class="LinearFunc_Param">P('LogIncome:Bike')</span> * <span class="LinearFunc_Data">X('log(INCOME)')</span></td></tr><tr><td>5</td><td style="text-align:left;"><div></div> + <span class="LinearFunc_Param">P.ASC_Transit</span><br> + <span class="LinearFunc_Param">P.InVehTime</span> * <span class="LinearFunc_Data">X.TRANSIT_IVTT</span><br> + <span class="LinearFunc_Param">P.OutVehTime</span> * <span class="LinearFunc_Data">X.TRANSIT_OVTT</span><br> + <span class="LinearFunc_Param">P.Cost</span> * <span class="LinearFunc_Data">X.TRANSIT_FARE</span><br> + <span class="LinearFunc_Param">P('LogIncome:Transit')</span> * <span class="LinearFunc_Data">X('log(INCOME)')</span></td></tr></tbody></table></div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">report</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+    <span class="s2">&quot;exampville_mode_choice.html&quot;</span><span class="p">,</span>
+    <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">metadata</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">dumps</span><span class="p">(),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;exampville_mode_choice.html&#39;
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="200_exampville.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">200: Exampville Simulated Data</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="202_exville_mc_logsums.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">202: Exampville Mode Choice Logsums</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preprocessing">Preprocessing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#model-definition">Model Definition</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#model-estimation">Model Estimation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#save-and-report-model">Save and Report Model</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/examples/exampville/201_exville_mode_choice.ipynb">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item"><!-- This will display the version of the docs -->
+<p class="larch-version">🌳 Larch v6.0.26.dev2+g135c0b8, © Copyright 2024.</p></div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
