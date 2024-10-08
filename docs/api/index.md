@@ -14,4 +14,5 @@ model
 linear
 nesting
 mixtures
+troubleshooting
 ```

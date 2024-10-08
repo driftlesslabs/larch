@@ -15,16 +15,82 @@ logger = logging.getLogger(__name__)
 
 def doctor(
     model: Model,
+    *,
     repair_ch_av: Literal["?", "+", "-", "!"] | None = "?",
     repair_ch_zq: Literal["?", "-", "!"] | None = None,
-    repair_asc=None,
     repair_noch_nzwt: Literal["?", "+", "-"] | None = "?",
     repair_nan_wt: Literal["?", True, "!"] | None = "?",
     repair_nan_data_co: Literal["?", True, "!"] | None = "?",
     check_low_variance_data_co: Literal["?", "!"] | None = None,
-    verbose=3,
-    warning_stacklevel=2,
+    verbose: int = 3,
+    warning_stacklevel: int = 2,
 ):
+    """
+    Diagnose data problems with a model.
+
+    The doctor will check for common data problems that can cause numerical
+    instability in a model.  The doctor will return a list of problems found,
+    and optionally repair them.
+
+    Parameters
+    ----------
+    model : larch.Model
+        The model to diagnose.
+    repair_ch_av : {'?', '+', '-', '!'}, default '?'
+        How to repair the data if some observations are chosen but not available.
+        The plus ('+') will make the conflicting alternatives available, overriding
+        the availability status. The minus ('-') will make them not chosen (possibly
+        leaving no chosen alternative). A question mark ('?') effects no repair, and
+        simply emits a warning without interrupting program execution. An exclamation
+        mark will raise an error if there are any conflicts.
+    repair_ch_zq : {'?', '-', '!'}, default None
+        How to repair the data if some observations are chosen but have zero quantity.
+        The minus ('-') will make alternatives with zero quantity not chosen (possibly
+        leaving no chosen alternative). A question mark ('?') effects no repair, and
+        simply emits a warning. An exclamation mark ('!') will raise an error if there
+        are any conflicts.
+    repair_noch_nzwt : {'?', '+', '-'}, default '?'
+        How to repair the data if some observations have no choice but have some weight.
+        Minus ('-') will make the weight zero when there is no choice. Plus ('+') will
+        make the weight zero, plus autoscale all remaining weights so the total of the
+        case weights equals the number of cases. A question mark ('?') effects no repair,
+        and simply emits a warning.
+    repair_nan_wt : {'?', '!', True}, default '?'
+        How to repair the data if some weight values are NaN. Any true value other than
+        "?" or "!" will make NaN values in weight zero. The question mark simply emits
+        a warning if there are NaN values found, while the exclamation mark will raise
+        an error.
+    repair_nan_data_co : {'?', '!', True}, default '?'
+        How to repair the data if some data_co values are NaN. Any true value other than
+        "?" or "!" will make NaN values in data_co zero. The question mark simply emits
+        a warning if there are NaN values found, while the exclamation mark will raise
+        an error.
+    check_low_variance_data_co : {'?', '!'}, default None
+        Check if any data_co columns have very low variance. No repairs are available for
+        this check. The question mark simply emits a warning if there are issues found,
+        while the exclamation mark will raise an error.
+    verbose : int, default 3
+        The number of example rows to list for each problem.
+    warning_stacklevel : int, default 2
+        The stacklevel for warnings.
+
+    Returns
+    -------
+    model : larch.Model
+        The model with revised dataset attached.
+    problems : dict
+        A dictionary of problems found, with the key being the name of the problem
+        and the value being a DataFrame with the number of bad instances and some
+        example rows.
+
+    Raises
+    ------
+    TypeError
+        If the model is not a Model instance.
+    ValueError
+        If any of the repair settings are invalid, or if the repair is set to '!' and
+        there are any conflicts found.
+    """
     problems = dictx()
 
     if not isinstance(model, Model):
@@ -59,16 +125,24 @@ def chosen_but_not_available(
     """
     Check if some observations are chosen but not available.
 
+    Alternatives that are unavailable have their utility values set to negative
+    infinity.  If even one observation is chosen but not available, the model
+    log-likelihood will nominally be negative infinity regardless of the values
+    of any other parameters.  Note that some compute engines (e.g. JAX) may
+    not actually return negative infinity log likelihoods due to clipping of
+    extreme values.
+
     Parameters
     ----------
     model : larch.Model
         The model to check.
-    repair : {None, '+', '-'}
-        How to repair the data.
-        Plus will make the conflicting alternatives available.
-        Minus will make them not chosen (possibly leaving no chosen alternative).
-        A question mark effects no repair, and simply emits a warning. An exclamation
-        mark will raise an error if there are any conflicts.
+    repair : {'?', '+', '-', '!'}, default '?'
+        How to repair the data. The plus ('+') will make the conflicting
+        alternatives available, overriding the availability status. The minus
+        ('-') will make them not chosen (possibly leaving no chosen alternative).
+        A question mark ('?') effects no repair, and simply emits a warning
+        without interrupting program execution. An exclamation mark will raise
+        an error if there are any conflicts.
     verbose : int, default 3
         The number of example rows to list for each problem.
 
@@ -79,6 +153,10 @@ def chosen_but_not_available(
     diagnosis : pd.DataFrame
         The number of bad instances, by alternative, and some example rows.
 
+    Raises
+    ------
+    ValueError
+        If the repair is set to '!' and there are any conflicts found.
     """
     dataset = model.dataset
     if dataset is None:
@@ -129,14 +207,27 @@ def chosen_but_zero_quantity(
     """
     Check if some observations are chosen but have zero quantity.
 
+    Alternatives that have zero quantity have utility values that end up as
+    negative infinity, regardless of whether the alternative would otherwise be
+    available.  Due to the mathematical structure of how quantities are used in
+    Larch, this situation is generally a result of a data problem, and not
+    due to the current values of model parameters.
+
+    If even one observation is chosen but has zero quantity, the model
+    log-likelihood will nominally be negative infinity regardless of the values
+    of any other parameters.  Note that some compute engines (e.g. JAX) may
+    not actually return negative infinity log likelihoods due to clipping of
+    extreme values.
+
     Parameters
     ----------
     model : BaseModel
-        The model to check
-    repair : {None, '-', '?', '!'}
-        How to repair the data.
-        Minus will make them not chosen (possibly leaving no chosen alternative).
-        None effects no repair, and simply emits a warning.
+        The model to check.
+    repair : {'?', '-', '!'}
+        How to repair the data. The minus ('-') will make alternatives with zero
+        quantity not chosen (possibly leaving no chosen alternative). A question
+        mark ('?') effects no repair, and simply emits a warning. An exclamation
+        mark ('!') will raise an error if there are any conflicts.
     verbose : int, default 3
         The number of example rows to list for each problem.
 
@@ -147,6 +238,10 @@ def chosen_but_zero_quantity(
     diagnosis : pd.DataFrame
         The number of bad instances, by alternative, and some example rows.
 
+    Raises
+    ------
+    ValueError
+        If the repair is set to '!' and there are any conflicts found.
     """
     if repair not in ("?", "-", "!", None):
         raise ValueError(f'invalid repair setting "{repair}"')
@@ -200,7 +295,7 @@ def chosen_but_zero_quantity(
 
 
 def nothing_chosen_but_nonzero_weight(
-    model, repair: Literal["?", "-", "*"] = "?", verbose=3
+    model, repair: Literal["?", "-", "*", "!"] = "?", verbose=3
 ):
     """
     Check if some observations have no choice but have some weight.
@@ -209,11 +304,12 @@ def nothing_chosen_but_nonzero_weight(
     ----------
     model : BaseModel
         The model to check.
-    repair : {None, '-', '*'}
-        How to repair the data.
-        Minus will make the weight zero when there is no choice. Star will
-        also make the weight zero, plus autoscale all remaining weights.
-        None effects no repair, and simply emits a warning.
+    repair : {'?', '-', '*', '!'}
+        How to repair the data. Minus ('-') will make the weight zero when there
+        is no choice. Star ('*') will also make the weight zero, plus autoscale
+        all remaining weights so the total of the case weights equals the number
+        of cases. A question mark ('?') effects no repair, and simply emits a
+        warning.
     verbose : int, default 3
         The number of example rows to list for each problem.
 
@@ -224,6 +320,10 @@ def nothing_chosen_but_nonzero_weight(
     diagnosis : pd.DataFrame
         The number of bad instances, by alternative, and some example rows.
 
+    Raises
+    ------
+    ValueError
+        If the repair is set to '!' and there are any conflicts found.
     """
     diagnosis = None
     dataset = model.dataset
@@ -252,7 +352,18 @@ def nothing_chosen_but_nonzero_weight(
             diagnosis.loc["nothing_chosen_some_weight", "example rows"] = ", ".join(
                 str(j) for j in i1[:verbose]
             )
-            if repair == "+":
+            msg = "nothing_chosen_but_nonzero_weight: some cases have no choice but non-zero weight.\n"
+            try:
+                from tabulate import tabulate
+            except ImportError:
+                msg += diagnosis.to_string()
+            else:
+                msg += tabulate(diagnosis, headers="keys", tablefmt="fancy_outline")
+            if repair == "!":
+                raise ValueError(msg)
+            elif repair == "?":
+                logger.warning(msg)
+            elif repair == "+":
                 raise ValueError(
                     "cannot resolve nothing_chosen_but_nonzero_weight by assuming some choice"
                 )
@@ -287,6 +398,11 @@ def nan_data_co(
         The model with revised dataset attached.
     diagnosis : pd.DataFrame
         The number of bad instances, and some example rows.
+
+    Raises
+    ------
+    ValueError
+        If the repair is set to '!' and there are any NaN values found.
     """
     dataset = model.dataset
     if dataset is None:
@@ -338,6 +454,11 @@ def nan_weight(
         The model with revised dataset attached.
     diagnosis : pd.DataFrame
         The number of bad instances, and some example rows.
+
+    Raises
+    ------
+    ValueError
+        If the repair is set to '!' and there are any NaN values found.
     """
     dataset = model.dataset
     if dataset is None:
@@ -387,6 +508,11 @@ def low_variance_data_co(
         The model with revised dataset attached.
     diagnosis : pd.DataFrame
         The number of bad instances, and some example rows.
+
+    Raises
+    ------
+    ValueError
+        If the repair is set to '!' and there are any low variance columns found.
     """
     dataset = model.dataset
     if dataset is None:

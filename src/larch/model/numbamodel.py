@@ -1169,20 +1169,23 @@ class NumbaModel(_BaseModel):
         self,
         repair_ch_av: Literal["?", "+", "-", None] = "?",
         repair_ch_zq: Literal["?", "-", "!"] | None = None,
-        repair_asc=None,
         repair_noch_nzwt: Literal["?", "+", "-", None] = None,
         repair_nan_wt: Literal["?", True, "!", None] = None,
         repair_nan_data_co: Literal["?", True, "!", None] = None,
         check_low_variance_data_co: Literal["?", "!", None] = None,
         verbose=3,
     ):
+        """
+        Run diagnostics, checking for common problems and inconsistencies.
+
+        See :func:`larch.model.troubleshooting.doctor` for more information.
+        """
         from .troubleshooting import doctor
 
         result = doctor(
             self,
             repair_ch_av=repair_ch_av,
             repair_ch_zq=repair_ch_zq,
-            repair_asc=repair_asc,
             repair_noch_nzwt=repair_noch_nzwt,
             repair_nan_wt=repair_nan_wt,
             repair_nan_data_co=repair_nan_data_co,

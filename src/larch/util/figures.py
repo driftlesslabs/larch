@@ -605,7 +605,7 @@ def distribution_on_idca_variable(
     if isinstance(x, str):
         x_label = x
         if model.dataset and "ca" in model.dataset and x in model.dataset["var_ca"]:
-            x = model.dataset["ca"][x].values.reshape(-1)
+            x = model.dataset["ca"].sel(var_ca=x).values.reshape(-1)
         # elif model.dataservice is not None:
         #     x = (
         #         model.dataservice.make_dataframes({"ca": [x]}, explicit=True)
@@ -657,7 +657,7 @@ def distribution_on_idca_variable(
         else:
             x_ = x
             if model.dataset is not None:
-                if "av" in model.dataset and model.dataframes.data_ca is not None:
+                if "av" in model.dataset and "ca" in model.dataset:
                     x_ = x[model.dataset["av"].values.reshape(-1) != 0]
             elif getattr(model, "datatree", None) is not None:
                 if model.availability_ca_var or model.availability_co_vars:

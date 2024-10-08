@@ -17,7 +17,7 @@ import logging
 import pathlib
 import uuid
 import warnings
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 import pandas as pd
@@ -367,14 +367,19 @@ class BaseModel:
 
     def doctor(
         self,
-        repair_ch_av="?",
-        repair_ch_zq=None,
-        repair_asc=None,
-        repair_noch_nzwt=None,
-        repair_nan_wt=None,
-        repair_nan_data_co=None,
-        verbose=3,
+        repair_ch_av: Literal["?", "+", "-", "!"] | None = "?",
+        repair_ch_zq: Literal["?", "-", "!"] | None = None,
+        repair_noch_nzwt: Literal["?", "+", "-"] | None = "?",
+        repair_nan_wt: Literal["?", True, "!"] | None = "?",
+        repair_nan_data_co: Literal["?", True, "!"] | None = "?",
+        check_low_variance_data_co: Literal["?", "!"] | None = None,
+        verbose: int = 3,
     ):
+        """
+        Run diagnostics, checking for common problems and inconsistencies.
+
+        See :func:`larch.model.troubleshooting.doctor` for more information.
+        """
         self.unmangle(True)
         from .troubleshooting import doctor
 
@@ -382,7 +387,6 @@ class BaseModel:
             self,
             repair_ch_av=repair_ch_av,
             repair_ch_zq=repair_ch_zq,
-            repair_asc=repair_asc,
             repair_noch_nzwt=repair_noch_nzwt,
             repair_nan_wt=repair_nan_wt,
             repair_nan_data_co=repair_nan_data_co,
