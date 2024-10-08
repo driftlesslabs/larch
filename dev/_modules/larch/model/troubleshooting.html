@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>larch.model.troubleshooting &#8212; v6.0.26.dev2+g135c0b8</title>
+    <title>larch.model.troubleshooting &#8212; v6.0.26.dev3+gf04cc70</title>
   
   
   
@@ -141,8 +141,8 @@
       
     
     
-    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.26.dev2+g135c0b8 - Home"/>
-    <script>document.write(`<img src="../../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.26.dev2+g135c0b8 - Home"/>`);</script>
+    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.26.dev3+gf04cc70 - Home"/>
+    <script>document.write(`<img src="../../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.26.dev3+gf04cc70 - Home"/>`);</script>
   
   
 </a></div>
@@ -393,6 +393,10 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">..util</span> <span class="kn">import</span> <span class="n">dictx</span>
 <span class="kn">from</span> <span class="nn">.numbamodel</span> <span class="kn">import</span> <span class="n">NumbaModel</span> <span class="k">as</span> <span class="n">Model</span>
+<span class="kn">from</span> <span class="nn">.possible_overspec</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PossibleOverspecificationError</span><span class="p">,</span>
+    <span class="n">compute_possible_overspecification</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -408,6 +412,7 @@ document.write(`
     <span class="n">repair_nan_wt</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span>
     <span class="n">repair_nan_data_co</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span>
     <span class="n">check_low_variance_data_co</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">check_overspec</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
     <span class="n">warning_stacklevel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
 <span class="p">):</span>
@@ -501,6 +506,7 @@ document.write(`
     <span class="n">apply_repair</span><span class="p">(</span><span class="n">repair_nan_wt</span><span class="p">,</span> <span class="n">nan_weight</span><span class="p">)</span>
     <span class="n">apply_repair</span><span class="p">(</span><span class="n">check_low_variance_data_co</span><span class="p">,</span> <span class="n">low_variance_data_co</span><span class="p">)</span>
     <span class="n">apply_repair</span><span class="p">(</span><span class="n">repair_ch_zq</span><span class="p">,</span> <span class="n">chosen_but_zero_quantity</span><span class="p">)</span>
+    <span class="n">apply_repair</span><span class="p">(</span><span class="n">check_overspec</span><span class="p">,</span> <span class="n">overspecification</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">problems</span></div>
 
@@ -939,6 +945,80 @@ document.write(`
 
     <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">diagnosis</span></div>
 
+
+
+<div class="viewcode-block" id="overspecification">
+<a class="viewcode-back" href="../../../api/generated/larch.model.troubleshooting.overspecification.html#larch.model.troubleshooting.overspecification">[docs]</a>
+<span class="k">def</span> <span class="nf">overspecification</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span> <span class="n">repair</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check model for possible over-specification.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : larch.Model</span>
+<span class="sd">        The model to check.</span>
+<span class="sd">    repair : {&#39;?&#39;, &#39;!&#39;}</span>
+<span class="sd">        No automatic repairs are available for this check. A question mark (&#39;?&#39;) simply</span>
+<span class="sd">        emits a warning if a possible over-specification is found. An exclamation mark</span>
+<span class="sd">        (&#39;!&#39;) will raise an error if possible over-specification is found.</span>
+<span class="sd">    verbose : int, default 3</span>
+<span class="sd">        This is ignored for the overspecification check; all possible problems are</span>
+<span class="sd">        listed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of tuples</span>
+<span class="sd">        A list of possible over-specification problems in the model.  Each problem</span>
+<span class="sd">        is a tuple containing the eigenvalue, the indices of the non-zero elements</span>
+<span class="sd">        in the eigenvector, and the eigenvector itself.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pvals</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">pvals</span>
+    <span class="n">locks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">pholdfast</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">compute_engine</span> <span class="o">==</span> <span class="s2">&quot;jax&quot;</span><span class="p">:</span>
+        <span class="n">_se</span><span class="p">,</span> <span class="n">hess</span><span class="p">,</span> <span class="n">_inv_hess</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">jax_param_cov</span><span class="p">(</span><span class="n">pvals</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">hess</span> <span class="o">=</span> <span class="o">-</span><span class="n">model</span><span class="o">.</span><span class="n">d2_loglike</span><span class="p">(</span><span class="n">pvals</span><span class="p">)</span>
+    <span class="n">hess</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">hess</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">hess</span><span class="p">[</span><span class="n">locks</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">hess</span><span class="p">[:,</span> <span class="n">locks</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">diagnosis</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">overspec</span> <span class="o">=</span> <span class="n">compute_possible_overspecification</span><span class="p">(</span><span class="n">hess</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">pholdfast</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">overspec</span><span class="p">:</span>
+        <span class="n">diagnosis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">possible_overspecification</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Model is possibly over-specified (hessian is nearly singular).&quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Look for problems in these parameters or groups of parameters:&quot;</span>
+        <span class="k">for</span> <span class="n">eigval</span><span class="p">,</span> <span class="n">ox</span><span class="p">,</span> <span class="n">eigenvec</span> <span class="ow">in</span> <span class="n">overspec</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">eigval</span> <span class="o">==</span> <span class="s2">&quot;LinAlgError&quot;</span><span class="p">:</span>
+                <span class="n">possible_overspecification</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">eigval</span><span class="p">,</span> <span class="p">[</span><span class="n">ox</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">paramset</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">pnames</span><span class="p">)[</span><span class="n">ox</span><span class="p">])</span>
+                <span class="n">possible_overspecification</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">eigval</span><span class="p">,</span> <span class="n">paramset</span><span class="p">,</span> <span class="n">eigenvec</span><span class="p">[</span><span class="n">ox</span><span class="p">]))</span>
+                <span class="n">diagnosis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="n">eigval</span><span class="p">,</span>
+                        <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">eigenvec</span><span class="p">[</span><span class="n">ox</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">paramset</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;eigenvector&quot;</span><span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">- Eigenvalue: </span><span class="si">{</span><span class="n">eigval</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">max_len_param</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paramset</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paramset</span><span class="p">,</span> <span class="n">eigenvec</span><span class="p">[</span><span class="n">ox</span><span class="p">]):</span>
+                    <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">    </span><span class="si">{</span><span class="n">p</span><span class="si">:{</span><span class="n">max_len_param</span><span class="si">}</span><span class="s2">s</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">z</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">_possible_overspecification</span> <span class="o">=</span> <span class="n">possible_overspecification</span>
+        <span class="k">if</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PossibleOverspecificationError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">diagnosis</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">diagnosis</span><span class="p">],</span>
+            <span class="n">keys</span><span class="o">=</span><span class="p">[(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">diagnosis</span><span class="p">)],</span>
+            <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;problem&quot;</span><span class="p">,</span> <span class="s2">&quot;eigenvalue&quot;</span><span class="p">,</span> <span class="s2">&quot;parameter&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">diagnosis</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+            <span class="n">diagnosis</span> <span class="o">=</span> <span class="n">diagnosis</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">diagnosis</span></div>
+
 </pre></div>
 
                 </article>
@@ -977,7 +1057,7 @@ document.write(`
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-<p class="larch-version">🌳 Larch v6.0.26.dev2+g135c0b8, © Copyright 2024.</p></div>
+<p class="larch-version">🌳 Larch v6.0.26.dev3+gf04cc70, © Copyright 2024.</p></div>
       
     </div>
   

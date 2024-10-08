@@ -18,6 +18,7 @@
       ~Model.apply_random_draws
       ~Model.bhhh
       ~Model.calculate_parameter_covariance
+      ~Model.check_for_overspecification
       ~Model.check_random_draws
       ~Model.choice_avail_summary
       ~Model.clear_cache
