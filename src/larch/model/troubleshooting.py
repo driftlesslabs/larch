@@ -9,6 +9,10 @@ import xarray as xr
 
 from ..util import dictx
 from .numbamodel import NumbaModel as Model
+from .possible_overspec import (
+    PossibleOverspecificationError,
+    compute_possible_overspecification,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +26,7 @@ def doctor(
     repair_nan_wt: Literal["?", True, "!"] | None = "?",
     repair_nan_data_co: Literal["?", True, "!"] | None = "?",
     check_low_variance_data_co: Literal["?", "!"] | None = None,
+    check_overspec: Literal["?", "!", None] = None,
     verbose: int = 3,
     warning_stacklevel: int = 2,
 ):
@@ -115,6 +120,7 @@ def doctor(
     apply_repair(repair_nan_wt, nan_weight)
     apply_repair(check_low_variance_data_co, low_variance_data_co)
     apply_repair(repair_ch_zq, chosen_but_zero_quantity)
+    apply_repair(check_overspec, overspecification)
 
     return model, problems
 
@@ -533,4 +539,75 @@ def low_variance_data_co(
                     f"low_variance_data_co: {len(diagnosis)} columns have low variance"
                 )
 
+    return model, diagnosis
+
+
+def overspecification(model: Model, repair: Literal["?", "!"] = "?", verbose: int = 3):
+    """
+    Check model for possible over-specification.
+
+    Parameters
+    ----------
+    model : larch.Model
+        The model to check.
+    repair : {'?', '!'}
+        No automatic repairs are available for this check. A question mark ('?') simply
+        emits a warning if a possible over-specification is found. An exclamation mark
+        ('!') will raise an error if possible over-specification is found.
+    verbose : int, default 3
+        This is ignored for the overspecification check; all possible problems are
+        listed.
+
+    Returns
+    -------
+    list of tuples
+        A list of possible over-specification problems in the model.  Each problem
+        is a tuple containing the eigenvalue, the indices of the non-zero elements
+        in the eigenvector, and the eigenvector itself.
+    """
+    pvals = model.pvals
+    locks = np.asarray(model.pholdfast.astype(bool))
+    if model.compute_engine == "jax":
+        _se, hess, _inv_hess = model.jax_param_cov(pvals)
+    else:
+        hess = -model.d2_loglike(pvals)
+    hess = np.asarray(hess).copy()
+    hess[locks, :] = 0
+    hess[:, locks] = 0
+
+    diagnosis = None
+    overspec = compute_possible_overspecification(hess, model.pholdfast)
+    if overspec:
+        diagnosis = []
+        possible_overspecification = []
+        msg = "Model is possibly over-specified (hessian is nearly singular)."
+        msg += "\nLook for problems in these parameters or groups of parameters:"
+        for eigval, ox, eigenvec in overspec:
+            if eigval == "LinAlgError":
+                possible_overspecification.append((eigval, [ox], [""]))
+            else:
+                paramset = list(np.asarray(model.pnames)[ox])
+                possible_overspecification.append((eigval, paramset, eigenvec[ox]))
+                diagnosis.append(
+                    (
+                        eigval,
+                        pd.Series(eigenvec[ox], index=paramset, name="eigenvector"),
+                    )
+                )
+                msg += f"\n- Eigenvalue: {eigval}"
+                max_len_param = max(len(p) for p in paramset)
+                for p, z in zip(paramset, eigenvec[ox]):
+                    msg += f"\n    {p:{max_len_param}s}: {z}"
+        model._possible_overspecification = possible_overspecification
+        if repair == "!":
+            raise PossibleOverspecificationError(msg)
+        elif repair == "?":
+            logger.warning(msg)
+        diagnosis = pd.concat(
+            [d[1] for d in diagnosis],
+            keys=[(n, d[0]) for (n, d) in enumerate(diagnosis)],
+            names=["problem", "eigenvalue", "parameter"],
+        )
+        if isinstance(diagnosis, pd.Series):
+            diagnosis = diagnosis.to_frame()
     return model, diagnosis

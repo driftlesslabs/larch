@@ -7,7 +7,13 @@ class PossibleOverspecification(Warning):
     pass
 
 
-def compute_possible_overspecification(a, holdfast_vector=None):
+class PossibleOverspecificationError(ValueError):
+    pass
+
+
+def compute_possible_overspecification(
+    a, holdfast_vector=None, eigenvalue_threshold=0.001, participation_magnitude=5
+):
     """
     Compute the possible overspecification of a model from its hessian matrix.
 
@@ -17,6 +23,13 @@ def compute_possible_overspecification(a, holdfast_vector=None):
         The hessian matrix
     holdfast_vector : vector
         A vector of indicators for which row/cols should be ignored as holdfast-ed
+    eigenvalue_threshold : float, default 0.001
+        The threshold to consider the absolute value of an eigenvalue as close
+        enough to zero to be considered as a possible overspecification.  This
+        should be a small positive number.
+    participation_magnitude : int, default 5
+        The magnitude of the participation to consider a parameter as
+        participating in a possible overspecification.
 
     Returns
     -------
@@ -37,9 +50,9 @@ def compute_possible_overspecification(a, holdfast_vector=None):
     except numpy.linalg.linalg.LinAlgError as err:
         return [("LinAlgError", str(err), "")]
     for i in range(len(eigenvalues_packed)):
-        if numpy.abs(eigenvalues_packed[i]) < 0.001:
+        if numpy.abs(eigenvalues_packed[i]) < eigenvalue_threshold:
             v = eigenvectors_packed[:, i]
-            v = numpy.round(v, 7)
+            v = numpy.round(v, participation_magnitude)
             v_unpacked = numpy.zeros(a.shape[0])
             v_unpacked[~holdfast_vector.astype(bool)] = v
             ret.append((eigenvalues_packed[i], numpy.where(v_unpacked)[0], v_unpacked))

@@ -268,6 +268,7 @@ class ModelGroup(ConstrainedModel, MutableSequence):
         repair_nan_wt: Literal["?", True, "!", None] = None,
         repair_nan_data_co: Literal["?", True, "!", None] = None,
         check_low_variance_data_co: Literal["?", "!", None] = None,
+        check_overspec: Literal["?", "!", None] = None,
         verbose=3,
     ):
         diagnosis = []
@@ -284,6 +285,12 @@ class ModelGroup(ConstrainedModel, MutableSequence):
                     verbose=verbose,
                 )
             )
+        from .troubleshooting import overspecification
+
+        if check_overspec:
+            self, overspec_diagnosis = overspecification(self, check_overspec)
+            if overspec_diagnosis:
+                diagnosis.append(overspec_diagnosis)
         return self, diagnosis
 
     def maximize_loglike(

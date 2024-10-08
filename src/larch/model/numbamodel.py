@@ -1173,6 +1173,7 @@ class NumbaModel(_BaseModel):
         repair_nan_wt: Literal["?", True, "!", None] = None,
         repair_nan_data_co: Literal["?", True, "!", None] = None,
         check_low_variance_data_co: Literal["?", "!", None] = None,
+        check_overspec: Literal["?", "!", None] = None,
         verbose=3,
     ):
         """
@@ -1190,6 +1191,7 @@ class NumbaModel(_BaseModel):
             repair_nan_wt=repair_nan_wt,
             repair_nan_data_co=repair_nan_data_co,
             check_low_variance_data_co=check_low_variance_data_co,
+            check_overspec=check_overspec,
             verbose=verbose,
         )
         self._rebuild_data_arrays()
@@ -2409,6 +2411,57 @@ class NumbaModel(_BaseModel):
                 constraints.extend(c.as_linear_constraints())
             return constraints
         return ()
+
+    def check_for_overspecification(self, pvals=None):
+        """
+        Check model for possible over-specification.
+
+        Parameters
+        ----------
+        pvals : array-like, optional
+            The parameter values to use in the calculation.  If not
+            given, the current parameter values are used.
+
+        Returns
+        -------
+        list of tuples
+            A list of possible overspecification problems in the model.  Each problem
+            is a tuple containing the eigenvalue, the indices of the non-zero elements
+            in the eigenvector, and the eigenvector itself.
+        """
+        if pvals is None:
+            pvals = self.pvals
+        locks = np.asarray(self.pholdfast.astype(bool))
+        if self.compute_engine == "jax":
+            _se, hess, _inv_hess = self.jax_param_cov(pvals)
+        else:
+            hess = -self.d2_loglike(pvals)
+        hess = np.asarray(hess).copy()
+        hess[locks, :] = 0
+        hess[:, locks] = 0
+
+        overspec = compute_possible_overspecification(hess, self.pholdfast)
+        if overspec:
+            possible_overspecification = []
+            msg = "Model is possibly over-specified (hessian is nearly singular)."
+            msg += "\nLook for problems in these parameters or groups of parameters:"
+            for eigval, ox, eigenvec in overspec:
+                if eigval == "LinAlgError":
+                    possible_overspecification.append((eigval, [ox], [""]))
+                else:
+                    paramset = list(np.asarray(self.pnames)[ox])
+                    possible_overspecification.append((eigval, paramset, eigenvec[ox]))
+                    msg += f"\n- Eigenvalue: {eigval}"
+                    max_len_param = max(len(p) for p in paramset)
+                    for p, z in zip(paramset, eigenvec[ox]):
+                        msg += f"\n    {p:{max_len_param}s}: {z}"
+            self._possible_overspecification = possible_overspecification
+            warnings.warn(
+                msg,
+                category=PossibleOverspecification,
+                stacklevel=2,
+            )
+            return possible_overspecification
 
     def calculate_parameter_covariance(self, pvals=None, *, robust=False):
         """

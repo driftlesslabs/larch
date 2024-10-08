@@ -373,6 +373,7 @@ class BaseModel:
         repair_nan_wt: Literal["?", True, "!"] | None = "?",
         repair_nan_data_co: Literal["?", True, "!"] | None = "?",
         check_low_variance_data_co: Literal["?", "!"] | None = None,
+        check_overspec: Literal["?", "!"] | None = "?",
         verbose: int = 3,
     ):
         """
@@ -390,6 +391,7 @@ class BaseModel:
             repair_noch_nzwt=repair_noch_nzwt,
             repair_nan_wt=repair_nan_wt,
             repair_nan_data_co=repair_nan_data_co,
+            check_overspec=check_overspec,
             verbose=verbose,
         )
         return result

@@ -7,6 +7,7 @@ from pytest import approx
 
 import larch as lx
 from larch import P, X
+from larch.model.troubleshooting import PossibleOverspecificationError
 
 
 @pytest.fixture(params=["numba", "jax"])
@@ -212,3 +213,28 @@ def test_chosen_but_zero_quantity():
     ).set_index("TAZ_ID")
 
     pd.testing.assert_frame_equal(problems.chosen_but_zero_quantity, the_problem)
+
+
+def test_overspec():
+    m = lx.example(1)
+    m.utility_co[1] = P.ASC_DA
+
+    # test raising error
+    with pytest.raises(PossibleOverspecificationError):
+        m, problems = m.doctor(check_overspec="!")
+
+    # test just checking
+    m, problems = m.doctor(check_overspec="?")
+    assert len(problems) == 1
+    assert "overspecification" in problems
+
+    assert problems["overspecification"].to_dict()["eigenvector"] == approx(
+        {
+            (0, 2.859880987671204e-05, "ASC_BIKE"): -0.40825000405311584,
+            (0, 2.859880987671204e-05, "ASC_DA"): -0.40825000405311584,
+            (0, 2.859880987671204e-05, "ASC_SR2"): -0.40825000405311584,
+            (0, 2.859880987671204e-05, "ASC_SR3P"): -0.40825000405311584,
+            (0, 2.859880987671204e-05, "ASC_TRAN"): -0.40825000405311584,
+            (0, 2.859880987671204e-05, "ASC_WALK"): -0.40825000405311584,
+        }
+    )
