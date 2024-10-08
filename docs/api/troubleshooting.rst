@@ -1,5 +1,5 @@
 =====================
-Model Troubleshooting
+Troubleshooting
 =====================
 
 .. currentmodule:: larch.model.troubleshooting
