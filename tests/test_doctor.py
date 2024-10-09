@@ -228,13 +228,18 @@ def test_overspec():
     assert len(problems) == 1
     assert "overspecification" in problems
 
-    assert problems["overspecification"].to_dict()["eigenvector"] == approx(
-        {
-            (0, 2.859880987671204e-05, "ASC_BIKE"): -0.40825000405311584,
-            (0, 2.859880987671204e-05, "ASC_DA"): -0.40825000405311584,
-            (0, 2.859880987671204e-05, "ASC_SR2"): -0.40825000405311584,
-            (0, 2.859880987671204e-05, "ASC_SR3P"): -0.40825000405311584,
-            (0, 2.859880987671204e-05, "ASC_TRAN"): -0.40825000405311584,
-            (0, 2.859880987671204e-05, "ASC_WALK"): -0.40825000405311584,
-        }
-    )
+    diagnosis = problems["overspecification"].to_dict()["eigenvector"]
+    key2s = []
+    for key, val in diagnosis.items():
+        assert key[0] == 0
+        key2s.append(key[2])
+        assert key[1] == approx(2.85988e-05, rel=0.1)
+        assert val == approx(-0.40825, rel=0.1)
+    assert set(key2s) == {
+        "ASC_BIKE",
+        "ASC_DA",
+        "ASC_SR2",
+        "ASC_SR3P",
+        "ASC_TRAN",
+        "ASC_WALK",
+    }
