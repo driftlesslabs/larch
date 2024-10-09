@@ -560,10 +560,14 @@ def overspecification(model: Model, repair: Literal["?", "!"] = "?", verbose: in
 
     Returns
     -------
-    list of tuples
-        A list of possible over-specification problems in the model.  Each problem
-        is a tuple containing the eigenvalue, the indices of the non-zero elements
-        in the eigenvector, and the eigenvector itself.
+    model : larch.Model
+        The model with revised dataset attached.
+    diagnosis : pd.DataFrame
+        A dataframe of possible over-specification problems in the model.  The index of
+        this dataframe is a multi-index with the first level being the problem number, the
+        second level being the eigenvalue, and the third level being the parameter name[s]
+        of the non-zero elements of each problematic eigenvector. The columns are the
+        non-zero eigenvector values.
     """
     pvals = model.pvals
     locks = np.asarray(model.pholdfast.astype(bool))
