@@ -978,6 +978,8 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
                 stop_case=stop_case,
                 step_case=step_case,
                 check_if_best=check_if_best,
+                error_if_bad=error_if_bad,
+                **kwargs,
             )
         if start_case is not None:
             raise NotImplementedError("start_case with engine=jax")
@@ -1001,20 +1003,30 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         if error_if_bad:
             for f, tag in [(np.isnan, "NaN"), (np.isinf, "Inf")]:
                 if f(result):
-                    wt = float(_as_jnp_array(self._data_arrays.wt))
-                    if f(wt):
-                        raise ValueError(f"weight_normalization is {tag}")
+                    caseids = self.dataset.dc.caseids()
+                    nan_wt = f(self._data_arrays.wt)
+                    bad_wt_indexes = np.where(nan_wt)[0]
+                    if len(bad_wt_indexes) > 0:
+                        msg = f"weight is {tag}"
+                        msg += f" in {len(bad_wt_indexes)} cases, including CASEIDs:"
+                        msg += f" {caseids[bad_wt_indexes[0]]}"
+                        for i in bad_wt_indexes[1:5]:
+                            msg += f", {caseids[i]}"
+                        if len(bad_wt_indexes) > 5:
+                            msg += ", ..."
+                        raise ValueError(msg)
                     ll_casewise = self.jax_loglike_casewise(self.pvals)
                     msg = f"log likelihood is {tag}"
                     bad_case_indexes = np.where(f(ll_casewise))[0]
                     if len(bad_case_indexes) > 0:
                         msg += f" in {len(bad_case_indexes)} cases, including CASEIDs:"
-                        caseids = self.dataset.dc.caseids()
                         msg += f" {caseids[bad_case_indexes[0]]}"
                         for i in bad_case_indexes[1:5]:
-                            msg += f", {i}"
+                            msg += f", {caseids[i]}"
                         if len(bad_case_indexes) > 5:
                             msg += ", ..."
+                    else:
+                        msg += " but not in any individual cases"
                     raise ValueError(msg)
         return result
 

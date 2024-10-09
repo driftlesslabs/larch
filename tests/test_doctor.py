@@ -108,7 +108,9 @@ def test_nan_in_data_co(ref_model: lx.Model):
     m._rebuild_data_arrays()
 
     assert np.isnan(m.dataset["co"][:3, 0]).all()
-    assert np.isnan(m.loglike())
+    assert np.isnan(m.loglike(error_if_bad=False))
+    with pytest.raises(ValueError, match="log likelihood is NaN"):
+        m.loglike(error_if_bad=True)
 
     # test raising error
     with pytest.raises(ValueError):
@@ -148,7 +150,9 @@ def test_nan_in_weight(ref_model: lx.Model):
     m._rebuild_data_arrays()
 
     assert np.isnan(m.dataset["wt"][3:9]).all()
-    assert np.isnan(m.loglike())
+    assert np.isnan(m.loglike(error_if_bad=False))
+    with pytest.raises(ValueError, match=".* is NaN in 6 cases"):
+        m.loglike(error_if_bad=True)
 
     # test raising error
     with pytest.raises(ValueError):
