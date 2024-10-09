@@ -964,10 +964,12 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         self,
         x=None,
         *,
-        start_case=None,
-        stop_case=None,
-        step_case=None,
-        check_if_best=True,
+        start_case: int | None = None,
+        stop_case: int | None = None,
+        step_case: int | None = None,
+        check_if_best: bool = True,
+        error_if_bad: bool = True,
+        **kwargs,
     ):
         if self.compute_engine != "jax":
             return super().loglike(
@@ -996,6 +998,24 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             and step_case is None
         ):
             self._check_if_best(result)
+        if error_if_bad:
+            for f, tag in [(np.isnan, "NaN"), (np.isinf, "Inf")]:
+                if f(result):
+                    wt = float(_as_jnp_array(self._data_arrays.wt))
+                    if f(wt):
+                        raise ValueError(f"weight_normalization is {tag}")
+                    ll_casewise = self.jax_loglike_casewise(self.pvals)
+                    msg = f"log likelihood is {tag}"
+                    bad_case_indexes = np.where(f(ll_casewise))[0]
+                    if len(bad_case_indexes) > 0:
+                        msg += f" in {len(bad_case_indexes)} cases, including CASEIDs:"
+                        caseids = self.dataset.dc.caseids()
+                        msg += f" {caseids[bad_case_indexes[0]]}"
+                        for i in bad_case_indexes[1:5]:
+                            msg += f", {i}"
+                        if len(bad_case_indexes) > 5:
+                            msg += ", ..."
+                    raise ValueError(msg)
         return result
 
     def d_loglike(
@@ -1006,6 +1026,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         stop_case=None,
         step_case=None,
         return_series=False,
+        **kwargs,
     ):
         if self.compute_engine != "jax":
             return super().d_loglike(
@@ -1021,8 +1042,8 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             raise NotImplementedError("stop_case with engine=jax")
         if step_case is not None:
             raise NotImplementedError("step_case with engine=jax")
-        # if kwargs:
-        #     raise NotImplementedError(f"{kwargs.popitem()[0]} with engine=jax")
+        if kwargs:
+            raise NotImplementedError(f"{kwargs.popitem()[0]} with engine=jax")
         if x is not None:
             self.pvals = x
         self.check_random_draws()

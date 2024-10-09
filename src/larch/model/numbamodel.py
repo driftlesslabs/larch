@@ -1505,10 +1505,11 @@ class NumbaModel(_BaseModel):
         self,
         x=None,
         *,
-        start_case=None,
-        stop_case=None,
-        step_case=None,
-        check_if_best=True,
+        start_case: int | None = None,
+        stop_case: int | None = None,
+        step_case: int | None = None,
+        check_if_best: bool = True,
+        error_if_bad: bool = True,
         **kwargs,
     ):
         """
@@ -1539,6 +1540,8 @@ class NumbaModel(_BaseModel):
             If True, check if the current log likelihood is the best
             found so far, and if so, update the cached best log likelihood
             and cached best parameters.
+        error_if_bad : bool, default True
+            If True, raise an exception if the log likelihood is NaN or Inf.
 
         Returns
         -------
@@ -1556,6 +1559,24 @@ class NumbaModel(_BaseModel):
                 x, start_case=start_case, stop_case=stop_case, step_case=step_case
             )
             result = result_arrays.loglike.sum() * self.weight_normalization
+            if error_if_bad:
+                for f, tag in [(np.isnan, "NaN"), (np.isinf, "Inf")]:
+                    if f(result):
+                        if f(self.weight_normalization):
+                            raise ValueError(f"weight_normalization is {tag}")
+                        msg = f"log likelihood is {tag}"
+                        bad_case_indexes = np.where(f(result_arrays.loglike))[0]
+                        if len(bad_case_indexes) > 0:
+                            msg += (
+                                f" in {len(bad_case_indexes)} cases, including CASEIDs:"
+                            )
+                            caseids = self.dataset.dc.caseids()
+                            msg += f" {caseids[bad_case_indexes[0]]}"
+                            for i in bad_case_indexes[1:5]:
+                                msg += f", {i}"
+                            if len(bad_case_indexes) > 5:
+                                msg += ", ..."
+                        raise ValueError(msg)
         if start_case is None and stop_case is None and step_case is None:
             self._check_if_best(result)
         return result

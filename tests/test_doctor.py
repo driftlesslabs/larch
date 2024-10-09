@@ -160,7 +160,8 @@ def test_nan_in_weight(ref_model: lx.Model):
     assert "nan_weight" in problems
 
 
-def test_chosen_but_zero_quantity():
+@pytest.mark.parametrize("compute_engine", ["numba", "jax"])
+def test_chosen_but_zero_quantity(compute_engine):
     hh, pp, tour, skims, emp = lx.example(200, ["hh", "pp", "tour", "skims", "emp"])
     base = lx.Dataset.construct.new_idca(tour.TOURID, skims.TAZ_ID)
     hh["INCOME_GRP"] = pd.qcut(hh.INCOME, 3)
@@ -186,7 +187,7 @@ def test_chosen_but_zero_quantity():
         ),
     )
 
-    m = lx.Model(datatree=tree)
+    m = lx.Model(datatree=tree, compute_engine=compute_engine)
     m.quantity_ca = (
         +P.EmpRetail_HighInc * X("RETAIL_EMP * (INCOME>50000)")
         + P.EmpNonRetail_HighInc * X("NONRETAIL_EMP") * X("INCOME>50000")
@@ -213,6 +214,12 @@ def test_chosen_but_zero_quantity():
     ).set_index("TAZ_ID")
 
     pd.testing.assert_frame_equal(problems.chosen_but_zero_quantity, the_problem)
+
+    # test that log likelihood error checking works, for numba
+    # for jax there is clipping and no error is raised
+    if compute_engine == "numba":
+        with pytest.raises(ValueError, match="log likelihood is Inf"):
+            m.loglike()
 
 
 def test_overspec():
