@@ -41,6 +41,10 @@ def test_chosen_but_not_available_query(ref_model: lx.Model):
     with pytest.raises(ValueError):
         m, problems = m.doctor(repair_ch_av="!")
 
+    # this problem included by default in doctor exceptions
+    with pytest.raises(ValueError):
+        m, problems = m.doctor()
+
 
 def test_chosen_but_not_available_plus(ref_model: lx.Model):
     m = ref_model
@@ -83,6 +87,10 @@ def test_nothing_chosen_but_nonzero_weight(ref_model: lx.Model):
     m, problems = m.doctor(repair_noch_nzwt="?")
     assert "nothing_chosen_but_nonzero_weight" in problems
 
+    # this problem included by default in doctor exceptions
+    with pytest.raises(ValueError):
+        m, problems = m.doctor()
+
 
 def test_nothing_chosen_but_nonzero_weight_minus(ref_model: lx.Model):
     m = ref_model
@@ -121,6 +129,10 @@ def test_nan_in_data_co(ref_model: lx.Model):
     assert len(problems) == 1
     assert "nan_data_co" in problems
 
+    # this problem included by default in doctor exceptions
+    with pytest.raises(ValueError):
+        m, problems = m.doctor()
+
 
 def test_low_variance_data_co(ref_model: lx.Model):
     m = ref_model
@@ -137,6 +149,10 @@ def test_low_variance_data_co(ref_model: lx.Model):
     # test just checking
     m, problems = m.doctor(check_low_variance_data_co="?")
     assert len(problems) == 1
+    assert "low_variance_data_co" in problems
+
+    # this problem included by default in doctor warnings not exceptions
+    m, problems = m.doctor()
     assert "low_variance_data_co" in problems
 
 
@@ -162,6 +178,10 @@ def test_nan_in_weight(ref_model: lx.Model):
     m, problems = m.doctor(repair_nan_wt="?")
     assert len(problems) == 1
     assert "nan_weight" in problems
+
+    # this problem included by default in doctor exceptions
+    with pytest.raises(ValueError):
+        m, problems = m.doctor()
 
 
 @pytest.mark.parametrize("compute_engine", ["numba", "jax"])
@@ -219,6 +239,10 @@ def test_chosen_but_zero_quantity(compute_engine):
 
     pd.testing.assert_frame_equal(problems.chosen_but_zero_quantity, the_problem)
 
+    # this problem included by default in doctor exceptions
+    with pytest.raises(ValueError):
+        m, problems = m.doctor()
+
     # test that log likelihood error checking works, for numba
     # for jax there is clipping and no error is raised
     if compute_engine == "numba":
@@ -254,3 +278,7 @@ def test_overspec():
         "ASC_TRAN",
         "ASC_WALK",
     }
+
+    # this problem included by default in doctor warnings, not an exception
+    m, problems = m.doctor()
+    assert "overspecification" in problems

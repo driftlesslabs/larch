@@ -252,6 +252,10 @@ def chosen_but_zero_quantity(
     if repair not in ("?", "-", "!", None):
         raise ValueError(f'invalid repair setting "{repair}"')
 
+    if not model.quantity_ca:
+        # no quantities, so no problem
+        return model, None
+
     quant = model.quantity()
     zero_quantity = np.asarray(quant[:, : model.graph.n_elementals()] == 0)
 

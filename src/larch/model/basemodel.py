@@ -17,7 +17,7 @@ import logging
 import pathlib
 import uuid
 import warnings
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
@@ -365,35 +365,28 @@ class BaseModel:
             stacklevel=2,
         )
 
-    def doctor(
-        self,
-        repair_ch_av: Literal["?", "+", "-", "!"] | None = "?",
-        repair_ch_zq: Literal["?", "-", "!"] | None = None,
-        repair_noch_nzwt: Literal["?", "+", "-"] | None = "?",
-        repair_nan_wt: Literal["?", True, "!"] | None = "?",
-        repair_nan_data_co: Literal["?", True, "!"] | None = "?",
-        check_low_variance_data_co: Literal["?", "!"] | None = None,
-        check_overspec: Literal["?", "!"] | None = "?",
-        verbose: int = 3,
-    ):
+    def doctor(self, **kwargs):
         """
         Run diagnostics, checking for common problems and inconsistencies.
 
         See :func:`larch.model.troubleshooting.doctor` for more information.
         """
-        self.unmangle(True)
+        self.unmangle()
         from .troubleshooting import doctor
 
-        result = doctor(
-            self,
-            repair_ch_av=repair_ch_av,
-            repair_ch_zq=repair_ch_zq,
-            repair_noch_nzwt=repair_noch_nzwt,
-            repair_nan_wt=repair_nan_wt,
-            repair_nan_data_co=repair_nan_data_co,
-            check_overspec=check_overspec,
-            verbose=verbose,
-        )
+        if len(kwargs) == 0:
+            kwargs = {
+                "repair_ch_av": "!",
+                "repair_ch_zq": "!",
+                "repair_noch_nzwt": "!",
+                "repair_nan_wt": "!",
+                "repair_nan_data_co": "!",
+                "check_low_variance_data_co": "?",
+                "check_overspec": "?",
+                "verbose": 3,
+            }
+
+        result = doctor(self, **kwargs)
         return result
 
     @property

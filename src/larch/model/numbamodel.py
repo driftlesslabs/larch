@@ -1165,35 +1165,13 @@ class NumbaModel(_BaseModel):
         else:
             self._fixed_arrays = None
 
-    def doctor(
-        self,
-        repair_ch_av: Literal["?", "+", "-", None] = "?",
-        repair_ch_zq: Literal["?", "-", "!"] | None = None,
-        repair_noch_nzwt: Literal["?", "+", "-", None] = None,
-        repair_nan_wt: Literal["?", True, "!", None] = None,
-        repair_nan_data_co: Literal["?", True, "!", None] = None,
-        check_low_variance_data_co: Literal["?", "!", None] = None,
-        check_overspec: Literal["?", "!", None] = None,
-        verbose=3,
-    ):
+    def doctor(self, **kwargs):
         """
         Run diagnostics, checking for common problems and inconsistencies.
 
         See :func:`larch.model.troubleshooting.doctor` for more information.
         """
-        from .troubleshooting import doctor
-
-        result = doctor(
-            self,
-            repair_ch_av=repair_ch_av,
-            repair_ch_zq=repair_ch_zq,
-            repair_noch_nzwt=repair_noch_nzwt,
-            repair_nan_wt=repair_nan_wt,
-            repair_nan_data_co=repair_nan_data_co,
-            check_low_variance_data_co=check_low_variance_data_co,
-            check_overspec=check_overspec,
-            verbose=verbose,
-        )
+        result = super().doctor(**kwargs)
         self._rebuild_data_arrays()
         return result
 
