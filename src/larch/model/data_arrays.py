@@ -607,10 +607,16 @@ def _prep_co(
     if preserve_vars or len(vars_co) > 1:
         if dim_name is None:
             dim_name = f"var_{tag}"
-        arr = arr.reshape(
-            model_dataset.sizes.get(caseid_dim),
-            -1,
-        )
+        if arr.size:
+            arr = arr.reshape(
+                model_dataset.sizes.get(caseid_dim),
+                -1,
+            )
+        else:
+            arr = arr.reshape(
+                model_dataset.sizes.get(caseid_dim),
+                len(vars_co.keys()),
+            )
         da = DataArray(
             arr,
             dims=[caseid_dim, dim_name],
