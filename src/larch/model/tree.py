@@ -66,7 +66,10 @@ class NestingTree(nx.DiGraph):
         # self : NestingTree object
         # instance : instance of parent class that has `self` as a member
         # value : the new value that is trying to be assigned
-        assert isinstance(value, NestingTree)
+        assert isinstance(value, NestingTree) or value is None
+        if value is None:
+            self.__delete__(instance)
+            return
         t = value.copy()
         t._instance = instance
         setattr(instance, self.private_name, t)

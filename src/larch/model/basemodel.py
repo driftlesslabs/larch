@@ -150,6 +150,7 @@ class BaseModel:
         use_streaming=False,
         cache_dir=None,
         autoscale_weights=False,
+        graph: NestingTree | None = None,
     ):
         if not hasattr(self, "_ident"):
             self._ident = _unique_ident()
@@ -190,6 +191,8 @@ class BaseModel:
         self._availability_ca_var = None
         self._availability_co_vars = None
         self._availability_any = True
+
+        self.graph = graph
 
     def __setattr__(self, name, value):
         if name.startswith("_") or hasattr(self, "_" + name) or hasattr(self, name):
@@ -836,7 +839,7 @@ class BaseModel:
         self._graph = g
 
     @property
-    def graph(self):
+    def graph(self) -> NestingTree:
         if self._graph is None:
             try:
                 self.initialize_graph()
@@ -853,7 +856,9 @@ class BaseModel:
         return self._graph
 
     @graph.setter
-    def graph(self, x):
+    def graph(self, x: NestingTree | None):
+        if x is not None and not isinstance(x, NestingTree):
+            raise TypeError("graph must be a NestingTree")
         self._graph = x
 
     def utility_functions(self, subset=None, resolve_parameters=False):
