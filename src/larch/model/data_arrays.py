@@ -428,6 +428,7 @@ def _prep_ca(
     cache_dir=None,
     flow=None,
     force_flow=False,
+    use_array_maker=True,
 ):
     from ..dataset import DataArray, DataTree
 
@@ -457,6 +458,7 @@ def _prep_ca(
     arr = flow.load(
         shared_data_ca,
         dtype=dtype,
+        use_array_maker=use_array_maker,
     )
     caseid_dim = shared_data_ca.CASEID
     altid_dim = shared_data_ca.ALTID
@@ -590,6 +592,7 @@ def _prep_co(
     dim_name=None,
     cache_dir=None,
     flow=None,
+    use_array_maker=True,
 ):
     from ..dataset import DataArray, DataTree
 
@@ -602,6 +605,7 @@ def _prep_co(
     arr = flow.load(
         shared_data_co,
         dtype=dtype,
+        use_array_maker=use_array_maker,
     )
     caseid_dim = shared_data_co.CASEID
     if preserve_vars or len(vars_co) > 1:

@@ -8,6 +8,7 @@ import pandas as pd
 import xarray as xr
 
 from ..util import dictx
+from .basemodel import BaseModel
 from .numbamodel import NumbaModel as Model
 from .possible_overspec import (
     PossibleOverspecificationError,
@@ -184,14 +185,16 @@ def chosen_but_not_available(
                 "n",
             ],
         )
+        diagnosis.insert(0, "altid", None)
 
         for colnum, colname in enumerate(
             chosen_but_not_available.coords[dataset.dc.ALTID]
         ):
             if chosen_but_not_available_sum[colnum] > 0:
-                diagnosis.loc[str(colname), "example rows"] = ", ".join(
+                diagnosis.loc[colnum, "example rows"] = ", ".join(
                     str(j) for j in i1[i2 == colnum][:verbose]
                 )
+                diagnosis.loc[colnum, "altid"] = colname
 
         if repair == "+":
             model.dataset["av"].data[
@@ -546,7 +549,9 @@ def low_variance_data_co(
     return model, diagnosis
 
 
-def overspecification(model: Model, repair: Literal["?", "!"] = "?", verbose: int = 3):
+def overspecification(
+    model: BaseModel, repair: Literal["?", "!"] = "?", verbose: int = 3
+):
     """
     Check model for possible over-specification.
 

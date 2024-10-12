@@ -2601,6 +2601,71 @@ class NumbaModel(_BaseModel):
             **kwargs,
         )
 
+    def utility_breakdown(
+        self,
+        altid: int,
+        *,
+        caseid: int | None = None,
+        caseindex: int | None = None,
+    ) -> pd.DataFrame:
+        """
+        Compute the utility breakdown for a given case and alternative.
+
+        One and only one of `caseid` or `caseindex` must be given as a keyword
+        argument, to indicate which case to compute the utility breakdown for.
+
+        Parameters
+        ----------
+        altid : int
+            The alternative ID on which to compute the utility breakdown.
+        caseid : int, optional
+            The case ID on which to compute the utility breakdown.
+        caseindex : int, optional
+            The case index on which to compute the utility breakdown.
+
+        Returns
+        -------
+        pandas.DataFrame
+        """
+        if caseid is None and caseindex is None:
+            raise ValueError("either caseid or caseindex must be given")
+        if caseid is not None and caseindex is not None:
+            raise ValueError("only one of caseid or caseindex must be given")
+        if caseid is not None:
+            caseindex = self.dataset.indexes[self.dataset.dc.CASEID].get_loc(caseid)
+        df = {}
+        df["co"] = pd.DataFrame(
+            [
+                (
+                    k.param,
+                    k.data,
+                    float(self.dataset["co"][caseindex].sel(var_co=k.data)),
+                    float(self.get_value(k.param)),
+                )
+                for k in self.utility_co[altid]
+            ],
+            columns=["parameter_name", "data_expr", "data_value", "parameter_value"],
+        )
+        df["ca"] = pd.DataFrame(
+            [
+                (
+                    k.param,
+                    k.data,
+                    float(
+                        self.dataset["ca"][caseindex].sel(
+                            **{self.dataset.dc.ALTID: altid, "var_ca": k.data}
+                        )
+                    ),
+                    float(self.get_value(k.param)),
+                )
+                for k in self.utility_ca
+            ],
+            columns=["parameter_name", "data_expr", "data_value", "parameter_value"],
+        )
+        result = pd.concat(df, keys=["co", "ca"], names=["utility_type"])
+        result["partial_utility"] = result["data_value"] * result["parameter_value"]
+        return result.set_index(["utility_type", "parameter_name", "data_expr"])
+
 
 @njit(cache=True)
 def _arr_inflate(arr, locks):

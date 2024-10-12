@@ -1172,6 +1172,14 @@ class LinearFunction:
                     pass
         raise NotImplementedError(f"{_what_is(self)} + {_what_is(other)}")
 
+    def __radd__(self, other):
+        if other == 0:
+            return self
+        else:
+            raise TypeError(
+                f"unsupported operand type(s) for +: {type(other)} and {type(self)}"
+            )
+
     def __iadd__(self, other):
         if isinstance(other, ParameterRef):
             other = LinearComponent(param=str(other))

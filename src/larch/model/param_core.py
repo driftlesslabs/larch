@@ -285,6 +285,50 @@ class ParameterBucket:
         )
 
     @property
+    def pinitvals(self):
+        return self._params["initvalue"].to_numpy()
+
+    @pinitvals.setter
+    def pinitvals(self, x):
+        if isinstance(x, str):
+            raise ValueError("cannot set initvals with a string")
+        if isinstance(x, dict):
+            candidates = (
+                xr.DataArray(
+                    np.asarray(list(x.values())),
+                    dims=self.index_name,
+                    coords={self.index_name: np.asarray(list(x.keys()))},
+                )
+                .reindex({self.index_name: self.pnames})
+                .fillna(self.pvals)
+            )
+            x = np.where(
+                self._params["holdfast"].to_numpy(),
+                self._params["initvalue"].to_numpy(),
+                candidates.to_numpy(),
+            )
+        elif isinstance(x, Number):
+            candidates = xr.full_like(self._params["value"], x)
+            x = np.where(
+                self._params["holdfast"].to_numpy(),
+                self._params["initvalue"].to_numpy(),
+                candidates.to_numpy(),
+            )
+        else:
+            # we are getting an array
+            x = np.asanyarray(x).reshape(-1)
+            assert x.size == self._params["initvalue"].size
+            # do not allow changing holdfast values
+            x = np.where(
+                self._params["holdfast"].to_numpy(),
+                self._params["initvalue"].to_numpy(),
+                x,
+            )
+        self._params = self._params.assign(
+            {"initvalue": xr.DataArray(x, dims=self._params["initvalue"].dims)}
+        )
+
+    @property
     def pholdfast(self):
         return self._params["holdfast"].to_numpy()
 

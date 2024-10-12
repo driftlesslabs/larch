@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import MutableSequence
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
@@ -259,32 +259,15 @@ class ModelGroup(ConstrainedModel, MutableSequence):
         for model in self._submodels:
             model.reflow_data_arrays()
 
-    def doctor(
-        self,
-        repair_ch_av: Literal["?", "+", "-", None] = "?",
-        repair_ch_zq: Literal["?", "-", "!"] | None = None,
-        repair_asc=None,
-        repair_noch_nzwt: Literal["?", "+", "-", None] = None,
-        repair_nan_wt: Literal["?", True, "!", None] = None,
-        repair_nan_data_co: Literal["?", True, "!", None] = None,
-        check_low_variance_data_co: Literal["?", "!", None] = None,
-        check_overspec: Literal["?", "!", None] = None,
-        verbose=3,
-    ):
+    def doctor(self, **kwargs):
         diagnosis = []
+        check_overspec = kwargs.pop("check_overspec", None)
+        if check_overspec and len(kwargs) == 0:
+            # when only check_overspec is passed, set verbose to 3 to signal
+            # that no other checks are requested
+            kwargs = {"verbose": 3}
         for model in self._submodels:
-            diagnosis.append(
-                model.doctor(
-                    repair_ch_av=repair_ch_av,
-                    repair_ch_zq=repair_ch_zq,
-                    repair_asc=repair_asc,
-                    repair_noch_nzwt=repair_noch_nzwt,
-                    repair_nan_wt=repair_nan_wt,
-                    repair_nan_data_co=repair_nan_data_co,
-                    check_low_variance_data_co=check_low_variance_data_co,
-                    verbose=verbose,
-                )
-            )
+            diagnosis.append(model.doctor(**kwargs))
         from .troubleshooting import overspecification
 
         if check_overspec:

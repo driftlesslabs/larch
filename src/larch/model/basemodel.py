@@ -440,6 +440,30 @@ class BaseModel:
         self._parameter_bucket.pvals = x
 
     @property
+    def pinitvals(self) -> np.ndarray[np.float64]:
+        """An array of the initial parameter values.
+
+        This property is a getter/setter for the initial parameter values.  The
+        array is a copy of the initial parameter values, and setting the array
+        with a given array (which must be a vector with length equal to the
+        number of parameters in the model) will update the initial values in
+        the model.
+
+        Values can also be set here using a dictionary of parameter names and
+        initial values. A warning will be given if any key of the dictionary is not
+        found among the existing named parameters in the parameter frame, and
+        the value associated with that key is ignored.  Any parameters not
+        named by a key in this dictionary are not changed.
+        """
+        self.unmangle()
+        return self._parameter_bucket.pinitvals
+
+    @pinitvals.setter
+    def pinitvals(self, x: np.ndarray[np.float64] | dict[str, float]):
+        self.unmangle()
+        self._parameter_bucket.pinitvals = x
+
+    @property
     def pnames(self) -> np.ndarray[np.str_]:
         """An array of the current parameter names."""
         self.unmangle()
@@ -747,11 +771,15 @@ class BaseModel:
             name = str(name)
         if value == "null":
             value = self.pf.loc[name, "nullvalue"]
-        self.pvals = {name: value}
+        # setting holdfast to 0 initially, so that the other value attributes are
+        # allowed to be changed.
         self.pholdfast = {name: 0}
-        self.pnullvals = {name: value}
+        self.pvals = {name: value}
+        self.pinitvals = {name: value}
+        # self.pnullvals = {name: value}
         self.pminimum = {name: value}
         self.pmaximum = {name: value}
+        # finally, setting holdfast to 1.
         self.pholdfast = {name: 1}
 
     def pretty_table(self):
@@ -764,10 +792,15 @@ class BaseModel:
     def __repr__(self):
         s = "<larch."
         s += self.__class__.__name__
-        if self.is_mnl():
-            s += " (MNL)"
+        try:
+            is_mnl = self.is_mnl()
+        except AttributeError:
+            is_mnl = None
         else:
-            s += " (GEV)"
+            if is_mnl:
+                s += " (MNL)"
+            else:
+                s += " (GEV)"
         if self.title != "Untitled":
             s += f' "{self.title}"'
         s += ">"
