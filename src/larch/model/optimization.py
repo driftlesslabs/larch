@@ -296,7 +296,7 @@ def maximize_loglike(
                     "steps": steps_bhhh,
                     "message": message,
                 }
-            except NotImplementedError:
+            except (NotImplementedError, AttributeError):
                 dashboard.update(
                     f"Iteration {iteration_number:03} [BHHH Not Available] {iteration_number_tail}",
                     body=model.pf,

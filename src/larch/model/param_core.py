@@ -88,7 +88,18 @@ class ParameterBucket:
         elif unmangle:
             model.unmangle()
         self._models[name] = model
+
+        # collect parameters from the incoming model to be attached,
+        # and update the bucket's parameters if they are not already present
+        move_values = {}
+        for k in model.pnames:
+            if k not in self._params[self.index_name]:
+                move_values[k] = model.parameters.sel({self.index_name: k}).copy(
+                    deep=True
+                )
         model._parameter_bucket = self
+        if move_values:
+            self.combine_parameters(xr.concat(move_values.values(), dim="param_name"))
         if agg:
             self._aggregate_parameters()
 
@@ -174,6 +185,30 @@ class ParameterBucket:
             should_mangle = True
         new_params = self._clean_dtypes(new_params)
         self._params = new_params
+        if should_mangle:
+            self.mangle()
+
+    def combine_parameters(self, other: xr.Dataset | ParameterBucket):
+        """
+        Combine the parameters with another set of parameters.
+
+        Values in the current parameter set are replaced by values in the
+        other parameter set.
+        """
+        if isinstance(other, ParameterBucket):
+            other = other._params
+        if isinstance(other, xr.Dataset):
+            if "param_name_2" in other.sizes:
+                other = other.drop_dims("param_name_2")
+        if len(other.sizes) != 1:
+            raise ValueError("expected parameters to be a 1-d vector")
+        if not isinstance(other, xr.Dataset):
+            raise TypeError("expected other to be a Dataset")
+        should_mangle = False
+        n_existing_params = self._params.sizes[self.index_name]
+        self._params = other.combine_first(self._params)
+        if self._params.sizes[self.index_name] != n_existing_params:
+            should_mangle = True
         if should_mangle:
             self.mangle()
 
