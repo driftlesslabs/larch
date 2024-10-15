@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import logging
 from numbers import Number
+from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 import xarray as xr
+
+if TYPE_CHECKING:
+    from larch import BaseModel
 
 
 def new_name(existing_names):
@@ -60,15 +64,26 @@ class ParameterBucket:
                 self.attach_model(m, agg=False)
         self._aggregate_parameters()
 
-    def attach_model(self, model, name=None, agg=True, unmangle=True):
+    def attach_model(
+        self,
+        model: BaseModel,
+        name: str | None = None,
+        agg: bool = True,
+        unmangle: bool | Literal["structure":] = True,
+    ):
         """
         Attach a model to the bucket.
 
         Parameters
         ----------
-        model
-        name
-        agg
+        model : BaseModel
+            The model to attach.
+        name : str, optional
+            The name to attach the model as.  If None, the model's ident
+            attribute is used.  If the model has no ident attribute, a new
+            name is generated.
+        agg : bool
+            If True, aggregate the parameters of the model with the bucket.
         unmangle : bool or str
             If True, unmangle the model.  If "structure", only unmangle the
             structure of the model.
@@ -89,18 +104,20 @@ class ParameterBucket:
             model.unmangle()
         self._models[name] = model
 
-        # collect parameters from the incoming model to be attached,
-        # and update the bucket's parameters if they are not already present
+        # collect parameters from the incoming model to be attached, to be able
+        # to update the bucket's parameters if they are not already present
         move_values = {}
-        for k in model.pnames:
+        for k in model._parameter_bucket.pnames:
             if k not in self._params[self.index_name]:
-                move_values[k] = model.parameters.sel({self.index_name: k}).copy(
-                    deep=True
-                )
+                move_values[k] = model._parameter_bucket.parameters.sel(
+                    {self.index_name: k}
+                ).copy(deep=True)
         model._parameter_bucket = self
-        if move_values:
-            self.combine_parameters(xr.concat(move_values.values(), dim="param_name"))
         if agg:
+            if move_values:
+                self.combine_parameters(
+                    xr.concat(move_values.values(), dim="param_name")
+                )
             self._aggregate_parameters()
 
     def detach_model(self, model):

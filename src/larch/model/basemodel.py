@@ -632,7 +632,15 @@ class BaseModel:
         not been created yet), they are not included.
         """
         self.unmangle()
-        cols = ["value", "best", "initvalue", "minimum", "maximum", "nullvalue"]
+        cols = [
+            "value",
+            "best",
+            "initvalue",
+            "minimum",
+            "maximum",
+            "nullvalue",
+            "holdfast",
+        ]
         cols = [i for i in cols if i in self._parameter_bucket._params]
         return self._parameter_bucket._params[cols].to_dataframe()
 
