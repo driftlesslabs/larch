@@ -71,7 +71,7 @@ def _initialize_for_larch(obj, caseid=None, alts=None):
         alts_dim_name = None
         alts_k = alts_v = None
     else:
-        alts_dim_name = getattr(alts, "name", "_altid_")
+        alts_dim_name = getattr(alts, "name", "_altid_") or "_altid_"
         alts_v = np.asarray(alts).reshape(-1)
         alts_k = None
     if alts_dim_name:
