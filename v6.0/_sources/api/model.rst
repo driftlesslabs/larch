@@ -150,3 +150,12 @@ Ancillary Computation
     Model.quantity
     Model.total_weight
     Model.utility
+
+
+Troubleshooting
+---------------
+
+.. autosummary::
+    :toctree: generated/
+
+    Model.doctor

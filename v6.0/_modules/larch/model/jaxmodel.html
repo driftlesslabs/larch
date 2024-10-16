@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>larch.model.jaxmodel &#8212; v6.0.25</title>
+    <title>larch.model.jaxmodel &#8212; v6.0.26</title>
   
   
   
@@ -31,7 +31,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=9d77a3fd" />
   
@@ -41,7 +41,7 @@
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../../../_static/documentation_options.js?v=c73c0f3e"></script>
-    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -141,8 +141,8 @@
       
     
     
-    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.25 - Home"/>
-    <script>document.write(`<img src="../../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.25 - Home"/>`);</script>
+    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.26 - Home"/>
+    <script>document.write(`<img src="../../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.26 - Home"/>`);</script>
   
   
 </a></div>
@@ -1361,10 +1361,12 @@ document.write(`
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">start_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">stop_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">step_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">check_if_best</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">start_case</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">stop_case</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">step_case</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">check_if_best</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">error_if_bad</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_engine</span> <span class="o">!=</span> <span class="s2">&quot;jax&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">loglike</span><span class="p">(</span>
@@ -1373,6 +1375,8 @@ document.write(`
                 <span class="n">stop_case</span><span class="o">=</span><span class="n">stop_case</span><span class="p">,</span>
                 <span class="n">step_case</span><span class="o">=</span><span class="n">step_case</span><span class="p">,</span>
                 <span class="n">check_if_best</span><span class="o">=</span><span class="n">check_if_best</span><span class="p">,</span>
+                <span class="n">error_if_bad</span><span class="o">=</span><span class="n">error_if_bad</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">start_case</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;start_case with engine=jax&quot;</span><span class="p">)</span>
@@ -1393,6 +1397,34 @@ document.write(`
             <span class="ow">and</span> <span class="n">step_case</span> <span class="ow">is</span> <span class="kc">None</span>
         <span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_check_if_best</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">error_if_bad</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">tag</span> <span class="ow">in</span> <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">,</span> <span class="s2">&quot;NaN&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">,</span> <span class="s2">&quot;Inf&quot;</span><span class="p">)]:</span>
+                <span class="k">if</span> <span class="n">f</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+                    <span class="n">caseids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">caseids</span><span class="p">()</span>
+                    <span class="n">nan_wt</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_arrays</span><span class="o">.</span><span class="n">wt</span><span class="p">)</span>
+                    <span class="n">bad_wt_indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">nan_wt</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_wt_indexes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;weight is </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; in </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">bad_wt_indexes</span><span class="p">)</span><span class="si">}</span><span class="s2"> cases, including CASEIDs:&quot;</span>
+                        <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">caseids</span><span class="p">[</span><span class="n">bad_wt_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">bad_wt_indexes</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">]:</span>
+                            <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;, </span><span class="si">{</span><span class="n">caseids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_wt_indexes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+                            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;, ...&quot;</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="n">ll_casewise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jax_loglike_casewise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pvals</span><span class="p">)</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;log likelihood is </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">bad_case_indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">ll_casewise</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_case_indexes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; in </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">bad_case_indexes</span><span class="p">)</span><span class="si">}</span><span class="s2"> cases, including CASEIDs:&quot;</span>
+                        <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">caseids</span><span class="p">[</span><span class="n">bad_case_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">bad_case_indexes</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">]:</span>
+                            <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;, </span><span class="si">{</span><span class="n">caseids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_case_indexes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+                            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;, ...&quot;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot; but not in any individual cases&quot;</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span></div>
 
 
@@ -1406,6 +1438,7 @@ document.write(`
         <span class="n">stop_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">step_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">return_series</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_engine</span> <span class="o">!=</span> <span class="s2">&quot;jax&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">d_loglike</span><span class="p">(</span>
@@ -1421,8 +1454,8 @@ document.write(`
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;stop_case with engine=jax&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">step_case</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;step_case with engine=jax&quot;</span><span class="p">)</span>
-        <span class="c1"># if kwargs:</span>
-        <span class="c1">#     raise NotImplementedError(f&quot;{kwargs.popitem()[0]} with engine=jax&quot;)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">kwargs</span><span class="o">.</span><span class="n">popitem</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> with engine=jax&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pvals</span> <span class="o">=</span> <span class="n">x</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_random_draws</span><span class="p">()</span>
@@ -1660,7 +1693,7 @@ document.write(`
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-<p class="larch-version">🌳 Larch v6.0.25, © Copyright 2024.</p></div>
+<p class="larch-version">🌳 Larch v6.0.26, © Copyright 2024.</p></div>
       
     </div>
   

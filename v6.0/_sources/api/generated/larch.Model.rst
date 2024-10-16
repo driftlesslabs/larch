@@ -18,6 +18,7 @@
       ~Model.apply_random_draws
       ~Model.bhhh
       ~Model.calculate_parameter_covariance
+      ~Model.check_for_overspecification
       ~Model.check_random_draws
       ~Model.choice_avail_summary
       ~Model.clear_cache
@@ -81,6 +82,7 @@
       ~Model.unmangle
       ~Model.update_parameters
       ~Model.utility
+      ~Model.utility_breakdown
       ~Model.utility_functions
    
    
@@ -135,6 +137,7 @@
       ~Model.pbounds
       ~Model.pf
       ~Model.pholdfast
+      ~Model.pinitvals
       ~Model.pmaximum
       ~Model.pminimum
       ~Model.pnames

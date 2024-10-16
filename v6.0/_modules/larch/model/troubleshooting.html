@@ -1,0 +1,1092 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>larch.model.troubleshooting &#8212; v6.0.26</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=9d77a3fd" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../_static/documentation_options.js?v=c73c0f3e"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/larch/model/troubleshooting';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/driftlesslabs/larch/docs/docs/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '6.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="icon" href="../../../_static/larch_favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search these docs..."
+         aria-label="Search these docs..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.26 - Home"/>
+    <script>document.write(`<img src="../../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.26 - Home"/>`);</script>
+  
+  
+</a></div>
+    
+      <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Examples
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Examples
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">larch.model....</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for larch.model.troubleshooting</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">from</span> <span class="nn">..util</span> <span class="kn">import</span> <span class="n">dictx</span>
+<span class="kn">from</span> <span class="nn">.basemodel</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+<span class="kn">from</span> <span class="nn">.numbamodel</span> <span class="kn">import</span> <span class="n">NumbaModel</span> <span class="k">as</span> <span class="n">Model</span>
+<span class="kn">from</span> <span class="nn">.possible_overspec</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PossibleOverspecificationError</span><span class="p">,</span>
+    <span class="n">compute_possible_overspecification</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="doctor">
+<a class="viewcode-back" href="../../../api/generated/larch.model.troubleshooting.doctor.html#larch.model.troubleshooting.doctor">[docs]</a>
+<span class="k">def</span> <span class="nf">doctor</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">repair_ch_av</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span>
+    <span class="n">repair_ch_zq</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">repair_noch_nzwt</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span>
+    <span class="n">repair_nan_wt</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span>
+    <span class="n">repair_nan_data_co</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span>
+    <span class="n">check_low_variance_data_co</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">check_overspec</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">warning_stacklevel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Diagnose data problems with a model.</span>
+
+<span class="sd">    The doctor will check for common data problems that can cause numerical</span>
+<span class="sd">    instability in a model.  The doctor will return a list of problems found,</span>
+<span class="sd">    and optionally repair them.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : larch.Model</span>
+<span class="sd">        The model to diagnose.</span>
+<span class="sd">    repair_ch_av : {&#39;?&#39;, &#39;+&#39;, &#39;-&#39;, &#39;!&#39;}, default &#39;?&#39;</span>
+<span class="sd">        How to repair the data if some observations are chosen but not available.</span>
+<span class="sd">        The plus (&#39;+&#39;) will make the conflicting alternatives available, overriding</span>
+<span class="sd">        the availability status. The minus (&#39;-&#39;) will make them not chosen (possibly</span>
+<span class="sd">        leaving no chosen alternative). A question mark (&#39;?&#39;) effects no repair, and</span>
+<span class="sd">        simply emits a warning without interrupting program execution. An exclamation</span>
+<span class="sd">        mark will raise an error if there are any conflicts.</span>
+<span class="sd">    repair_ch_zq : {&#39;?&#39;, &#39;-&#39;, &#39;!&#39;}, default None</span>
+<span class="sd">        How to repair the data if some observations are chosen but have zero quantity.</span>
+<span class="sd">        The minus (&#39;-&#39;) will make alternatives with zero quantity not chosen (possibly</span>
+<span class="sd">        leaving no chosen alternative). A question mark (&#39;?&#39;) effects no repair, and</span>
+<span class="sd">        simply emits a warning. An exclamation mark (&#39;!&#39;) will raise an error if there</span>
+<span class="sd">        are any conflicts.</span>
+<span class="sd">    repair_noch_nzwt : {&#39;?&#39;, &#39;+&#39;, &#39;-&#39;}, default &#39;?&#39;</span>
+<span class="sd">        How to repair the data if some observations have no choice but have some weight.</span>
+<span class="sd">        Minus (&#39;-&#39;) will make the weight zero when there is no choice. Plus (&#39;+&#39;) will</span>
+<span class="sd">        make the weight zero, plus autoscale all remaining weights so the total of the</span>
+<span class="sd">        case weights equals the number of cases. A question mark (&#39;?&#39;) effects no repair,</span>
+<span class="sd">        and simply emits a warning.</span>
+<span class="sd">    repair_nan_wt : {&#39;?&#39;, &#39;!&#39;, True}, default &#39;?&#39;</span>
+<span class="sd">        How to repair the data if some weight values are NaN. Any true value other than</span>
+<span class="sd">        &quot;?&quot; or &quot;!&quot; will make NaN values in weight zero. The question mark simply emits</span>
+<span class="sd">        a warning if there are NaN values found, while the exclamation mark will raise</span>
+<span class="sd">        an error.</span>
+<span class="sd">    repair_nan_data_co : {&#39;?&#39;, &#39;!&#39;, True}, default &#39;?&#39;</span>
+<span class="sd">        How to repair the data if some data_co values are NaN. Any true value other than</span>
+<span class="sd">        &quot;?&quot; or &quot;!&quot; will make NaN values in data_co zero. The question mark simply emits</span>
+<span class="sd">        a warning if there are NaN values found, while the exclamation mark will raise</span>
+<span class="sd">        an error.</span>
+<span class="sd">    check_low_variance_data_co : {&#39;?&#39;, &#39;!&#39;}, default None</span>
+<span class="sd">        Check if any data_co columns have very low variance. No repairs are available for</span>
+<span class="sd">        this check. The question mark simply emits a warning if there are issues found,</span>
+<span class="sd">        while the exclamation mark will raise an error.</span>
+<span class="sd">    verbose : int, default 3</span>
+<span class="sd">        The number of example rows to list for each problem.</span>
+<span class="sd">    warning_stacklevel : int, default 2</span>
+<span class="sd">        The stacklevel for warnings.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model : larch.Model</span>
+<span class="sd">        The model with revised dataset attached.</span>
+<span class="sd">    problems : dict</span>
+<span class="sd">        A dictionary of problems found, with the key being the name of the problem</span>
+<span class="sd">        and the value being a DataFrame with the number of bad instances and some</span>
+<span class="sd">        example rows.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If the model is not a Model instance.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If any of the repair settings are invalid, or if the repair is set to &#39;!&#39; and</span>
+<span class="sd">        there are any conflicts found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">problems</span> <span class="o">=</span> <span class="n">dictx</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">Model</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;the doctor requires a Model instance to diagnose&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">apply_repair</span><span class="p">(</span><span class="n">repair</span><span class="p">,</span> <span class="n">repair_func</span><span class="p">):</span>
+        <span class="k">nonlocal</span> <span class="n">model</span><span class="p">,</span> <span class="n">problems</span><span class="p">,</span> <span class="n">verbose</span>
+        <span class="k">if</span> <span class="n">repair</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;checking for </span><span class="si">{</span><span class="n">repair_func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">model</span><span class="p">,</span> <span class="n">diagnosis</span> <span class="o">=</span> <span class="n">repair_func</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">repair</span><span class="o">=</span><span class="n">repair</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">diagnosis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;problem: </span><span class="si">{</span><span class="n">repair_func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> has (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">diagnosis</span><span class="p">)</span><span class="si">}</span><span class="s2"> issues)&quot;</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="n">warning_stacklevel</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">problems</span><span class="p">[</span><span class="n">repair_func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">diagnosis</span>
+
+    <span class="n">apply_repair</span><span class="p">(</span><span class="n">repair_ch_av</span><span class="p">,</span> <span class="n">chosen_but_not_available</span><span class="p">)</span>
+    <span class="n">apply_repair</span><span class="p">(</span><span class="n">repair_noch_nzwt</span><span class="p">,</span> <span class="n">nothing_chosen_but_nonzero_weight</span><span class="p">)</span>
+    <span class="n">apply_repair</span><span class="p">(</span><span class="n">repair_nan_data_co</span><span class="p">,</span> <span class="n">nan_data_co</span><span class="p">)</span>
+    <span class="n">apply_repair</span><span class="p">(</span><span class="n">repair_nan_wt</span><span class="p">,</span> <span class="n">nan_weight</span><span class="p">)</span>
+    <span class="n">apply_repair</span><span class="p">(</span><span class="n">check_low_variance_data_co</span><span class="p">,</span> <span class="n">low_variance_data_co</span><span class="p">)</span>
+    <span class="n">apply_repair</span><span class="p">(</span><span class="n">repair_ch_zq</span><span class="p">,</span> <span class="n">chosen_but_zero_quantity</span><span class="p">)</span>
+    <span class="n">apply_repair</span><span class="p">(</span><span class="n">check_overspec</span><span class="p">,</span> <span class="n">overspecification</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">problems</span></div>
+
+
+
+<div class="viewcode-block" id="chosen_but_not_available">
+<a class="viewcode-back" href="../../../api/generated/larch.model.troubleshooting.chosen_but_not_available.html#larch.model.troubleshooting.chosen_but_not_available">[docs]</a>
+<span class="k">def</span> <span class="nf">chosen_but_not_available</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span> <span class="n">repair</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Model</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if some observations are chosen but not available.</span>
+
+<span class="sd">    Alternatives that are unavailable have their utility values set to negative</span>
+<span class="sd">    infinity.  If even one observation is chosen but not available, the model</span>
+<span class="sd">    log-likelihood will nominally be negative infinity regardless of the values</span>
+<span class="sd">    of any other parameters.  Note that some compute engines (e.g. JAX) may</span>
+<span class="sd">    not actually return negative infinity log likelihoods due to clipping of</span>
+<span class="sd">    extreme values.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : larch.Model</span>
+<span class="sd">        The model to check.</span>
+<span class="sd">    repair : {&#39;?&#39;, &#39;+&#39;, &#39;-&#39;, &#39;!&#39;}, default &#39;?&#39;</span>
+<span class="sd">        How to repair the data. The plus (&#39;+&#39;) will make the conflicting</span>
+<span class="sd">        alternatives available, overriding the availability status. The minus</span>
+<span class="sd">        (&#39;-&#39;) will make them not chosen (possibly leaving no chosen alternative).</span>
+<span class="sd">        A question mark (&#39;?&#39;) effects no repair, and simply emits a warning</span>
+<span class="sd">        without interrupting program execution. An exclamation mark will raise</span>
+<span class="sd">        an error if there are any conflicts.</span>
+<span class="sd">    verbose : int, default 3</span>
+<span class="sd">        The number of example rows to list for each problem.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model : larch.Model</span>
+<span class="sd">        The model with revised dataset attached.</span>
+<span class="sd">    diagnosis : pd.DataFrame</span>
+<span class="sd">        The number of bad instances, by alternative, and some example rows.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the repair is set to &#39;!&#39; and there are any conflicts found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">dataset</span>
+    <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data not loaded&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span>
+
+    <span class="n">not_avail</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;av&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="n">chosen</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;ch&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">chosen_but_not_available</span> <span class="o">=</span> <span class="n">not_avail</span> <span class="o">&amp;</span> <span class="n">chosen</span>
+    <span class="n">chosen_but_not_available_sum</span> <span class="o">=</span> <span class="n">chosen_but_not_available</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">CASEID</span><span class="p">)</span>
+
+    <span class="n">diagnosis</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">chosen_but_not_available_sum</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">chosen_but_not_available</span><span class="p">)</span>
+
+        <span class="n">diagnosis</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">chosen_but_not_available_sum</span><span class="p">[</span><span class="n">chosen_but_not_available_sum</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;n&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">diagnosis</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;altid&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">colnum</span><span class="p">,</span> <span class="n">colname</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="n">chosen_but_not_available</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">ALTID</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="n">chosen_but_not_available_sum</span><span class="p">[</span><span class="n">colnum</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">diagnosis</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">colnum</span><span class="p">,</span> <span class="s2">&quot;example rows&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">i1</span><span class="p">[</span><span class="n">i2</span> <span class="o">==</span> <span class="n">colnum</span><span class="p">][:</span><span class="n">verbose</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">diagnosis</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">colnum</span><span class="p">,</span> <span class="s2">&quot;altid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">colname</span>
+
+        <span class="k">if</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;+&quot;</span><span class="p">:</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;av&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span>
+                <span class="n">chosen_but_not_available</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;av&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;ch&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span>
+                <span class="n">chosen_but_not_available</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;ch&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;some observed choices are not available&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">diagnosis</span></div>
+
+
+
+<div class="viewcode-block" id="chosen_but_zero_quantity">
+<a class="viewcode-back" href="../../../api/generated/larch.model.troubleshooting.chosen_but_zero_quantity.html#larch.model.troubleshooting.chosen_but_zero_quantity">[docs]</a>
+<span class="k">def</span> <span class="nf">chosen_but_zero_quantity</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span> <span class="n">repair</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if some observations are chosen but have zero quantity.</span>
+
+<span class="sd">    Alternatives that have zero quantity have utility values that end up as</span>
+<span class="sd">    negative infinity, regardless of whether the alternative would otherwise be</span>
+<span class="sd">    available.  Due to the mathematical structure of how quantities are used in</span>
+<span class="sd">    Larch, this situation is generally a result of a data problem, and not</span>
+<span class="sd">    due to the current values of model parameters.</span>
+
+<span class="sd">    If even one observation is chosen but has zero quantity, the model</span>
+<span class="sd">    log-likelihood will nominally be negative infinity regardless of the values</span>
+<span class="sd">    of any other parameters.  Note that some compute engines (e.g. JAX) may</span>
+<span class="sd">    not actually return negative infinity log likelihoods due to clipping of</span>
+<span class="sd">    extreme values.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : BaseModel</span>
+<span class="sd">        The model to check.</span>
+<span class="sd">    repair : {&#39;?&#39;, &#39;-&#39;, &#39;!&#39;}</span>
+<span class="sd">        How to repair the data. The minus (&#39;-&#39;) will make alternatives with zero</span>
+<span class="sd">        quantity not chosen (possibly leaving no chosen alternative). A question</span>
+<span class="sd">        mark (&#39;?&#39;) effects no repair, and simply emits a warning. An exclamation</span>
+<span class="sd">        mark (&#39;!&#39;) will raise an error if there are any conflicts.</span>
+<span class="sd">    verbose : int, default 3</span>
+<span class="sd">        The number of example rows to list for each problem.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model : BaseModel</span>
+<span class="sd">        The model with revised data</span>
+<span class="sd">    diagnosis : pd.DataFrame</span>
+<span class="sd">        The number of bad instances, by alternative, and some example rows.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the repair is set to &#39;!&#39; and there are any conflicts found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">repair</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;invalid repair setting &quot;</span><span class="si">{</span><span class="n">repair</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">model</span><span class="o">.</span><span class="n">quantity_ca</span><span class="p">:</span>
+        <span class="c1"># no quantities, so no problem</span>
+        <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="n">quant</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">quantity</span><span class="p">()</span>
+    <span class="n">zero_quantity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">quant</span><span class="p">[:,</span> <span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">n_elementals</span><span class="p">()]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">dataset</span>
+    <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data not loaded&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span>
+
+    <span class="n">ch_and_zero_quantity</span> <span class="o">=</span> <span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;ch&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">zero_quantity</span>
+    <span class="n">ch_and_zero_quantity_sum</span> <span class="o">=</span> <span class="n">ch_and_zero_quantity</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">CASEID</span><span class="p">)</span>
+    <span class="n">diagnosis</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">ch_and_zero_quantity</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ch_and_zero_quantity</span><span class="p">)</span>
+        <span class="n">diagnosis</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">ch_and_zero_quantity_sum</span><span class="p">[</span><span class="n">ch_and_zero_quantity_sum</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">colnum</span><span class="p">,</span> <span class="n">colname</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">altids</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">ch_and_zero_quantity_sum</span><span class="p">[</span><span class="n">colnum</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">diagnosis</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">colname</span><span class="p">,</span> <span class="s2">&quot;example rows&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">i1</span><span class="p">[</span><span class="n">i2</span> <span class="o">==</span> <span class="n">colnum</span><span class="p">][:</span><span class="n">verbose</span><span class="p">]</span>
+                <span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;chosen_but_zero_quantity: some observed choices have zero quantity.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">diagnosis</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">tabulate</span><span class="p">(</span><span class="n">diagnosis</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="s2">&quot;keys&quot;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;fancy_outline&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="s2">&quot;some observed choices&quot;</span><span class="p">,</span> <span class="s2">&quot;zeroing out observed choices that&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;ch&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">ch_and_zero_quantity</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">diagnosis</span></div>
+
+
+
+<div class="viewcode-block" id="nothing_chosen_but_nonzero_weight">
+<a class="viewcode-back" href="../../../api/generated/larch.model.troubleshooting.nothing_chosen_but_nonzero_weight.html#larch.model.troubleshooting.nothing_chosen_but_nonzero_weight">[docs]</a>
+<span class="k">def</span> <span class="nf">nothing_chosen_but_nonzero_weight</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span> <span class="n">repair</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">3</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if some observations have no choice but have some weight.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : BaseModel</span>
+<span class="sd">        The model to check.</span>
+<span class="sd">    repair : {&#39;?&#39;, &#39;-&#39;, &#39;*&#39;, &#39;!&#39;}</span>
+<span class="sd">        How to repair the data. Minus (&#39;-&#39;) will make the weight zero when there</span>
+<span class="sd">        is no choice. Star (&#39;*&#39;) will also make the weight zero, plus autoscale</span>
+<span class="sd">        all remaining weights so the total of the case weights equals the number</span>
+<span class="sd">        of cases. A question mark (&#39;?&#39;) effects no repair, and simply emits a</span>
+<span class="sd">        warning.</span>
+<span class="sd">    verbose : int, default 3</span>
+<span class="sd">        The number of example rows to list for each problem.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model : BaseModel</span>
+<span class="sd">        The revised dataframe</span>
+<span class="sd">    diagnosis : pd.DataFrame</span>
+<span class="sd">        The number of bad instances, by alternative, and some example rows.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the repair is set to &#39;!&#39; and there are any conflicts found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">diagnosis</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">dataset</span>
+    <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data not loaded&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;wt&quot;</span> <span class="ow">in</span> <span class="n">dataset</span> <span class="ow">and</span> <span class="s2">&quot;ch&quot;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+        <span class="n">nothing_chosen</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;ch&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">ALTID</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="n">nothing_chosen_some_weight</span> <span class="o">=</span> <span class="n">nothing_chosen</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;wt&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nothing_chosen_some_weight</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">i1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">nothing_chosen_some_weight</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">diagnosis</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">nothing_chosen_some_weight</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+                <span class="p">],</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+                    <span class="s2">&quot;n&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="n">index</span><span class="o">=</span><span class="p">[</span>
+                    <span class="s2">&quot;nothing_chosen_some_weight&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="p">)</span>
+
+            <span class="n">diagnosis</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">&quot;nothing_chosen_some_weight&quot;</span><span class="p">,</span> <span class="s2">&quot;example rows&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">i1</span><span class="p">[:</span><span class="n">verbose</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;nothing_chosen_but_nonzero_weight: some cases have no choice but non-zero weight.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="n">diagnosis</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="n">tabulate</span><span class="p">(</span><span class="n">diagnosis</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="s2">&quot;keys&quot;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;fancy_outline&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;+&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;cannot resolve nothing_chosen_but_nonzero_weight by assuming some choice&quot;</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;wt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">nothing_chosen</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;*&quot;</span><span class="p">:</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;wt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">nothing_chosen</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">autoscale_weights</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">diagnosis</span></div>
+
+
+
+<div class="viewcode-block" id="nan_data_co">
+<a class="viewcode-back" href="../../../api/generated/larch.model.troubleshooting.nan_data_co.html#larch.model.troubleshooting.nan_data_co">[docs]</a>
+<span class="k">def</span> <span class="nf">nan_data_co</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span> <span class="n">repair</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Model</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if some data_co values are NaN.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : larch.Model</span>
+<span class="sd">        The model to check.</span>
+<span class="sd">    repair : {&quot;?&quot;, &quot;!&quot;, True}</span>
+<span class="sd">        Whether to repair the data. Any true value other than &quot;?&quot; or &quot;!&quot; will make</span>
+<span class="sd">        NaN values in data_co zero. The question mark simply emits a warning</span>
+<span class="sd">        if there are NaN values found, while the exclamation mark will raise an error.</span>
+<span class="sd">    verbose : int, default 3</span>
+<span class="sd">        The number of example columns to list for each problem.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model : larch.Model</span>
+<span class="sd">        The model with revised dataset attached.</span>
+<span class="sd">    diagnosis : pd.DataFrame</span>
+<span class="sd">        The number of bad instances, and some example rows.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the repair is set to &#39;!&#39; and there are any NaN values found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">dataset</span>
+    <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data not loaded&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span>
+
+    <span class="n">diagnosis</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="s2">&quot;co&quot;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+        <span class="n">nan_dat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;co&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">CASEID</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nan_dat</span><span class="o">.</span><span class="n">sum</span><span class="p">():</span>
+            <span class="n">diagnosis</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">nan_dat</span><span class="p">[</span><span class="n">nan_dat</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+                <span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="n">verbose</span><span class="p">]</span>
+                <span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+                <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;n_nan&quot;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nan_dat</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nan_data_co: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> instances have NaN values&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nan_data_co: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> instances have NaN values&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">repair</span> <span class="ow">and</span> <span class="n">repair</span> <span class="o">!=</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
+                <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;co&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;co&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">diagnosis</span></div>
+
+
+
+<div class="viewcode-block" id="nan_weight">
+<a class="viewcode-back" href="../../../api/generated/larch.model.troubleshooting.nan_weight.html#larch.model.troubleshooting.nan_weight">[docs]</a>
+<span class="k">def</span> <span class="nf">nan_weight</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span> <span class="n">repair</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Model</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if some weight values are NaN.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : larch.Model</span>
+<span class="sd">        The model to check.</span>
+<span class="sd">    repair : {&quot;?&quot;, &quot;!&quot;, True}</span>
+<span class="sd">        Whether to repair the data. Any true value other than &quot;?&quot; or &quot;!&quot; will make</span>
+<span class="sd">        NaN values in weight zero. The question mark simply emits a warning</span>
+<span class="sd">        if there are NaN values found, while the exclamation mark will raise an error.</span>
+<span class="sd">    verbose : int, default 3</span>
+<span class="sd">        The number of example columns to list for each problem.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model : larch.Model</span>
+<span class="sd">        The model with revised dataset attached.</span>
+<span class="sd">    diagnosis : pd.DataFrame</span>
+<span class="sd">        The number of bad instances, and some example rows.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the repair is set to &#39;!&#39; and there are any NaN values found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">dataset</span>
+    <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data not loaded&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span>
+
+    <span class="n">diagnosis</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="s2">&quot;wt&quot;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+        <span class="n">nan_wt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;wt&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">nan_wt</span><span class="p">:</span>
+            <span class="n">diagnosis</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;wt&quot;</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;wt&quot;</span><span class="p">])]</span>
+                <span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="n">verbose</span><span class="p">]</span>
+                <span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+                <span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nan_weight: </span><span class="si">{</span><span class="n">nan_wt</span><span class="si">}</span><span class="s2"> instances have NaN values&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nan_weight: </span><span class="si">{</span><span class="n">nan_wt</span><span class="si">}</span><span class="s2"> instances have NaN values&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">repair</span> <span class="ow">and</span> <span class="n">repair</span> <span class="o">!=</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
+                <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;wt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;wt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">diagnosis</span></div>
+
+
+
+<div class="viewcode-block" id="low_variance_data_co">
+<a class="viewcode-back" href="../../../api/generated/larch.model.troubleshooting.low_variance_data_co.html#larch.model.troubleshooting.low_variance_data_co">[docs]</a>
+<span class="k">def</span> <span class="nf">low_variance_data_co</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span> <span class="n">repair</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if any data_co columns have very low variance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : larch.Model</span>
+<span class="sd">        The model to check.</span>
+<span class="sd">    repair : {&quot;?&quot;, &quot;!&quot;}</span>
+<span class="sd">        No repairs are available for this check. The question mark simply emits</span>
+<span class="sd">        a warning if there are issues found, while the exclamation mark will</span>
+<span class="sd">        raise an error.</span>
+<span class="sd">    verbose : int, default 3</span>
+<span class="sd">        The number of example columns to list if there is a problem.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model : larch.Model</span>
+<span class="sd">        The model with revised dataset attached.</span>
+<span class="sd">    diagnosis : pd.DataFrame</span>
+<span class="sd">        The number of bad instances, and some example rows.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the repair is set to &#39;!&#39; and there are any low variance columns found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">dataset</span>
+    <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data not loaded&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span>
+
+    <span class="n">diagnosis</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="s2">&quot;co&quot;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+        <span class="n">variance</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;co&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">CASEID</span><span class="p">)</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;variance&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">variance</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">1e-3</span><span class="p">:</span>
+            <span class="n">diagnosis</span> <span class="o">=</span> <span class="n">variance</span><span class="p">[</span><span class="n">variance</span> <span class="o">&lt;</span> <span class="mf">1e-3</span><span class="p">]</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;low_variance_data_co: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">diagnosis</span><span class="p">)</span><span class="si">}</span><span class="s2"> columns have low variance&quot;</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;low_variance_data_co: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">diagnosis</span><span class="p">)</span><span class="si">}</span><span class="s2"> columns have low variance&quot;</span>
+                <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">diagnosis</span></div>
+
+
+
+<div class="viewcode-block" id="overspecification">
+<a class="viewcode-back" href="../../../api/generated/larch.model.troubleshooting.overspecification.html#larch.model.troubleshooting.overspecification">[docs]</a>
+<span class="k">def</span> <span class="nf">overspecification</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">repair</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check model for possible over-specification.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : larch.Model</span>
+<span class="sd">        The model to check.</span>
+<span class="sd">    repair : {&#39;?&#39;, &#39;!&#39;}</span>
+<span class="sd">        No automatic repairs are available for this check. A question mark (&#39;?&#39;) simply</span>
+<span class="sd">        emits a warning if a possible over-specification is found. An exclamation mark</span>
+<span class="sd">        (&#39;!&#39;) will raise an error if possible over-specification is found.</span>
+<span class="sd">    verbose : int, default 3</span>
+<span class="sd">        This is ignored for the overspecification check; all possible problems are</span>
+<span class="sd">        listed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model : larch.Model</span>
+<span class="sd">        The model with revised dataset attached.</span>
+<span class="sd">    diagnosis : pd.DataFrame</span>
+<span class="sd">        A dataframe of possible over-specification problems in the model.  The index of</span>
+<span class="sd">        this dataframe is a multi-index with the first level being the problem number, the</span>
+<span class="sd">        second level being the eigenvalue, and the third level being the parameter name[s]</span>
+<span class="sd">        of the non-zero elements of each problematic eigenvector. The columns are the</span>
+<span class="sd">        non-zero eigenvector values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pvals</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">pvals</span>
+    <span class="n">locks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">pholdfast</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">compute_engine</span> <span class="o">==</span> <span class="s2">&quot;jax&quot;</span><span class="p">:</span>
+        <span class="n">_se</span><span class="p">,</span> <span class="n">hess</span><span class="p">,</span> <span class="n">_inv_hess</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">jax_param_cov</span><span class="p">(</span><span class="n">pvals</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">hess</span> <span class="o">=</span> <span class="o">-</span><span class="n">model</span><span class="o">.</span><span class="n">d2_loglike</span><span class="p">(</span><span class="n">pvals</span><span class="p">)</span>
+    <span class="n">hess</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">hess</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">hess</span><span class="p">[</span><span class="n">locks</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">hess</span><span class="p">[:,</span> <span class="n">locks</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">diagnosis</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">overspec</span> <span class="o">=</span> <span class="n">compute_possible_overspecification</span><span class="p">(</span><span class="n">hess</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">pholdfast</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">overspec</span><span class="p">:</span>
+        <span class="n">diagnosis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">possible_overspecification</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Model is possibly over-specified (hessian is nearly singular).&quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Look for problems in these parameters or groups of parameters:&quot;</span>
+        <span class="k">for</span> <span class="n">eigval</span><span class="p">,</span> <span class="n">ox</span><span class="p">,</span> <span class="n">eigenvec</span> <span class="ow">in</span> <span class="n">overspec</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">eigval</span> <span class="o">==</span> <span class="s2">&quot;LinAlgError&quot;</span><span class="p">:</span>
+                <span class="n">possible_overspecification</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">eigval</span><span class="p">,</span> <span class="p">[</span><span class="n">ox</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">paramset</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">pnames</span><span class="p">)[</span><span class="n">ox</span><span class="p">])</span>
+                <span class="n">possible_overspecification</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">eigval</span><span class="p">,</span> <span class="n">paramset</span><span class="p">,</span> <span class="n">eigenvec</span><span class="p">[</span><span class="n">ox</span><span class="p">]))</span>
+                <span class="n">diagnosis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="n">eigval</span><span class="p">,</span>
+                        <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">eigenvec</span><span class="p">[</span><span class="n">ox</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">paramset</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;eigenvector&quot;</span><span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">- Eigenvalue: </span><span class="si">{</span><span class="n">eigval</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">max_len_param</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paramset</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paramset</span><span class="p">,</span> <span class="n">eigenvec</span><span class="p">[</span><span class="n">ox</span><span class="p">]):</span>
+                    <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">    </span><span class="si">{</span><span class="n">p</span><span class="si">:{</span><span class="n">max_len_param</span><span class="si">}</span><span class="s2">s</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">z</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">_possible_overspecification</span> <span class="o">=</span> <span class="n">possible_overspecification</span>
+        <span class="k">if</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PossibleOverspecificationError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">diagnosis</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">diagnosis</span><span class="p">],</span>
+            <span class="n">keys</span><span class="o">=</span><span class="p">[(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">diagnosis</span><span class="p">)],</span>
+            <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;problem&quot;</span><span class="p">,</span> <span class="s2">&quot;eigenvalue&quot;</span><span class="p">,</span> <span class="s2">&quot;parameter&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">diagnosis</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+            <span class="n">diagnosis</span> <span class="o">=</span> <span class="n">diagnosis</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">diagnosis</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item"><!-- This will display the version of the docs -->
+<p class="larch-version">🌳 Larch v6.0.26, © Copyright 2024.</p></div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
