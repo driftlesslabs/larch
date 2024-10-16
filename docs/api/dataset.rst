@@ -28,11 +28,11 @@ Attributes
 .. autosummary::
     :toctree: generated/
 
-    Dataset.n_cases
-    Dataset.n_alts
-    Dataset.CASEID
-    Dataset.ALTID
-    Dataset.alts_mapping
+    Dataset.dc.n_cases
+    Dataset.dc.n_alts
+    Dataset.dc.CASEID
+    Dataset.dc.ALTID
+    Dataset.dc.alts_mapping
     Dataset.dims
     Dataset.sizes
     Dataset.data_vars
