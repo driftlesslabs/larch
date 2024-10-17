@@ -2095,6 +2095,36 @@ class NumbaModel(_BaseModel):
                 logger.debug(f"jump to {j_pvals}")
                 self.set_values(j_pvals)
 
+    def check_d_loglike(self, stylize=True, skip_zeros=False):
+        """
+        Check that the analytic and finite-difference gradients are approximately equal.
+
+        Primarily used for debugging.
+
+        Parameters
+        ----------
+        stylize : bool, default True
+            See :ref:`check_gradient` for details.
+        skip_zeros : bool, default False
+            See :ref:`check_gradient` for details.
+
+        Returns
+        -------
+        pd.DataFrame or Stylized DataFrame
+        """
+        epsilon = np.sqrt(np.finfo(self.float_dtype).eps)
+        from .gradient_check import check_gradient
+
+        return check_gradient(
+            self.loglike,
+            self.d_loglike,
+            self.pvals.copy(),
+            names=list(self.pnames),
+            stylize=stylize,
+            skip_zeros=skip_zeros,
+            epsilon=epsilon,
+        )
+
     def __getstate__(self):
         attr = {}
         port = [
@@ -2192,8 +2222,8 @@ class NumbaModel(_BaseModel):
                 )
 
     @property
-    def n_cases(self):
-        """Int : The number of cases in the attached data."""
+    def n_cases(self) -> int:
+        """The number of cases in the attached data."""
         data_as_possible = self.data_as_possible
         if data_as_possible is None:
             raise MissingDataError("no data are set")
@@ -2228,7 +2258,7 @@ class NumbaModel(_BaseModel):
 
     @property
     def dataset(self) -> Dataset | None:
-        """larch.Dataset : Data arrays as loaded for model computation."""
+        """xarray.Dataset : Data arrays as loaded for model computation."""
         super().unmangle()
         if self._dataset is None:
             self.reflow_data_arrays()

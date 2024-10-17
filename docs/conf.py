@@ -5,6 +5,7 @@
 ###############################################################################
 
 import packaging.version
+import sphinx_autosummary_accessors
 
 import larch
 
@@ -42,6 +43,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinxcontrib.bibtex",
     # "pydata_sphinx_theme",
+    "sphinx_autosummary_accessors",
 ]
 # external_toc_exclude_missing = False
 # external_toc_path = "_toc.yml"
@@ -89,11 +91,23 @@ nb_output_stderr = "show"
 numfig = True
 pygments_style = "sphinx"
 rst_epilog = (
-    ".. |idca| replace:: :ref:`idca <idca>`\n.. |idco| replace:: :ref:`idco <idco>`\n"
+    ".. |idca| replace:: :ref:`idca <idca>`\n"
+    ".. |idco| replace:: :ref:`idco <idco>`\n"
+    ".. |idce| replace:: :ref:`idce <idce>`\n"
 )
 suppress_warnings = ["myst.domains"]
 templates_path = [
     "_templates",
+    sphinx_autosummary_accessors.templates_path,
 ]
 use_jupyterbook_latex = True
 use_multitoc_numbering = True
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "pandas": ("http://pandas.pydata.org/pandas-docs/stable", None),
+    "xarray": ("https://docs.xarray.dev/en/stable", None),
+    "pyarrow": ("https://arrow.apache.org/docs", None),
+    "numba": ("https://numba.readthedocs.io/en/stable", None),
+    "sharrow": ("https://activitysim.github.io/sharrow", None),
+}

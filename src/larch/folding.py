@@ -170,7 +170,7 @@ def fold_dataset(
 #     ds = cls()(df, caseid=caseidname, alts=altidname)
 #     if crack:
 #         ds = ds.dc.dissolve_zero_variance()
-#     ds = ds.set_dtypes(df)
+#     ds = ds.dc.set_dtypes(df)
 #     if altnames is not None:
 #         ds = ds.dc.set_altnames(altnames)
 #     if avail not in ds and len(df) < ds.dc.n_cases * ds.dc.n_alts:

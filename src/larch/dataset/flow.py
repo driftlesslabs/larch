@@ -2,15 +2,26 @@ from __future__ import annotations
 
 import logging
 import warnings
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
+from typing import TYPE_CHECKING, TypeVar
 
 import numba as nb
 import numpy as np
+import pandas as pd
 import xarray as xr
 
 from larch.warning import WeightRescaleWarning
 
+from .construct import _DatasetConstruct
 from .dim_names import ALTID, ALTIDX, CASEALT, CASEID, CASEPTR, GROUPID, INGROUP
+
+if TYPE_CHECKING:
+    import sharrow as sh
+    from numpy.typing import ArrayLike
+
+    from larch.dataset import DataTree
+
+DataT = TypeVar("DataT", bound=xr.Dataset | xr.DataArray)
 
 
 @nb.njit
@@ -74,12 +85,12 @@ def ce_dissolve_zero_variance(ce_data, ce_caseptr):
 
 
 class _GenericFlow:
-    def __init__(self, x=None):
+    def __init__(self, x: xr.DataArray | xr.Dataset | None = None):
         self._obj = x
         self._flow_library = {}
 
     @property
-    def CASEID(self):
+    def CASEID(self) -> str | None:
         """Str : The _caseid_ dimension of this Dataset, if defined."""
         result = self._obj.attrs.get(CASEID, None)
         return result
@@ -98,8 +109,8 @@ class _GenericFlow:
         self.__set_attr(CASEID, dim_name, check_dim=self.GROUPID is not None)
 
     @property
-    def ALTID(self):
-        """Str : The _altid_ dimension of this Dataset, if defined."""
+    def ALTID(self) -> str | None:
+        """The _altid_ dimension of this Dataset, if defined."""
         result = self._obj.attrs.get(ALTID, None)
         return result
 
@@ -108,8 +119,8 @@ class _GenericFlow:
         self.__set_attr(ALTID, dim_name)
 
     @property
-    def CASEALT(self):
-        """Str : The _casealt_ dimension of this Dataset, if defined."""
+    def CASEALT(self) -> str | None:
+        """The _casealt_ dimension of this Dataset, if defined."""
         result = self._obj.attrs.get(CASEALT, None)
         return result
 
@@ -118,7 +129,7 @@ class _GenericFlow:
         self.__set_attr(CASEALT, dim_name)
 
     @property
-    def ALTIDX(self):
+    def ALTIDX(self) -> str | None:
         """Str : The _alt_idx_ dimension of this Dataset, if defined."""
         result = self._obj.attrs.get(ALTIDX, None)
         return result
@@ -128,8 +139,8 @@ class _GenericFlow:
         self.__set_attr(ALTIDX, dim_name, False)
 
     @property
-    def CASEPTR(self):
-        """Str : The _caseptr_ dimension of this Dataset, if defined."""
+    def CASEPTR(self) -> str | None:
+        """The _caseptr_ dimension of this Dataset, if defined."""
         result = self._obj.attrs.get(CASEPTR, None)
         return result
 
@@ -138,8 +149,8 @@ class _GenericFlow:
         self.__set_attr(CASEPTR, dim_name, False)
 
     @property
-    def GROUPID(self):
-        """Str : The _groupid_ dimension of this Dataset, if defined."""
+    def GROUPID(self) -> str | None:
+        """The _groupid_ dimension of this Dataset, if defined."""
         result = self._obj.attrs.get(GROUPID, None)
         return result
 
@@ -148,8 +159,8 @@ class _GenericFlow:
         self.__set_attr(GROUPID, dim_name)
 
     @property
-    def INGROUP(self):
-        """Str : The _ingroup_ dimension of this Dataset, if defined."""
+    def INGROUP(self) -> str | None:
+        """The _ingroup_ dimension of this Dataset, if defined."""
         result = self._obj.attrs.get(INGROUP, None)
         return result
 
@@ -157,7 +168,9 @@ class _GenericFlow:
     def INGROUP(self, dim_name):
         self.__set_attr(INGROUP, dim_name)
 
-    def set_altids(self, altids, dim_name=None, dtype=None, inplace=False):
+    def set_altids(
+        self, altids, dim_name=None, dtype=None, inplace=False
+    ) -> xr.Dataset:
         """
         Set the alternative ids for this Dataset.
 
@@ -175,7 +188,8 @@ class _GenericFlow:
 
         Returns
         -------
-        Dataset
+        xarray.Dataset
+            The modified Dataset.
 
         Examples
         --------
@@ -221,7 +235,7 @@ class _GenericFlow:
         obj.dc.ALTID = dim_name
         return obj
 
-    def set_altnames(self, altnames, inplace=False):
+    def set_altnames(self, altnames, inplace=False) -> xr.Dataset:
         """
         Set the alternative names for this Dataset.
 
@@ -237,7 +251,9 @@ class _GenericFlow:
 
         Returns
         -------
-        Dataset
+        xarray.Dataset
+            The modified Dataset.  A value is returned regardless of whether
+            `inplace` is True.
         """
         if inplace:
             obj = self._obj
@@ -261,7 +277,7 @@ class _GenericFlow:
         obj.coords["alt_names"] = names
         return obj
 
-    def as_tree(self, label="main", exclude_dims=()):
+    def as_tree(self, label="main", exclude_dims=()) -> DataTree:
         """
         Convert this Dataset to a DataTree.
 
@@ -304,7 +320,7 @@ class _GenericFlow:
             tree = DataTree(**{label: self._obj})
         return tree
 
-    def setup_flow(self, *args, **kwargs):
+    def setup_flow(self, *args, **kwargs) -> sh.Flow:
         """
         Set up a new Flow for analysis using the structure of this DataTree.
 
@@ -318,39 +334,39 @@ class _GenericFlow:
         """
         return self.as_tree().setup_flow(*args, **kwargs)
 
-    def caseids(self):
+    def caseids(self) -> pd.Index:
         """
         Access the caseids coordinates as an index.
 
         Returns
         -------
-        pd.Index
+        pandas.Index
         """
-        return self.indexes[self.CASEID]
+        return self._obj.indexes[self.CASEID]
 
-    def altids(self):
+    def altids(self) -> pd.Index:
         """
         Access the altids coordinates as an index.
 
         Returns
         -------
-        pd.Index
+        pandas.Index
         """
         return self._obj.indexes[self.ALTID]
 
-    def groupids(self):
+    def groupids(self) -> pd.Index:
         """
         Access the groupids coordinates as an index.
 
         Returns
         -------
-        pd.Index
+        pandas.Index
         """
-        return self.indexes[self.GROUPID]
+        return self._obj.indexes[self.GROUPID]
 
     @property
-    def alts_mapping(self):
-        """Dict[int,str] : Mapping of alternative codes to names."""
+    def alts_mapping(self) -> dict[int, str]:
+        """Mapping of alternative codes to names."""
         a = self._obj.coords[self.ALTID]
         if "alt_names" in a.coords:
             return dict(zip(a.values, a.coords["alt_names"].values))
@@ -358,38 +374,50 @@ class _GenericFlow:
             return dict(zip(a.values, a.values))
 
     @property
-    def n_cases(self):
+    def n_cases(self) -> int:
+        """The number of discrete choice cases in this Dataset."""
         try:
-            return self.sizes[self.CASEID]
+            return self._obj.sizes[self.CASEID]
         except KeyError:
             try:
-                return self.sizes[self.GROUPID] * self.sizes[self.INGROUP]
+                return self._obj.sizes[self.GROUPID] * self._obj.sizes[self.INGROUP]
             except KeyError:
                 pass
             logging.getLogger().error(
-                f"missing {self.CASEID!r} among dims {self.sizes}"
+                f"missing {self.CASEID!r} among dims {self._obj.sizes}"
             )
             raise
 
     @property
     def n_panels(self):
         try:
-            return self.sizes[self.GROUPID]
+            return self._obj.sizes[self.GROUPID]
         except KeyError:
             try:
-                return self.sizes[self.CASEID]
+                return self._obj.sizes[self.CASEID]
             except KeyError:
                 pass
             logging.getLogger().error(
-                f"missing {self.GROUPID!r} and {self.CASEID!r} among dims {self.sizes}"
+                f"missing {self.GROUPID!r} and {self.CASEID!r} among dims {self._obj.sizes}"
             )
             raise
 
     @property
     def n_in_panel(self):
-        return self.sizes[self.INGROUP]
+        return self._obj.sizes[self.INGROUP]
 
-    def transfer_dimension_attrs(self, target):
+    def transfer_dimension_attrs(self, target: DataT) -> DataT:
+        """
+        Transfer discrete choice dimension attributes to a new Dataset or DataArray.
+
+        Parameters
+        ----------
+        target : xarray.DataArray or xarray.Dataset
+
+        Returns
+        -------
+        xarray.DataArray or xarray.Dataset
+        """
         if not isinstance(target, xr.DataArray | xr.Dataset):
             return target
         updates = {}
@@ -399,7 +427,7 @@ class _GenericFlow:
                 updates[i] = j
         return target.assign_attrs(updates)
 
-    def get_expr(self, expression):
+    def get_expr(self, expression) -> xr.DataArray:
         """
         Access or evaluate an expression.
 
@@ -409,7 +437,7 @@ class _GenericFlow:
 
         Returns
         -------
-        DataArray
+        xarray.DataArray
         """
         try:
             result = self._obj[expression]
@@ -425,7 +453,7 @@ class _GenericFlow:
         result = self.transfer_dimension_attrs(result)
         return result
 
-    def dissolve_zero_variance(self, dim="<ALTID>", inplace=False):
+    def dissolve_zero_variance(self, dim="<ALTID>", inplace=False) -> xr.Dataset:
         """
         Dissolve dimension on variables where it has no variance.
 
@@ -442,7 +470,9 @@ class _GenericFlow:
 
         Returns
         -------
-        Dataset
+        xarray.Dataset
+            The modified Dataset. A value is returned regardless of whether
+            `inplace` is True.
         """
         if dim == "<ALTID>":
             dim = self.ALTID
@@ -485,14 +515,19 @@ class _GenericFlow:
 
 @xr.register_dataarray_accessor("dc")
 class _DataArrayDC(_GenericFlow):
+    """Larch discrete choice attributes and methods for xarray.DataArray."""
+
     _parent_class = xr.DataArray
 
     @property
     def n_alts(self):
+        """The number of discrete choice alternatives in this DataArray."""
         if self.ALTID in self._obj.sizes:
-            return self._obj.shape[self.sizes.index(self.ALTID)]
+            return self._obj.sizes.get(self.ALTID)
         if "n_alts" in self._obj.attrs:
             return self._obj.attrs["n_alts"]
+        if self.name:
+            raise ValueError(f"no n_alts set for {self.name!r}")
         raise ValueError("no n_alts set")
 
     def __getitem__(self, name):
@@ -510,10 +545,13 @@ class _DataArrayDC(_GenericFlow):
 
 @xr.register_dataset_accessor("dc")
 class _DatasetDC(_GenericFlow):
+    """Larch discrete choice attributes and methods for xarray.Dataset."""
+
     _parent_class = xr.Dataset
 
     @property
-    def n_alts(self):
+    def n_alts(self) -> int:
+        """The number of discrete choice alternatives in this Dataset."""
         if self.ALTID in self._obj.sizes:
             return self._obj.sizes[self.ALTID]
         if "n_alts" in self._obj.attrs:
@@ -702,6 +740,169 @@ class _DatasetDC(_GenericFlow):
             self._obj["wt"] *= scale_level
         self._obj["wt"].attrs["normalization"] = 1.0
         return scale_level
+
+    @staticmethod
+    def from_idco(df, alts: Mapping[int, str] | ArrayLike[int] | None = None):
+        """
+        Construct a Dataset from an idco-format DataFrame.
+
+        Parameters
+        ----------
+        df : DataFrame
+            The input data should be an idco-format DataFrame, with
+            the caseid's in a single-level index,
+        alts : Mapping or array-like, optional
+            If given as a mapping, links alternative codes to names.
+            An array or list of integers gives codes for the alternatives,
+            which are otherwise unnamed.
+
+        Returns
+        -------
+        Dataset
+        """
+        return _DatasetConstruct.from_idco(df, alts=alts)
+
+    @staticmethod
+    def from_idca(
+        df: pd.DataFrame,
+        *,
+        crack: bool = True,
+        altnames: Mapping[int, str] | Sequence[str] = None,
+        avail: str = "_avail_",
+        fill_missing: dict = None,
+    ) -> xr.Dataset:
+        """
+        Construct a Dataset from an idca-format DataFrame.
+
+        This method loads the data as dense arrays.
+
+        Parameters
+        ----------
+        df : DataFrame
+            The input data should be an idca-format or idce-format DataFrame,
+            with the caseid's and altid's in a two-level pandas MultiIndex.
+        crack : bool, default True
+            If True, the `dissolve_zero_variance` method is applied before
+            repairing dtypes, to ensure that missing value are handled
+            properly.
+        altnames : Mapping, optional
+            If given as a mapping, links alternative codes to names.
+            An array or list of strings gives names for the alternatives,
+            sorted in the same order as the codes.
+        avail : str, default '_avail_'
+            When the imported data is in idce format (i.e. sparse) then
+            an availability indicator is computed and given this name. This
+            argument has no effect if the data is already in idca format.
+        fill_missing : scalar or Mapping, optional
+            Fill values to use for missing values when imported data is
+            in idce format (i.e. sparse).  Give a single value to use
+            globally, or a mapping of {variable: value} or {dtype: value}.
+
+        Returns
+        -------
+        Dataset
+
+        See Also
+        --------
+        Dataset.dc.from_idce : Construct a Dataset from a sparse idca-format DataFrame.
+        """
+        return _DatasetConstruct.from_idca(
+            df, crack=crack, altnames=altnames, avail=avail, fill_missing=fill_missing
+        )
+
+    @staticmethod
+    def from_idce(
+        df: pd.DataFrame,
+        crack: bool = True,
+        altnames: Mapping[int, str] | Sequence[str] = None,
+        dim_name: str | None = None,
+        alt_index: str = "alt_idx",
+        case_index: str | None = None,
+        case_pointer=None,
+    ):
+        """
+        Construct a Dataset from a sparse idca-format DataFrame.
+
+        Parameters
+        ----------
+        df : DataFrame
+            The input data should be an idca-format or idce-format DataFrame,
+            with the caseid's and altid's in a two-level pandas MultiIndex.
+        crack : bool, default False
+            If True, the `dissolve_zero_variance` method is applied before
+            repairing dtypes, to ensure that missing value are handled
+            properly.
+        altnames : Mapping, optional
+            If given as a mapping, links alternative codes to names.
+            An array or list of strings gives names for the alternatives,
+            sorted in the same order as the codes.
+        dim_name : str, optional
+            Name to apply to the sparse index dimension.
+        alt_index : str, default 'alt_idx'
+            Add the alt index (position) for each sparse data row as a
+            coords array with this name.
+        case_index : str, optional
+            Add the case index (position) for each sparse data row as a
+            coords array with this name. If not given, this array is not
+            stored but it can still be reconstructed later from the case
+            pointers.
+        case_pointer : str, optional
+            Use this name for the case_ptr dimension, overriding the
+            default.
+
+        Returns
+        -------
+        Dataset
+
+        See Also
+        --------
+        Dataset.from_idca : Construct a dense Dataset from a idca-format DataFrame.
+        """
+        return _DatasetConstruct.from_idce(
+            df,
+            crack=crack,
+            altnames=altnames,
+            dim_name=dim_name,
+            alt_index=alt_index,
+            case_index=case_index,
+            case_pointer=case_pointer,
+        )
+
+    def set_dtypes(self, dtypes, inplace=False, on_error="warn"):
+        """
+        Set the dtypes for the variables in this Dataset.
+
+        Parameters
+        ----------
+        dtypes : Mapping or DataFrame
+            Mapping of names to dtypes, or a DataFrame to infer such a
+            mapping.
+        inplace : bool, default False
+            Whether to convert dtypes inplace.
+        on_error : {'warn', 'raise', 'ignore'}
+            What to do when a type conversion triggers an error.
+
+        Returns
+        -------
+        Dataset
+        """
+        if isinstance(dtypes, pd.DataFrame):
+            dtypes = dtypes.dtypes
+        if inplace:
+            obj = self._obj
+        else:
+            obj = self._obj.copy()
+        for k in obj:
+            if k not in dtypes:
+                continue
+            try:
+                obj[k] = obj[k].astype(dtypes[k])
+            except Exception as err:
+                if on_error == "warn":
+                    warnings.warn(f"{err!r} on converting {k}", stacklevel=2)
+                elif on_error == "raise":
+                    raise
+        return obj
 
 
 @xr.register_dataset_accessor("icase")

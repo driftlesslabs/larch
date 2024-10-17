@@ -391,8 +391,8 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
                 self._is_mangled = MANGLE_DATA
 
     @property
-    def dataset(self):
-        """larch.Dataset : Data arrays as loaded for model computation."""
+    def dataset(self) -> xr.Dataset | None:
+        """xarray.Dataset : Data arrays as loaded for model computation."""
         super().unmangle()
         if self._dataset is None:
             self.reflow_data_arrays()

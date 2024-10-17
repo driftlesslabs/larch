@@ -115,9 +115,7 @@ Model Fitness
 .. autosummary::
     :toctree: generated/
 
-    Model.loglike_nil
     Model.loglike_null
-    Model.rho_sq_nil
     Model.rho_sq_null
 
 

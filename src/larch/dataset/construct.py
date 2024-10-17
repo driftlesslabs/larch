@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 
 import numpy as np
 import pandas as pd
@@ -88,6 +88,33 @@ def _initialize_for_larch(obj, caseid=None, alts=None):
     return obj
 
 
+def initialize_for_larch(
+    obj, caseid=None, alts: Mapping[int, str] | str | Sequence[int] | None = None
+) -> xr.Dataset:
+    """
+    Initialize a Dataset for use with larch.
+
+    Parameters
+    ----------
+    obj : Dataset
+        The dataset being initialized.
+    caseid : str, optional
+        The name of a dimension referencing cases.
+    alts : Mapping or str or array-like, optional
+        If given as a mapping, links alternative codes to names.
+        A string names a dimension that defines the alternatives.
+        An array or list of integers gives codes for the alternatives,
+        which are otherwise unnamed.
+
+    Returns
+    -------
+    Dataset
+    """
+    result = construct(obj)
+    result = _initialize_for_larch(result, caseid, alts)
+    return result
+
+
 @xr.register_dataset_accessor("construct")
 class _DatasetConstruct:
     _parent_class = xr.Dataset
@@ -157,7 +184,7 @@ class _DatasetConstruct:
             )
         caseidname = df.index.name or "index"
         ds = cls()(df, caseid=caseidname, alts=alts)
-        ds = ds.set_dtypes(df)
+        ds = ds.dc.set_dtypes(df)
         return ds
 
     @classmethod
@@ -222,7 +249,7 @@ class _DatasetConstruct:
         ds = cls()(df, caseid=caseidname, alts=altidname)
         if crack:
             ds = ds.dc.dissolve_zero_variance()
-        ds = ds.set_dtypes(df)
+        ds = ds.dc.set_dtypes(df)
         if altnames is not None:
             ds = ds.dc.set_altnames(altnames)
         if avail not in ds and len(df) < ds.dc.n_cases * ds.dc.n_alts:
@@ -371,7 +398,7 @@ class _DatasetConstruct:
         ds = ds.drop_vars(dim_name)
         if crack:
             ds = ds.dc.dissolve_zero_variance()
-        ds = ds.set_dtypes(df)
+        ds = ds.dc.set_dtypes(df)
         if altnames is not None:
             ds = ds.dc.set_altnames(altnames)
         return ds

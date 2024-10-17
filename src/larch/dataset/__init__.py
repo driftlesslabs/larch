@@ -4,6 +4,7 @@ import warnings
 
 import numpy as np
 import pandas as pd
+import sharrow as sh
 import xarray as xr
 from xarray.core import dtypes
 
@@ -340,7 +341,7 @@ class DataTree(_sharrow_DataTree):
     def alts_name_to_id(self):
         return dict((j, i) for (i, j) in self.alts_mapping().items())
 
-    def setup_flow(self, *args, **kwargs):
+    def setup_flow(self, *args, **kwargs) -> sh.Flow:
         """
         Set up a new Flow for analysis using the structure of this DataTree.
 

@@ -6,7 +6,7 @@ import pytest
 from pytest import approx
 
 import larch as lx
-from larch import P, X
+from larch import PX, P, X
 from larch.exceptions import MissingDataError
 
 
@@ -85,3 +85,34 @@ def test_model_choice_avail_weighted():
         cas["available weighted"].values,
         [59820.0, 59820.0, 48023.0, 22370.0, 19273.0, 59820.0, np.nan],
     )
+
+
+def test_model_gradient_check():
+    d = lx.examples.MTC(format="dataset")
+    m = lx.Model(d, compute_engine="numba")
+    m.availability_ca_var = "avail"
+    m.choice_ca_var = "chose"
+    m.utility_co[2] = P("ASC_SR2") + P("hhinc#2") * X("hhinc")
+    m.utility_co[3] = P("ASC_SR3P") + P("hhinc#3") * X("hhinc")
+    m.utility_co[4] = P("ASC_TRAN") + P("hhinc#4") * X("hhinc")
+    m.utility_co[5] = P("ASC_BIKE") + P("hhinc#5") * X("hhinc")
+    m.utility_co[6] = P("ASC_WALK") + P("hhinc#6") * X("hhinc")
+    m.utility_ca = PX("tottime") + PX("totcost")
+    chk = m.check_d_loglike()
+    assert chk.data.similarity.min() > 5
+    dll = {
+        "ASC_BIKE": -279.79999999999376,
+        "ASC_SR2": -687.7000000000156,
+        "ASC_SR3P": -1043.7000000000337,
+        "ASC_TRAN": -380.78333333332864,
+        "ASC_WALK": -113.65000000000244,
+        "hhinc#2": -41179.541666666715,
+        "hhinc#3": -60691.541666666686,
+        "hhinc#4": -24028.374999999985,
+        "hhinc#5": -17374.80833333334,
+        "hhinc#6": -7739.108333333339,
+        "totcost": 127397.53666666638,
+        "tottime": -42104.202666666555,
+    }
+    assert chk.data.analytic.to_dict() == approx(dll)
+    assert chk.data.finite_diff.to_dict() == approx(dll, rel=1e-5)
