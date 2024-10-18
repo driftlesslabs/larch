@@ -810,17 +810,17 @@ for generating draws.</p>
 │ └────────────────────────────────┴────────────────┴────────────────┴────────────┴──────────┘ │
 └──────────────────────────────────────────────────────────────────────────────────────────────┘
 </pre>
-</div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2024-10-16 20:37:58.558617: E external/xla/xla/service/slow_operation_alarm.cc:65] Constant folding an instruction is taking &gt; 1s:
+</div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2024-10-18 20:50:37.558366: E external/xla/xla/service/slow_operation_alarm.cc:65] Constant folding an instruction is taking &gt; 1s:
 
-  %slice.118 = f32[1484,200,1]{2,1,0} slice(f32[1484,200,6]{2,1,0} %constant.508), slice={[0:1484], [0:200], [4:5]}, metadata={op_name=&quot;jit(func)/jit(main)/vmap(jvp(jvp(jit(func))))/jit(func)/vmap(jit(func))/slice&quot; source_file=&quot;/tmp/ipykernel_4829/1105560992.py&quot; source_line=1}
+  %slice.66 = f32[1484,200,1]{2,1,0} slice(f32[1484,200,6]{2,1,0} %constant.426), slice={[0:1484], [0:200], [5:6]}, metadata={op_name=&quot;jit(func)/jit(main)/jvp(jit(func))/jit(func)/vmap(jit(func))/slice&quot; source_file=&quot;/tmp/ipykernel_4669/1105560992.py&quot; source_line=1}
 
 This isn&#39;t necessarily a bug; constant-folding is inherently a trade-off between compilation time and speed at runtime. XLA has some guards that attempt to keep constant folding from taking too long, but fundamentally you&#39;ll always be able to come up with an input program that takes a long time.
 
 If you&#39;d like to file a bug, run with envvar XLA_FLAGS=--xla_dump_to=/tmp/foo and attach the results.
-2024-10-16 20:37:58.565607: E external/xla/xla/service/slow_operation_alarm.cc:133] The operation took 1.007102893s
+2024-10-18 20:50:37.558897: E external/xla/xla/service/slow_operation_alarm.cc:133] The operation took 1.000633847s
 Constant folding an instruction is taking &gt; 1s:
 
-  %slice.118 = f32[1484,200,1]{2,1,0} slice(f32[1484,200,6]{2,1,0} %constant.508), slice={[0:1484], [0:200], [4:5]}, metadata={op_name=&quot;jit(func)/jit(main)/vmap(jvp(jvp(jit(func))))/jit(func)/vmap(jit(func))/slice&quot; source_file=&quot;/tmp/ipykernel_4829/1105560992.py&quot; source_line=1}
+  %slice.66 = f32[1484,200,1]{2,1,0} slice(f32[1484,200,6]{2,1,0} %constant.426), slice={[0:1484], [0:200], [5:6]}, metadata={op_name=&quot;jit(func)/jit(main)/jvp(jit(func))/jit(func)/vmap(jit(func))/slice&quot; source_file=&quot;/tmp/ipykernel_4669/1105560992.py&quot; source_line=1}
 
 This isn&#39;t necessarily a bug; constant-folding is inherently a trade-off between compilation time and speed at runtime. XLA has some guards that attempt to keep constant folding from taking too long, but fundamentally you&#39;ll always be able to come up with an input program that takes a long time.
 
