@@ -152,3 +152,77 @@ def test_destination_some_zero_q(compute_engine):
     assert m.loglike() == approx(-62083.82421875)
     result = m.maximize_loglike()
     assert result.loglike == approx(-39720.1015625)
+
+
+def test_query_on_subspace():
+    hh, pp, tour, skims = lx.example(200, ["hh", "pp", "tour", "skims"])
+
+    from addicty import Dict
+
+    Mode = Dict(
+        DA=1,
+        SR=2,
+        Walk=3,
+        Bike=4,
+        Transit=5,
+    ).freeze()
+
+    tour_dataset = lx.Dataset.construct.from_idco(tour.set_index("TOURID"), alts=Mode)
+    od_skims = lx.Dataset.construct.from_omx(skims)
+    dt = lx.DataTree(
+        tour=tour_dataset,
+        hh=hh.set_index("HHID"),
+        person=pp.set_index("PERSONID"),
+        od=od_skims,
+        do=od_skims,
+        relationships=(
+            "tours.HHID @ hh.HHID",
+            "tours.PERSONID @ person.PERSONID",
+            "hh.HOMETAZ @ od.otaz",
+            "tours.DTAZ @ od.dtaz",
+            "hh.HOMETAZ @ do.dtaz",
+            "tours.DTAZ @ do.otaz",
+        ),
+    )
+    assert dt.n_cases == 20739
+
+    # query cases on a variable in the root dataset
+    dt_work = dt.query_cases("TOURPURP == 1")
+
+    # check that the query worked, and that the result from pandas is the same
+    assert dt_work.n_cases == 7564
+    # straightforward pandas
+    assert tour.eval("TOURPURP == 1").sum() == 7564
+
+    # query cases on a IDCO variable in the household dataset
+    dt_lowincome = dt.query_cases("INCOME < 25_000")
+
+    # check that the query worked, and that the result from pandas is the same
+    assert dt_lowincome.n_cases == 6911
+    # more complex pandas eval-on-join
+    assert (
+        tour.join(hh.set_index("HHID").INCOME, on="HHID").eval("INCOME < 25_000")
+    ).sum() == 6911
+
+    # query cases on a variable in the skims dataset
+    dt_long = dt.query_cases("AUTO_DIST > 10")
+
+    # check that the query worked, and that the result from pandas is the same
+    assert dt_long.n_cases == 94
+    # and here is why DataTree exists ...
+    assert (
+        tour.join(
+            hh.set_index("HHID").HOMETAZ,
+            on="HHID",
+        )
+        .join(
+            (
+                skims.get_dataframe("AUTO_DIST", "TAZ_ID", "TAZ_ID")
+                .stack()
+                .rename("AUTO_DIST")
+                .rename_axis(["otaz", "dtaz"])
+            ),
+            on=["HOMETAZ", "DTAZ"],
+        )
+        .eval("AUTO_DIST > 10")
+    ).sum() == 94

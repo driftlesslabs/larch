@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import sharrow as sh
 import xarray as xr
+from pandas.errors import UndefinedVariableError
 from xarray.core import dtypes
 
 from . import construct as construct
@@ -245,7 +246,7 @@ class DataTree(_sharrow_DataTree):
         """Int : The size of the _altid_ dimension of the root Dataset."""
         return self.root_dataset.sizes[self.ALTID]
 
-    def query_cases(self, *args, **kwargs):
+    def query_cases(self, query, parser="pandas", engine=None):
         """
         Return a new DataTree, with a query filter applied to the root Dataset.
 
@@ -280,7 +281,15 @@ class DataTree(_sharrow_DataTree):
         Dataset.query_cases
         """
         obj = self.copy()
-        obj.root_dataset = obj.root_dataset.dc.query_cases(*args, **kwargs)
+        try:
+            obj.root_dataset = obj.root_dataset.dc.query_cases(
+                query, parser=parser, engine=engine
+            )
+        except UndefinedVariableError:
+            filter = self.idco_subtree().get_expr(
+                query, allow_native=False, engine="sharrow", dtype="bool_"
+            )
+            obj.root_dataset = obj.root_dataset.dc.isel({self.CASEID: filter})
         return obj
 
     def slice_cases(self, *case_slice):
