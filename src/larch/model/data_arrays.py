@@ -593,20 +593,28 @@ def _prep_co(
     cache_dir=None,
     flow=None,
     use_array_maker=True,
+    use_eval=True,
 ):
     from ..dataset import DataArray, DataTree
 
     assert isinstance(shared_data_co, DataTree)
     if not isinstance(vars_co, dict):
         vars_co = {i: i for i in vars_co}
-    flowname = flownamer(tag, vars_co, shared_data_co._hash_features())
-    if flow is None or flowname != flow.name:
-        flow = shared_data_co.setup_flow(vars_co, cache_dir=cache_dir, name=flowname)
-    arr = flow.load(
-        shared_data_co,
-        dtype=dtype,
-        use_array_maker=use_array_maker,
-    )
+    if use_eval:
+        arr = shared_data_co.eval_many(
+            vars_co, dtype=dtype, result_type="dataarray", with_coords=False
+        ).values
+    else:
+        flowname = flownamer(tag, vars_co, shared_data_co._hash_features())
+        if flow is None or flowname != flow.name:
+            flow = shared_data_co.setup_flow(
+                vars_co, cache_dir=cache_dir, name=flowname
+            )
+        arr = flow.load(
+            shared_data_co,
+            dtype=dtype,
+            use_array_maker=use_array_maker,
+        )
     caseid_dim = shared_data_co.CASEID
     if preserve_vars or len(vars_co) > 1:
         if dim_name is None:
