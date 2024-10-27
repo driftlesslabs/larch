@@ -600,6 +600,8 @@ def _prep_co(
     assert isinstance(shared_data_co, DataTree)
     if not isinstance(vars_co, dict):
         vars_co = {i: i for i in vars_co}
+    if not vars_co:
+        return model_dataset, None
     if use_eval:
         arr = shared_data_co.eval_many(
             vars_co, dtype=dtype, result_type="dataarray", with_coords=False
