@@ -25,10 +25,10 @@ This will install the package and all of its required dependencies.  Note that
 while the installation name is "larch6", the package import name is "larch", and
 you cannot install both Larch v5 and Larch v6 in the same environment.
 
-Or you can install it using `mamba` to create a new environment:
+Or you can install it using `conda` to create a new environment:
 
 ```shell
-mamba env create -p ARBORETUM -f https://raw.githubusercontent.com/driftlesslabs/larch/main/envs/arboretum.yml
+conda env create -p ARBORETUM -f https://raw.githubusercontent.com/driftlesslabs/larch/main/envs/arboretum.yml
 conda activate ./ARBORETUM
 ```
 
@@ -38,11 +38,7 @@ conda activate ./ARBORETUM
 Before you start with the installation, you need have the following tools already:
 - [miniforge for Mac or Linux](https://github.com/conda-forge/miniforge#unix-like-platforms-mac-os--linux)
   or [miniforge for Windows](https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe)
-- [gh](https://cli.github.com), the github command line tool (`mamba install gh` should work)
-
-For now, you also need to have a github account and have authenticated
-with `gh` using `gh auth login`.  Once this repository is public, this
-will no longer be necessary.
+- [gh](https://cli.github.com), the github command line tool (`conda install gh` should work)
 
 ```zsh
 #!/usr/bin/env zsh
@@ -60,10 +56,9 @@ mkdir -p "${TARGET_DIR}"
 cd -- "${TARGET_DIR}"
 
 # clone the various repositories
-gh repo clone driftlesslabs/larch
-gh repo clone driftlesslabs/sharrow
+gh repo clone driftlesslabs/larch -- --recurse-submodules
 
-# install the mamba development environment
+# install the conda development environment
 mkdir -p .env/LARIX
 conda env update -p .env/LARIX -f larch/envs/development.yaml
 conda activate .env/LARIX
@@ -74,13 +69,17 @@ ipython kernel install --user --name=LARIX
 # rip examples to loadable modules
 python larch/tools/rip_examples.py
 
+# prep sharrow submodule
+uv tool install -e ./larch/sharrow
+
 # compile and install
-python -m pip install -e ./sharrow
-python -m pip install -e ./larch
+uv pip install -e ./larch
 
 # run unit tests (optional)
-python -m pytest -v ./sharrow/sharrow/tests
-python -m pytest -v ./larch/tests
+mkdir sandbox
+cd sandbox
+python -m pytest -v ../larch/sharrow/sharrow/tests
+python -m pytest -v ../larch/tests
 ```
 
 
@@ -88,9 +87,9 @@ python -m pytest -v ./larch/tests
 
 The above script should *mostly* work on Windows as well, but one minor modification
 is required, as the JAX library is not yet available for Windows via conda.  You need to
-install it with pip instead.  So, replace the `mamba env update` line in the script
+install it with pip instead.  So, replace the `conda env update` line in the script
 above with the following:
 
 ```
-mamba env update -p .env/LARIX -f larch/envs/windows.yaml
+conda env update -p .env/LARIX -f larch/envs/windows.yaml
 ```
