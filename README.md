@@ -70,7 +70,7 @@ ipython kernel install --user --name=LARIX
 python larch/tools/rip_examples.py
 
 # prep sharrow submodule
-uv tool install -e ./larch/sharrow
+uv pip install -e ./larch/sharrow
 
 # compile and install
 uv pip install -e ./larch
