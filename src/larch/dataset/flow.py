@@ -16,9 +16,9 @@ from .construct import _DatasetConstruct
 from .dim_names import ALTID, ALTIDX, CASEALT, CASEID, CASEPTR, GROUPID, INGROUP
 
 if TYPE_CHECKING:
-    import sharrow as sh
     from numpy.typing import ArrayLike
 
+    import sharrow as sh
     from larch.dataset import DataTree
 
 DataT = TypeVar("DataT", bound=xr.Dataset | xr.DataArray)
