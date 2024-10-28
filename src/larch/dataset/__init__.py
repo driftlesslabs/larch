@@ -4,10 +4,11 @@ import warnings
 
 import numpy as np
 import pandas as pd
-import sharrow as sh
 import xarray as xr
 from pandas.errors import UndefinedVariableError
 from xarray.core import dtypes
+
+import sharrow as sh
 
 from . import construct as construct
 from . import flow as flow
