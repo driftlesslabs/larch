@@ -31,5 +31,16 @@ jobs:
           python -m pip install build
           python -m pip install -e ./sharrow
           python -m build .
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          # Install a specific version of uv.
+          version: "0.4.27"
+      - name: Test wheel
+        run: |
+          uv venv
+          uv pip install dist/*.whl
+          python -c "import larch"
+          python -c "import sharrow"
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
