@@ -24,10 +24,7 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
-#      - name: Set up Python ${{ matrix.python-version }}
-#        uses: actions/setup-python@v5
-#        with:
-#          python-version: ${{ matrix.python-version }}
+          submodules: recursive
       - name: Install dependencies
         uses: conda-incubator/setup-miniconda@v3
         with:
@@ -42,7 +39,7 @@ jobs:
         with:
           # Install a specific version of uv.
           version: "0.4.27"
-      - name: Install larch
+      - name: Install larch and sharrow
         run: |
           python tools/rip_examples.py
           uv tool install -e ./sharrow
