@@ -4,57 +4,50 @@
 Dataset
 =======
 
-Constructors
-------------
+The :class:`Dataset` class is the primary data structure in Larch. It is an
+extension of :class:`xarray.Dataset`, with additional methods and attributes
+specific to discrete choice modeling, collected under the ``dc`` accessor.
+All of the larch-specific discrete choice methods and attributes on the
+:class:`Dataset` documented here are invoked using ``Dataset.dc.*``.
+
+
+Dataset.dc Constructors
+-----------------------
 
 .. autosummary::
     :toctree: generated/
+    :template: autosummary/accessor_method.rst
 
-    Dataset
-    Dataset.construct.from_idca
-    Dataset.construct.from_idce
-    Dataset.construct.from_idco
-    Dataset.construct
-    Dataset.from_table
-    Dataset.from_omx
-    Dataset.from_omx_3d
-    Dataset.from_zarr
-    Dataset.from_named_objects
+    Dataset.dc.from_idca
+    Dataset.dc.from_idce
+    Dataset.dc.from_idco
 
 
-Attributes
-----------
+Dataset.dc Attributes
+---------------------
 
 .. autosummary::
     :toctree: generated/
+    :template: autosummary/accessor_attribute.rst
 
-    Dataset.n_cases
-    Dataset.n_alts
-    Dataset.CASEID
-    Dataset.ALTID
-    Dataset.alts_mapping
-    Dataset.dims
-    Dataset.sizes
-    Dataset.data_vars
-    Dataset.coords
-    Dataset.attrs
-    Dataset.encoding
-    Dataset.indexes
-    Dataset.chunks
-    Dataset.chunksizes
-    Dataset.nbytes
+    Dataset.dc.n_cases
+    Dataset.dc.n_alts
+    Dataset.dc.CASEID
+    Dataset.dc.ALTID
+    Dataset.dc.alts_mapping
 
-Methods
--------
+Dataset.dc Methods
+------------------
 
 .. autosummary::
     :toctree: generated/
+    :template: autosummary/accessor_method.rst
 
-    Dataset.caseids
-    Dataset.dissolve_zero_variance
-    Dataset.query_cases
-    Dataset.set_altids
-    Dataset.set_altnames
-    Dataset.set_dtypes
-    Dataset.setup_flow
-    Dataset.get_expr
+    Dataset.dc.caseids
+    Dataset.dc.dissolve_zero_variance
+    Dataset.dc.query_cases
+    Dataset.dc.set_altids
+    Dataset.dc.set_altnames
+    Dataset.dc.set_dtypes
+    Dataset.dc.setup_flow
+    Dataset.dc.get_expr

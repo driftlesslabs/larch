@@ -27,6 +27,8 @@
       ~DataTree.digitize_relationships
       ~DataTree.dims_detail
       ~DataTree.drop_dims
+      ~DataTree.eval
+      ~DataTree.eval_many
       ~DataTree.finditem
       ~DataTree.get
       ~DataTree.get_expr
