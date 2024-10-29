@@ -4,13 +4,15 @@
 Dataset
 =======
 
-The :class:`larch.Dataset` class is the primary data structure in Larch. It is an
+The :class:`Dataset` class is the primary data structure in Larch. It is an
 extension of :class:`xarray.Dataset`, with additional methods and attributes
-specific to discrete choice modeling, collected under the `dc` accessor.
+specific to discrete choice modeling, collected under the ``dc`` accessor.
+All of the larch-specific discrete choice methods and attributes on the
+:class:`Dataset` documented here are invoked using ``Dataset.dc.*``.
 
 
-DC Constructors
----------------
+Dataset.dc Constructors
+-----------------------
 
 .. autosummary::
     :toctree: generated/
@@ -21,8 +23,8 @@ DC Constructors
     Dataset.dc.from_idco
 
 
-DC Attributes
--------------
+Dataset.dc Attributes
+---------------------
 
 .. autosummary::
     :toctree: generated/
@@ -34,8 +36,8 @@ DC Attributes
     Dataset.dc.ALTID
     Dataset.dc.alts_mapping
 
-DC Methods
-----------
+Dataset.dc Methods
+------------------
 
 .. autosummary::
     :toctree: generated/
