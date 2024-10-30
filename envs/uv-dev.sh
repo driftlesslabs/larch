@@ -81,15 +81,15 @@ gh repo clone driftlesslabs/larch -- --recurse-submodules
 # change to the larch directory
 cd larch
 
+# create/sync the UV python venv
+# this will install larch in editable mode
+uv sync --all-extras
+
 # install sharrow in editable mode in the UV virtual environment
 uv pip install -e ./subs/sharrow
 
 # rip examples to loadable modules
 uv run ./tools/rip_examples.py
-
-# create/sync the UV python venv
-# this will install larch in editable mode
-uv sync
 
 # make this environment available to jupyter if --no-kernel option is not provided
 if [ "$NO_KERNEL" = false ]; then
