@@ -92,6 +92,11 @@ if [ -d ".git" ]; then
 else
   # clone the repository
   if [ -n "$LOCAL_REPO_PATH" ]; then
+    if [[ "$LOCAL_REPO_PATH" != /* ]]; then
+      LOCAL_REPO_PATH="file://$(pwd)/$LOCAL_REPO_PATH"
+    elif [[ "$LOCAL_REPO_PATH" != file://* ]]; then
+      LOCAL_REPO_PATH="file://$LOCAL_REPO_PATH"
+    fi
     git clone --recurse-submodules "$LOCAL_REPO_PATH" larch
   else
     gh repo clone driftlesslabs/larch -- --recurse-submodules
