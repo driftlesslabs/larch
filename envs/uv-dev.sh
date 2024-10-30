@@ -7,20 +7,22 @@ set -e
 TARGET_DIR="${HOME}/driftless"
 TARGET_KERNEL="LARIX"
 RUN_TESTS=false
+NO_KERNEL=false
 
 # function to display help
 show_help() {
-  echo "Usage: cmd [-d target_directory] [-k kernel_name] [-t] [-h]"
+  echo "Usage: cmd [-d target_directory] [-k kernel_name] [-t] [--no-kernel] [-h]"
   echo ""
   echo "Options:"
   echo "  -d    Define a target directory"
   echo "  -k    Name a kernel"
   echo "  -t    Run tests"
+  echo "  --no-kernel  Do not create a Jupyter kernel"
   echo "  -h    Show help"
 }
 
 # parse options
-while getopts "d:k:th" opt; do
+while getopts "d:k:th-:" opt; do
   case ${opt} in
     d )
       TARGET_DIR=$OPTARG
@@ -34,6 +36,17 @@ while getopts "d:k:th" opt; do
     h )
       show_help
       exit 0
+      ;;
+    - )
+      case "${OPTARG}" in
+        no-kernel)
+          NO_KERNEL=true
+          ;;
+        *)
+          show_help
+          exit 1
+          ;;
+      esac
       ;;
     \? )
       show_help
@@ -78,9 +91,11 @@ uv run ./tools/rip_examples.py
 # this will install larch in editable mode
 uv sync
 
-# make this environment available to jupyter
-uv add --dev ipykernel
-uv run ipython kernel install --user --name=$TARGET_KERNEL
+# make this environment available to jupyter if --no-kernel option is not provided
+if [ "$NO_KERNEL" = false ]; then
+    uv add --dev ipykernel
+    uv run ipython kernel install --user --name=$TARGET_KERNEL
+fi
 
 # run tests if -t option is provided
 if [ "$RUN_TESTS" = true ]; then
