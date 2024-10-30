@@ -84,7 +84,8 @@ cd -- "${TARGET_DIR}"
 # check if the target directory is a clone of the larch repo
 if [ -d ".git" ]; then
   REMOTE_URL=$(git config --get remote.origin.url)
-  if [ "$REMOTE_URL" = "https://github.com/driftlesslabs/larch.git" ]; then
+  NORMALIZED_REMOTE_URL=${REMOTE_URL%.git}
+  if [ "$NORMALIZED_REMOTE_URL" = "https://github.com/driftlesslabs/larch" ]; then
     echo "The target directory is already a clone of the larch repository."
   else
     echo "The target directory is a git repository with remote URL: $REMOTE_URL"
