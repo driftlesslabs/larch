@@ -9,6 +9,7 @@ TARGET_KERNEL="LARIX"
 RUN_TESTS=false
 NO_KERNEL=false
 LOCAL_REPO_PATH=""
+ORIGINAL_PWD=$(pwd)
 
 # function to display help
 show_help() {
@@ -63,14 +64,14 @@ done
 # check that uv is installed
 if ! command -v uv &> /dev/null
 then
-    echo "uv is not installed, installing it..."
+    echo "uv is not installed, installing it ..."
     curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 
 # check that gh is installed
 if ! command -v gh &> /dev/null
 then
-    echo "gh is not installed, installing it..."
+    echo "gh is not installed, installing it ..."
     curl -sS https://webi.sh/gh | sh
 fi
 
@@ -93,12 +94,14 @@ else
   # clone the repository
   if [ -n "$LOCAL_REPO_PATH" ]; then
     if [[ "$LOCAL_REPO_PATH" != /* ]]; then
-      LOCAL_REPO_PATH="file://$(pwd)/$LOCAL_REPO_PATH"
+      LOCAL_REPO_PATH="file://$ORIGINAL_PWD/$LOCAL_REPO_PATH"
     elif [[ "$LOCAL_REPO_PATH" != file://* ]]; then
       LOCAL_REPO_PATH="file://$LOCAL_REPO_PATH"
     fi
+    echo "Cloning the larch repository from $LOCAL_REPO_PATH ..."
     git clone --recurse-submodules "$LOCAL_REPO_PATH" larch
   else
+    echo "Cloning the larch repository from GitHub: driftlesslabs/larch ..."
     gh repo clone driftlesslabs/larch -- --recurse-submodules
   fi
   cd larch
@@ -106,21 +109,26 @@ fi
 
 # create/sync the UV python venv
 # this will install larch in editable mode
+echo "Creating/syncing the UV python venv ..."
 uv sync --all-extras
 
 # install sharrow in editable mode in the UV virtual environment
+echo "Installing sharrow in editable mode ..."
 uv pip install -e ./subs/sharrow
 
 # rip examples to loadable modules
+echo "Ripping examples to loadable modules ..."
 uv run ./tools/rip_examples.py
 
 # make this environment available to jupyter if --no-kernel option is not provided
 if [ "$NO_KERNEL" = false ]; then
+    echo "Making this environment available to Jupyter ..."
     uv add --dev ipykernel
     uv run ipython kernel install --user --name=$TARGET_KERNEL
 fi
 
 # run tests if -t option is provided
 if [ "$RUN_TESTS" = true ]; then
+    echo "Running tests ..."
     uv run pytest
 fi
