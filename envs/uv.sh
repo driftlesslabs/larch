@@ -1,28 +1,59 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 
 # exit this script immediately upon any failure
 set -e
 
+# default values
+TARGET_DIR="${HOME}/driftless"
+TARGET_KERNEL="LARIX"
+RUN_TESTS=false
+
+# function to display help
+show_help() {
+  echo "Usage: cmd [-d target_directory] [-k kernel_name] [-t] [-h]"
+  echo ""
+  echo "Options:"
+  echo "  -d    Define a target directory"
+  echo "  -k    Name a kernel"
+  echo "  -t    Run tests"
+  echo "  -h    Show help"
+}
+
+# parse options
+while getopts "d:k:th" opt; do
+  case ${opt} in
+    d )
+      TARGET_DIR=$OPTARG
+      ;;
+    k )
+      TARGET_KERNEL=$OPTARG
+      ;;
+    t )
+      RUN_TESTS=true
+      ;;
+    h )
+      show_help
+      exit 0
+      ;;
+    \? )
+      show_help
+      exit 1
+      ;;
+  esac
+done
+
 # check that uv is installed
 if ! command -v uv &> /dev/null
 then
-    echo "uv is not installed, install it with 'curl -LsSf https://astral.sh/uv/install.sh | sh'"
-    exit 1
+    echo "uv is not installed, installing it..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 
 # check that gh is installed
 if ! command -v gh &> /dev/null
 then
-    echo "gh is not installed, install it with 'brew install gh'"
-    exit 1
-fi
-
-# if provided, take the first shell argument as the target directory
-# otherwise default HOME/driftless
-if [ -n "$1" ]; then
-    export TARGET_DIR="$1"
-else
-    export TARGET_DIR="${HOME}/driftless"
+    echo "gh is not installed, installing it..."
+    curl -sS https://webi.sh/gh | sh
 fi
 
 # make the target working directory if it doesn't already exist
@@ -37,31 +68,21 @@ gh repo clone driftlesslabs/larch -- --recurse-submodules
 # change to the larch directory
 cd larch
 
-# create/sync the UV python venv
-uv sync
-
-
-# install larch in editable mode in a UV virtual environment
-
-# install the conda development environment
-#mkdir -p .env/LARIX
-#conda env update -p .env/LARIX -f larch/envs/development.yaml
-#conda activate .env/LARIX
-
-# make this environment available to jupyter
-#ipython kernel install --user --name=LARIX
+# install sharrow in editable mode in the UV virtual environment
+uv pip install -e ./subs/sharrow
 
 # rip examples to loadable modules
 uv run ./tools/rip_examples.py
 
-## prep sharrow submodule
-#uv pip install -e ./larch/sharrow
-#
-## compile and install
-#uv pip install -e ./larch
-#
-## run unit tests (optional)
-#mkdir sandbox
-#cd sandbox
-#python -m pytest -v ../larch/sharrow/sharrow/tests
-#python -m pytest -v ../larch/tests
+# create/sync the UV python venv
+# this will install larch in editable mode
+uv sync
+
+# make this environment available to jupyter
+uv add --dev ipykernel
+uv run ipython kernel install --user --name=$TARGET_KERNEL
+
+# run tests if -t option is provided
+if [ "$RUN_TESTS" = true ]; then
+    uv run pytest
+fi
