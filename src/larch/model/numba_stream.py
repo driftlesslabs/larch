@@ -3,7 +3,6 @@ from __future__ import annotations
 import numba as nb
 import numpy as np
 import pandas as pd
-
 from sharrow import Flow
 
 

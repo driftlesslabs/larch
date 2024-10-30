@@ -4,9 +4,8 @@ from collections.abc import Mapping, Sequence
 
 import numpy as np
 import pandas as pd
-import xarray as xr
-
 import sharrow.dataset as sd
+import xarray as xr
 from sharrow.dataset import construct
 
 from .dim_names import ALTID, ALTIDX, CASEALT, CASEID, CASEPTR
