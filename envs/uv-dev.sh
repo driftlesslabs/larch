@@ -122,6 +122,10 @@ uv pip install -e ./subs/sharrow
 echo "Ripping examples to loadable modules ..."
 uv run ./tools/rip_examples.py
 
+# ensure pre-commit hooks are installed
+echo "Ensuring pre-commit hooks are installed ..."
+uvx pre-commit install
+
 # make this environment available to jupyter if --no-kernel option is not provided
 if [ "$NO_KERNEL" = false ]; then
     echo "Making this environment available to Jupyter ..."
