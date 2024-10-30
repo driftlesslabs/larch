@@ -87,6 +87,8 @@ if [ -d ".git" ]; then
   NORMALIZED_REMOTE_URL=${REMOTE_URL%.git}
   if [ "$NORMALIZED_REMOTE_URL" = "https://github.com/driftlesslabs/larch" ]; then
     echo "The target directory is already a clone of the larch repository."
+    echo "Updating submodules ..."
+    git submodule update --init --recursive
   else
     echo "The target directory is a git repository with remote URL: $REMOTE_URL"
     echo "This is not the expected remote URL."
