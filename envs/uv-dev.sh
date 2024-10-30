@@ -8,16 +8,18 @@ TARGET_DIR="${HOME}/driftless"
 TARGET_KERNEL="LARIX"
 RUN_TESTS=false
 NO_KERNEL=false
+LOCAL_REPO_PATH=""
 
 # function to display help
 show_help() {
-  echo "Usage: cmd [-d target_directory] [-k kernel_name] [-t] [--no-kernel] [-h]"
+  echo "Usage: cmd [-d target_directory] [-k kernel_name] [-t] [--no-kernel] [--local-repo path] [-h]"
   echo ""
   echo "Options:"
   echo "  -d    Define a target directory"
   echo "  -k    Name a kernel"
   echo "  -t    Run tests"
   echo "  --no-kernel  Do not create a Jupyter kernel"
+  echo "  --local-repo  Path to a local repository to clone from"
   echo "  -h    Show help"
 }
 
@@ -41,6 +43,9 @@ while getopts "d:k:th-:" opt; do
       case "${OPTARG}" in
         no-kernel)
           NO_KERNEL=true
+          ;;
+        local-repo)
+          LOCAL_REPO_PATH="${!OPTIND}"; OPTIND=$(( $OPTIND + 1 ))
           ;;
         *)
           show_help
@@ -85,8 +90,12 @@ if [ -d ".git" ]; then
     exit 1
   fi
 else
-  # clone the various repositories
-  gh repo clone driftlesslabs/larch -- --recurse-submodules
+  # clone the repository
+  if [ -n "$LOCAL_REPO_PATH" ]; then
+    git clone --recurse-submodules "$LOCAL_REPO_PATH" larch
+  else
+    gh repo clone driftlesslabs/larch -- --recurse-submodules
+  fi
   cd larch
 fi
 
