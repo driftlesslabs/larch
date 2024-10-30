@@ -8,6 +8,19 @@ on:
   workflow_dispatch:
 
 jobs:
+  test-dev-install:
+    name: developer install
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+        - name: checkout
+          uses: actions/checkout@v4
+        - name: run developer install script
+          run: |
+            bash envs/uv-dev.sh -t -d .
+
   test:
     name: ${{ matrix.os }} py${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}

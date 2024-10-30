@@ -75,11 +75,20 @@ mkdir -p "${TARGET_DIR}"
 # change to the target working directory
 cd -- "${TARGET_DIR}"
 
-# clone the various repositories
-gh repo clone driftlesslabs/larch -- --recurse-submodules
-
-# change to the larch directory
-cd larch
+# check if the target directory is a clone of the larch repo
+if [ -d ".git" ]; then
+  REMOTE_URL=$(git config --get remote.origin.url)
+  if [ "$REMOTE_URL" = "https://github.com/driftlesslabs/larch.git" ]; then
+    echo "The target directory is already a clone of the larch repository."
+  else
+    echo "The target directory is a git repository, but not a clone of the larch repository."
+    exit 1
+  fi
+else
+  # clone the various repositories
+  gh repo clone driftlesslabs/larch -- --recurse-submodules
+  cd larch
+fi
 
 # create/sync the UV python venv
 # this will install larch in editable mode
