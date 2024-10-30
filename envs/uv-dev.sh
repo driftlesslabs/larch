@@ -87,7 +87,8 @@ if [ -d ".git" ]; then
   if [ "$REMOTE_URL" = "https://github.com/driftlesslabs/larch.git" ]; then
     echo "The target directory is already a clone of the larch repository."
   else
-    echo "The target directory is a git repository, but not a clone of the larch repository."
+    echo "The target directory is a git repository with remote URL: $REMOTE_URL"
+    echo "This is not the expected remote URL."
     exit 1
   fi
 else
