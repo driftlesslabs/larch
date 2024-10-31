@@ -22,49 +22,58 @@ jobs:
         - name: run tests
           run: uv run pytest
 
-#  test:
-#    name: ${{ matrix.os }} py${{ matrix.python-version }}
-#    runs-on: ${{ matrix.os }}
-#    strategy:
-#      matrix:
-#        os: ["ubuntu-latest"]
-#        python-version: ["3.10"]
-#    defaults:
-#      run:
-#        shell: bash -l {0}
-#    steps:
-#      - name: checkout
-#        uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0
-#          fetch-tags: true
-#          submodules: recursive
-#      - name: Install dependencies
-#        uses: conda-incubator/setup-miniconda@v3
-#        with:
-#          miniforge-version: latest
-#          environment-file: envs/testing.yml
-#          python-version: ${{ matrix.python-version }}
-#          activate-environment: testing-env
-#          auto-activate-base: false
-#          auto-update-conda: false
-#      - name: Install uv
-#        uses: astral-sh/setup-uv@v3
-#        with:
-#          # Install a specific version of uv.
-#          version: "0.4.27"
-#      - name: Install larch and sharrow
-#        run: |
-#          python tools/rip_examples.py
-#          uv pip install -e ./sharrow
-#          uv pip install -e .
-#      - name: Conda checkup
-#        run: |
-#          conda info -a
-#          conda list
-#      - name: Test with pytest
-#        run: |
-#          # test in the sandbox directory to ensure import of sharrow works
-#          mkdir sandbox
-#          cd sandbox
-#          python -m pytest ..
+  build-wheel:
+    name: 🛞 build wheel
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+      - name: build wheel
+        run: uv build
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels
+          path: dist
+
+  test-wheel:
+    name: 🧪 test wheel
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.10', '3.11', '3.12' ]
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Download wheel artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels
+          path: dist
+      - name: Install wheel
+        run: |
+          uv pip install dist/*.whl
+      - name: Run tests
+        run: |
+          uv run python -c "import larch; print(larch.__version__)"
+          uv run python -c "import sharrow; print(sharrow.__version__)"
