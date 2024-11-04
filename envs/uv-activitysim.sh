@@ -112,7 +112,7 @@ uv pip install altair asv "black<23" cytoolz dask filelock geopandas isort \
   matplotlib myst-parser nbconvert nbformat nbmake numpydoc psutil pyarrow \
   pycodestyle pydata-sphinx-theme pyinstrument pypyr pytest pytest-regressions \
   rich ruby setuptools_scm scikit-learn simwrapper sparse sphinx sphinx_rtd_theme \
-  sphinx-argparse zarr zstandard
+  sphinx-argparse zarr zstandard xlsxwriter
 
 cd larch
 uvx pre-commit install
