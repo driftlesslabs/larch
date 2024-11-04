@@ -34,8 +34,12 @@ def interaction_simulate_data(
     edb_directory = edb_directory.format(name=name)
 
     def _read_csv(filename, **kwargs):
-        filename = filename.format(name=name)
-        return pd.read_csv(os.path.join(edb_directory, filename), **kwargs)
+        filename = Path(edb_directory).joinpath(filename.format(name=name))
+        if filename.with_suffix(".parquet").exists():
+            print("loading from", filename.with_suffix(".parquet"))
+            return pd.read_parquet(filename.with_suffix(".parquet"), **kwargs)
+        print("loading from", filename)
+        return pd.read_csv(filename, **kwargs)
 
     settings_file = settings_file.format(name=name)
     with open(os.path.join(edb_directory, settings_file)) as yf:

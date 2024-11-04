@@ -45,8 +45,12 @@ def location_choice_model(
     edb_directory = edb_directory.format(model_selector=model_selector)
 
     def _read_csv(filename, **kwargs):
-        filename = filename.format(model_selector=model_selector)
-        return pd.read_csv(os.path.join(edb_directory, filename), **kwargs)
+        filename = Path(edb_directory).joinpath(filename)
+        if filename.with_suffix(".parquet").exists():
+            print("loading from", filename.with_suffix(".parquet"))
+            return pd.read_parquet(filename.with_suffix(".parquet"), **kwargs)
+        print("loading from", filename)
+        return pd.read_csv(filename, **kwargs)
 
     coefficients = _read_csv(
         coefficients_file,

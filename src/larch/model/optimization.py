@@ -77,7 +77,7 @@ def maximize_loglike(
     prior_result=None,
     stderr=False,
     **kwargs,
-):
+) -> dictx:
     """
     Maximize the log likelihood.
 
@@ -96,7 +96,7 @@ def maximize_loglike(
 
     Returns
     -------
-    dictx
+    larch.util.dictx
         A dictionary of results, including final log likelihood,
         elapsed time, and other statistics.  The exact items
         included in output will vary by estimation method.

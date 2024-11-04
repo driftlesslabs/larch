@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import warnings
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
@@ -12,6 +13,10 @@ from ..compiled import compiledmethod, jitmethod, reset_compiled_methods
 from ..folding import fold_dataset
 from ..optimize import OptimizeMixin
 from .numbamodel import NumbaModel
+
+if TYPE_CHECKING:
+    from larch.util import dictx
+    from larch.util.excel import ExcelWriter
 
 logger = logging.getLogger(__name__)
 
@@ -1099,7 +1104,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         self,
         *args,
         **kwargs,
-    ):
+    ) -> dictx:
         """
         Maximize the log likelihood.
 
@@ -1121,7 +1126,7 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
 
         Returns
         -------
-        dictx
+        larch.util.dictx
             A dictionary of results, including final log likelihood,
             elapsed time, and other statistics.  The exact items
             included in output will vary by estimation method.
@@ -1132,6 +1137,24 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
             return self.jax_maximize_loglike(*args, **kwargs)
         else:
             return super().maximize_loglike(*args, **kwargs)
+
+    def estimate(self, *args, **kwargs):
+        """
+        Maximize loglike, and then calculate parameter covariance.
+
+        This convenience method runs the following methods in order:
+        - maximize_loglike
+        - calculate_parameter_covariance
+
+        All arguments are passed through to maximize_loglike.
+
+        Returns
+        -------
+        dictx
+        """
+        result = self.maximize_loglike(*args, **kwargs)
+        self.calculate_parameter_covariance()
+        return result
 
     def loglike_null(self, use_cache=True):
         """
@@ -1241,3 +1264,47 @@ class Model(NumbaModel, OptimizeMixin, PanelMixin):
         result = sns.kdeplot(random_params, cut=0, clip=(q01, q99))
         result.set_xlabel(param_name)
         return result
+
+    def to_xlsx(
+        self,
+        filename,
+        save_now=True,
+        data_statistics: bool = True,
+        nesting: bool = True,
+        embed_model: bool = True,
+    ) -> ExcelWriter:
+        """
+        Write the estimation results to an Excel file.
+
+        Parameters
+        ----------
+        filename : str
+            The name of the file to write.
+        save_now : bool, default True
+            Whether to save the file immediately.  If False, the
+            ExcelWriter object is returned.
+        data_statistics : bool, default True
+            Whether to include data statistics in the Excel file.
+        nesting : bool, default True
+            Whether to include nesting statistics in the Excel file.
+        embed_model : bool, default True
+            Whether to embed the model in the Excel file.
+
+        Returns
+        -------
+        larch.util.excel.ExcelWriter or None
+        """
+        from larch.util.excel import _make_excel_writer
+
+        result = _make_excel_writer(self, filename, save_now=False)
+        result._post_init(
+            filename,
+            model=self,
+            data_statistics=data_statistics,
+            nesting=nesting,
+            embed=embed_model,
+        )
+        if save_now:
+            result.close()
+        else:
+            return result

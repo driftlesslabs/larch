@@ -2350,7 +2350,7 @@ class NumbaModel(_BaseModel):
         self,
         *args,
         **kwargs,
-    ):
+    ) -> dictx:
         """
         Maximize the log likelihood.
 
@@ -2372,7 +2372,7 @@ class NumbaModel(_BaseModel):
 
         Returns
         -------
-        dictx
+        larch.util.dictx
             A dictionary of results, including final log likelihood,
             elapsed time, and other statistics.  The exact items
             included in output will vary by estimation method.

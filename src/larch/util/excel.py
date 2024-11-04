@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import base64
 import logging
+import os
 import time
+from typing import TYPE_CHECKING
 
 import matplotlib.axes
 import matplotlib.figure
@@ -11,9 +13,14 @@ import pandas as pd
 from pandas.io.formats.style import Styler
 from xmle import Elem
 
-from .. import Model, __version__
+from .. import __version__
 from ..model.model_group import ModelGroup
 from .png import make_png
+
+FilePath = str | os.PathLike[str]
+
+if TYPE_CHECKING:
+    from pandas._typing import WriteExcelBuffer
 
 logger = logging.getLogger("Larch.Excel")
 
@@ -47,8 +54,9 @@ class ExcelWriter(_XlsxWriter):
     engine = "xlsxwriter_larch"
     supported_extensions = (".xlsx",)
 
-    def __init__(
+    def _post_init(
         self,
+        path: FilePath | WriteExcelBuffer | ExcelWriter,
         *args,
         model=None,
         data_statistics=True,
@@ -58,24 +66,22 @@ class ExcelWriter(_XlsxWriter):
         output_renderer=None,
         embed_model=True,
         engine_kwargs=None,
+        makedirs: bool = True,
+        overwrite: bool = False,
         **kwargs,
     ):
-        _engine = "xlsxwriter_larch"
-        kwargs.pop("engine", None)
-        options = kwargs.pop("workbook_options", {})
-        if "nan_inf_to_errors" not in options:
-            options["nan_inf_to_errors"] = True
-        kwargs["options"] = options
-        super().__init__(*args, engine=_engine, engine_kwargs=kwargs)
+        self.fixed_precision = {2: "_-0.00;-0.00"}
+        self.sheet_startrow = {}
+        self._col_widths = {}
+        self._log_queue = []
+        self.logsheet = None
+
+        self._init_file(path, makedirs=makedirs, overwrite=overwrite)
         self.book.set_size(1600, 1200)
         self.head_fmt = self.book.add_format({"bold": True, "font_size": 14})
         self.ital_fmt = self.book.add_format({"italic": True, "font_size": 12})
         self.toc_link_fmt = self.book.add_format({"font_size": 8})
 
-        self.fixed_precision = {2: "_-0.00;-0.00"}
-
-        self.sheet_startrow = {}
-        self._col_widths = {}
         if output_renderer is None:
             output_renderer = lambda x: x
         self._output_renderer = output_renderer
@@ -110,7 +116,30 @@ class ExcelWriter(_XlsxWriter):
                 data_statistics=data_statistics,
                 nesting=nesting,
                 embed=embed_model,
+                on_error="raise",
             )
+
+    def _init_file(self, path, makedirs: bool = True, overwrite: bool = False):
+        if isinstance(path, str | os.PathLike):
+            if makedirs:
+                dirname = os.path.dirname(path)
+                if dirname:
+                    os.makedirs(dirname, exist_ok=True)
+
+            if not overwrite and not getattr(
+                self, "__file_archived", False
+            ):  # don't move twice
+                from xmle.file_util import archive_existing_file
+
+                try:
+                    new_name = archive_existing_file(
+                        path, archive_path=None, tag="creation"
+                    )
+                except FileNotFoundError:
+                    pass
+                else:
+                    self.log(f"archived existing file to {new_name}")
+                    setattr(self, "__file_archived", new_name)
 
     def add_model(
         self,
@@ -123,7 +152,7 @@ class ExcelWriter(_XlsxWriter):
     ):
         ps_data_index_nlevels = 1
         try:
-            ps = model.parameter_summary("df")
+            ps = model.parameter_summary()
             ps_data_index_nlevels = ps.data.index.nlevels
             if "Constrained" in ps.data.columns:
                 ps.data["Constrained"] = ps.data["Constrained"].str.replace(
@@ -320,9 +349,19 @@ class ExcelWriter(_XlsxWriter):
     def log(self, message):
         t = time.strftime("%Y-%b-%d %H:%M:%S")
         row = self.sheet_startrow.get("_log_", 0)
-        self.logsheet.write(row, 0, t)
-        self.logsheet.write(row, 1, str(message))
-        self.sheet_startrow["_log_"] = row + 1
+        if self.logsheet is None:
+            self._log_queue.append((t, message))
+        else:
+            # clear the log queue first before writing to the sheet
+            while self._log_queue:
+                t, message = self._log_queue.pop(0)
+                self.logsheet.write(row, 0, t)
+                self.logsheet.write(row, 1, str(message))
+                row += 1
+            # then write the new message
+            self.logsheet.write(row, 0, t)
+            self.logsheet.write(row, 1, str(message))
+            self.sheet_startrow["_log_"] = row + 1
 
     def add_worksheet(self, name, force=False, hide=None):
         if not force and name in self.sheets:
@@ -565,33 +604,6 @@ class ExcelWriter(_XlsxWriter):
         self.sheet_startrow[worksheet.name] = startrow
         return self._output_renderer(content_in)
 
-    def save(self, makedirs=True, overwrite=False):
-        if self.path is not None:
-            if makedirs:
-                import os
-
-                dirname = os.path.dirname(self.path)
-                if dirname:
-                    os.makedirs(dirname, exist_ok=True)
-
-            if not overwrite and not getattr(
-                self, "__file_archived", False
-            ):  # don't move twice
-                from xmle.file_util import archive_existing_file
-
-                try:
-                    new_name = archive_existing_file(
-                        self.path, archive_path=None, tag="creation"
-                    )
-                except FileNotFoundError:
-                    pass
-                else:
-                    self.log(f"archived existing file to {new_name}")
-                    setattr(self, "__file_archived", new_name)
-
-        self.log("saving")
-        super().save()
-
 
 if xlsxwriter is not None:
     from pandas.io.excel import register_writer
@@ -599,7 +611,7 @@ if xlsxwriter is not None:
     register_writer(ExcelWriter)
 
 
-def _make_excel_writer(model, filename, save_now=True, **kwargs):
+def _make_excel_writer(model, filename, save_now=True, engine_kwargs=None):
     """
     Write the model to an Excel file.
 
@@ -616,17 +628,17 @@ def _make_excel_writer(model, filename, save_now=True, **kwargs):
 
     Returns
     -------
-    larch.util.excel.ExcelWriter
+    larch.util.excel.ExcelWriter or None
+        If `save_now` is False, returns the ExcelWriter object. Otherwise
+        returns None.
     """
     if xlsxwriter is None:
         raise RuntimeError("xlsxwriter is not installed")
-    xl = ExcelWriter(filename, engine="xlsxwriter_larch", model=model, **kwargs)
+    xl = ExcelWriter(filename)
     if save_now:
-        xl.save()
-    return xl
-
-
-Model.to_xlsx = _make_excel_writer
+        xl.close()
+    else:
+        return xl
 
 
 def load_metadata(xlsx_filename, key=None):
@@ -771,7 +783,7 @@ def _estimation_statistics_excel(
                     model.loglike()
             else:
                 ll_z = 0
-        if ll_z != 0:
+        if ll_z is not None and ll_z != 0:
             catname("Log Likelihood at Null Parameters")
             worksheet.write(row, datum_col + 1, ll_z, fixed_2)  # "{:.2f}".format(ll_z)
             if ncases:
@@ -789,8 +801,11 @@ def _estimation_statistics_excel(
                 )  # "{:.3f}".format(rsz)
             row += 1
 
-        ll_nil = model._cached_loglike_nil
-        if ll_nil != 0:
+        try:
+            ll_nil = model._cached_loglike_nil
+        except AttributeError:
+            ll_nil = None
+        if ll_nil is not None and ll_nil != 0:
             catname("Log Likelihood with No Model")
             worksheet.write(
                 row, datum_col + 1, ll_nil, fixed_2
@@ -810,8 +825,11 @@ def _estimation_statistics_excel(
                 )  # "{:.3f}".format(rsz)
             row += 1
 
-        ll_c = model._cached_loglike_constants_only
-        if ll_c != 0:
+        try:
+            ll_c = model._cached_loglike_constants_only
+        except AttributeError:
+            ll_c = None
+        if ll_c is not None and ll_c != 0:
             catname("Log Likelihood at Constants Only")
             worksheet.write(row, datum_col + 1, ll_c, fixed_2)  # "{:.2f}".format(ll_c)
             if ncases:
