@@ -454,6 +454,12 @@ class ParametricConstraintList(MutableSequence):
                         f"members of {self.__class__.__name__} must be ParametricConstraint"
                     )
 
+    def __getstate__(self):
+        return self._cx, self.allow_dupes
+
+    def __setstate__(self, state):
+        self._cx, self.allow_dupes = state
+
     def set_instance(self, instance):
         self._instance = instance
         for i in self._cx:

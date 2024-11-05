@@ -2140,7 +2140,7 @@ class NumbaModel(_BaseModel):
             "constraint_intensity",
             "constraint_sharpness",
             "constraints",
-            "dataflows",
+            # "dataflows",
             # 'dataset',
             # 'datatree',
             "float_dtype",
