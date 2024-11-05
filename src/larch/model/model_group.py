@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from collections.abc import MutableSequence
 from typing import TYPE_CHECKING
 
@@ -9,6 +10,11 @@ import pandas as pd
 from ..util import dictx
 from .basemodel import BaseModel
 from .constrainedmodel import ConstrainedModel
+from .numbamodel import _arr_inflate, _safe_sqrt
+from .possible_overspec import (
+    PossibleOverspecification,
+    compute_possible_overspecification,
+)
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
@@ -311,3 +317,189 @@ class ModelGroup(ConstrainedModel, MutableSequence):
         from .optimization import maximize_loglike
 
         return maximize_loglike(self, *args, **kwargs)
+
+    def estimate(self, *args, **kwargs):
+        """
+        Maximize loglike, and then calculate parameter covariance.
+
+        This convenience method runs the following methods in order:
+        - maximize_loglike
+        - calculate_parameter_covariance
+
+        All arguments are passed through to maximize_loglike.
+
+        Returns
+        -------
+        dictx
+        """
+        result = self.maximize_loglike(*args, **kwargs)
+        self.calculate_parameter_covariance()
+        return result
+
+    def d2_loglike(
+        self,
+        x=None,
+        *,
+        start_case=None,
+        stop_case=None,
+        step_case=None,
+    ):
+        """
+        Compute the Hessian matrix of the log likelihood.
+
+        Parameters
+        ----------
+        x : array-like, optional
+            The parameter values to use in the calculation.  If not
+            given, the current parameter values are used.
+        start_case : int, optional
+            The first case to include in the calculation.
+        stop_case : int, optional
+            The last case to include in the calculation.
+        step_case : int, optional
+            The step size between cases to include in the calculation.
+
+        Returns
+        -------
+        array
+        """
+        if x is None:
+            x = self.pvals.copy()
+        from ..util.math import approx_fprime
+
+        return approx_fprime(
+            x,
+            lambda y: self.d_loglike(
+                y,
+                start_case=start_case,
+                stop_case=stop_case,
+                step_case=step_case,
+            ),
+        )
+
+    def calculate_parameter_covariance(self, pvals=None, *, robust=False):
+        """
+        Calculate the parameter covariance matrix.
+
+        Parameters
+        ----------
+        pvals : array-like, optional
+            The parameter values to use in the calculation.  If not
+            given, the current parameter values are used.
+        robust : bool, default False
+            Whether to calculate the robust covariance matrix.
+
+        Returns
+        -------
+        se : array
+            The standard errors of the parameter estimates.
+        hess : array
+            The Hessian matrix.
+        ihess : array
+            The inverse of the Hessian matrix.
+        """
+        if pvals is None:
+            pvals = self.pvals
+        locks = np.asarray(self.pholdfast.astype(bool))
+        if self.compute_engine == "jax":
+            se, hess, ihess = self.jax_param_cov(pvals)
+        else:
+            hess = -self.d2_loglike(pvals)
+            if self.parameters["holdfast"].sum():
+                free = self.pholdfast == 0
+                hess_ = hess[free][:, free]
+                try:
+                    ihess_ = np.linalg.inv(hess_)
+                except np.linalg.LinAlgError:
+                    ihess_ = np.linalg.pinv(hess_)
+                ihess = _arr_inflate(ihess_, locks)
+            else:
+                try:
+                    ihess = np.linalg.inv(hess)
+                except np.linalg.LinAlgError:
+                    ihess = np.linalg.pinv(hess)
+            se = _safe_sqrt(ihess.diagonal())
+            self.pstderr = se
+        hess = np.asarray(hess).copy()
+        hess[locks, :] = 0
+        hess[:, locks] = 0
+        ihess = np.asarray(ihess).copy()
+        ihess[locks, :] = 0
+        ihess[:, locks] = 0
+        self.add_parameter_array("hess", hess)
+        self.add_parameter_array("ihess", ihess)
+
+        overspec = compute_possible_overspecification(hess, self.pholdfast)
+        if overspec:
+            warnings.warn(
+                "Model is possibly over-specified (hessian is nearly singular).",
+                category=PossibleOverspecification,
+                stacklevel=2,
+            )
+            possible_overspecification = []
+            for eigval, ox, eigenvec in overspec:
+                if eigval == "LinAlgError":
+                    possible_overspecification.append((eigval, [ox], [""]))
+                else:
+                    paramset = list(np.asarray(self.pnames)[ox])
+                    possible_overspecification.append((eigval, paramset, eigenvec[ox]))
+            self._possible_overspecification = possible_overspecification
+
+        # constrained covariance
+        if self.constraints:
+            constraints = list(self.constraints)
+        else:
+            constraints = []
+        try:
+            constraints.extend(self._get_bounds_constraints())
+        except Exception:
+            pass
+
+        if constraints:
+            binding_constraints = list()
+            self.add_parameter_array("unconstrained_std_err", self.pstderr)
+            self.add_parameter_array("unconstrained_covariance_matrix", ihess)
+
+            s = np.asarray(ihess)
+            pvals = self.pvals
+            for c in constraints:
+                if np.absolute(c.fun(pvals)) < c.binding_tol:
+                    binding_constraints.append(c)
+                    b = c.jac(self.pf.value)
+                    den = b @ s @ b
+                    if den != 0:
+                        s = s - (1 / den) * s @ b.reshape(-1, 1) @ b.reshape(1, -1) @ s
+            self.add_parameter_array("covariance_matrix", s)
+            self.pstderr = _safe_sqrt(s.diagonal())
+
+            # Fix numerical issues on some constraints, add constrained notes
+            if binding_constraints or any(self.pholdfast != 0):
+                notes = {}
+                for c in binding_constraints:
+                    pa = c.get_parameters()
+                    for p in pa:
+                        # if self.pf.loc[p, 't_stat'] > 1e5:
+                        #     self.pf.loc[p, 't_stat'] = np.inf
+                        #     self.pf.loc[p, 'std_err'] = np.nan
+                        # if self.pf.loc[p, 't_stat'] < -1e5:
+                        #     self.pf.loc[p, 't_stat'] = -np.inf
+                        #     self.pf.loc[p, 'std_err'] = np.nan
+                        n = notes.get(p, [])
+                        n.append(c.get_binding_note(pvals))
+                        notes[p] = n
+                constrained_note = (
+                    pd.Series({k: "\n".join(v) for k, v in notes.items()}, dtype=object)
+                    .reindex(self.pnames)
+                    .fillna("")
+                )
+                constrained_note[self.pholdfast != 0] = "fixed value"
+                self.add_parameter_array("constrained", constrained_note)
+
+        if robust:
+            raise NotImplementedError(
+                "Robust covariance not yet implemented for ModelGroup."
+            )
+            # self.robust_covariance()
+            # se = self.parameters["robust_std_err"]
+
+        return se, hess, ihess
