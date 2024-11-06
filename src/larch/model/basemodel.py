@@ -1431,6 +1431,38 @@ class BaseModel:
     def choice_any(self):
         self._choice_any = False
 
+    def choice_def(self) -> dict:
+        """
+        Get the definition of the choice variable.
+
+        This read-only method can be used to check what the choice variable is
+        currently set to.  The choice variable can be set in one of four ways:
+
+        * choice_ca_var : A single |idca| variable or expression that evaluates
+            to an indicator value
+        * choice_co_vars : A dictionary of |idco| expressions, where each key is
+            an alternative code and the value is a variable name or other
+            expression that evaluates to an indicator value
+        * choice_co_code : A single |idco| variable, which evaluates to the
+            alternative code of the chosen alternative
+        * choice_any : A flag for setting the choice to "True", which may used
+            when the choice variable is not explicitly defined
+
+        Returns
+        -------
+        dict
+        """
+        if self._choice_ca_var:
+            return {"choice_ca_var": self._choice_ca_var}
+        elif self._choice_co_vars:
+            return {"choice_co_vars": self._choice_co_vars}
+        elif self._choice_co_code:
+            return {"choice_co_code": self._choice_co_code}
+        elif self._choice_any:
+            return {"choice_any": True}
+        else:
+            raise ValueError("no choice variable defined")
+
     @property
     def weight_co_var(self):
         return self._weight_co_var

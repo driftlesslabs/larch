@@ -445,6 +445,15 @@ def _prep_ca(
                 and shared_data_ca.ALTID in proposal.sizes
             ):
                 proposal = proposal.drop_vars(list(proposal.coords)).rename(tag)
+                # check if proposal.dtype matches the requested dtype (if any)
+                if dtype is not None and proposal.dtype != dtype:
+                    # if the requested dtype is an integer type but the native
+                    # dtype is float, fill any missing values with zeros
+                    if np.issubdtype(dtype, np.integer) and np.issubdtype(
+                        proposal.dtype, np.floating
+                    ):
+                        proposal = proposal.fillna(0)
+                    proposal = proposal.astype(dtype)
                 return model_dataset.merge(proposal), vars_ca
     if isinstance(vars_ca, str):
         vars_ca = {vars_ca: vars_ca}
