@@ -1431,12 +1431,13 @@ class BaseModel:
     def choice_any(self):
         self._choice_any = False
 
-    def choice_def(self) -> dict:
+    def choice_def(self, new_def: dict | None = None, **kwargs) -> dict:
         """
-        Get the definition of the choice variable.
+        Get or set the definition of the choice variable.
 
-        This read-only method can be used to check what the choice variable is
-        currently set to.  The choice variable can be set in one of four ways:
+        This method can be used to check what the choice variable is currently
+        set to, or to set the choice variable in a dynamic fashion.  The choice
+        variable can be set in one of four ways:
 
         * choice_ca_var : A single |idca| variable or expression that evaluates
             to an indicator value
@@ -1452,6 +1453,27 @@ class BaseModel:
         -------
         dict
         """
+        if len(kwargs) and new_def is None:
+            new_def = kwargs
+        if new_def is not None:
+            if len(kwargs):
+                raise ValueError("cannot give both new_def and other keyword args")
+            if not isinstance(new_def, dict):
+                raise TypeError("new choice definition must be given by a dictionary")
+            if len(new_def) > 1:
+                raise ValueError("new choice definition must have only one key")
+            key, value = new_def.popitem()
+            if key == "choice_ca_var":
+                self.choice_ca_var = value
+            elif key == "choice_co_vars":
+                self.choice_co_vars = value
+            elif key == "choice_co_code":
+                self.choice_co_code = value
+            elif key == "choice_any":
+                self.choice_any = value
+            else:
+                raise ValueError("invalid key in new_def")
+
         if self._choice_ca_var:
             return {"choice_ca_var": self._choice_ca_var}
         elif self._choice_co_vars:
