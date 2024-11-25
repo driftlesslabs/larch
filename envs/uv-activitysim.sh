@@ -92,10 +92,14 @@ mkdir -p "${TARGET_DIR}"
 # change to the target working directory
 cd -- "${TARGET_DIR}"
 
+# initialize conda in the shell
+eval "$(conda shell.bash hook)"
+
 # create a conda environment
-conda create -p .env/$TARGET_KERNEL python=3.10 --yes
-source activate base
-conda activate .env/$TARGET_KERNEL
+conda create -p .env/${TARGET_KERNEL} python=3.10 --yes
+
+# activate the conda environment
+conda activate .env/${TARGET_KERNEL}
 
 # clone the repos
 gh repo clone driftlesslabs/activitysim
@@ -108,7 +112,7 @@ uv pip install -e ./larch
 uv pip install -e ./activitysim
 
 # install development dependencies
-uv pip install altair asv "black<23" cytoolz dask filelock geopandas isort \
+uv pip install altair asv "black<23" cytoolz dask filelock geopandas h5py isort \
   matplotlib myst-parser nbconvert nbformat nbmake numpydoc psutil pyarrow \
   pycodestyle pydata-sphinx-theme pyinstrument pypyr pytest pytest-regressions \
   rich ruby setuptools_scm scikit-learn simwrapper sparse sphinx sphinx_rtd_theme \
@@ -126,5 +130,5 @@ cd ..
 if [ "$NO_KERNEL" = false ]; then
     echo "Making this environment available to Jupyter ..."
     uv pip install ipykernel
-    ipython kernel install --user --name=$TARGET_KERNEL
+    ipython kernel install --user --name=${TARGET_KERNEL}
 fi
