@@ -1896,8 +1896,8 @@ class BaseModel:
 
         return div
 
-    def estimation_statistics_dict(self, compute_loglike_null=True) -> dict:
-        """Create a dictionary of estimation statistics."""
+    def estimation_statistics_raw(self, compute_loglike_null=True) -> pd.Series:
+        """Compile estimation statistics as a pandas Series."""
         stats = {}
 
         try:
@@ -1959,4 +1959,4 @@ class BaseModel:
                 rsc = 1.0 - (mostrecent.loglike / ll_c)
                 stats[("Rho Squared w.r.t. Constants Only", "Aggregate")] = rsc
 
-        return stats
+        return pd.Series(stats)
