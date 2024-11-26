@@ -132,3 +132,8 @@ if [ "$NO_KERNEL" = false ]; then
     uv pip install ipykernel
     ipython kernel install --user --name=${TARGET_KERNEL}
 fi
+
+if [ "$RUN_TESTS" = true ]; then
+    echo "Running sharrow tests ..."
+    uv run python -m pytest larch/subs/sharrow/sharrow/tests
+fi
