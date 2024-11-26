@@ -1895,3 +1895,68 @@ class BaseModel:
                 tr.put("td", text=f"{rsc:.3f}", colspan="2")
 
         return div
+
+    def estimation_statistics_dict(self, compute_loglike_null=True) -> dict:
+        """Create a dictionary of estimation statistics."""
+        stats = {}
+
+        try:
+            ncases = self.n_cases
+        except (MissingDataError, AttributeError):
+            ncases = None
+
+        if ncases:
+            stats[("Number of Cases", "Aggregate")] = ncases
+        else:
+            stats[("Number of Cases", "Aggregate")] = "not available"
+
+        mostrecent = self._most_recent_estimation_result
+        if mostrecent is not None:
+            stats[("Log Likelihood at Convergence", "Aggregate")] = mostrecent.loglike
+            if ncases:
+                stats[("Log Likelihood at Convergence", "Per Case")] = (
+                    mostrecent.loglike / ncases
+                )
+
+        ll_z = self._cached_loglike_null
+        if ll_z == 0 or ll_z is None:
+            if compute_loglike_null:
+                try:
+                    ll_z = self.loglike_null()
+                except (MissingDataError, AttributeError):
+                    ll_z = 0
+            else:
+                ll_z = 0
+        if ll_z:
+            stats[("Log Likelihood at Null Parameters", "Aggregate")] = ll_z
+            if ncases:
+                stats[("Log Likelihood at Null Parameters", "Per Case")] = ll_z / ncases
+            if mostrecent is not None:
+                rsz = 1.0 - (mostrecent.loglike / ll_z)
+                stats[("Rho Squared w.r.t. Null Parameters", "Aggregate")] = rsz
+
+        try:
+            ll_nil = self._cached_loglike_nil
+        except (MissingDataError, AttributeError):
+            ll_nil = 0
+        if ll_nil:
+            stats[("Log Likelihood with No Model", "Aggregate")] = ll_nil
+            if ncases:
+                stats[("Log Likelihood with No Model", "Per Case")] = ll_nil / ncases
+            if mostrecent is not None:
+                rsz = 1.0 - (mostrecent.loglike / ll_nil)
+                stats[("Rho Squared w.r.t. No Model", "Aggregate")] = rsz
+
+        try:
+            ll_c = self._cached_loglike_constants_only
+        except (MissingDataError, AttributeError):
+            ll_c = 0
+        if ll_c:
+            stats[("Log Likelihood at Constants Only", "Aggregate")] = ll_c
+            if ncases:
+                stats[("Log Likelihood at Constants Only", "Per Case")] = ll_c / ncases
+            if mostrecent is not None:
+                rsc = 1.0 - (mostrecent.loglike / ll_c)
+                stats[("Rho Squared w.r.t. Constants Only", "Aggregate")] = rsc
+
+        return stats
