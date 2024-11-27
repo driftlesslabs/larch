@@ -36,17 +36,15 @@ class Info:
         return r
 
     def _repr_html_(self):
-        from ..util.styles import _default_css_jupyter, _tooltipped_style_css
+        from ..util.styles import _default_css_jupyter
 
-        style_prefix = (
-            f"<style>{_default_css_jupyter}\n\n{_tooltipped_style_css}</style>\n"
-        )
+        style_prefix = f"<style>{_default_css_jupyter}</style>\n"
         from xmle import Elem
 
         xsign = Elem("div", {"class": "larch_head_tag"})
         from .images import favicon
 
-        p = xsign.elem("p", {"style": "float:left;margin-top:6px"})
+        p = xsign.elem("p", {"style": "margin-top:6px"})
         p.elem(
             "img",
             {
@@ -60,22 +58,15 @@ class Info:
         p.elem("span", {"class": "larch_head_tag_ver"}, text=f" {self.version} ")
         if not self.minimal:
             p.elem("span", {"class": "larch_head_tag_pth"}, text=f" {self.path} ")
-            from .images import camsyslogo_element
-
-            xsign << camsyslogo_element
-            if "larch" in sys.modules:
-                from .images import georgiatechlogo_element
-
-                xsign << georgiatechlogo_element
 
             if self.extra:
                 v = "\n│".join(sys.version.split("\n"))
-                xsign.elem("br")
+                # xsign.elem("br")
                 xinfo = xsign.elem(
                     "div",
                     {
                         "class": "larch_head_tag_more",
-                        "style": "margin-top:10px; padding:7px",
+                        "style": "padding:7px",
                     },
                     text=f"Python {v}",
                 )

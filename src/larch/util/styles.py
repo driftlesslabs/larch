@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-from .display import HTML, display_html
-from .xhtml import tooltipped_style
-
 body_font = 'font-family: "Book-Antiqua", "Palatino", serif;'
 
 signature_font = (
@@ -138,7 +135,7 @@ div.jp-OutputArea-output div.LinearFunc
   font-family:"Roboto Slab", "Roboto", Verdana; padding-left:5px;
 }
 .larch_head_tag_more {
-  font-size:50%; font-weight:300; font-family:"Roboto Mono", monospace; line-height:130%;
+  font-size:70%; font-weight:300; font-family:"Roboto Mono", monospace; line-height:120%;
 }
 
 div.output_wrapper a.parameter_reference,
@@ -235,11 +232,11 @@ div.jp-RenderedMarkdown p code {
 """
 
 
-css = HTML(f"<style>{_default_css_jupyter}\n\n{tooltipped_style().tostring()}</style>")
-
-
 def stylesheet():
+    from .display import HTML, display_html
+    from .xhtml import tooltipped_style
+
+    css = HTML(
+        f"<style>{_default_css_jupyter}\n\n{tooltipped_style().tostring()}</style>"
+    )
     display_html(css)
-    # floatThead, floatTheadA = floating_table_head()
-    # display_html(HTML(floatThead.tostring()))
-    # display_html(HTML(floatTheadA.tostring()))
