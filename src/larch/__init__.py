@@ -52,4 +52,23 @@ __all__ = [
     "P",
     "X",
     "figures",
+    "versions",
 ]
+
+
+def versions() -> dict:
+    """Versions of Larch and its key dependencies."""
+    import numba as nb
+    import numpy as np
+    import pandas as pd
+    import sharrow as sh
+    import xarray as xr
+
+    return {
+        "larch": __version__,
+        "sharrow": sh.__version__,
+        "numpy": np.__version__,
+        "pandas": pd.__version__,
+        "xarray": xr.__version__,
+        "numba": nb.__version__,
+    }
