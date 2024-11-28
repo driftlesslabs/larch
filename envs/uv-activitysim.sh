@@ -101,6 +101,9 @@ conda create -p .env/${TARGET_KERNEL} python=3.10 --yes
 # activate the conda environment
 conda activate .env/${TARGET_KERNEL}
 
+# install pydot for rendering nesting trees
+conda install pydot --yes
+
 # clone the repos
 gh repo clone driftlesslabs/activitysim
 gh repo clone driftlesslabs/larch -- --recurse-submodules

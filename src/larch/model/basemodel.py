@@ -384,6 +384,7 @@ class BaseModel:
                 "repair_noch_nzwt": "!",
                 "repair_nan_wt": "!",
                 "repair_nan_data_co": "!",
+                "repair_nan_utility": "!",
                 "check_low_variance_data_co": "?",
                 "check_overspec": "?",
                 "verbose": 3,

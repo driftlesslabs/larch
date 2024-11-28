@@ -291,7 +291,7 @@ class ExcelWriter(_XlsxWriter):
                     raise
             try:
                 self.add_content_tab(
-                    model.graph_descrip("nodes"),
+                    model.graph.description("nodes"),
                     sheetname="Nesting",
                     heading="Nesting Node List",
                 )
@@ -313,7 +313,7 @@ class ExcelWriter(_XlsxWriter):
                             raise
                     try:
                         self.add_content_tab(
-                            m.graph_descrip("nodes"),
+                            m.graph.description("nodes"),
                             sheetname="Nesting",
                             heading="Nesting Node List",
                         )

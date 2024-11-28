@@ -26,6 +26,7 @@ def doctor(
     repair_noch_nzwt: Literal["?", "+", "-"] | None = "?",
     repair_nan_wt: Literal["?", True, "!"] | None = "?",
     repair_nan_data_co: Literal["?", True, "!"] | None = "?",
+    repair_nan_utility: Literal["?", True, "!"] | None = "?",
     check_low_variance_data_co: Literal["?", "!"] | None = None,
     check_overspec: Literal["?", "!", None] = None,
     verbose: int = 3,
@@ -71,6 +72,11 @@ def doctor(
         "?" or "!" will make NaN values in data_co zero. The question mark simply emits
         a warning if there are NaN values found, while the exclamation mark will raise
         an error.
+    repair_nan_utility : {'?', '!', True}, default '?'
+        How to repair the data if some utility values are NaN at current parameters.
+        Any true value other than "?" or "!" will take alternatives with NaN values in
+        utility, and make them unavailable. The question mark simply emits a warning if
+        there are NaN values found, while the exclamation mark will raise an error.
     check_low_variance_data_co : {'?', '!'}, default None
         Check if any data_co columns have very low variance. No repairs are available for
         this check. The question mark simply emits a warning if there are issues found,
@@ -115,6 +121,7 @@ def doctor(
             )
             problems[repair_func.__name__] = diagnosis
 
+    apply_repair(repair_nan_utility, nan_utility)
     apply_repair(repair_ch_av, chosen_but_not_available)
     apply_repair(repair_noch_nzwt, nothing_chosen_but_nonzero_weight)
     apply_repair(repair_nan_data_co, nan_data_co)
@@ -187,14 +194,18 @@ def chosen_but_not_available(
         )
         diagnosis.insert(0, "altid", None)
 
+        diagnosis_rownum = 0
         for colnum, colname in enumerate(
             chosen_but_not_available.coords[dataset.dc.ALTID]
         ):
             if chosen_but_not_available_sum[colnum] > 0:
-                diagnosis.loc[colnum, "example rows"] = ", ".join(
+                diagnosis.loc[diagnosis_rownum, "example rows"] = ", ".join(
                     str(j) for j in i1[i2 == colnum][:verbose]
                 )
-                diagnosis.loc[colnum, "altid"] = colname
+                if isinstance(colname, xr.DataArray) and colname.ndim == 0:
+                    colname = colname.item()
+                diagnosis.loc[diagnosis_rownum, "altid"] = colname
+                diagnosis_rownum += 1
 
         if repair == "+":
             model.dataset["av"].data[
@@ -545,6 +556,62 @@ def low_variance_data_co(
                 raise ValueError(
                     f"low_variance_data_co: {len(diagnosis)} columns have low variance"
                 )
+
+    return model, diagnosis
+
+
+def nan_utility(model: Model, repair: Literal["?", True, "!"] = "?", verbose: int = 3):
+    """
+    Check if any utility values are NaN at current parameters.
+
+    Parameters
+    ----------
+    model : larch.Model
+        The model to check.
+    repair : {'?', '!', True}
+        Whether to repair the data. Any true value other than "?" or "!" will
+        take alternatives with NaN values in utility, and make them unavailable.
+        The question mark simply emits a warning if there are NaN values found,
+        while the exclamation mark will raise an error.
+    verbose : int, default 3
+        The number of example columns to list for each problem.
+
+    Returns
+    -------
+    model : larch.Model
+        The model with revised dataset attached.
+    diagnosis : pd.DataFrame
+        The number of bad instances, and some example rows.
+
+    Raises
+    ------
+    ValueError
+        If the repair is set to '!' and there are any NaN values found.
+    """
+    dataset = model.dataset
+    if dataset is None:
+        raise ValueError("data not loaded")
+    assert isinstance(dataset, xr.Dataset)
+
+    n_alts = dataset["av"].shape[1]
+
+    u = model.utility()[:, :n_alts]
+    nan_u = np.isnan(u) & (dataset["av"] > 0)
+
+    diagnosis = None
+    nan_util = int(nan_u.sum())
+    if nan_util:
+        diagnosis = nan_u.sum(dataset.dc.CASEID).to_pandas().rename("n").to_frame()
+        if repair == "?":
+            logger.warning(
+                f"nan_utility: {nan_util} available alternatives have NaN utility values"
+            )
+        elif repair == "!":
+            raise ValueError(
+                f"nan_utility: {nan_util} available alternatives have NaN utility values"
+            )
+        elif repair:
+            model.dataset["av"].data[nan_u] = 0
 
     return model, diagnosis
 

@@ -3,11 +3,15 @@ from __future__ import annotations
 import heapq
 import warnings
 from collections import OrderedDict
+from typing import TYPE_CHECKING, Literal
 
 import networkx as nx
 import numpy as np
 
 from ..util.lazy import lazy
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 def add_split_key(d, k, v):
@@ -1067,6 +1071,47 @@ class NestingTree(nx.DiGraph):
         result["start_slots"] = start
         result["len_slots"] = num
         return result
+
+    def description(self, which: Literal["nodes", "edges"] = "nodes") -> pd.DataFrame:
+        """
+        Generate a DataFrame that describe this graph.
+
+        Parameters
+        ----------
+        which : {'nodes','edges'}
+            Which type of description to return.
+
+        Returns
+        -------
+        DataFrame
+            Describing nodes or edges
+        """
+        from itertools import islice
+
+        import pandas as pd
+
+        if which in ("edge", "edges", "link", "links"):
+            ef = pd.DataFrame.from_dict(self.edges, orient="index")
+            ef.index.names = ["up", "down"]
+            return ef.fillna("")
+
+        nf = pd.DataFrame.from_dict(self.nodes, orient="index")
+        max_c = 8
+        max_p = 8
+        for n in nf.index:
+            children = [e[1] for e in islice(self.graph.out_edges(n), max_c)]
+            if len(children) > max_c - 1:
+                children[-1] = "..."
+            if children:
+                nf.loc[n, "children"] = ", ".join(str(c) for c in children)
+        for n in nf.index:
+            parents = [e[0] for e in islice(self.graph.in_edges(n), max_p)]
+            if len(parents) > max_p - 1:
+                parents[-1] = "..."
+            if parents:
+                nf.loc[n, "parents"] = ", ".join(str(c) for c in parents)
+        nf.drop(columns="root", errors="ignore", inplace=True)
+        return nf.fillna("")
 
 
 def graph_to_figure(graph, output_format="svg", **format):

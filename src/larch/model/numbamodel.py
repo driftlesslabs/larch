@@ -1551,7 +1551,7 @@ class NumbaModel(_BaseModel):
                             caseids = self.dataset.dc.caseids()
                             msg += f" {caseids[bad_case_indexes[0]]}"
                             for i in bad_case_indexes[1:5]:
-                                msg += f", {i}"
+                                msg += f", {caseids[i]}"
                             if len(bad_case_indexes) > 5:
                                 msg += ", ..."
                         raise ValueError(msg)
@@ -1605,6 +1605,26 @@ class NumbaModel(_BaseModel):
             step_case=step_case,
         )
         return result_arrays.loglike * self.weight_normalization
+
+    def loglike_problems(self) -> pd.DataFrame:
+        """
+        Identify cases with log likelihood problems.
+
+        Returns
+        -------
+        pandas.DataFrame
+            A DataFrame identifying the caseids of cases with log likelihood
+            problems, and the nature of the problem (e.g. NaN, +Inf, -Inf,
+            exactly zero).
+        """
+        llcase = self.loglike_casewise()
+        caseids = self.datatree.caseids()
+        problems = pd.Series(np.nan, index=caseids, name="problem")
+        problems.iloc[np.where(np.isnan(llcase))] = "nan"
+        problems.iloc[np.where(np.isposinf(llcase))] = "+inf"
+        problems.iloc[np.where(np.isneginf(llcase))] = "-inf"
+        problems.iloc[np.where(llcase == 0)] = "zero"
+        return problems.reset_index().rename_axis("caseindex").dropna()
 
     def loglike_null(self, use_cache=True):
         """
