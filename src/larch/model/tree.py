@@ -1099,13 +1099,13 @@ class NestingTree(nx.DiGraph):
         max_c = 8
         max_p = 8
         for n in nf.index:
-            children = [e[1] for e in islice(self.graph.out_edges(n), max_c)]
+            children = [e[1] for e in islice(self.out_edges(n), max_c)]
             if len(children) > max_c - 1:
                 children[-1] = "..."
             if children:
                 nf.loc[n, "children"] = ", ".join(str(c) for c in children)
         for n in nf.index:
-            parents = [e[0] for e in islice(self.graph.in_edges(n), max_p)]
+            parents = [e[0] for e in islice(self.in_edges(n), max_p)]
             if len(parents) > max_p - 1:
                 parents[-1] = "..."
             if parents:
