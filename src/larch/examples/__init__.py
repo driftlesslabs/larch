@@ -7,10 +7,16 @@ import numpy as np
 import pandas as pd
 
 from ..dataset import DataArray, Dataset
-from .generated import ex
+
+try:
+    from .generated import ex
+except ImportError:
+    ex = None
 
 
 def _exec_example_n(n, *arg, **kwarg):
+    if ex is None:
+        raise ImportError("No examples are available")
     return ex[n](*arg, **kwarg)
 
 
