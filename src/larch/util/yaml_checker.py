@@ -68,7 +68,7 @@ class Format:
 
     @staticmethod
     def standard(problem, filename):
-        line = "  %d:%d" % (problem.line, problem.column)
+        line = f"  {problem.line:d}:{problem.column:d}"
         line += max(12 - len(line), 0) * " "
         line += problem.level
         line += max(21 - len(line), 0) * " "
@@ -79,7 +79,7 @@ class Format:
 
     @staticmethod
     def standard_color(problem, filename):
-        line = "  \033[2m%d:%d\033[0m" % (problem.line, problem.column)
+        line = f"  \033[2m{problem.line:d}:{problem.column:d}\033[0m"
         line += max(20 - len(line), 0) * " "
         if problem.level == "warning":
             line += f"\033[33m{problem.level}\033[0m"
