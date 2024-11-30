@@ -12,6 +12,8 @@ from larch.model.troubleshooting import PossibleOverspecificationError
 
 @pytest.fixture(params=["numba", "jax"])
 def ref_model(request):
+    if request.param == "jax":
+        pytest.importorskip("jax")
     m = lx.example(1)
     m.compute_engine = request.param
     m.graph.new_node(parameter="mu_motor", children=[1, 2, 3, 4], name="Motorized")
@@ -186,6 +188,9 @@ def test_nan_in_weight(ref_model: lx.Model):
 
 @pytest.mark.parametrize("compute_engine", ["numba", "jax"])
 def test_chosen_but_zero_quantity(compute_engine):
+    if compute_engine == "jax":
+        pytest.importorskip("jax")
+
     hh, pp, tour, skims, emp = lx.example(200, ["hh", "pp", "tour", "skims", "emp"])
     base = lx.Dataset.construct.new_idca(tour.TOURID, skims.TAZ_ID)
     hh["INCOME_GRP"] = pd.qcut(hh.INCOME, 3)
@@ -268,7 +273,7 @@ def test_overspec():
     for key, val in diagnosis.items():
         assert key[0] == 0
         key2s.append(key[2])
-        assert key[1] == approx(2.85988e-05, rel=0.1)
+        assert key[1] == approx(-0.0039239, rel=0.1)
         assert np.absolute(val) == approx(0.40825, rel=0.1)
     assert set(key2s) == {
         "ASC_BIKE",

@@ -12,7 +12,7 @@ class PossibleOverspecificationError(ValueError):
 
 
 def compute_possible_overspecification(
-    a, holdfast_vector=None, eigenvalue_threshold=0.001, participation_magnitude=5
+    a, holdfast_vector=None, eigenvalue_threshold=0.005, participation_magnitude=5
 ):
     """
     Compute the possible overspecification of a model from its hessian matrix.
@@ -23,13 +23,15 @@ def compute_possible_overspecification(
         The hessian matrix
     holdfast_vector : vector
         A vector of indicators for which row/cols should be ignored as holdfast-ed
-    eigenvalue_threshold : float, default 0.001
+    eigenvalue_threshold : float, default 0.005
         The threshold to consider the absolute value of an eigenvalue as close
         enough to zero to be considered as a possible overspecification.  This
         should be a small positive number.
     participation_magnitude : int, default 5
         The magnitude of the participation to consider a parameter as
-        participating in a possible overspecification.
+        participating in a possible overspecification.  Each problematic eigenvector
+        is rounded to this number of decimal places to determine the participation
+        of each parameter (any non-zero value is considered participating).
 
     Returns
     -------

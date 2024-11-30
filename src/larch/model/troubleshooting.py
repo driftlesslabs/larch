@@ -26,9 +26,9 @@ def doctor(
     repair_noch_nzwt: Literal["?", "+", "-"] | None = "?",
     repair_nan_wt: Literal["?", True, "!"] | None = "?",
     repair_nan_data_co: Literal["?", True, "!"] | None = "?",
-    repair_nan_utility: Literal["?", True, "!"] | None = "?",
     check_low_variance_data_co: Literal["?", "!"] | None = None,
     check_overspec: Literal["?", "!", None] = None,
+    repair_nan_utility: Literal["?", True, "!"] | None = "?",
     verbose: int = 3,
     warning_stacklevel: int = 2,
 ):
@@ -72,15 +72,23 @@ def doctor(
         "?" or "!" will make NaN values in data_co zero. The question mark simply emits
         a warning if there are NaN values found, while the exclamation mark will raise
         an error.
-    repair_nan_utility : {'?', '!', True}, default '?'
-        How to repair the data if some utility values are NaN at current parameters.
-        Any true value other than "?" or "!" will take alternatives with NaN values in
-        utility, and make them unavailable. The question mark simply emits a warning if
-        there are NaN values found, while the exclamation mark will raise an error.
     check_low_variance_data_co : {'?', '!'}, default None
         Check if any data_co columns have very low variance. No repairs are available for
         this check. The question mark simply emits a warning if there are issues found,
         while the exclamation mark will raise an error.
+    check_overspec : {'?', '!'}, default None
+        Check model for possible over-specification. No repairs are available for this
+        check. A question mark ('?') simply emits a warning if a possible over-
+        specification is found. An exclamation mark ('!') will raise an error if
+        possible over-specification is found.  This is considered a "deep" check, and
+        will only be run if there are no known data problems found by the other checks.
+    repair_nan_utility : {'?', '!', True}, default '?'
+        How to repair the data if some utility values are NaN at current parameters.
+        Any true value other than "?" or "!" will take alternatives with NaN values in
+        utility, and make them unavailable. The question mark simply emits a warning if
+        there are NaN values found, while the exclamation mark will raise an error. This
+        is considered a "deep" check, and will only be run if there are no known data
+        problems found by the other checks.
     verbose : int, default 3
         The number of example rows to list for each problem.
     warning_stacklevel : int, default 2
@@ -121,14 +129,19 @@ def doctor(
             )
             problems[repair_func.__name__] = diagnosis
 
-    apply_repair(repair_nan_utility, nan_utility)
     apply_repair(repair_ch_av, chosen_but_not_available)
     apply_repair(repair_noch_nzwt, nothing_chosen_but_nonzero_weight)
     apply_repair(repair_nan_data_co, nan_data_co)
     apply_repair(repair_nan_wt, nan_weight)
     apply_repair(check_low_variance_data_co, low_variance_data_co)
     apply_repair(repair_ch_zq, chosen_but_zero_quantity)
-    apply_repair(check_overspec, overspecification)
+
+    if not problems:
+        # Following are deep checks, which require actually evaluating the model.
+        # We run these after the data checks above, so we can skip this work if there
+        # are already known data problems.
+        apply_repair(repair_nan_utility, nan_utility)
+        apply_repair(check_overspec, overspecification)
 
     return model, problems
 

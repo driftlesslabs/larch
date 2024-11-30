@@ -2014,7 +2014,7 @@ class NumbaModel(_BaseModel):
             x = self.pvals.copy()
         from ..util.math import approx_fprime
 
-        return approx_fprime(
+        result = approx_fprime(
             x,
             lambda y: self.d_loglike(
                 y,
@@ -2023,6 +2023,11 @@ class NumbaModel(_BaseModel):
                 step_case=step_case,
             ),
         )
+        # the approx_fprime function will leave a residual epsilon on the last
+        # parameter, we need to clean that up and restore the parameters to their
+        # original values
+        self.pvals = x
+        return result
 
     def neg_loglike(
         self,
