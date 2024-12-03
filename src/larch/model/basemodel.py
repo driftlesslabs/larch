@@ -632,7 +632,7 @@ class BaseModel:
         null values.  If any of these are not present (i.e. because they have
         not been created yet), they are not included.
         """
-        self.unmangle()
+        self.unmangle(structure_only=True)
         cols = [
             "value",
             "best",
