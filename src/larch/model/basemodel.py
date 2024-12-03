@@ -49,6 +49,54 @@ def _unique_ident():
     return f"{j[:5]}-{j[5:10]}-{j[10:15]}-{j[15:20]}-{j[20:]}"
 
 
+class _ModelData:
+    __slots__ = ("model",)
+
+    def __set_name__(self, owner, name):
+        assert name == "data"
+
+    def __init__(self, instance: BaseModel | None = None):
+        self.model = instance
+
+    def get_dataref(self):
+        """Dataset | DataTree : A source for data for the model.
+
+        If the datatree is a single-node tree (i.e. a single Dataset), this
+        property returns the root dataset.  Otherwise, it returns the full
+        datatree.
+        """
+        if self.model.datatree is None:
+            raise MissingDataError("no data available for model")
+        if len(self.model.datatree.subspaces) == 1:
+            return self.model.datatree.root_dataset
+        else:
+            return self.model.datatree
+
+    def __getitem__(self, key):
+        return self.get_dataref()[key]
+
+    def __setitem__(self, key, value):
+        self.get_dataref()[key] = value
+        self.model.mangle(data=True, structure=False)
+
+    def __delitem__(self, key):
+        del self.get_dataref()[key]
+        self.model.mangle(data=True, structure=False)
+
+    def __getattr__(self, item):
+        return getattr(self.get_dataref(), item)
+
+    def __get__(self, instance: BaseModel, owner):
+        if instance is None:
+            return self
+        return _ModelData(instance)
+
+    def __set__(self, instance: BaseModel, value):
+        if instance is None:
+            raise AttributeError("can't set attribute")
+        raise instance.swap_datatree(value, True)
+
+
 class BaseModel:
     """Base class for discrete choice models."""
 
@@ -367,6 +415,8 @@ class BaseModel:
             DeprecationWarning,
             stacklevel=2,
         )
+
+    data = _ModelData()
 
     def doctor(self, **kwargs):
         """
