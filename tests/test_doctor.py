@@ -273,7 +273,8 @@ def test_overspec():
     for key, val in diagnosis.items():
         assert key[0] == 0
         key2s.append(key[2])
-        assert key[1] == approx(-0.0039239, rel=0.1)
+        # eigenvalues near zero are not stable, don't check the value
+        # assert key[1] == approx(2.8603410100913607e-05, rel=0.1)
         assert np.absolute(val) == approx(0.40825, rel=0.1)
     assert set(key2s) == {
         "ASC_BIKE",

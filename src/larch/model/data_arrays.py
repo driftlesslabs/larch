@@ -464,11 +464,21 @@ def _prep_ca(
         raise ValueError("expected flow {flow!r}")
     if flow is None or flowname != flow.name:
         flow = shared_data_ca.setup_flow(vars_ca, cache_dir=cache_dir, name=flowname)
-    arr = flow.load(
-        shared_data_ca,
-        dtype=dtype,
-        use_array_maker=use_array_maker,
-    )
+    try:
+        arr = flow.load(
+            shared_data_ca,
+            dtype=dtype,
+            use_array_maker=use_array_maker,
+        )
+    except NameError:
+        # the original resolution of the flow failed, try again with a fresh flow
+        flow = shared_data_ca.setup_flow(vars_ca, cache_dir=cache_dir, hashing_level=2)
+        arr = flow.load(
+            shared_data_ca,
+            dtype=dtype,
+            use_array_maker=use_array_maker,
+        )
+
     caseid_dim = shared_data_ca.CASEID
     altid_dim = shared_data_ca.ALTID
     if preserve_vars or len(vars_ca) > 1:

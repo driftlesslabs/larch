@@ -122,7 +122,7 @@ def maximize_loglike(
                 getattr(model, "data_as_loaded", None) is None
                 and getattr(model, "datatree", None) is not None
             ):
-                model.unmangle()
+                model.unmangle(force=True)
             if (
                 getattr(model, "data_as_loaded", None) is None
                 and not model.use_streaming
