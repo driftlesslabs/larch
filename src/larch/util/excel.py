@@ -202,62 +202,62 @@ class ExcelWriter(_XlsxWriter):
             if on_error == "raise":
                 raise
 
-        if data_statistics and not isinstance(model, ModelGroup):
-            from .statistics import statistics_for_dataframe
+        # if data_statistics and not isinstance(model, ModelGroup):
+        #     from .statistics import statistics_for_dataframe
 
-            if model.dataframes is not None:
-                if model.dataframes.data_co is not None and len(
-                    model.dataframes.data_co.columns
-                ):
-                    try:
-                        self.add_content_tab(
-                            statistics_for_dataframe(model.dataframes.data_co),
-                            sheetname="CO Data",
-                            heading="CO Data",
-                        )
-                    except Exception:
-                        if on_error == "raise":
-                            raise
-                if model.dataframes.data_ca is not None and len(
-                    model.dataframes.data_ca.columns
-                ):
-                    try:
-                        self.add_content_tab(
-                            statistics_for_dataframe(model.dataframes.data_ca),
-                            sheetname="CA Data",
-                            heading="CA Data",
-                        )
-                    except Exception:
-                        if on_error == "raise":
-                            raise
-                if model.dataframes.data_ce is not None and len(
-                    model.dataframes.data_ce.columns
-                ):
-                    try:
-                        self.add_content_tab(
-                            statistics_for_dataframe(model.dataframes.data_ce),
-                            sheetname="CE Data",
-                            heading="CE Data",
-                        )
-                    except Exception:
-                        if on_error == "raise":
-                            raise
-                if (
-                    model.dataframes.data_ch is not None
-                    and model.dataframes.data_av is not None
-                ):
-                    try:
-                        self.add_content_tab(
-                            model.dataframes.choice_avail_summary(
-                                graph=model.graph,
-                                availability_co_vars=model.availability_co_vars,
-                            ),
-                            sheetname="Choice",
-                            heading="Choices",
-                        )
-                    except Exception:
-                        if on_error == "raise":
-                            raise
+        #     if model.dataframes is not None:
+        #         if model.dataframes.data_co is not None and len(
+        #             model.dataframes.data_co.columns
+        #         ):
+        #             try:
+        #                 self.add_content_tab(
+        #                     statistics_for_dataframe(model.dataframes.data_co),
+        #                     sheetname="CO Data",
+        #                     heading="CO Data",
+        #                 )
+        #             except Exception:
+        #                 if on_error == "raise":
+        #                     raise
+        #         if model.dataframes.data_ca is not None and len(
+        #             model.dataframes.data_ca.columns
+        #         ):
+        #             try:
+        #                 self.add_content_tab(
+        #                     statistics_for_dataframe(model.dataframes.data_ca),
+        #                     sheetname="CA Data",
+        #                     heading="CA Data",
+        #                 )
+        #             except Exception:
+        #                 if on_error == "raise":
+        #                     raise
+        #         if model.dataframes.data_ce is not None and len(
+        #             model.dataframes.data_ce.columns
+        #         ):
+        #             try:
+        #                 self.add_content_tab(
+        #                     statistics_for_dataframe(model.dataframes.data_ce),
+        #                     sheetname="CE Data",
+        #                     heading="CE Data",
+        #                 )
+        #             except Exception:
+        #                 if on_error == "raise":
+        #                     raise
+        #         if (
+        #             model.dataframes.data_ch is not None
+        #             and model.dataframes.data_av is not None
+        #         ):
+        #             try:
+        #                 self.add_content_tab(
+        #                     model.dataframes.choice_avail_summary(
+        #                         graph=model.graph,
+        #                         availability_co_vars=model.availability_co_vars,
+        #                     ),
+        #                     sheetname="Choice",
+        #                     heading="Choices",
+        #                 )
+        #             except Exception:
+        #                 if on_error == "raise":
+        #                     raise
 
         if utility_functions:
             try:
