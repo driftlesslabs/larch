@@ -3,4 +3,4 @@
 
 .. currentmodule:: larch
 
-.. autoproperty:: Dataset.dc.CASEID
+.. autoaccessorattribute:: Dataset.dc.CASEID

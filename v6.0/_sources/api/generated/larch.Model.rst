@@ -18,9 +18,11 @@
       ~Model.apply_random_draws
       ~Model.bhhh
       ~Model.calculate_parameter_covariance
+      ~Model.check_d_loglike
       ~Model.check_for_overspecification
       ~Model.check_random_draws
       ~Model.choice_avail_summary
+      ~Model.choice_def
       ~Model.clear_cache
       ~Model.constraint_converge_tolerance
       ~Model.constraint_penalty
@@ -34,7 +36,9 @@
       ~Model.distribution_on_idco_variable
       ~Model.doctor
       ~Model.dumps
+      ~Model.estimate
       ~Model.estimation_statistics
+      ~Model.estimation_statistics_raw
       ~Model.fit_bhhh
       ~Model.from_dict
       ~Model.get_param_loc
@@ -54,6 +58,7 @@
       ~Model.loglike2_bhhh
       ~Model.loglike_casewise
       ~Model.loglike_null
+      ~Model.loglike_problems
       ~Model.logloss
       ~Model.logsums
       ~Model.make_random_draws
@@ -78,6 +83,7 @@
       ~Model.set_values
       ~Model.should_preload_data
       ~Model.swap_datatree
+      ~Model.to_xlsx
       ~Model.total_weight
       ~Model.unmangle
       ~Model.update_parameters
@@ -107,6 +113,7 @@
       ~Model.constraint_sharpness
       ~Model.constraints
       ~Model.dashboard
+      ~Model.data
       ~Model.data_as_loaded
       ~Model.data_as_possible
       ~Model.dataflows

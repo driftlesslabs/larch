@@ -1,6 +1,6 @@
-﻿larch.Dataset.dc.n\_alts
-========================
+﻿larch.Dataset.dc.n_alts
+=======================
 
 .. currentmodule:: larch
 
-.. autoproperty:: Dataset.dc.n_alts
+.. autoaccessorattribute:: Dataset.dc.n_alts

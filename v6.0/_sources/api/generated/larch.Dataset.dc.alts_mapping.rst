@@ -1,6 +1,6 @@
-﻿larch.Dataset.dc.alts\_mapping
-==============================
+﻿larch.Dataset.dc.alts_mapping
+=============================
 
 .. currentmodule:: larch
 
-.. autoproperty:: Dataset.dc.alts_mapping
+.. autoaccessorattribute:: Dataset.dc.alts_mapping

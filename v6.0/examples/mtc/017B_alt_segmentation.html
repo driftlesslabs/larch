@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>17B: Alternative Segmentation &#8212; v6.0.26</title>
+    <title>17B: Alternative Segmentation &#8212; v6.0.32</title>
   
   
   
@@ -16,17 +16,19 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
@@ -36,10 +38,11 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=9d77a3fd" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
     <script src="../../_static/documentation_options.js?v=c73c0f3e"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
@@ -55,7 +58,7 @@
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mtc/017B_alt_segmentation';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/driftlesslabs/larch/docs/docs/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '6.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
@@ -67,6 +70,7 @@
     <link rel="prev" title="17A: Market Segmentation" href="017A_market_seg.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
   
   
@@ -82,19 +86,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../search.html"
       method="get">
@@ -102,7 +95,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search these docs..."
          aria-label="Search these docs..."
          autocomplete="off"
@@ -110,8 +102,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -144,35 +136,31 @@
       
     
     
-    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.26 - Home"/>
-    <script>document.write(`<img src="../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.26 - Home"/>`);</script>
+    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.32 - Home"/>
+    <img src="../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.32 - Home"/>
   
   
 </a></div>
     
       <div class="navbar-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-2"
-      type="button"
-      class="version-switcher__button btn btn-sm dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-2"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-2"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-2">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
     
   </div>
   
@@ -215,29 +203,21 @@ document.write(`
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
     </div>
     
@@ -246,15 +226,11 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
@@ -273,7 +249,8 @@ document.write(`
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -320,15 +297,11 @@ document.write(`
         
           <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
       </div>
     
@@ -410,8 +383,6 @@ document.write(`
       
         <div class="header-article-item">
 
-
-
 <nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
@@ -426,7 +397,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">MTC Examples</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">17B:...</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">17B: Alternative Segmentation</span></li>
   </ul>
 </nav>
 </div>
@@ -460,7 +431,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;6.0.26&#39;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;6.0.32&#39;
 </pre></div>
 </div>
 </div>
@@ -504,14 +475,14 @@ document.write(`
   --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
 }
 
-html[theme=dark],
-html[data-theme=dark],
-body[data-theme=dark],
+html[theme="dark"],
+html[data-theme="dark"],
+body[data-theme="dark"],
 body.vscode-dark {
   --xr-font-color0: rgba(255, 255, 255, 1);
   --xr-font-color2: rgba(255, 255, 255, 0.54);
   --xr-font-color3: rgba(255, 255, 255, 0.38);
-  --xr-border-color: #1F1F1F;
+  --xr-border-color: #1f1f1f;
   --xr-disabled-color: #515151;
   --xr-background-color: #111111;
   --xr-background-color-row-even: #111111;
@@ -566,6 +537,7 @@ body.vscode-dark {
 .xr-section-item input {
   display: inline-block;
   opacity: 0;
+  height: 0;
 }
 
 .xr-section-item input + label {
@@ -602,7 +574,7 @@ body.vscode-dark {
 
 .xr-section-summary-in + label:before {
   display: inline-block;
-  content: '►';
+  content: "►";
   font-size: 11px;
   width: 15px;
   text-align: center;
@@ -613,7 +585,7 @@ body.vscode-dark {
 }
 
 .xr-section-summary-in:checked + label:before {
-  content: '▼';
+  content: "▼";
 }
 
 .xr-section-summary-in:checked + label > span {
@@ -685,15 +657,15 @@ body.vscode-dark {
 }
 
 .xr-dim-list:before {
-  content: '(';
+  content: "(";
 }
 
 .xr-dim-list:after {
-  content: ')';
+  content: ")";
 }
 
 .xr-dim-list li:not(:last-child):after {
-  content: ',';
+  content: ",";
   padding-right: 5px;
 }
 
@@ -865,52 +837,52 @@ Data variables: (12/38)
     avail      (caseid, altid) int8 30kB 1 1 1 1 1 0 1 1 1 ... 1 0 1 1 1 1 1 1 1
 Attributes:
     _caseid_:  caseid
-    _altid_:   altid</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-73f83c11-f687-4fc0-aafd-3dc13268bbdb' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-73f83c11-f687-4fc0-aafd-3dc13268bbdb' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>caseid</span>: 5029</li><li><span class='xr-has-index'>altid</span>: 6</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-6c534f59-d634-4142-8368-f571c77e11a0' class='xr-section-summary-in' type='checkbox'  checked><label for='section-6c534f59-d634-4142-8368-f571c77e11a0' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>caseid</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2 3 4 5 ... 5026 5027 5028 5029</div><input id='attrs-fbb7b2c6-2191-4b8a-82f2-a4e3bbba5245' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-fbb7b2c6-2191-4b8a-82f2-a4e3bbba5245' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2fb59866-b4bf-483c-8dcb-70b1f390f195' class='xr-var-data-in' type='checkbox'><label for='data-2fb59866-b4bf-483c-8dcb-70b1f390f195' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   1,    2,    3, ..., 5027, 5028, 5029])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>altid</span></div><div class='xr-var-dims'>(altid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2 3 4 5 6</div><input id='attrs-2463cc52-65b0-4b10-a441-756ebf13a40c' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2463cc52-65b0-4b10-a441-756ebf13a40c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2b575d1b-d48b-400d-b6d1-f426fe301151' class='xr-var-data-in' type='checkbox'><label for='data-2b575d1b-d48b-400d-b6d1-f426fe301151' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2, 3, 4, 5, 6])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>alt_names</span></div><div class='xr-var-dims'>(altid)</div><div class='xr-var-dtype'>&lt;U7</div><div class='xr-var-preview xr-preview'>&#x27;DA&#x27; &#x27;SR2&#x27; &#x27;SR3+&#x27; ... &#x27;Bike&#x27; &#x27;Walk&#x27;</div><input id='attrs-2412bbb0-725f-48fc-931b-10248d25cbf1' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2412bbb0-725f-48fc-931b-10248d25cbf1' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-830de0ec-e4cd-4336-856b-0cfef469b512' class='xr-var-data-in' type='checkbox'><label for='data-830de0ec-e4cd-4336-856b-0cfef469b512' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;DA&#x27;, &#x27;SR2&#x27;, &#x27;SR3+&#x27;, &#x27;Transit&#x27;, &#x27;Bike&#x27;, &#x27;Walk&#x27;], dtype=&#x27;&lt;U7&#x27;)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-fe6f4ed8-0be9-4950-80c2-baaea75587ad' class='xr-section-summary-in' type='checkbox'  ><label for='section-fe6f4ed8-0be9-4950-80c2-baaea75587ad' class='xr-section-summary' >Data variables: <span>(38)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>chose</span></div><div class='xr-var-dims'>(caseid, altid)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>1.0 0.0 0.0 0.0 ... 0.0 0.0 0.0 0.0</div><input id='attrs-efebef68-5525-4d2e-ae1b-3d6db282634d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-efebef68-5525-4d2e-ae1b-3d6db282634d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f99845e4-77d4-495f-a1f0-2287df350ee0' class='xr-var-data-in' type='checkbox'><label for='data-f99845e4-77d4-495f-a1f0-2287df350ee0' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[1., 0., 0., 0., 0., 0.],
+    _altid_:   altid</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-2631d983-51e0-489c-ae39-2bf176037a10' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-2631d983-51e0-489c-ae39-2bf176037a10' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>caseid</span>: 5029</li><li><span class='xr-has-index'>altid</span>: 6</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-580cfb92-1bbc-4933-815e-829978c593d8' class='xr-section-summary-in' type='checkbox'  checked><label for='section-580cfb92-1bbc-4933-815e-829978c593d8' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>caseid</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2 3 4 5 ... 5026 5027 5028 5029</div><input id='attrs-b8e7537c-6f11-4936-ae7d-685eb87d76be' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b8e7537c-6f11-4936-ae7d-685eb87d76be' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4206ee6a-86a1-49b9-a921-036b1c033d5e' class='xr-var-data-in' type='checkbox'><label for='data-4206ee6a-86a1-49b9-a921-036b1c033d5e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   1,    2,    3, ..., 5027, 5028, 5029])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>altid</span></div><div class='xr-var-dims'>(altid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2 3 4 5 6</div><input id='attrs-c34fde63-1c7d-4da1-aae2-7c24c34f78c9' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c34fde63-1c7d-4da1-aae2-7c24c34f78c9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ab3e8162-d3fa-43c4-ac28-39de02f5a473' class='xr-var-data-in' type='checkbox'><label for='data-ab3e8162-d3fa-43c4-ac28-39de02f5a473' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2, 3, 4, 5, 6])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>alt_names</span></div><div class='xr-var-dims'>(altid)</div><div class='xr-var-dtype'>&lt;U7</div><div class='xr-var-preview xr-preview'>&#x27;DA&#x27; &#x27;SR2&#x27; &#x27;SR3+&#x27; ... &#x27;Bike&#x27; &#x27;Walk&#x27;</div><input id='attrs-74f0b655-d6b9-4d89-ac03-9a27d5372e91' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-74f0b655-d6b9-4d89-ac03-9a27d5372e91' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-74cd9a9b-dc9f-4e33-b3d3-a4175424cbd5' class='xr-var-data-in' type='checkbox'><label for='data-74cd9a9b-dc9f-4e33-b3d3-a4175424cbd5' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;DA&#x27;, &#x27;SR2&#x27;, &#x27;SR3+&#x27;, &#x27;Transit&#x27;, &#x27;Bike&#x27;, &#x27;Walk&#x27;], dtype=&#x27;&lt;U7&#x27;)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-4c962974-d7f2-4d26-88ef-81207423e396' class='xr-section-summary-in' type='checkbox'  ><label for='section-4c962974-d7f2-4d26-88ef-81207423e396' class='xr-section-summary' >Data variables: <span>(38)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>chose</span></div><div class='xr-var-dims'>(caseid, altid)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>1.0 0.0 0.0 0.0 ... 0.0 0.0 0.0 0.0</div><input id='attrs-676cf772-fd7b-47cb-b942-65568154173f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-676cf772-fd7b-47cb-b942-65568154173f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-26e85d9b-79a3-4bd8-aea3-4e5acf552515' class='xr-var-data-in' type='checkbox'><label for='data-26e85d9b-79a3-4bd8-aea3-4e5acf552515' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[1., 0., 0., 0., 0., 0.],
        [0., 0., 0., 1., 0., 0.],
        [1., 0., 0., 0., 0., 0.],
        ...,
        [1., 0., 0., 0., 0., 0.],
        [1., 0., 0., 0., 0., 0.],
-       [1., 0., 0., 0., 0., 0.]], dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>ivtt</span></div><div class='xr-var-dims'>(caseid, altid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>13.38 18.38 20.38 ... 1.59 6.55 0.0</div><input id='attrs-9c6b7ac2-4fbf-4a02-ac20-e65cf0a28ef7' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9c6b7ac2-4fbf-4a02-ac20-e65cf0a28ef7' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-be4eefc6-7b92-4875-8068-8aead18ef9dc' class='xr-var-data-in' type='checkbox'><label for='data-be4eefc6-7b92-4875-8068-8aead18ef9dc' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[13.38, 18.38, 20.38, 25.9 , 40.5 ,  0.  ],
+       [1., 0., 0., 0., 0., 0.]], dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>ivtt</span></div><div class='xr-var-dims'>(caseid, altid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>13.38 18.38 20.38 ... 1.59 6.55 0.0</div><input id='attrs-868acc23-cf71-4e5e-9be2-3ca3d65ccd02' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-868acc23-cf71-4e5e-9be2-3ca3d65ccd02' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-932fdafb-4278-4f33-a291-0264403a740c' class='xr-var-data-in' type='checkbox'><label for='data-932fdafb-4278-4f33-a291-0264403a740c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[13.38, 18.38, 20.38, 25.9 , 40.5 ,  0.  ],
        [29.92, 34.92, 21.92, 22.96, 58.95,  0.  ],
        [ 8.6 , 13.6 , 15.6 , 16.87,  0.  ,  0.  ],
        ...,
        [17.26, 22.26, 24.26,  0.  ,  0.  ,  0.  ],
        [17.2 , 22.2 , 24.2 ,  8.87,  0.  ,  0.  ],
-       [ 6.54, 11.54, 13.54,  1.59,  6.55,  0.  ]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>ovtt</span></div><div class='xr-var-dims'>(caseid, altid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.0 2.0 2.0 15.2 ... 16.0 4.5 0.0</div><input id='attrs-26a5feaa-0b22-4665-b841-ac34be71137e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-26a5feaa-0b22-4665-b841-ac34be71137e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-edcdb6b9-3eb5-46ed-9be7-937cfb3bef1a' class='xr-var-data-in' type='checkbox'><label for='data-edcdb6b9-3eb5-46ed-9be7-937cfb3bef1a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[ 2.  ,  2.  ,  2.  , 15.2 ,  2.  ,  0.  ],
+       [ 6.54, 11.54, 13.54,  1.59,  6.55,  0.  ]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>ovtt</span></div><div class='xr-var-dims'>(caseid, altid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.0 2.0 2.0 15.2 ... 16.0 4.5 0.0</div><input id='attrs-352182cb-450a-40a4-a83b-ff7922d157de' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-352182cb-450a-40a4-a83b-ff7922d157de' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d3d12dc5-2fd4-4d91-98c2-2c319c7df6f2' class='xr-var-data-in' type='checkbox'><label for='data-d3d12dc5-2fd4-4d91-98c2-2c319c7df6f2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[ 2.  ,  2.  ,  2.  , 15.2 ,  2.  ,  0.  ],
        [10.  , 10.  , 10.  , 14.2 , 10.  ,  0.  ],
        [ 6.  ,  6.  ,  6.  , 21.4 ,  0.  ,  0.  ],
        ...,
        [ 3.  ,  3.  ,  3.  ,  0.  ,  0.  ,  0.  ],
        [ 2.  ,  2.  ,  2.  , 19.02,  0.  ,  0.  ],
-       [ 4.5 ,  4.5 ,  4.5 , 16.  ,  4.5 ,  0.  ]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>tottime</span></div><div class='xr-var-dims'>(caseid, altid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>15.38 20.38 22.38 ... 11.05 19.1</div><input id='attrs-14197db4-8f29-4dec-92a2-900489c7728f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-14197db4-8f29-4dec-92a2-900489c7728f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2f06e421-80a0-4b50-8ec9-dc8e858288dc' class='xr-var-data-in' type='checkbox'><label for='data-2f06e421-80a0-4b50-8ec9-dc8e858288dc' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[15.38, 20.38, 22.38, 41.1 , 42.5 ,  0.  ],
+       [ 4.5 ,  4.5 ,  4.5 , 16.  ,  4.5 ,  0.  ]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>tottime</span></div><div class='xr-var-dims'>(caseid, altid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>15.38 20.38 22.38 ... 11.05 19.1</div><input id='attrs-a2b490e2-889d-495d-96b9-b33adf4a5f0a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a2b490e2-889d-495d-96b9-b33adf4a5f0a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b9e41f6b-ec81-43ce-9e4c-5080717866fc' class='xr-var-data-in' type='checkbox'><label for='data-b9e41f6b-ec81-43ce-9e4c-5080717866fc' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[15.38, 20.38, 22.38, 41.1 , 42.5 ,  0.  ],
        [39.92, 44.92, 31.92, 37.16, 68.95,  0.  ],
        [14.6 , 19.6 , 21.6 , 38.27,  0.  ,  0.  ],
        ...,
        [20.26, 25.26, 27.26,  0.  ,  0.  ,  0.  ],
        [19.2 , 24.2 , 26.2 , 27.89,  0.  , 61.  ],
-       [11.04, 16.04, 18.04, 17.59, 11.05, 19.1 ]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>totcost</span></div><div class='xr-var-dims'>(caseid, altid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>70.63 35.32 20.18 ... 75.0 0.0 0.0</div><input id='attrs-158b7bec-39bd-43da-bb6e-2b9f42ca6583' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-158b7bec-39bd-43da-bb6e-2b9f42ca6583' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-fff5f361-103b-40f4-88ee-117a20002f14' class='xr-var-data-in' type='checkbox'><label for='data-fff5f361-103b-40f4-88ee-117a20002f14' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[ 70.63,  35.32,  20.18, 115.64,   0.  ,   0.  ],
+       [11.04, 16.04, 18.04, 17.59, 11.05, 19.1 ]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>totcost</span></div><div class='xr-var-dims'>(caseid, altid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>70.63 35.32 20.18 ... 75.0 0.0 0.0</div><input id='attrs-d8dc6ea8-3d0d-48b9-b659-90b9282758d5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-d8dc6ea8-3d0d-48b9-b659-90b9282758d5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0c497b9d-ccda-44e7-9478-b326c78acaa8' class='xr-var-data-in' type='checkbox'><label for='data-0c497b9d-ccda-44e7-9478-b326c78acaa8' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[ 70.63,  35.32,  20.18, 115.64,   0.  ,   0.  ],
        [390.81, 195.4 ,  97.97, 185.  ,   0.  ,   0.  ],
        [ 37.76,  18.88,  10.79, 105.  ,   0.  ,   0.  ],
        ...,
        [112.05,  56.03,  32.01,   0.  ,   0.  ,   0.  ],
        [ 41.42,  20.71,  11.83,  75.  ,   0.  ,   0.  ],
-       [ 11.42,   5.71,   3.26,  75.  ,   0.  ,   0.  ]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>hhid</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2 3 5 6 8 ... 9433 9434 9436 9438</div><input id='attrs-50cf0157-7e76-44ba-9e59-8ba49f305aa2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-50cf0157-7e76-44ba-9e59-8ba49f305aa2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ef671a01-7122-4df0-bd69-3ad5e9e29816' class='xr-var-data-in' type='checkbox'><label for='data-ef671a01-7122-4df0-bd69-3ad5e9e29816' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   2,    3,    5, ..., 9434, 9436, 9438])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>perid</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 2 3 2 2 ... 2 1 1 1 1 1 1 1</div><input id='attrs-78ffbe89-f555-4932-98cd-5405436bde72' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-78ffbe89-f555-4932-98cd-5405436bde72' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-3a0aca2b-79ac-4ce4-a051-de9e3824e10e' class='xr-var-data-in' type='checkbox'><label for='data-3a0aca2b-79ac-4ce4-a051-de9e3824e10e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>numalts</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2 2 2 2 2 2 2 2 ... 2 2 2 2 2 2 2 2</div><input id='attrs-4ff93877-47e4-472d-860a-3b16ffd7071c' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4ff93877-47e4-472d-860a-3b16ffd7071c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-56a904f5-f3d5-46cd-af0b-be2bb5a099ba' class='xr-var-data-in' type='checkbox'><label for='data-56a904f5-f3d5-46cd-af0b-be2bb5a099ba' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([2, 2, 2, ..., 2, 2, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dist</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>7.69 11.62 4.1 ... 12.06 2.95 0.73</div><input id='attrs-bdf68257-664d-44cb-9cb5-bf7a9440c146' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-bdf68257-664d-44cb-9cb5-bf7a9440c146' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7a947603-4402-446d-9746-55e20d518ced' class='xr-var-data-in' type='checkbox'><label for='data-7a947603-4402-446d-9746-55e20d518ced' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 7.69, 11.62,  4.1 , ..., 12.06,  2.95,  0.73])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>wkzone</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>664 738 696 665 ... 1009 1030 1021</div><input id='attrs-87e12609-d475-4c20-9e58-18ad16bac7a8' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-87e12609-d475-4c20-9e58-18ad16bac7a8' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7f64990f-fcf1-488e-a151-dce3acaacb57' class='xr-var-data-in' type='checkbox'><label for='data-7f64990f-fcf1-488e-a151-dce3acaacb57' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 664,  738,  696, ..., 1009, 1030, 1021])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>hmzone</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>726 9 667 8 ... 1023 1019 1030 1021</div><input id='attrs-fb3006ce-cd75-4973-a826-43dcb53838db' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-fb3006ce-cd75-4973-a826-43dcb53838db' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e4adc5ab-7276-4391-b32c-3d7ae26dd0c7' class='xr-var-data-in' type='checkbox'><label for='data-e4adc5ab-7276-4391-b32c-3d7ae26dd0c7' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 726,    9,  667, ..., 1019, 1030, 1021])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>rspopden</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>15.52 35.81 85.35 ... 2.98 14.77</div><input id='attrs-5df8df6c-3bac-4b82-bf4b-207df8f333b9' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-5df8df6c-3bac-4b82-bf4b-207df8f333b9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-706c44b0-4076-446f-be3e-d2a73820aa87' class='xr-var-data-in' type='checkbox'><label for='data-706c44b0-4076-446f-be3e-d2a73820aa87' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([15.52, 35.81, 85.35, ..., 18.33,  2.98, 14.77])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>rsempden</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>9.96 53.33 105.9 ... 19.06 40.51</div><input id='attrs-1f61bf95-5c95-4a31-b9a3-a6cdf5e4a267' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1f61bf95-5c95-4a31-b9a3-a6cdf5e4a267' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a11d779d-c4a1-4115-8a94-2a6e1b9b241a' class='xr-var-data-in' type='checkbox'><label for='data-a11d779d-c4a1-4115-8a94-2a6e1b9b241a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  9.96,  53.33, 105.93, ...,  39.67,  19.06,  40.51])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>wkpopden</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>37.26 32.91 29.45 ... 2.98 14.77</div><input id='attrs-62336d03-7dcc-4aaa-9294-f1277d0a52e8' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-62336d03-7dcc-4aaa-9294-f1277d0a52e8' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-69c0f661-8856-4cdb-bdd9-06bae00e586d' class='xr-var-data-in' type='checkbox'><label for='data-69c0f661-8856-4cdb-bdd9-06bae00e586d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([37.26, 32.91, 29.45, ...,  3.82,  2.98, 14.77])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>wkempden</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.48 764.2 22.42 ... 19.06 40.51</div><input id='attrs-85ce8233-5b71-4601-b226-21a0a2969a51' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-85ce8233-5b71-4601-b226-21a0a2969a51' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b6b586ec-83d8-434f-b520-cd8b8332fd05' class='xr-var-data-in' type='checkbox'><label for='data-b6b586ec-83d8-434f-b520-cd8b8332fd05' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  3.48, 764.19,  22.42, ...,  19.55,  19.06,  40.51])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>vehavdum</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 0 0 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-2dc702b7-9606-487f-b373-aeeff988d5bd' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2dc702b7-9606-487f-b373-aeeff988d5bd' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5a30261e-b021-400b-ba5a-cf17206e86b3' class='xr-var-data-in' type='checkbox'><label for='data-5a30261e-b021-400b-ba5a-cf17206e86b3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>femdum</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 1 1 1 1 0 0 ... 0 0 1 0 1 0 0 1</div><input id='attrs-edd83112-0ccf-42c1-a377-6aa5b548b70f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-edd83112-0ccf-42c1-a377-6aa5b548b70f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-94b9d02c-9296-4db4-bdfe-e6d593c6028b' class='xr-var-data-in' type='checkbox'><label for='data-94b9d02c-9296-4db4-bdfe-e6d593c6028b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 1, ..., 0, 0, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>age</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>35 40 28 34 43 ... 58 33 34 35 37</div><input id='attrs-8cfe768d-d043-430b-a2fb-1ce0c0ff5f35' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8cfe768d-d043-430b-a2fb-1ce0c0ff5f35' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-49d7e271-eabf-420b-869c-24cd7d7542e7' class='xr-var-data-in' type='checkbox'><label for='data-49d7e271-eabf-420b-869c-24cd7d7542e7' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([35, 40, 28, ..., 34, 35, 37])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>drlicdum</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 0 0 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-6d5dd8b4-3608-4c07-95c7-eecf8abdc932' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-6d5dd8b4-3608-4c07-95c7-eecf8abdc932' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7115aadc-2343-4828-82e5-8b6e3e4d48bc' class='xr-var-data-in' type='checkbox'><label for='data-7115aadc-2343-4828-82e5-8b6e3e4d48bc' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>noncadum</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 1 1 1 1 1 1 ... 1 0 1 0 0 1 0 0</div><input id='attrs-91faa743-93df-4c32-8be8-a4da163d85c2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-91faa743-93df-4c32-8be8-a4da163d85c2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-97a1be01-12aa-4984-8061-fbfefc31e4d2' class='xr-var-data-in' type='checkbox'><label for='data-97a1be01-12aa-4984-8061-fbfefc31e4d2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 1, ..., 1, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>numveh</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>4 1 1 2 0 0 2 2 ... 2 2 2 2 2 2 3 3</div><input id='attrs-7c920e0b-d0c3-4155-b60c-e2653eb6fcc2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7c920e0b-d0c3-4155-b60c-e2653eb6fcc2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c139f36f-cd89-494a-8aeb-39690b742ca3' class='xr-var-data-in' type='checkbox'><label for='data-c139f36f-cd89-494a-8aeb-39690b742ca3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([4, 1, 1, ..., 2, 3, 3])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>hhsize</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 5 3 3 3 2 4 ... 4 3 2 4 3 4 3 5</div><input id='attrs-b7744492-9f7d-4aa4-9a33-8a5d50df07d4' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b7744492-9f7d-4aa4-9a33-8a5d50df07d4' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a25dd5da-6618-422d-adf1-0f4bb408c0ca' class='xr-var-data-in' type='checkbox'><label for='data-a25dd5da-6618-422d-adf1-0f4bb408c0ca' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 5, ..., 4, 3, 5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>hhinc</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>42.5 17.5 12.5 ... 47.5 42.5 47.5</div><input id='attrs-e90a32c2-6364-42e3-aa1b-08c1f591cadc' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e90a32c2-6364-42e3-aa1b-08c1f591cadc' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9d356df2-41b1-4ea7-89af-39ad3734ae49' class='xr-var-data-in' type='checkbox'><label for='data-9d356df2-41b1-4ea7-89af-39ad3734ae49' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([42.5, 17.5, 12.5, ..., 47.5, 42.5, 47.5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>famtype</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>7 7 12 3 6 6 8 ... 5 5 99 99 99 99</div><input id='attrs-1bc12a4c-da94-4c3c-9a18-df6f4f030b9b' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1bc12a4c-da94-4c3c-9a18-df6f4f030b9b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-20cb0244-20d7-4a8c-8478-9036f1280d7a' class='xr-var-data-in' type='checkbox'><label for='data-20cb0244-20d7-4a8c-8478-9036f1280d7a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 7,  7, 12, ..., 99, 99, 99])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>hhowndum</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 1 1 1 0 1 ... 1 1 1 0 1 1 1 0</div><input id='attrs-8188b71c-c4be-409d-bd29-604a5726077d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8188b71c-c4be-409d-bd29-604a5726077d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-313dec2e-d7dd-4aee-b523-07dbea46d23b' class='xr-var-data-in' type='checkbox'><label for='data-313dec2e-d7dd-4aee-b523-07dbea46d23b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 1, 1, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>numemphh</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 3 2 3 3 2 2 ... 2 1 1 1 1 1 1 1</div><input id='attrs-40fcd745-9591-4da3-89fd-3d0d98e86f92' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-40fcd745-9591-4da3-89fd-3d0d98e86f92' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a137e439-fa2e-41bb-9725-c740c3fec5a9' class='xr-var-data-in' type='checkbox'><label for='data-a137e439-fa2e-41bb-9725-c740c3fec5a9' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 3, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>numadlt</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 3 2 3 3 2 2 ... 2 3 1 1 1 1 1 1</div><input id='attrs-9637a205-d4a6-46ce-a2ff-8b6a3a990d8a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9637a205-d4a6-46ce-a2ff-8b6a3a990d8a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-97049bba-7217-4400-ad50-ba966b3e8380' class='xr-var-data-in' type='checkbox'><label for='data-97049bba-7217-4400-ad50-ba966b3e8380' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 3, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>nmlt5</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 2 1 0 0 0 0 ... 2 0 0 1 1 0 0 2</div><input id='attrs-b432a837-47e9-4570-ad36-6d85371337dd' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b432a837-47e9-4570-ad36-6d85371337dd' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8425ff6e-f754-4147-af90-2077ca7b17e1' class='xr-var-data-in' type='checkbox'><label for='data-8425ff6e-f754-4147-af90-2077ca7b17e1' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 2, ..., 0, 0, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>nm5to11</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 1 ... 0 0 1 0 1 3 2 2</div><input id='attrs-0d298e04-12cc-4203-a36b-70c6994755ae' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-0d298e04-12cc-4203-a36b-70c6994755ae' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7aa6ed84-5ca9-4a38-a1fe-6d2139e81205' class='xr-var-data-in' type='checkbox'><label for='data-7aa6ed84-5ca9-4a38-a1fe-6d2139e81205' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 3, 2, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>nm12to16</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 1 ... 0 0 0 2 0 0 0 0</div><input id='attrs-5ba92b87-8716-4672-9f6b-7767e313bd13' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-5ba92b87-8716-4672-9f6b-7767e313bd13' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6dfa2823-556d-4e22-b6ee-cf53afc85bf0' class='xr-var-data-in' type='checkbox'><label for='data-6dfa2823-556d-4e22-b6ee-cf53afc85bf0' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>wkccbd</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 0 1 0 0 0 0 ... 0 0 0 0 0 0 0 0</div><input id='attrs-52503222-a53c-4f3f-9fdb-a0faf6c35b68' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-52503222-a53c-4f3f-9fdb-a0faf6c35b68' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7bbdadac-d70f-464e-b973-dd702c1b75d2' class='xr-var-data-in' type='checkbox'><label for='data-7bbdadac-d70f-464e-b973-dd702c1b75d2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1, 0, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>wknccbd</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 1 0 1 1 1 0 ... 0 0 0 0 0 0 0 0</div><input id='attrs-70706525-d3e6-4021-b2e0-534ce1ed3e16' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-70706525-d3e6-4021-b2e0-534ce1ed3e16' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-30b0df8c-94c2-464c-a2b7-f9887dcb2205' class='xr-var-data-in' type='checkbox'><label for='data-30b0df8c-94c2-464c-a2b7-f9887dcb2205' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 1, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>corredis</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 0 0 0 0 0 0 ... 0 0 0 0 0 0 0 0</div><input id='attrs-7423f0dc-135e-4c85-bf50-db1e305ebb65' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7423f0dc-135e-4c85-bf50-db1e305ebb65' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0a366a43-c40c-44c2-84e6-61f0fd896c57' class='xr-var-data-in' type='checkbox'><label for='data-0a366a43-c40c-44c2-84e6-61f0fd896c57' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1, 0, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>vehbywrk</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>4.0 1.0 0.33 1.0 ... 2.0 3.0 3.0</div><input id='attrs-395c1870-f5c9-4f28-95bf-652ed823e72d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-395c1870-f5c9-4f28-95bf-652ed823e72d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6e623902-3baa-4865-8f90-228a5c8e2aa5' class='xr-var-data-in' type='checkbox'><label for='data-6e623902-3baa-4865-8f90-228a5c8e2aa5' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([4.  , 1.  , 0.33, ..., 2.  , 3.  , 3.  ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>vocc</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 0 1 0 2 0 1 1 ... 1 1 0 1 2 1 1 1</div><input id='attrs-7594d81e-28f3-4012-ba5a-5e951289e2d6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7594d81e-28f3-4012-ba5a-5e951289e2d6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-90d048f5-0997-4919-9119-3d8b518e6a0f' class='xr-var-data-in' type='checkbox'><label for='data-90d048f5-0997-4919-9119-3d8b518e6a0f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 0, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>wgt</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-2ac564e6-11b9-4963-b36c-d0f2f51d7f04' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2ac564e6-11b9-4963-b36c-d0f2f51d7f04' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-96787f71-b8f1-40dc-b3ea-3807036d4d73' class='xr-var-data-in' type='checkbox'><label for='data-96787f71-b8f1-40dc-b3ea-3807036d4d73' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>_avail_</span></div><div class='xr-var-dims'>(caseid, altid)</div><div class='xr-var-dtype'>int8</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 0 1 1 ... 0 1 1 1 1 1 1 1</div><input id='attrs-88313079-e083-42c3-8554-19fbec249d41' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-88313079-e083-42c3-8554-19fbec249d41' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-df43aef8-f564-4774-b106-2634c0f5ff95' class='xr-var-data-in' type='checkbox'><label for='data-df43aef8-f564-4774-b106-2634c0f5ff95' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[1, 1, 1, 1, 1, 0],
+       [ 11.42,   5.71,   3.26,  75.  ,   0.  ,   0.  ]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>hhid</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2 3 5 6 8 ... 9433 9434 9436 9438</div><input id='attrs-37eed326-b458-4b77-a3fa-eb5e8c9cb17b' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-37eed326-b458-4b77-a3fa-eb5e8c9cb17b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ccdb01d3-7fd4-4cac-9ade-ed4eb6d8c8d6' class='xr-var-data-in' type='checkbox'><label for='data-ccdb01d3-7fd4-4cac-9ade-ed4eb6d8c8d6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   2,    3,    5, ..., 9434, 9436, 9438])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>perid</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 2 3 2 2 ... 2 1 1 1 1 1 1 1</div><input id='attrs-931bcf48-0937-4734-b38b-ccbf0c2c67fa' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-931bcf48-0937-4734-b38b-ccbf0c2c67fa' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b4fe231e-75ef-4153-b345-27b059a5b868' class='xr-var-data-in' type='checkbox'><label for='data-b4fe231e-75ef-4153-b345-27b059a5b868' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>numalts</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2 2 2 2 2 2 2 2 ... 2 2 2 2 2 2 2 2</div><input id='attrs-512a035f-6887-42dd-aec7-1cfd14e64e0b' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-512a035f-6887-42dd-aec7-1cfd14e64e0b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4e28b186-a72c-4461-a0bb-7aba60bf7076' class='xr-var-data-in' type='checkbox'><label for='data-4e28b186-a72c-4461-a0bb-7aba60bf7076' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([2, 2, 2, ..., 2, 2, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dist</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>7.69 11.62 4.1 ... 12.06 2.95 0.73</div><input id='attrs-848eb5b5-ca72-4f9c-a31b-85a7e6db5b63' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-848eb5b5-ca72-4f9c-a31b-85a7e6db5b63' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b69f1d8b-a758-4cf2-88f7-a43bdb47cf79' class='xr-var-data-in' type='checkbox'><label for='data-b69f1d8b-a758-4cf2-88f7-a43bdb47cf79' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 7.69, 11.62,  4.1 , ..., 12.06,  2.95,  0.73])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>wkzone</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>664 738 696 665 ... 1009 1030 1021</div><input id='attrs-f7e9572d-0c3e-4a0a-ab58-4649d681c565' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f7e9572d-0c3e-4a0a-ab58-4649d681c565' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-466a4d9a-bd6f-443d-a3aa-5386732e40bf' class='xr-var-data-in' type='checkbox'><label for='data-466a4d9a-bd6f-443d-a3aa-5386732e40bf' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 664,  738,  696, ..., 1009, 1030, 1021])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>hmzone</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>726 9 667 8 ... 1023 1019 1030 1021</div><input id='attrs-ecec3943-2519-44a5-9b1e-ef3c3b473422' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-ecec3943-2519-44a5-9b1e-ef3c3b473422' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-78236828-feac-440d-87fd-f27cf85b8047' class='xr-var-data-in' type='checkbox'><label for='data-78236828-feac-440d-87fd-f27cf85b8047' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 726,    9,  667, ..., 1019, 1030, 1021])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>rspopden</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>15.52 35.81 85.35 ... 2.98 14.77</div><input id='attrs-67ab2710-76a4-485b-a588-1a8d85258c71' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-67ab2710-76a4-485b-a588-1a8d85258c71' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e4bbcfa6-c34f-4bfa-8357-b38707df0800' class='xr-var-data-in' type='checkbox'><label for='data-e4bbcfa6-c34f-4bfa-8357-b38707df0800' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([15.52, 35.81, 85.35, ..., 18.33,  2.98, 14.77])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>rsempden</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>9.96 53.33 105.9 ... 19.06 40.51</div><input id='attrs-d4bedd54-7980-4696-b420-5bd405b88e84' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-d4bedd54-7980-4696-b420-5bd405b88e84' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-cce39ee3-1465-4c2c-aaae-03bfaff6e39b' class='xr-var-data-in' type='checkbox'><label for='data-cce39ee3-1465-4c2c-aaae-03bfaff6e39b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  9.96,  53.33, 105.93, ...,  39.67,  19.06,  40.51])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>wkpopden</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>37.26 32.91 29.45 ... 2.98 14.77</div><input id='attrs-a17c18ac-e362-4f71-aa09-ef2fe341b899' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a17c18ac-e362-4f71-aa09-ef2fe341b899' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-082bcc0e-9be8-4151-93cd-ec172f503a46' class='xr-var-data-in' type='checkbox'><label for='data-082bcc0e-9be8-4151-93cd-ec172f503a46' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([37.26, 32.91, 29.45, ...,  3.82,  2.98, 14.77])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>wkempden</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.48 764.2 22.42 ... 19.06 40.51</div><input id='attrs-406e778c-5393-4f6b-a265-b505c8fa39c2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-406e778c-5393-4f6b-a265-b505c8fa39c2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-786d17d4-abb9-499b-9b8f-a8976e3adc6a' class='xr-var-data-in' type='checkbox'><label for='data-786d17d4-abb9-499b-9b8f-a8976e3adc6a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  3.48, 764.19,  22.42, ...,  19.55,  19.06,  40.51])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>vehavdum</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 0 0 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-92e6f6fd-6591-4e00-91a6-e4906fcadb2e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-92e6f6fd-6591-4e00-91a6-e4906fcadb2e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d3311c7a-3eeb-4b68-9855-08f1ad0abd87' class='xr-var-data-in' type='checkbox'><label for='data-d3311c7a-3eeb-4b68-9855-08f1ad0abd87' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>femdum</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 1 1 1 1 0 0 ... 0 0 1 0 1 0 0 1</div><input id='attrs-f7a99517-b26b-4966-adbc-b916566bb094' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f7a99517-b26b-4966-adbc-b916566bb094' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7d197af8-9453-44d4-a0a1-03bfd7284214' class='xr-var-data-in' type='checkbox'><label for='data-7d197af8-9453-44d4-a0a1-03bfd7284214' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 1, ..., 0, 0, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>age</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>35 40 28 34 43 ... 58 33 34 35 37</div><input id='attrs-6cf1dd45-49f1-4087-bfb8-ddb32a7b85c4' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-6cf1dd45-49f1-4087-bfb8-ddb32a7b85c4' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ffc15b5a-7c55-46e6-a473-25cfd1e836ca' class='xr-var-data-in' type='checkbox'><label for='data-ffc15b5a-7c55-46e6-a473-25cfd1e836ca' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([35, 40, 28, ..., 34, 35, 37])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>drlicdum</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 0 0 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-bdc8a58f-4bed-4340-a960-fc41c17350c6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-bdc8a58f-4bed-4340-a960-fc41c17350c6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8bc4f303-8bec-4ddc-b9da-15f76ebcbb70' class='xr-var-data-in' type='checkbox'><label for='data-8bc4f303-8bec-4ddc-b9da-15f76ebcbb70' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>noncadum</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 1 1 1 1 1 1 ... 1 0 1 0 0 1 0 0</div><input id='attrs-3549cac0-9b77-425e-abab-dcb8807736b2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3549cac0-9b77-425e-abab-dcb8807736b2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-12883fa5-aaa5-4541-b190-44923b3e2ee5' class='xr-var-data-in' type='checkbox'><label for='data-12883fa5-aaa5-4541-b190-44923b3e2ee5' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 1, ..., 1, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>numveh</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>4 1 1 2 0 0 2 2 ... 2 2 2 2 2 2 3 3</div><input id='attrs-73728f22-45c1-4883-8fbd-c770699aded6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-73728f22-45c1-4883-8fbd-c770699aded6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-3fad5748-6f85-4e55-a329-eadb5f5c076e' class='xr-var-data-in' type='checkbox'><label for='data-3fad5748-6f85-4e55-a329-eadb5f5c076e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([4, 1, 1, ..., 2, 3, 3])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>hhsize</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 5 3 3 3 2 4 ... 4 3 2 4 3 4 3 5</div><input id='attrs-a2a8975b-7ed5-4fa6-903b-9b6d1683cbcc' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a2a8975b-7ed5-4fa6-903b-9b6d1683cbcc' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6f6f4542-50a9-4a7e-8afe-fec48e15f964' class='xr-var-data-in' type='checkbox'><label for='data-6f6f4542-50a9-4a7e-8afe-fec48e15f964' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 5, ..., 4, 3, 5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>hhinc</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>42.5 17.5 12.5 ... 47.5 42.5 47.5</div><input id='attrs-1de3f786-1b38-4b7a-84de-586220e33787' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1de3f786-1b38-4b7a-84de-586220e33787' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-3eac2f13-1cbc-4a56-936b-469e1c95423f' class='xr-var-data-in' type='checkbox'><label for='data-3eac2f13-1cbc-4a56-936b-469e1c95423f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([42.5, 17.5, 12.5, ..., 47.5, 42.5, 47.5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>famtype</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>7 7 12 3 6 6 8 ... 5 5 99 99 99 99</div><input id='attrs-7301fbed-f7a3-49a5-be59-b5ce8ac9d583' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7301fbed-f7a3-49a5-be59-b5ce8ac9d583' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-117e428a-309c-4662-9702-0ce4259189f2' class='xr-var-data-in' type='checkbox'><label for='data-117e428a-309c-4662-9702-0ce4259189f2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 7,  7, 12, ..., 99, 99, 99])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>hhowndum</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 1 1 1 0 1 ... 1 1 1 0 1 1 1 0</div><input id='attrs-316da0b5-e4db-4018-a39e-64db976069cf' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-316da0b5-e4db-4018-a39e-64db976069cf' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-91c9a2f1-cb43-4850-a784-3816804b50e2' class='xr-var-data-in' type='checkbox'><label for='data-91c9a2f1-cb43-4850-a784-3816804b50e2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 1, 1, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>numemphh</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 3 2 3 3 2 2 ... 2 1 1 1 1 1 1 1</div><input id='attrs-c2223837-7b63-40c8-b307-07e92b5cca76' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c2223837-7b63-40c8-b307-07e92b5cca76' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4f97a5a9-3e6b-4119-b211-9b8b6d44af15' class='xr-var-data-in' type='checkbox'><label for='data-4f97a5a9-3e6b-4119-b211-9b8b6d44af15' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 3, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>numadlt</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 3 2 3 3 2 2 ... 2 3 1 1 1 1 1 1</div><input id='attrs-2a2bd99c-6531-468b-b24f-121199f09e5d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2a2bd99c-6531-468b-b24f-121199f09e5d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5aba58ab-62cc-4b48-a68f-06c461ef9edc' class='xr-var-data-in' type='checkbox'><label for='data-5aba58ab-62cc-4b48-a68f-06c461ef9edc' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 3, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>nmlt5</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 2 1 0 0 0 0 ... 2 0 0 1 1 0 0 2</div><input id='attrs-ec28f795-437f-4277-9ff1-93ca00037543' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-ec28f795-437f-4277-9ff1-93ca00037543' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-eaf150fe-fa63-4169-8349-a503550bca7c' class='xr-var-data-in' type='checkbox'><label for='data-eaf150fe-fa63-4169-8349-a503550bca7c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 2, ..., 0, 0, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>nm5to11</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 1 ... 0 0 1 0 1 3 2 2</div><input id='attrs-7f547ab7-42df-42c1-a5b8-822de36a6457' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7f547ab7-42df-42c1-a5b8-822de36a6457' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-841c2f9b-6b1e-436c-b66b-9dd7c1c9c722' class='xr-var-data-in' type='checkbox'><label for='data-841c2f9b-6b1e-436c-b66b-9dd7c1c9c722' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 3, 2, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>nm12to16</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 1 ... 0 0 0 2 0 0 0 0</div><input id='attrs-e37bb342-620f-4e50-a507-b0a24800b315' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e37bb342-620f-4e50-a507-b0a24800b315' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-1ba969bf-a2bb-44c5-8f86-b374070a35fe' class='xr-var-data-in' type='checkbox'><label for='data-1ba969bf-a2bb-44c5-8f86-b374070a35fe' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>wkccbd</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 0 1 0 0 0 0 ... 0 0 0 0 0 0 0 0</div><input id='attrs-368ca41f-436c-4dbf-9e0e-a44622a1af9a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-368ca41f-436c-4dbf-9e0e-a44622a1af9a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-075cc5c9-cbc0-40a6-bffb-52ea0035a6ad' class='xr-var-data-in' type='checkbox'><label for='data-075cc5c9-cbc0-40a6-bffb-52ea0035a6ad' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1, 0, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>wknccbd</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 1 0 1 1 1 0 ... 0 0 0 0 0 0 0 0</div><input id='attrs-158a4a24-4a27-402e-87b2-9f17cf61ff48' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-158a4a24-4a27-402e-87b2-9f17cf61ff48' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-84c83fd8-3deb-44c6-995a-b2586748ff0b' class='xr-var-data-in' type='checkbox'><label for='data-84c83fd8-3deb-44c6-995a-b2586748ff0b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 1, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>corredis</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 0 0 0 0 0 0 ... 0 0 0 0 0 0 0 0</div><input id='attrs-4fe5fafa-724b-4af4-9738-af730fe85b1c' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4fe5fafa-724b-4af4-9738-af730fe85b1c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0b24bbf7-ae69-4320-a35f-c01836763346' class='xr-var-data-in' type='checkbox'><label for='data-0b24bbf7-ae69-4320-a35f-c01836763346' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1, 0, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>vehbywrk</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>4.0 1.0 0.33 1.0 ... 2.0 3.0 3.0</div><input id='attrs-8604c08f-3765-4663-bb12-e5def4de2a0f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8604c08f-3765-4663-bb12-e5def4de2a0f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9003b558-6e71-454e-9f81-69632056858e' class='xr-var-data-in' type='checkbox'><label for='data-9003b558-6e71-454e-9f81-69632056858e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([4.  , 1.  , 0.33, ..., 2.  , 3.  , 3.  ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>vocc</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 0 1 0 2 0 1 1 ... 1 1 0 1 2 1 1 1</div><input id='attrs-9efc725a-6ccb-4468-b3cf-c006ec02fb4a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9efc725a-6ccb-4468-b3cf-c006ec02fb4a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-68edb765-ccd7-4f99-bf7e-e1be5621807b' class='xr-var-data-in' type='checkbox'><label for='data-68edb765-ccd7-4f99-bf7e-e1be5621807b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 0, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>wgt</span></div><div class='xr-var-dims'>(caseid)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-f314bacc-ad9b-46d2-89cd-8a4da5ab9e7d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f314bacc-ad9b-46d2-89cd-8a4da5ab9e7d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-cf69d018-eda5-4ebc-b8b8-4f0bdf649714' class='xr-var-data-in' type='checkbox'><label for='data-cf69d018-eda5-4ebc-b8b8-4f0bdf649714' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>_avail_</span></div><div class='xr-var-dims'>(caseid, altid)</div><div class='xr-var-dtype'>int8</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 0 1 1 ... 0 1 1 1 1 1 1 1</div><input id='attrs-aab8d1c9-fa56-410d-b858-d1eeebcc676b' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-aab8d1c9-fa56-410d-b858-d1eeebcc676b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-cc02ccc2-f0cc-4a26-868b-bbfeda3c7593' class='xr-var-data-in' type='checkbox'><label for='data-cc02ccc2-f0cc-4a26-868b-bbfeda3c7593' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[1, 1, 1, 1, 1, 0],
        [1, 1, 1, 1, 1, 0],
        [1, 1, 1, 1, 0, 0],
        ...,
        [1, 1, 1, 0, 0, 0],
        [1, 1, 1, 1, 0, 1],
-       [1, 1, 1, 1, 1, 1]], dtype=int8)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>avail</span></div><div class='xr-var-dims'>(caseid, altid)</div><div class='xr-var-dtype'>int8</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 0 1 1 ... 0 1 1 1 1 1 1 1</div><input id='attrs-dd67d6b7-f478-4bc4-86b0-ed921a9fa6d6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-dd67d6b7-f478-4bc4-86b0-ed921a9fa6d6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b99adfcc-7629-4c9d-9344-d0dde344a459' class='xr-var-data-in' type='checkbox'><label for='data-b99adfcc-7629-4c9d-9344-d0dde344a459' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[1, 1, 1, 1, 1, 0],
+       [1, 1, 1, 1, 1, 1]], dtype=int8)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>avail</span></div><div class='xr-var-dims'>(caseid, altid)</div><div class='xr-var-dtype'>int8</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 0 1 1 ... 0 1 1 1 1 1 1 1</div><input id='attrs-1b359fa2-6c24-4ce1-9343-fff3f4ac7017' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1b359fa2-6c24-4ce1-9343-fff3f4ac7017' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-46c588a3-1c11-45d6-8514-0298d851bc9f' class='xr-var-data-in' type='checkbox'><label for='data-46c588a3-1c11-45d6-8514-0298d851bc9f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[1, 1, 1, 1, 1, 0],
        [1, 1, 1, 1, 1, 0],
        [1, 1, 1, 1, 0, 0],
        ...,
        [1, 1, 1, 0, 0, 0],
        [1, 1, 1, 1, 0, 1],
-       [1, 1, 1, 1, 1, 1]], dtype=int8)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-b51e75e3-6077-4f6f-9ff1-56fdef79477d' class='xr-section-summary-in' type='checkbox'  ><label for='section-b51e75e3-6077-4f6f-9ff1-56fdef79477d' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>caseid</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-b34332dc-80d0-458d-aa86-15158f1cbf6c' class='xr-index-data-in' type='checkbox'/><label for='index-b34332dc-80d0-458d-aa86-15158f1cbf6c' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([   1,    2,    3,    4,    5,    6,    7,    8,    9,   10,
+       [1, 1, 1, 1, 1, 1]], dtype=int8)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-d23ecf1c-c794-4753-a64d-15ccec4d5129' class='xr-section-summary-in' type='checkbox'  ><label for='section-d23ecf1c-c794-4753-a64d-15ccec4d5129' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>caseid</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-338fcfd8-1ad1-44fe-b689-cd90b4247ced' class='xr-index-data-in' type='checkbox'/><label for='index-338fcfd8-1ad1-44fe-b689-cd90b4247ced' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([   1,    2,    3,    4,    5,    6,    7,    8,    9,   10,
        ...
        5020, 5021, 5022, 5023, 5024, 5025, 5026, 5027, 5028, 5029],
-      dtype=&#x27;int64&#x27;, name=&#x27;caseid&#x27;, length=5029))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>altid</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-87782df1-d940-4279-9c6e-9ff28d53e5f1' class='xr-index-data-in' type='checkbox'/><label for='index-87782df1-d940-4279-9c6e-9ff28d53e5f1' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1, 2, 3, 4, 5, 6], dtype=&#x27;int64&#x27;, name=&#x27;altid&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-8886c22c-2312-4527-939a-38441dc1a3d4' class='xr-section-summary-in' type='checkbox'  checked><label for='section-8886c22c-2312-4527-939a-38441dc1a3d4' class='xr-section-summary' >Attributes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>_caseid_ :</span></dt><dd>caseid</dd><dt><span>_altid_ :</span></dt><dd>altid</dd></dl></div></li></ul></div></div></div></div>
+      dtype=&#x27;int64&#x27;, name=&#x27;caseid&#x27;, length=5029))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>altid</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-d691f79c-cf33-45af-9326-ce76c83bbaec' class='xr-index-data-in' type='checkbox'/><label for='index-d691f79c-cf33-45af-9326-ce76c83bbaec' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1, 2, 3, 4, 5, 6], dtype=&#x27;int64&#x27;, name=&#x27;altid&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-2905147a-5921-4282-a16f-f1bfb0ca669c' class='xr-section-summary-in' type='checkbox'  checked><label for='section-2905147a-5921-4282-a16f-f1bfb0ca669c' class='xr-section-summary' >Attributes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>_caseid_ :</span></dt><dd>caseid</dd><dt><span>_altid_ :</span></dt><dd>altid</dd></dl></div></li></ul></div></div></div></div>
 </div>
 <p>Include only the cases where number of vehicles is 2 or more</p>
 <div class="cell docutils container">
@@ -1399,7 +1371,7 @@ Attributes:
     </tr>
   </tbody>
 </table>
-</div></div><div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>np.float64(-2296.7365751730104)
+</div></div><div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>np.float64(-2296.7365749681976)
 </pre></div>
 </div>
 </div>
@@ -1412,27 +1384,27 @@ Attributes:
 </div>
 <div class="cell_output docutils container">
 <div class="output text_html"><style type="text/css">
-#T_b4745 th {
+#T_8cdef th {
   vertical-align: top;
   text-align: left;
 }
-#T_b4745 td {
+#T_8cdef td {
   vertical-align: top;
   text-align: left;
 }
-#T_b4745_row0_col0, #T_b4745_row0_col1, #T_b4745_row0_col2, #T_b4745_row0_col3, #T_b4745_row0_col4, #T_b4745_row1_col0, #T_b4745_row1_col1, #T_b4745_row1_col2, #T_b4745_row1_col3, #T_b4745_row1_col4, #T_b4745_row2_col0, #T_b4745_row2_col1, #T_b4745_row2_col2, #T_b4745_row2_col3, #T_b4745_row2_col4, #T_b4745_row3_col0, #T_b4745_row3_col1, #T_b4745_row3_col2, #T_b4745_row3_col3, #T_b4745_row3_col4, #T_b4745_row4_col0, #T_b4745_row4_col1, #T_b4745_row4_col2, #T_b4745_row4_col3, #T_b4745_row4_col4, #T_b4745_row5_col0, #T_b4745_row5_col1, #T_b4745_row5_col2, #T_b4745_row5_col3, #T_b4745_row5_col4, #T_b4745_row6_col0, #T_b4745_row6_col1, #T_b4745_row6_col2, #T_b4745_row6_col3, #T_b4745_row6_col4, #T_b4745_row7_col0, #T_b4745_row7_col1, #T_b4745_row7_col2, #T_b4745_row7_col3, #T_b4745_row7_col4, #T_b4745_row8_col0, #T_b4745_row8_col1, #T_b4745_row8_col2, #T_b4745_row8_col3, #T_b4745_row8_col4, #T_b4745_row9_col0, #T_b4745_row9_col1, #T_b4745_row9_col2, #T_b4745_row9_col3, #T_b4745_row9_col4, #T_b4745_row10_col0, #T_b4745_row10_col1, #T_b4745_row10_col2, #T_b4745_row10_col3, #T_b4745_row10_col4, #T_b4745_row11_col0, #T_b4745_row11_col1, #T_b4745_row11_col2, #T_b4745_row11_col3, #T_b4745_row11_col4, #T_b4745_row12_col0, #T_b4745_row12_col1, #T_b4745_row12_col2, #T_b4745_row12_col3, #T_b4745_row12_col4, #T_b4745_row13_col0, #T_b4745_row13_col1, #T_b4745_row13_col2, #T_b4745_row13_col3, #T_b4745_row13_col4, #T_b4745_row14_col0, #T_b4745_row14_col1, #T_b4745_row14_col2, #T_b4745_row14_col3, #T_b4745_row14_col4, #T_b4745_row15_col0, #T_b4745_row15_col1, #T_b4745_row15_col2, #T_b4745_row15_col3, #T_b4745_row15_col4, #T_b4745_row16_col0, #T_b4745_row16_col1, #T_b4745_row16_col2, #T_b4745_row16_col3, #T_b4745_row16_col4, #T_b4745_row17_col0, #T_b4745_row17_col1, #T_b4745_row17_col2, #T_b4745_row17_col3, #T_b4745_row17_col4, #T_b4745_row18_col0, #T_b4745_row18_col1, #T_b4745_row18_col2, #T_b4745_row18_col3, #T_b4745_row18_col4, #T_b4745_row19_col0, #T_b4745_row19_col1, #T_b4745_row19_col2, #T_b4745_row19_col3, #T_b4745_row19_col4, #T_b4745_row20_col0, #T_b4745_row20_col1, #T_b4745_row20_col2, #T_b4745_row20_col3, #T_b4745_row20_col4, #T_b4745_row21_col0, #T_b4745_row21_col1, #T_b4745_row21_col2, #T_b4745_row21_col3, #T_b4745_row21_col4, #T_b4745_row22_col0, #T_b4745_row22_col1, #T_b4745_row22_col2, #T_b4745_row22_col3, #T_b4745_row22_col4, #T_b4745_row23_col0, #T_b4745_row23_col1, #T_b4745_row23_col2, #T_b4745_row23_col3, #T_b4745_row23_col4, #T_b4745_row24_col0, #T_b4745_row24_col1, #T_b4745_row24_col2, #T_b4745_row24_col3, #T_b4745_row24_col4, #T_b4745_row25_col0, #T_b4745_row25_col1, #T_b4745_row25_col2, #T_b4745_row25_col3, #T_b4745_row25_col4 {
+#T_8cdef_row0_col0, #T_8cdef_row0_col1, #T_8cdef_row0_col2, #T_8cdef_row0_col3, #T_8cdef_row0_col4, #T_8cdef_row1_col0, #T_8cdef_row1_col1, #T_8cdef_row1_col2, #T_8cdef_row1_col3, #T_8cdef_row1_col4, #T_8cdef_row2_col0, #T_8cdef_row2_col1, #T_8cdef_row2_col2, #T_8cdef_row2_col3, #T_8cdef_row2_col4, #T_8cdef_row3_col0, #T_8cdef_row3_col1, #T_8cdef_row3_col2, #T_8cdef_row3_col3, #T_8cdef_row3_col4, #T_8cdef_row4_col0, #T_8cdef_row4_col1, #T_8cdef_row4_col2, #T_8cdef_row4_col3, #T_8cdef_row4_col4, #T_8cdef_row5_col0, #T_8cdef_row5_col1, #T_8cdef_row5_col2, #T_8cdef_row5_col3, #T_8cdef_row5_col4, #T_8cdef_row6_col0, #T_8cdef_row6_col1, #T_8cdef_row6_col2, #T_8cdef_row6_col3, #T_8cdef_row6_col4, #T_8cdef_row7_col0, #T_8cdef_row7_col1, #T_8cdef_row7_col2, #T_8cdef_row7_col3, #T_8cdef_row7_col4, #T_8cdef_row8_col0, #T_8cdef_row8_col1, #T_8cdef_row8_col2, #T_8cdef_row8_col3, #T_8cdef_row8_col4, #T_8cdef_row9_col0, #T_8cdef_row9_col1, #T_8cdef_row9_col2, #T_8cdef_row9_col3, #T_8cdef_row9_col4, #T_8cdef_row10_col0, #T_8cdef_row10_col1, #T_8cdef_row10_col2, #T_8cdef_row10_col3, #T_8cdef_row10_col4, #T_8cdef_row11_col0, #T_8cdef_row11_col1, #T_8cdef_row11_col2, #T_8cdef_row11_col3, #T_8cdef_row11_col4, #T_8cdef_row12_col0, #T_8cdef_row12_col1, #T_8cdef_row12_col2, #T_8cdef_row12_col3, #T_8cdef_row12_col4, #T_8cdef_row13_col0, #T_8cdef_row13_col1, #T_8cdef_row13_col2, #T_8cdef_row13_col3, #T_8cdef_row13_col4, #T_8cdef_row14_col0, #T_8cdef_row14_col1, #T_8cdef_row14_col2, #T_8cdef_row14_col3, #T_8cdef_row14_col4, #T_8cdef_row15_col0, #T_8cdef_row15_col1, #T_8cdef_row15_col2, #T_8cdef_row15_col3, #T_8cdef_row15_col4, #T_8cdef_row16_col0, #T_8cdef_row16_col1, #T_8cdef_row16_col2, #T_8cdef_row16_col3, #T_8cdef_row16_col4, #T_8cdef_row17_col0, #T_8cdef_row17_col1, #T_8cdef_row17_col2, #T_8cdef_row17_col3, #T_8cdef_row17_col4, #T_8cdef_row18_col0, #T_8cdef_row18_col1, #T_8cdef_row18_col2, #T_8cdef_row18_col3, #T_8cdef_row18_col4, #T_8cdef_row19_col0, #T_8cdef_row19_col1, #T_8cdef_row19_col2, #T_8cdef_row19_col3, #T_8cdef_row19_col4, #T_8cdef_row20_col0, #T_8cdef_row20_col1, #T_8cdef_row20_col2, #T_8cdef_row20_col3, #T_8cdef_row20_col4, #T_8cdef_row21_col0, #T_8cdef_row21_col1, #T_8cdef_row21_col2, #T_8cdef_row21_col3, #T_8cdef_row21_col4, #T_8cdef_row22_col0, #T_8cdef_row22_col1, #T_8cdef_row22_col2, #T_8cdef_row22_col3, #T_8cdef_row22_col4, #T_8cdef_row23_col0, #T_8cdef_row23_col1, #T_8cdef_row23_col2, #T_8cdef_row23_col3, #T_8cdef_row23_col4, #T_8cdef_row24_col0, #T_8cdef_row24_col1, #T_8cdef_row24_col2, #T_8cdef_row24_col3, #T_8cdef_row24_col4, #T_8cdef_row25_col0, #T_8cdef_row25_col1, #T_8cdef_row25_col2, #T_8cdef_row25_col3, #T_8cdef_row25_col4 {
   font-family: monospace;
 }
 </style>
-<table id="T_b4745">
+<table id="T_8cdef">
   <thead>
     <tr>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_b4745_level0_col0" class="col_heading level0 col0" >Value</th>
-      <th id="T_b4745_level0_col1" class="col_heading level0 col1" >Std Err</th>
-      <th id="T_b4745_level0_col2" class="col_heading level0 col2" >t Stat</th>
-      <th id="T_b4745_level0_col3" class="col_heading level0 col3" >Signif</th>
-      <th id="T_b4745_level0_col4" class="col_heading level0 col4" >Null Value</th>
+      <th id="T_8cdef_level0_col0" class="col_heading level0 col0" >Value</th>
+      <th id="T_8cdef_level0_col1" class="col_heading level0 col1" >Std Err</th>
+      <th id="T_8cdef_level0_col2" class="col_heading level0 col2" >t Stat</th>
+      <th id="T_8cdef_level0_col3" class="col_heading level0 col3" >Signif</th>
+      <th id="T_8cdef_level0_col4" class="col_heading level0 col4" >Null Value</th>
     </tr>
     <tr>
       <th class="index_name level0" >Parameter</th>
@@ -1445,212 +1417,212 @@ Attributes:
   </thead>
   <tbody>
     <tr>
-      <th id="T_b4745_level0_row0" class="row_heading level0 row0" >ASC_Bike</th>
-      <td id="T_b4745_row0_col0" class="data row0 col0" >-3.13</td>
-      <td id="T_b4745_row0_col1" class="data row0 col1" > 0.734</td>
-      <td id="T_b4745_row0_col2" class="data row0 col2" >-4.27</td>
-      <td id="T_b4745_row0_col3" class="data row0 col3" >***</td>
-      <td id="T_b4745_row0_col4" class="data row0 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row0" class="row_heading level0 row0" >ASC_Bike</th>
+      <td id="T_8cdef_row0_col0" class="data row0 col0" >-3.13</td>
+      <td id="T_8cdef_row0_col1" class="data row0 col1" > 0.734</td>
+      <td id="T_8cdef_row0_col2" class="data row0 col2" >-4.27</td>
+      <td id="T_8cdef_row0_col3" class="data row0 col3" >***</td>
+      <td id="T_8cdef_row0_col4" class="data row0 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row1" class="row_heading level0 row1" >ASC_SR2</th>
-      <td id="T_b4745_row1_col0" class="data row1 col0" >-1.98</td>
-      <td id="T_b4745_row1_col1" class="data row1 col1" > 0.129</td>
-      <td id="T_b4745_row1_col2" class="data row1 col2" >-15.42</td>
-      <td id="T_b4745_row1_col3" class="data row1 col3" >***</td>
-      <td id="T_b4745_row1_col4" class="data row1 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row1" class="row_heading level0 row1" >ASC_SR2</th>
+      <td id="T_8cdef_row1_col0" class="data row1 col0" >-1.98</td>
+      <td id="T_8cdef_row1_col1" class="data row1 col1" > 0.129</td>
+      <td id="T_8cdef_row1_col2" class="data row1 col2" >-15.42</td>
+      <td id="T_8cdef_row1_col3" class="data row1 col3" >***</td>
+      <td id="T_8cdef_row1_col4" class="data row1 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row2" class="row_heading level0 row2" >ASC_SR3+</th>
-      <td id="T_b4745_row2_col0" class="data row2 col0" >-3.73</td>
-      <td id="T_b4745_row2_col1" class="data row2 col1" > 0.186</td>
-      <td id="T_b4745_row2_col2" class="data row2 col2" >-20.05</td>
-      <td id="T_b4745_row2_col3" class="data row2 col3" >***</td>
-      <td id="T_b4745_row2_col4" class="data row2 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row2" class="row_heading level0 row2" >ASC_SR3+</th>
+      <td id="T_8cdef_row2_col0" class="data row2 col0" >-3.73</td>
+      <td id="T_8cdef_row2_col1" class="data row2 col1" > 0.186</td>
+      <td id="T_8cdef_row2_col2" class="data row2 col2" >-20.05</td>
+      <td id="T_8cdef_row2_col3" class="data row2 col3" >***</td>
+      <td id="T_8cdef_row2_col4" class="data row2 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row3" class="row_heading level0 row3" >ASC_Transit</th>
-      <td id="T_b4745_row3_col0" class="data row3 col0" >-2.16</td>
-      <td id="T_b4745_row3_col1" class="data row3 col1" > 0.383</td>
-      <td id="T_b4745_row3_col2" class="data row3 col2" >-5.63</td>
-      <td id="T_b4745_row3_col3" class="data row3 col3" >***</td>
-      <td id="T_b4745_row3_col4" class="data row3 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row3" class="row_heading level0 row3" >ASC_Transit</th>
+      <td id="T_8cdef_row3_col0" class="data row3 col0" >-2.16</td>
+      <td id="T_8cdef_row3_col1" class="data row3 col1" > 0.383</td>
+      <td id="T_8cdef_row3_col2" class="data row3 col2" >-5.63</td>
+      <td id="T_8cdef_row3_col3" class="data row3 col3" >***</td>
+      <td id="T_8cdef_row3_col4" class="data row3 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row4" class="row_heading level0 row4" >ASC_Walk</th>
-      <td id="T_b4745_row4_col0" class="data row4 col0" >-1.58</td>
-      <td id="T_b4745_row4_col1" class="data row4 col1" > 0.574</td>
-      <td id="T_b4745_row4_col2" class="data row4 col2" >-2.76</td>
-      <td id="T_b4745_row4_col3" class="data row4 col3" >**</td>
-      <td id="T_b4745_row4_col4" class="data row4 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row4" class="row_heading level0 row4" >ASC_Walk</th>
+      <td id="T_8cdef_row4_col0" class="data row4 col0" >-1.58</td>
+      <td id="T_8cdef_row4_col1" class="data row4 col1" > 0.574</td>
+      <td id="T_8cdef_row4_col2" class="data row4 col2" >-2.76</td>
+      <td id="T_8cdef_row4_col3" class="data row4 col3" >**</td>
+      <td id="T_8cdef_row4_col4" class="data row4 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row5" class="row_heading level0 row5" >costbyincome</th>
-      <td id="T_b4745_row5_col0" class="data row5 col0" >-0.0979</td>
-      <td id="T_b4745_row5_col1" class="data row5 col1" > 0.0162</td>
-      <td id="T_b4745_row5_col2" class="data row5 col2" >-6.05</td>
-      <td id="T_b4745_row5_col3" class="data row5 col3" >***</td>
-      <td id="T_b4745_row5_col4" class="data row5 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row5" class="row_heading level0 row5" >costbyincome</th>
+      <td id="T_8cdef_row5_col0" class="data row5 col0" >-0.0979</td>
+      <td id="T_8cdef_row5_col1" class="data row5 col1" > 0.0162</td>
+      <td id="T_8cdef_row5_col2" class="data row5 col2" >-6.05</td>
+      <td id="T_8cdef_row5_col3" class="data row5 col3" >***</td>
+      <td id="T_8cdef_row5_col4" class="data row5 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row6" class="row_heading level0 row6" >hhinc#4</th>
-      <td id="T_b4745_row6_col0" class="data row6 col0" > 0.000361</td>
-      <td id="T_b4745_row6_col1" class="data row6 col1" > 0.00263</td>
-      <td id="T_b4745_row6_col2" class="data row6 col2" > 0.14</td>
-      <td id="T_b4745_row6_col3" class="data row6 col3" ></td>
-      <td id="T_b4745_row6_col4" class="data row6 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row6" class="row_heading level0 row6" >hhinc#4</th>
+      <td id="T_8cdef_row6_col0" class="data row6 col0" > 0.000361</td>
+      <td id="T_8cdef_row6_col1" class="data row6 col1" > 0.00263</td>
+      <td id="T_8cdef_row6_col2" class="data row6 col2" > 0.14</td>
+      <td id="T_8cdef_row6_col3" class="data row6 col3" ></td>
+      <td id="T_8cdef_row6_col4" class="data row6 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row7" class="row_heading level0 row7" >hhinc#5</th>
-      <td id="T_b4745_row7_col0" class="data row7 col0" >-0.00265</td>
-      <td id="T_b4745_row7_col1" class="data row7 col1" > 0.00654</td>
-      <td id="T_b4745_row7_col2" class="data row7 col2" >-0.41</td>
-      <td id="T_b4745_row7_col3" class="data row7 col3" ></td>
-      <td id="T_b4745_row7_col4" class="data row7 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row7" class="row_heading level0 row7" >hhinc#5</th>
+      <td id="T_8cdef_row7_col0" class="data row7 col0" >-0.00265</td>
+      <td id="T_8cdef_row7_col1" class="data row7 col1" > 0.00654</td>
+      <td id="T_8cdef_row7_col2" class="data row7 col2" >-0.41</td>
+      <td id="T_8cdef_row7_col3" class="data row7 col3" ></td>
+      <td id="T_8cdef_row7_col4" class="data row7 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row8" class="row_heading level0 row8" >hhinc#6</th>
-      <td id="T_b4745_row8_col0" class="data row8 col0" > 0.000910</td>
-      <td id="T_b4745_row8_col1" class="data row8 col1" > 0.00406</td>
-      <td id="T_b4745_row8_col2" class="data row8 col2" > 0.22</td>
-      <td id="T_b4745_row8_col3" class="data row8 col3" ></td>
-      <td id="T_b4745_row8_col4" class="data row8 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row8" class="row_heading level0 row8" >hhinc#6</th>
+      <td id="T_8cdef_row8_col0" class="data row8 col0" > 0.000910</td>
+      <td id="T_8cdef_row8_col1" class="data row8 col1" > 0.00406</td>
+      <td id="T_8cdef_row8_col2" class="data row8 col2" > 0.22</td>
+      <td id="T_8cdef_row8_col3" class="data row8 col3" ></td>
+      <td id="T_8cdef_row8_col4" class="data row8 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row9" class="row_heading level0 row9" >motorized_ovtbydist</th>
-      <td id="T_b4745_row9_col0" class="data row9 col0" >-0.194</td>
-      <td id="T_b4745_row9_col1" class="data row9 col1" > 0.0330</td>
-      <td id="T_b4745_row9_col2" class="data row9 col2" >-5.87</td>
-      <td id="T_b4745_row9_col3" class="data row9 col3" >***</td>
-      <td id="T_b4745_row9_col4" class="data row9 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row9" class="row_heading level0 row9" >motorized_ovtbydist</th>
+      <td id="T_8cdef_row9_col0" class="data row9 col0" >-0.194</td>
+      <td id="T_8cdef_row9_col1" class="data row9 col1" > 0.0330</td>
+      <td id="T_8cdef_row9_col2" class="data row9 col2" >-5.87</td>
+      <td id="T_8cdef_row9_col3" class="data row9 col3" >***</td>
+      <td id="T_8cdef_row9_col4" class="data row9 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row10" class="row_heading level0 row10" >motorized_time</th>
-      <td id="T_b4745_row10_col0" class="data row10 col0" >-0.0188</td>
-      <td id="T_b4745_row10_col1" class="data row10 col1" > 0.00513</td>
-      <td id="T_b4745_row10_col2" class="data row10 col2" >-3.65</td>
-      <td id="T_b4745_row10_col3" class="data row10 col3" >***</td>
-      <td id="T_b4745_row10_col4" class="data row10 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row10" class="row_heading level0 row10" >motorized_time</th>
+      <td id="T_8cdef_row10_col0" class="data row10 col0" >-0.0188</td>
+      <td id="T_8cdef_row10_col1" class="data row10 col1" > 0.00513</td>
+      <td id="T_8cdef_row10_col2" class="data row10 col2" >-3.65</td>
+      <td id="T_8cdef_row10_col3" class="data row10 col3" >***</td>
+      <td id="T_8cdef_row10_col4" class="data row10 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row11" class="row_heading level0 row11" >nonmotorized_time</th>
-      <td id="T_b4745_row11_col0" class="data row11 col0" >-0.0452</td>
-      <td id="T_b4745_row11_col1" class="data row11 col1" > 0.00873</td>
-      <td id="T_b4745_row11_col2" class="data row11 col2" >-5.18</td>
-      <td id="T_b4745_row11_col3" class="data row11 col3" >***</td>
-      <td id="T_b4745_row11_col4" class="data row11 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row11" class="row_heading level0 row11" >nonmotorized_time</th>
+      <td id="T_8cdef_row11_col0" class="data row11 col0" >-0.0452</td>
+      <td id="T_8cdef_row11_col1" class="data row11 col1" > 0.00873</td>
+      <td id="T_8cdef_row11_col2" class="data row11 col2" >-5.18</td>
+      <td id="T_8cdef_row11_col3" class="data row11 col3" >***</td>
+      <td id="T_8cdef_row11_col4" class="data row11 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row12" class="row_heading level0 row12" >vehbywrk_Bike</th>
-      <td id="T_b4745_row12_col0" class="data row12 col0" >-0.217</td>
-      <td id="T_b4745_row12_col1" class="data row12 col1" > 0.332</td>
-      <td id="T_b4745_row12_col2" class="data row12 col2" >-0.65</td>
-      <td id="T_b4745_row12_col3" class="data row12 col3" ></td>
-      <td id="T_b4745_row12_col4" class="data row12 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row12" class="row_heading level0 row12" >vehbywrk_Bike</th>
+      <td id="T_8cdef_row12_col0" class="data row12 col0" >-0.217</td>
+      <td id="T_8cdef_row12_col1" class="data row12 col1" > 0.332</td>
+      <td id="T_8cdef_row12_col2" class="data row12 col2" >-0.65</td>
+      <td id="T_8cdef_row12_col3" class="data row12 col3" ></td>
+      <td id="T_8cdef_row12_col4" class="data row12 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row13" class="row_heading level0 row13" >vehbywrk_SR</th>
-      <td id="T_b4745_row13_col0" class="data row13 col0" >-0.238</td>
-      <td id="T_b4745_row13_col1" class="data row13 col1" > 0.0736</td>
-      <td id="T_b4745_row13_col2" class="data row13 col2" >-3.24</td>
-      <td id="T_b4745_row13_col3" class="data row13 col3" >**</td>
-      <td id="T_b4745_row13_col4" class="data row13 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row13" class="row_heading level0 row13" >vehbywrk_SR</th>
+      <td id="T_8cdef_row13_col0" class="data row13 col0" >-0.238</td>
+      <td id="T_8cdef_row13_col1" class="data row13 col1" > 0.0736</td>
+      <td id="T_8cdef_row13_col2" class="data row13 col2" >-3.24</td>
+      <td id="T_8cdef_row13_col3" class="data row13 col3" >**</td>
+      <td id="T_8cdef_row13_col4" class="data row13 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row14" class="row_heading level0 row14" >vehbywrk_Transit</th>
-      <td id="T_b4745_row14_col0" class="data row14 col0" >-0.236</td>
-      <td id="T_b4745_row14_col1" class="data row14 col1" > 0.136</td>
-      <td id="T_b4745_row14_col2" class="data row14 col2" >-1.74</td>
-      <td id="T_b4745_row14_col3" class="data row14 col3" ></td>
-      <td id="T_b4745_row14_col4" class="data row14 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row14" class="row_heading level0 row14" >vehbywrk_Transit</th>
+      <td id="T_8cdef_row14_col0" class="data row14 col0" >-0.236</td>
+      <td id="T_8cdef_row14_col1" class="data row14 col1" > 0.136</td>
+      <td id="T_8cdef_row14_col2" class="data row14 col2" >-1.74</td>
+      <td id="T_8cdef_row14_col3" class="data row14 col3" ></td>
+      <td id="T_8cdef_row14_col4" class="data row14 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row15" class="row_heading level0 row15" >vehbywrk_Walk</th>
-      <td id="T_b4745_row15_col0" class="data row15 col0" >-0.0800</td>
-      <td id="T_b4745_row15_col1" class="data row15 col1" > 0.209</td>
-      <td id="T_b4745_row15_col2" class="data row15 col2" >-0.38</td>
-      <td id="T_b4745_row15_col3" class="data row15 col3" ></td>
-      <td id="T_b4745_row15_col4" class="data row15 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row15" class="row_heading level0 row15" >vehbywrk_Walk</th>
+      <td id="T_8cdef_row15_col0" class="data row15 col0" >-0.0800</td>
+      <td id="T_8cdef_row15_col1" class="data row15 col1" > 0.209</td>
+      <td id="T_8cdef_row15_col2" class="data row15 col2" >-0.38</td>
+      <td id="T_8cdef_row15_col3" class="data row15 col3" ></td>
+      <td id="T_8cdef_row15_col4" class="data row15 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row16" class="row_heading level0 row16" >wkcbd_Bike</th>
-      <td id="T_b4745_row16_col0" class="data row16 col0" > 0.565</td>
-      <td id="T_b4745_row16_col1" class="data row16 col1" > 0.494</td>
-      <td id="T_b4745_row16_col2" class="data row16 col2" > 1.14</td>
-      <td id="T_b4745_row16_col3" class="data row16 col3" ></td>
-      <td id="T_b4745_row16_col4" class="data row16 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row16" class="row_heading level0 row16" >wkcbd_Bike</th>
+      <td id="T_8cdef_row16_col0" class="data row16 col0" > 0.565</td>
+      <td id="T_8cdef_row16_col1" class="data row16 col1" > 0.494</td>
+      <td id="T_8cdef_row16_col2" class="data row16 col2" > 1.14</td>
+      <td id="T_8cdef_row16_col3" class="data row16 col3" ></td>
+      <td id="T_8cdef_row16_col4" class="data row16 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row17" class="row_heading level0 row17" >wkcbd_SR2</th>
-      <td id="T_b4745_row17_col0" class="data row17 col0" > 0.164</td>
-      <td id="T_b4745_row17_col1" class="data row17 col1" > 0.149</td>
-      <td id="T_b4745_row17_col2" class="data row17 col2" > 1.10</td>
-      <td id="T_b4745_row17_col3" class="data row17 col3" ></td>
-      <td id="T_b4745_row17_col4" class="data row17 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row17" class="row_heading level0 row17" >wkcbd_SR2</th>
+      <td id="T_8cdef_row17_col0" class="data row17 col0" > 0.164</td>
+      <td id="T_8cdef_row17_col1" class="data row17 col1" > 0.149</td>
+      <td id="T_8cdef_row17_col2" class="data row17 col2" > 1.10</td>
+      <td id="T_8cdef_row17_col3" class="data row17 col3" ></td>
+      <td id="T_8cdef_row17_col4" class="data row17 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row18" class="row_heading level0 row18" >wkcbd_SR3+</th>
-      <td id="T_b4745_row18_col0" class="data row18 col0" > 1.33</td>
-      <td id="T_b4745_row18_col1" class="data row18 col1" > 0.221</td>
-      <td id="T_b4745_row18_col2" class="data row18 col2" > 6.03</td>
-      <td id="T_b4745_row18_col3" class="data row18 col3" >***</td>
-      <td id="T_b4745_row18_col4" class="data row18 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row18" class="row_heading level0 row18" >wkcbd_SR3+</th>
+      <td id="T_8cdef_row18_col0" class="data row18 col0" > 1.33</td>
+      <td id="T_8cdef_row18_col1" class="data row18 col1" > 0.221</td>
+      <td id="T_8cdef_row18_col2" class="data row18 col2" > 6.03</td>
+      <td id="T_8cdef_row18_col3" class="data row18 col3" >***</td>
+      <td id="T_8cdef_row18_col4" class="data row18 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row19" class="row_heading level0 row19" >wkcbd_Transit</th>
-      <td id="T_b4745_row19_col0" class="data row19 col0" > 1.26</td>
-      <td id="T_b4745_row19_col1" class="data row19 col1" > 0.244</td>
-      <td id="T_b4745_row19_col2" class="data row19 col2" > 5.17</td>
-      <td id="T_b4745_row19_col3" class="data row19 col3" >***</td>
-      <td id="T_b4745_row19_col4" class="data row19 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row19" class="row_heading level0 row19" >wkcbd_Transit</th>
+      <td id="T_8cdef_row19_col0" class="data row19 col0" > 1.26</td>
+      <td id="T_8cdef_row19_col1" class="data row19 col1" > 0.244</td>
+      <td id="T_8cdef_row19_col2" class="data row19 col2" > 5.17</td>
+      <td id="T_8cdef_row19_col3" class="data row19 col3" >***</td>
+      <td id="T_8cdef_row19_col4" class="data row19 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row20" class="row_heading level0 row20" >wkcbd_Walk</th>
-      <td id="T_b4745_row20_col0" class="data row20 col0" > 0.216</td>
-      <td id="T_b4745_row20_col1" class="data row20 col1" > 0.380</td>
-      <td id="T_b4745_row20_col2" class="data row20 col2" > 0.57</td>
-      <td id="T_b4745_row20_col3" class="data row20 col3" ></td>
-      <td id="T_b4745_row20_col4" class="data row20 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row20" class="row_heading level0 row20" >wkcbd_Walk</th>
+      <td id="T_8cdef_row20_col0" class="data row20 col0" > 0.216</td>
+      <td id="T_8cdef_row20_col1" class="data row20 col1" > 0.380</td>
+      <td id="T_8cdef_row20_col2" class="data row20 col2" > 0.57</td>
+      <td id="T_8cdef_row20_col3" class="data row20 col3" ></td>
+      <td id="T_8cdef_row20_col4" class="data row20 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row21" class="row_heading level0 row21" >wkempden_Bike</th>
-      <td id="T_b4745_row21_col0" class="data row21 col0" > 0.00144</td>
-      <td id="T_b4745_row21_col1" class="data row21 col1" > 0.00170</td>
-      <td id="T_b4745_row21_col2" class="data row21 col2" > 0.85</td>
-      <td id="T_b4745_row21_col3" class="data row21 col3" ></td>
-      <td id="T_b4745_row21_col4" class="data row21 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row21" class="row_heading level0 row21" >wkempden_Bike</th>
+      <td id="T_8cdef_row21_col0" class="data row21 col0" > 0.00144</td>
+      <td id="T_8cdef_row21_col1" class="data row21 col1" > 0.00170</td>
+      <td id="T_8cdef_row21_col2" class="data row21 col2" > 0.85</td>
+      <td id="T_8cdef_row21_col3" class="data row21 col3" ></td>
+      <td id="T_8cdef_row21_col4" class="data row21 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row22" class="row_heading level0 row22" >wkempden_SR2</th>
-      <td id="T_b4745_row22_col0" class="data row22 col0" > 0.00107</td>
-      <td id="T_b4745_row22_col1" class="data row22 col1" > 0.000483</td>
-      <td id="T_b4745_row22_col2" class="data row22 col2" > 2.22</td>
-      <td id="T_b4745_row22_col3" class="data row22 col3" >*</td>
-      <td id="T_b4745_row22_col4" class="data row22 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row22" class="row_heading level0 row22" >wkempden_SR2</th>
+      <td id="T_8cdef_row22_col0" class="data row22 col0" > 0.00107</td>
+      <td id="T_8cdef_row22_col1" class="data row22 col1" > 0.000483</td>
+      <td id="T_8cdef_row22_col2" class="data row22 col2" > 2.22</td>
+      <td id="T_8cdef_row22_col3" class="data row22 col3" >*</td>
+      <td id="T_8cdef_row22_col4" class="data row22 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row23" class="row_heading level0 row23" >wkempden_SR3+</th>
-      <td id="T_b4745_row23_col0" class="data row23 col0" > 0.00135</td>
-      <td id="T_b4745_row23_col1" class="data row23 col1" > 0.000547</td>
-      <td id="T_b4745_row23_col2" class="data row23 col2" > 2.46</td>
-      <td id="T_b4745_row23_col3" class="data row23 col3" >*</td>
-      <td id="T_b4745_row23_col4" class="data row23 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row23" class="row_heading level0 row23" >wkempden_SR3+</th>
+      <td id="T_8cdef_row23_col0" class="data row23 col0" > 0.00135</td>
+      <td id="T_8cdef_row23_col1" class="data row23 col1" > 0.000547</td>
+      <td id="T_8cdef_row23_col2" class="data row23 col2" > 2.46</td>
+      <td id="T_8cdef_row23_col3" class="data row23 col3" >*</td>
+      <td id="T_8cdef_row23_col4" class="data row23 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row24" class="row_heading level0 row24" >wkempden_Transit</th>
-      <td id="T_b4745_row24_col0" class="data row24 col0" > 0.00289</td>
-      <td id="T_b4745_row24_col1" class="data row24 col1" > 0.000448</td>
-      <td id="T_b4745_row24_col2" class="data row24 col2" > 6.45</td>
-      <td id="T_b4745_row24_col3" class="data row24 col3" >***</td>
-      <td id="T_b4745_row24_col4" class="data row24 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row24" class="row_heading level0 row24" >wkempden_Transit</th>
+      <td id="T_8cdef_row24_col0" class="data row24 col0" > 0.00289</td>
+      <td id="T_8cdef_row24_col1" class="data row24 col1" > 0.000448</td>
+      <td id="T_8cdef_row24_col2" class="data row24 col2" > 6.45</td>
+      <td id="T_8cdef_row24_col3" class="data row24 col3" >***</td>
+      <td id="T_8cdef_row24_col4" class="data row24 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_b4745_level0_row25" class="row_heading level0 row25" >wkempden_Walk</th>
-      <td id="T_b4745_row25_col0" class="data row25 col0" >-0.00106</td>
-      <td id="T_b4745_row25_col1" class="data row25 col1" > 0.00214</td>
-      <td id="T_b4745_row25_col2" class="data row25 col2" >-0.49</td>
-      <td id="T_b4745_row25_col3" class="data row25 col3" ></td>
-      <td id="T_b4745_row25_col4" class="data row25 col4" > 0.00</td>
+      <th id="T_8cdef_level0_row25" class="row_heading level0 row25" >wkempden_Walk</th>
+      <td id="T_8cdef_row25_col0" class="data row25 col0" >-0.00106</td>
+      <td id="T_8cdef_row25_col1" class="data row25 col1" > 0.00214</td>
+      <td id="T_8cdef_row25_col2" class="data row25 col2" >-0.49</td>
+      <td id="T_8cdef_row25_col3" class="data row25 col3" ></td>
+      <td id="T_8cdef_row25_col4" class="data row25 col4" > 0.00</td>
     </tr>
   </tbody>
 </table>
@@ -1693,28 +1665,28 @@ Attributes:
 </div>
 <div class="cell_output docutils container">
 <div class="output text_html"><style type="text/css">
-#T_c3424 th {
+#T_b8019 th {
   vertical-align: top;
   text-align: left;
 }
-#T_c3424 td {
+#T_b8019 td {
   vertical-align: top;
   text-align: left;
 }
-#T_c3424_row0_col0, #T_c3424_row0_col1, #T_c3424_row0_col2, #T_c3424_row0_col3, #T_c3424_row0_col4, #T_c3424_row1_col0, #T_c3424_row1_col1, #T_c3424_row1_col2, #T_c3424_row1_col3, #T_c3424_row1_col4, #T_c3424_row2_col0, #T_c3424_row2_col1, #T_c3424_row2_col2, #T_c3424_row2_col3, #T_c3424_row2_col4, #T_c3424_row3_col0, #T_c3424_row3_col1, #T_c3424_row3_col2, #T_c3424_row3_col3, #T_c3424_row3_col4, #T_c3424_row4_col0, #T_c3424_row4_col1, #T_c3424_row4_col2, #T_c3424_row4_col3, #T_c3424_row4_col4, #T_c3424_row5_col0, #T_c3424_row5_col1, #T_c3424_row5_col2, #T_c3424_row5_col3, #T_c3424_row5_col4, #T_c3424_row6_col0, #T_c3424_row6_col1, #T_c3424_row6_col2, #T_c3424_row6_col3, #T_c3424_row6_col4, #T_c3424_row7_col0, #T_c3424_row7_col1, #T_c3424_row7_col2, #T_c3424_row7_col3, #T_c3424_row7_col4, #T_c3424_row8_col0, #T_c3424_row8_col1, #T_c3424_row8_col2, #T_c3424_row8_col3, #T_c3424_row8_col4, #T_c3424_row9_col0, #T_c3424_row9_col1, #T_c3424_row9_col2, #T_c3424_row9_col3, #T_c3424_row9_col4, #T_c3424_row10_col0, #T_c3424_row10_col1, #T_c3424_row10_col2, #T_c3424_row10_col3, #T_c3424_row10_col4, #T_c3424_row11_col0, #T_c3424_row11_col1, #T_c3424_row11_col2, #T_c3424_row11_col3, #T_c3424_row11_col4, #T_c3424_row12_col0, #T_c3424_row12_col1, #T_c3424_row12_col2, #T_c3424_row12_col3, #T_c3424_row12_col4, #T_c3424_row13_col0, #T_c3424_row13_col1, #T_c3424_row13_col2, #T_c3424_row13_col3, #T_c3424_row13_col4, #T_c3424_row14_col0, #T_c3424_row14_col1, #T_c3424_row14_col2, #T_c3424_row14_col3, #T_c3424_row14_col4, #T_c3424_row15_col0, #T_c3424_row15_col1, #T_c3424_row15_col2, #T_c3424_row15_col3, #T_c3424_row15_col4, #T_c3424_row16_col0, #T_c3424_row16_col1, #T_c3424_row16_col2, #T_c3424_row16_col3, #T_c3424_row16_col4, #T_c3424_row17_col0, #T_c3424_row17_col1, #T_c3424_row17_col2, #T_c3424_row17_col3, #T_c3424_row17_col4, #T_c3424_row18_col0, #T_c3424_row18_col1, #T_c3424_row18_col2, #T_c3424_row18_col3, #T_c3424_row18_col4, #T_c3424_row19_col0, #T_c3424_row19_col1, #T_c3424_row19_col2, #T_c3424_row19_col3, #T_c3424_row19_col4, #T_c3424_row20_col0, #T_c3424_row20_col1, #T_c3424_row20_col2, #T_c3424_row20_col3, #T_c3424_row20_col4, #T_c3424_row21_col0, #T_c3424_row21_col1, #T_c3424_row21_col2, #T_c3424_row21_col3, #T_c3424_row21_col4, #T_c3424_row22_col0, #T_c3424_row22_col1, #T_c3424_row22_col2, #T_c3424_row22_col3, #T_c3424_row22_col4, #T_c3424_row23_col0, #T_c3424_row23_col1, #T_c3424_row23_col2, #T_c3424_row23_col3, #T_c3424_row23_col4, #T_c3424_row24_col0, #T_c3424_row24_col1, #T_c3424_row24_col2, #T_c3424_row24_col3, #T_c3424_row24_col4, #T_c3424_row25_col0, #T_c3424_row25_col1, #T_c3424_row25_col2, #T_c3424_row25_col3, #T_c3424_row25_col4 {
+#T_b8019_row0_col0, #T_b8019_row0_col1, #T_b8019_row0_col2, #T_b8019_row0_col3, #T_b8019_row0_col4, #T_b8019_row1_col0, #T_b8019_row1_col1, #T_b8019_row1_col2, #T_b8019_row1_col3, #T_b8019_row1_col4, #T_b8019_row2_col0, #T_b8019_row2_col1, #T_b8019_row2_col2, #T_b8019_row2_col3, #T_b8019_row2_col4, #T_b8019_row3_col0, #T_b8019_row3_col1, #T_b8019_row3_col2, #T_b8019_row3_col3, #T_b8019_row3_col4, #T_b8019_row4_col0, #T_b8019_row4_col1, #T_b8019_row4_col2, #T_b8019_row4_col3, #T_b8019_row4_col4, #T_b8019_row5_col0, #T_b8019_row5_col1, #T_b8019_row5_col2, #T_b8019_row5_col3, #T_b8019_row5_col4, #T_b8019_row6_col0, #T_b8019_row6_col1, #T_b8019_row6_col2, #T_b8019_row6_col3, #T_b8019_row6_col4, #T_b8019_row7_col0, #T_b8019_row7_col1, #T_b8019_row7_col2, #T_b8019_row7_col3, #T_b8019_row7_col4, #T_b8019_row8_col0, #T_b8019_row8_col1, #T_b8019_row8_col2, #T_b8019_row8_col3, #T_b8019_row8_col4, #T_b8019_row9_col0, #T_b8019_row9_col1, #T_b8019_row9_col2, #T_b8019_row9_col3, #T_b8019_row9_col4, #T_b8019_row10_col0, #T_b8019_row10_col1, #T_b8019_row10_col2, #T_b8019_row10_col3, #T_b8019_row10_col4, #T_b8019_row11_col0, #T_b8019_row11_col1, #T_b8019_row11_col2, #T_b8019_row11_col3, #T_b8019_row11_col4, #T_b8019_row12_col0, #T_b8019_row12_col1, #T_b8019_row12_col2, #T_b8019_row12_col3, #T_b8019_row12_col4, #T_b8019_row13_col0, #T_b8019_row13_col1, #T_b8019_row13_col2, #T_b8019_row13_col3, #T_b8019_row13_col4, #T_b8019_row14_col0, #T_b8019_row14_col1, #T_b8019_row14_col2, #T_b8019_row14_col3, #T_b8019_row14_col4, #T_b8019_row15_col0, #T_b8019_row15_col1, #T_b8019_row15_col2, #T_b8019_row15_col3, #T_b8019_row15_col4, #T_b8019_row16_col0, #T_b8019_row16_col1, #T_b8019_row16_col2, #T_b8019_row16_col3, #T_b8019_row16_col4, #T_b8019_row17_col0, #T_b8019_row17_col1, #T_b8019_row17_col2, #T_b8019_row17_col3, #T_b8019_row17_col4, #T_b8019_row18_col0, #T_b8019_row18_col1, #T_b8019_row18_col2, #T_b8019_row18_col3, #T_b8019_row18_col4, #T_b8019_row19_col0, #T_b8019_row19_col1, #T_b8019_row19_col2, #T_b8019_row19_col3, #T_b8019_row19_col4, #T_b8019_row20_col0, #T_b8019_row20_col1, #T_b8019_row20_col2, #T_b8019_row20_col3, #T_b8019_row20_col4, #T_b8019_row21_col0, #T_b8019_row21_col1, #T_b8019_row21_col2, #T_b8019_row21_col3, #T_b8019_row21_col4, #T_b8019_row22_col0, #T_b8019_row22_col1, #T_b8019_row22_col2, #T_b8019_row22_col3, #T_b8019_row22_col4, #T_b8019_row23_col0, #T_b8019_row23_col1, #T_b8019_row23_col2, #T_b8019_row23_col3, #T_b8019_row23_col4, #T_b8019_row24_col0, #T_b8019_row24_col1, #T_b8019_row24_col2, #T_b8019_row24_col3, #T_b8019_row24_col4, #T_b8019_row25_col0, #T_b8019_row25_col1, #T_b8019_row25_col2, #T_b8019_row25_col3, #T_b8019_row25_col4 {
   font-family: monospace;
 }
 </style>
-<table id="T_c3424">
+<table id="T_b8019">
   <thead>
     <tr>
       <th class="blank" >&nbsp;</th>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_c3424_level0_col0" class="col_heading level0 col0" >Value</th>
-      <th id="T_c3424_level0_col1" class="col_heading level0 col1" >Std Err</th>
-      <th id="T_c3424_level0_col2" class="col_heading level0 col2" >t Stat</th>
-      <th id="T_c3424_level0_col3" class="col_heading level0 col3" >Signif</th>
-      <th id="T_c3424_level0_col4" class="col_heading level0 col4" >Null Value</th>
+      <th id="T_b8019_level0_col0" class="col_heading level0 col0" >Value</th>
+      <th id="T_b8019_level0_col1" class="col_heading level0 col1" >Std Err</th>
+      <th id="T_b8019_level0_col2" class="col_heading level0 col2" >t Stat</th>
+      <th id="T_b8019_level0_col3" class="col_heading level0 col3" >Signif</th>
+      <th id="T_b8019_level0_col4" class="col_heading level0 col4" >Null Value</th>
     </tr>
     <tr>
       <th class="index_name level0" >Category</th>
@@ -1728,216 +1700,216 @@ Attributes:
   </thead>
   <tbody>
     <tr>
-      <th id="T_c3424_level0_row0" class="row_heading level0 row0" rowspan="4">LOS</th>
-      <th id="T_c3424_level1_row0" class="row_heading level1 row0" >costbyincome</th>
-      <td id="T_c3424_row0_col0" class="data row0 col0" >-0.0979</td>
-      <td id="T_c3424_row0_col1" class="data row0 col1" > 0.0162</td>
-      <td id="T_c3424_row0_col2" class="data row0 col2" >-6.05</td>
-      <td id="T_c3424_row0_col3" class="data row0 col3" >***</td>
-      <td id="T_c3424_row0_col4" class="data row0 col4" > 0.00</td>
+      <th id="T_b8019_level0_row0" class="row_heading level0 row0" rowspan="4">LOS</th>
+      <th id="T_b8019_level1_row0" class="row_heading level1 row0" >costbyincome</th>
+      <td id="T_b8019_row0_col0" class="data row0 col0" >-0.0979</td>
+      <td id="T_b8019_row0_col1" class="data row0 col1" > 0.0162</td>
+      <td id="T_b8019_row0_col2" class="data row0 col2" >-6.05</td>
+      <td id="T_b8019_row0_col3" class="data row0 col3" >***</td>
+      <td id="T_b8019_row0_col4" class="data row0 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row1" class="row_heading level1 row1" >motorized_time</th>
-      <td id="T_c3424_row1_col0" class="data row1 col0" >-0.0188</td>
-      <td id="T_c3424_row1_col1" class="data row1 col1" > 0.00513</td>
-      <td id="T_c3424_row1_col2" class="data row1 col2" >-3.65</td>
-      <td id="T_c3424_row1_col3" class="data row1 col3" >***</td>
-      <td id="T_c3424_row1_col4" class="data row1 col4" > 0.00</td>
+      <th id="T_b8019_level1_row1" class="row_heading level1 row1" >motorized_time</th>
+      <td id="T_b8019_row1_col0" class="data row1 col0" >-0.0188</td>
+      <td id="T_b8019_row1_col1" class="data row1 col1" > 0.00513</td>
+      <td id="T_b8019_row1_col2" class="data row1 col2" >-3.65</td>
+      <td id="T_b8019_row1_col3" class="data row1 col3" >***</td>
+      <td id="T_b8019_row1_col4" class="data row1 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row2" class="row_heading level1 row2" >nonmotorized_time</th>
-      <td id="T_c3424_row2_col0" class="data row2 col0" >-0.0452</td>
-      <td id="T_c3424_row2_col1" class="data row2 col1" > 0.00873</td>
-      <td id="T_c3424_row2_col2" class="data row2 col2" >-5.18</td>
-      <td id="T_c3424_row2_col3" class="data row2 col3" >***</td>
-      <td id="T_c3424_row2_col4" class="data row2 col4" > 0.00</td>
+      <th id="T_b8019_level1_row2" class="row_heading level1 row2" >nonmotorized_time</th>
+      <td id="T_b8019_row2_col0" class="data row2 col0" >-0.0452</td>
+      <td id="T_b8019_row2_col1" class="data row2 col1" > 0.00873</td>
+      <td id="T_b8019_row2_col2" class="data row2 col2" >-5.18</td>
+      <td id="T_b8019_row2_col3" class="data row2 col3" >***</td>
+      <td id="T_b8019_row2_col4" class="data row2 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row3" class="row_heading level1 row3" >motorized_ovtbydist</th>
-      <td id="T_c3424_row3_col0" class="data row3 col0" >-0.194</td>
-      <td id="T_c3424_row3_col1" class="data row3 col1" > 0.0330</td>
-      <td id="T_c3424_row3_col2" class="data row3 col2" >-5.87</td>
-      <td id="T_c3424_row3_col3" class="data row3 col3" >***</td>
-      <td id="T_c3424_row3_col4" class="data row3 col4" > 0.00</td>
+      <th id="T_b8019_level1_row3" class="row_heading level1 row3" >motorized_ovtbydist</th>
+      <td id="T_b8019_row3_col0" class="data row3 col0" >-0.194</td>
+      <td id="T_b8019_row3_col1" class="data row3 col1" > 0.0330</td>
+      <td id="T_b8019_row3_col2" class="data row3 col2" >-5.87</td>
+      <td id="T_b8019_row3_col3" class="data row3 col3" >***</td>
+      <td id="T_b8019_row3_col4" class="data row3 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level0_row4" class="row_heading level0 row4" rowspan="10">Zonal</th>
-      <th id="T_c3424_level1_row4" class="row_heading level1 row4" >wkcbd_Bike</th>
-      <td id="T_c3424_row4_col0" class="data row4 col0" > 0.565</td>
-      <td id="T_c3424_row4_col1" class="data row4 col1" > 0.494</td>
-      <td id="T_c3424_row4_col2" class="data row4 col2" > 1.14</td>
-      <td id="T_c3424_row4_col3" class="data row4 col3" ></td>
-      <td id="T_c3424_row4_col4" class="data row4 col4" > 0.00</td>
+      <th id="T_b8019_level0_row4" class="row_heading level0 row4" rowspan="10">Zonal</th>
+      <th id="T_b8019_level1_row4" class="row_heading level1 row4" >wkcbd_Bike</th>
+      <td id="T_b8019_row4_col0" class="data row4 col0" > 0.565</td>
+      <td id="T_b8019_row4_col1" class="data row4 col1" > 0.494</td>
+      <td id="T_b8019_row4_col2" class="data row4 col2" > 1.14</td>
+      <td id="T_b8019_row4_col3" class="data row4 col3" ></td>
+      <td id="T_b8019_row4_col4" class="data row4 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row5" class="row_heading level1 row5" >wkcbd_SR2</th>
-      <td id="T_c3424_row5_col0" class="data row5 col0" > 0.164</td>
-      <td id="T_c3424_row5_col1" class="data row5 col1" > 0.149</td>
-      <td id="T_c3424_row5_col2" class="data row5 col2" > 1.10</td>
-      <td id="T_c3424_row5_col3" class="data row5 col3" ></td>
-      <td id="T_c3424_row5_col4" class="data row5 col4" > 0.00</td>
+      <th id="T_b8019_level1_row5" class="row_heading level1 row5" >wkcbd_SR2</th>
+      <td id="T_b8019_row5_col0" class="data row5 col0" > 0.164</td>
+      <td id="T_b8019_row5_col1" class="data row5 col1" > 0.149</td>
+      <td id="T_b8019_row5_col2" class="data row5 col2" > 1.10</td>
+      <td id="T_b8019_row5_col3" class="data row5 col3" ></td>
+      <td id="T_b8019_row5_col4" class="data row5 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row6" class="row_heading level1 row6" >wkcbd_SR3+</th>
-      <td id="T_c3424_row6_col0" class="data row6 col0" > 1.33</td>
-      <td id="T_c3424_row6_col1" class="data row6 col1" > 0.221</td>
-      <td id="T_c3424_row6_col2" class="data row6 col2" > 6.03</td>
-      <td id="T_c3424_row6_col3" class="data row6 col3" >***</td>
-      <td id="T_c3424_row6_col4" class="data row6 col4" > 0.00</td>
+      <th id="T_b8019_level1_row6" class="row_heading level1 row6" >wkcbd_SR3+</th>
+      <td id="T_b8019_row6_col0" class="data row6 col0" > 1.33</td>
+      <td id="T_b8019_row6_col1" class="data row6 col1" > 0.221</td>
+      <td id="T_b8019_row6_col2" class="data row6 col2" > 6.03</td>
+      <td id="T_b8019_row6_col3" class="data row6 col3" >***</td>
+      <td id="T_b8019_row6_col4" class="data row6 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row7" class="row_heading level1 row7" >wkcbd_Transit</th>
-      <td id="T_c3424_row7_col0" class="data row7 col0" > 1.26</td>
-      <td id="T_c3424_row7_col1" class="data row7 col1" > 0.244</td>
-      <td id="T_c3424_row7_col2" class="data row7 col2" > 5.17</td>
-      <td id="T_c3424_row7_col3" class="data row7 col3" >***</td>
-      <td id="T_c3424_row7_col4" class="data row7 col4" > 0.00</td>
+      <th id="T_b8019_level1_row7" class="row_heading level1 row7" >wkcbd_Transit</th>
+      <td id="T_b8019_row7_col0" class="data row7 col0" > 1.26</td>
+      <td id="T_b8019_row7_col1" class="data row7 col1" > 0.244</td>
+      <td id="T_b8019_row7_col2" class="data row7 col2" > 5.17</td>
+      <td id="T_b8019_row7_col3" class="data row7 col3" >***</td>
+      <td id="T_b8019_row7_col4" class="data row7 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row8" class="row_heading level1 row8" >wkcbd_Walk</th>
-      <td id="T_c3424_row8_col0" class="data row8 col0" > 0.216</td>
-      <td id="T_c3424_row8_col1" class="data row8 col1" > 0.380</td>
-      <td id="T_c3424_row8_col2" class="data row8 col2" > 0.57</td>
-      <td id="T_c3424_row8_col3" class="data row8 col3" ></td>
-      <td id="T_c3424_row8_col4" class="data row8 col4" > 0.00</td>
+      <th id="T_b8019_level1_row8" class="row_heading level1 row8" >wkcbd_Walk</th>
+      <td id="T_b8019_row8_col0" class="data row8 col0" > 0.216</td>
+      <td id="T_b8019_row8_col1" class="data row8 col1" > 0.380</td>
+      <td id="T_b8019_row8_col2" class="data row8 col2" > 0.57</td>
+      <td id="T_b8019_row8_col3" class="data row8 col3" ></td>
+      <td id="T_b8019_row8_col4" class="data row8 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row9" class="row_heading level1 row9" >wkempden_Bike</th>
-      <td id="T_c3424_row9_col0" class="data row9 col0" > 0.00144</td>
-      <td id="T_c3424_row9_col1" class="data row9 col1" > 0.00170</td>
-      <td id="T_c3424_row9_col2" class="data row9 col2" > 0.85</td>
-      <td id="T_c3424_row9_col3" class="data row9 col3" ></td>
-      <td id="T_c3424_row9_col4" class="data row9 col4" > 0.00</td>
+      <th id="T_b8019_level1_row9" class="row_heading level1 row9" >wkempden_Bike</th>
+      <td id="T_b8019_row9_col0" class="data row9 col0" > 0.00144</td>
+      <td id="T_b8019_row9_col1" class="data row9 col1" > 0.00170</td>
+      <td id="T_b8019_row9_col2" class="data row9 col2" > 0.85</td>
+      <td id="T_b8019_row9_col3" class="data row9 col3" ></td>
+      <td id="T_b8019_row9_col4" class="data row9 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row10" class="row_heading level1 row10" >wkempden_SR2</th>
-      <td id="T_c3424_row10_col0" class="data row10 col0" > 0.00107</td>
-      <td id="T_c3424_row10_col1" class="data row10 col1" > 0.000483</td>
-      <td id="T_c3424_row10_col2" class="data row10 col2" > 2.22</td>
-      <td id="T_c3424_row10_col3" class="data row10 col3" >*</td>
-      <td id="T_c3424_row10_col4" class="data row10 col4" > 0.00</td>
+      <th id="T_b8019_level1_row10" class="row_heading level1 row10" >wkempden_SR2</th>
+      <td id="T_b8019_row10_col0" class="data row10 col0" > 0.00107</td>
+      <td id="T_b8019_row10_col1" class="data row10 col1" > 0.000483</td>
+      <td id="T_b8019_row10_col2" class="data row10 col2" > 2.22</td>
+      <td id="T_b8019_row10_col3" class="data row10 col3" >*</td>
+      <td id="T_b8019_row10_col4" class="data row10 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row11" class="row_heading level1 row11" >wkempden_SR3+</th>
-      <td id="T_c3424_row11_col0" class="data row11 col0" > 0.00135</td>
-      <td id="T_c3424_row11_col1" class="data row11 col1" > 0.000547</td>
-      <td id="T_c3424_row11_col2" class="data row11 col2" > 2.46</td>
-      <td id="T_c3424_row11_col3" class="data row11 col3" >*</td>
-      <td id="T_c3424_row11_col4" class="data row11 col4" > 0.00</td>
+      <th id="T_b8019_level1_row11" class="row_heading level1 row11" >wkempden_SR3+</th>
+      <td id="T_b8019_row11_col0" class="data row11 col0" > 0.00135</td>
+      <td id="T_b8019_row11_col1" class="data row11 col1" > 0.000547</td>
+      <td id="T_b8019_row11_col2" class="data row11 col2" > 2.46</td>
+      <td id="T_b8019_row11_col3" class="data row11 col3" >*</td>
+      <td id="T_b8019_row11_col4" class="data row11 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row12" class="row_heading level1 row12" >wkempden_Transit</th>
-      <td id="T_c3424_row12_col0" class="data row12 col0" > 0.00289</td>
-      <td id="T_c3424_row12_col1" class="data row12 col1" > 0.000448</td>
-      <td id="T_c3424_row12_col2" class="data row12 col2" > 6.45</td>
-      <td id="T_c3424_row12_col3" class="data row12 col3" >***</td>
-      <td id="T_c3424_row12_col4" class="data row12 col4" > 0.00</td>
+      <th id="T_b8019_level1_row12" class="row_heading level1 row12" >wkempden_Transit</th>
+      <td id="T_b8019_row12_col0" class="data row12 col0" > 0.00289</td>
+      <td id="T_b8019_row12_col1" class="data row12 col1" > 0.000448</td>
+      <td id="T_b8019_row12_col2" class="data row12 col2" > 6.45</td>
+      <td id="T_b8019_row12_col3" class="data row12 col3" >***</td>
+      <td id="T_b8019_row12_col4" class="data row12 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row13" class="row_heading level1 row13" >wkempden_Walk</th>
-      <td id="T_c3424_row13_col0" class="data row13 col0" >-0.00106</td>
-      <td id="T_c3424_row13_col1" class="data row13 col1" > 0.00214</td>
-      <td id="T_c3424_row13_col2" class="data row13 col2" >-0.49</td>
-      <td id="T_c3424_row13_col3" class="data row13 col3" ></td>
-      <td id="T_c3424_row13_col4" class="data row13 col4" > 0.00</td>
+      <th id="T_b8019_level1_row13" class="row_heading level1 row13" >wkempden_Walk</th>
+      <td id="T_b8019_row13_col0" class="data row13 col0" >-0.00106</td>
+      <td id="T_b8019_row13_col1" class="data row13 col1" > 0.00214</td>
+      <td id="T_b8019_row13_col2" class="data row13 col2" >-0.49</td>
+      <td id="T_b8019_row13_col3" class="data row13 col3" ></td>
+      <td id="T_b8019_row13_col4" class="data row13 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level0_row14" class="row_heading level0 row14" rowspan="7">Household</th>
-      <th id="T_c3424_level1_row14" class="row_heading level1 row14" >hhinc#4</th>
-      <td id="T_c3424_row14_col0" class="data row14 col0" > 0.000361</td>
-      <td id="T_c3424_row14_col1" class="data row14 col1" > 0.00263</td>
-      <td id="T_c3424_row14_col2" class="data row14 col2" > 0.14</td>
-      <td id="T_c3424_row14_col3" class="data row14 col3" ></td>
-      <td id="T_c3424_row14_col4" class="data row14 col4" > 0.00</td>
+      <th id="T_b8019_level0_row14" class="row_heading level0 row14" rowspan="7">Household</th>
+      <th id="T_b8019_level1_row14" class="row_heading level1 row14" >hhinc#4</th>
+      <td id="T_b8019_row14_col0" class="data row14 col0" > 0.000361</td>
+      <td id="T_b8019_row14_col1" class="data row14 col1" > 0.00263</td>
+      <td id="T_b8019_row14_col2" class="data row14 col2" > 0.14</td>
+      <td id="T_b8019_row14_col3" class="data row14 col3" ></td>
+      <td id="T_b8019_row14_col4" class="data row14 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row15" class="row_heading level1 row15" >hhinc#5</th>
-      <td id="T_c3424_row15_col0" class="data row15 col0" >-0.00265</td>
-      <td id="T_c3424_row15_col1" class="data row15 col1" > 0.00654</td>
-      <td id="T_c3424_row15_col2" class="data row15 col2" >-0.41</td>
-      <td id="T_c3424_row15_col3" class="data row15 col3" ></td>
-      <td id="T_c3424_row15_col4" class="data row15 col4" > 0.00</td>
+      <th id="T_b8019_level1_row15" class="row_heading level1 row15" >hhinc#5</th>
+      <td id="T_b8019_row15_col0" class="data row15 col0" >-0.00265</td>
+      <td id="T_b8019_row15_col1" class="data row15 col1" > 0.00654</td>
+      <td id="T_b8019_row15_col2" class="data row15 col2" >-0.41</td>
+      <td id="T_b8019_row15_col3" class="data row15 col3" ></td>
+      <td id="T_b8019_row15_col4" class="data row15 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row16" class="row_heading level1 row16" >hhinc#6</th>
-      <td id="T_c3424_row16_col0" class="data row16 col0" > 0.000910</td>
-      <td id="T_c3424_row16_col1" class="data row16 col1" > 0.00406</td>
-      <td id="T_c3424_row16_col2" class="data row16 col2" > 0.22</td>
-      <td id="T_c3424_row16_col3" class="data row16 col3" ></td>
-      <td id="T_c3424_row16_col4" class="data row16 col4" > 0.00</td>
+      <th id="T_b8019_level1_row16" class="row_heading level1 row16" >hhinc#6</th>
+      <td id="T_b8019_row16_col0" class="data row16 col0" > 0.000910</td>
+      <td id="T_b8019_row16_col1" class="data row16 col1" > 0.00406</td>
+      <td id="T_b8019_row16_col2" class="data row16 col2" > 0.22</td>
+      <td id="T_b8019_row16_col3" class="data row16 col3" ></td>
+      <td id="T_b8019_row16_col4" class="data row16 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row17" class="row_heading level1 row17" >vehbywrk_Bike</th>
-      <td id="T_c3424_row17_col0" class="data row17 col0" >-0.217</td>
-      <td id="T_c3424_row17_col1" class="data row17 col1" > 0.332</td>
-      <td id="T_c3424_row17_col2" class="data row17 col2" >-0.65</td>
-      <td id="T_c3424_row17_col3" class="data row17 col3" ></td>
-      <td id="T_c3424_row17_col4" class="data row17 col4" > 0.00</td>
+      <th id="T_b8019_level1_row17" class="row_heading level1 row17" >vehbywrk_Bike</th>
+      <td id="T_b8019_row17_col0" class="data row17 col0" >-0.217</td>
+      <td id="T_b8019_row17_col1" class="data row17 col1" > 0.332</td>
+      <td id="T_b8019_row17_col2" class="data row17 col2" >-0.65</td>
+      <td id="T_b8019_row17_col3" class="data row17 col3" ></td>
+      <td id="T_b8019_row17_col4" class="data row17 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row18" class="row_heading level1 row18" >vehbywrk_SR</th>
-      <td id="T_c3424_row18_col0" class="data row18 col0" >-0.238</td>
-      <td id="T_c3424_row18_col1" class="data row18 col1" > 0.0736</td>
-      <td id="T_c3424_row18_col2" class="data row18 col2" >-3.24</td>
-      <td id="T_c3424_row18_col3" class="data row18 col3" >**</td>
-      <td id="T_c3424_row18_col4" class="data row18 col4" > 0.00</td>
+      <th id="T_b8019_level1_row18" class="row_heading level1 row18" >vehbywrk_SR</th>
+      <td id="T_b8019_row18_col0" class="data row18 col0" >-0.238</td>
+      <td id="T_b8019_row18_col1" class="data row18 col1" > 0.0736</td>
+      <td id="T_b8019_row18_col2" class="data row18 col2" >-3.24</td>
+      <td id="T_b8019_row18_col3" class="data row18 col3" >**</td>
+      <td id="T_b8019_row18_col4" class="data row18 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row19" class="row_heading level1 row19" >vehbywrk_Transit</th>
-      <td id="T_c3424_row19_col0" class="data row19 col0" >-0.236</td>
-      <td id="T_c3424_row19_col1" class="data row19 col1" > 0.136</td>
-      <td id="T_c3424_row19_col2" class="data row19 col2" >-1.74</td>
-      <td id="T_c3424_row19_col3" class="data row19 col3" ></td>
-      <td id="T_c3424_row19_col4" class="data row19 col4" > 0.00</td>
+      <th id="T_b8019_level1_row19" class="row_heading level1 row19" >vehbywrk_Transit</th>
+      <td id="T_b8019_row19_col0" class="data row19 col0" >-0.236</td>
+      <td id="T_b8019_row19_col1" class="data row19 col1" > 0.136</td>
+      <td id="T_b8019_row19_col2" class="data row19 col2" >-1.74</td>
+      <td id="T_b8019_row19_col3" class="data row19 col3" ></td>
+      <td id="T_b8019_row19_col4" class="data row19 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row20" class="row_heading level1 row20" >vehbywrk_Walk</th>
-      <td id="T_c3424_row20_col0" class="data row20 col0" >-0.0800</td>
-      <td id="T_c3424_row20_col1" class="data row20 col1" > 0.209</td>
-      <td id="T_c3424_row20_col2" class="data row20 col2" >-0.38</td>
-      <td id="T_c3424_row20_col3" class="data row20 col3" ></td>
-      <td id="T_c3424_row20_col4" class="data row20 col4" > 0.00</td>
+      <th id="T_b8019_level1_row20" class="row_heading level1 row20" >vehbywrk_Walk</th>
+      <td id="T_b8019_row20_col0" class="data row20 col0" >-0.0800</td>
+      <td id="T_b8019_row20_col1" class="data row20 col1" > 0.209</td>
+      <td id="T_b8019_row20_col2" class="data row20 col2" >-0.38</td>
+      <td id="T_b8019_row20_col3" class="data row20 col3" ></td>
+      <td id="T_b8019_row20_col4" class="data row20 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level0_row21" class="row_heading level0 row21" rowspan="5">ASCs</th>
-      <th id="T_c3424_level1_row21" class="row_heading level1 row21" >ASC_Bike</th>
-      <td id="T_c3424_row21_col0" class="data row21 col0" >-3.13</td>
-      <td id="T_c3424_row21_col1" class="data row21 col1" > 0.734</td>
-      <td id="T_c3424_row21_col2" class="data row21 col2" >-4.27</td>
-      <td id="T_c3424_row21_col3" class="data row21 col3" >***</td>
-      <td id="T_c3424_row21_col4" class="data row21 col4" > 0.00</td>
+      <th id="T_b8019_level0_row21" class="row_heading level0 row21" rowspan="5">ASCs</th>
+      <th id="T_b8019_level1_row21" class="row_heading level1 row21" >ASC_Bike</th>
+      <td id="T_b8019_row21_col0" class="data row21 col0" >-3.13</td>
+      <td id="T_b8019_row21_col1" class="data row21 col1" > 0.734</td>
+      <td id="T_b8019_row21_col2" class="data row21 col2" >-4.27</td>
+      <td id="T_b8019_row21_col3" class="data row21 col3" >***</td>
+      <td id="T_b8019_row21_col4" class="data row21 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row22" class="row_heading level1 row22" >ASC_SR2</th>
-      <td id="T_c3424_row22_col0" class="data row22 col0" >-1.98</td>
-      <td id="T_c3424_row22_col1" class="data row22 col1" > 0.129</td>
-      <td id="T_c3424_row22_col2" class="data row22 col2" >-15.42</td>
-      <td id="T_c3424_row22_col3" class="data row22 col3" >***</td>
-      <td id="T_c3424_row22_col4" class="data row22 col4" > 0.00</td>
+      <th id="T_b8019_level1_row22" class="row_heading level1 row22" >ASC_SR2</th>
+      <td id="T_b8019_row22_col0" class="data row22 col0" >-1.98</td>
+      <td id="T_b8019_row22_col1" class="data row22 col1" > 0.129</td>
+      <td id="T_b8019_row22_col2" class="data row22 col2" >-15.42</td>
+      <td id="T_b8019_row22_col3" class="data row22 col3" >***</td>
+      <td id="T_b8019_row22_col4" class="data row22 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row23" class="row_heading level1 row23" >ASC_SR3+</th>
-      <td id="T_c3424_row23_col0" class="data row23 col0" >-3.73</td>
-      <td id="T_c3424_row23_col1" class="data row23 col1" > 0.186</td>
-      <td id="T_c3424_row23_col2" class="data row23 col2" >-20.05</td>
-      <td id="T_c3424_row23_col3" class="data row23 col3" >***</td>
-      <td id="T_c3424_row23_col4" class="data row23 col4" > 0.00</td>
+      <th id="T_b8019_level1_row23" class="row_heading level1 row23" >ASC_SR3+</th>
+      <td id="T_b8019_row23_col0" class="data row23 col0" >-3.73</td>
+      <td id="T_b8019_row23_col1" class="data row23 col1" > 0.186</td>
+      <td id="T_b8019_row23_col2" class="data row23 col2" >-20.05</td>
+      <td id="T_b8019_row23_col3" class="data row23 col3" >***</td>
+      <td id="T_b8019_row23_col4" class="data row23 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row24" class="row_heading level1 row24" >ASC_Transit</th>
-      <td id="T_c3424_row24_col0" class="data row24 col0" >-2.16</td>
-      <td id="T_c3424_row24_col1" class="data row24 col1" > 0.383</td>
-      <td id="T_c3424_row24_col2" class="data row24 col2" >-5.63</td>
-      <td id="T_c3424_row24_col3" class="data row24 col3" >***</td>
-      <td id="T_c3424_row24_col4" class="data row24 col4" > 0.00</td>
+      <th id="T_b8019_level1_row24" class="row_heading level1 row24" >ASC_Transit</th>
+      <td id="T_b8019_row24_col0" class="data row24 col0" >-2.16</td>
+      <td id="T_b8019_row24_col1" class="data row24 col1" > 0.383</td>
+      <td id="T_b8019_row24_col2" class="data row24 col2" >-5.63</td>
+      <td id="T_b8019_row24_col3" class="data row24 col3" >***</td>
+      <td id="T_b8019_row24_col4" class="data row24 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_c3424_level1_row25" class="row_heading level1 row25" >ASC_Walk</th>
-      <td id="T_c3424_row25_col0" class="data row25 col0" >-1.58</td>
-      <td id="T_c3424_row25_col1" class="data row25 col1" > 0.574</td>
-      <td id="T_c3424_row25_col2" class="data row25 col2" >-2.76</td>
-      <td id="T_c3424_row25_col3" class="data row25 col3" >**</td>
-      <td id="T_c3424_row25_col4" class="data row25 col4" > 0.00</td>
+      <th id="T_b8019_level1_row25" class="row_heading level1 row25" >ASC_Walk</th>
+      <td id="T_b8019_row25_col0" class="data row25 col0" >-1.58</td>
+      <td id="T_b8019_row25_col1" class="data row25 col1" > 0.574</td>
+      <td id="T_b8019_row25_col2" class="data row25 col2" >-2.76</td>
+      <td id="T_b8019_row25_col3" class="data row25 col3" >**</td>
+      <td id="T_b8019_row25_col4" class="data row25 col4" > 0.00</td>
     </tr>
   </tbody>
 </table>
@@ -2027,7 +1999,8 @@ Attributes:
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
   <div class="sidebar-secondary-item">
@@ -2052,8 +2025,8 @@ Attributes:
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -2061,7 +2034,7 @@ Attributes:
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-<p class="larch-version">🌳 Larch v6.0.26, © Copyright 2024.</p></div>
+<p class="larch-version">🌳 Larch v6.0.32, © Copyright 2024.</p></div>
       
     </div>
   
@@ -2071,7 +2044,7 @@ Attributes:
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
 </p></div>
       
     </div>

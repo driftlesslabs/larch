@@ -25,6 +25,7 @@
       ~NestingTree.clear
       ~NestingTree.clear_edges
       ~NestingTree.copy
+      ~NestingTree.description
       ~NestingTree.edge_slot_arrays
       ~NestingTree.edge_subgraph
       ~NestingTree.elemental_descendants

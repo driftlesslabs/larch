@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>102: Swissmetro Weighted MNL Mode Choice &#8212; v6.0.26</title>
+    <title>102: Swissmetro Weighted MNL Mode Choice &#8212; v6.0.32</title>
   
   
   
@@ -16,17 +16,19 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
@@ -36,10 +38,11 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=9d77a3fd" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
     <script src="../../_static/documentation_options.js?v=c73c0f3e"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
@@ -55,7 +58,7 @@
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/swissmetro/102-swissmetro-weighted';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/driftlesslabs/larch/docs/docs/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '6.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
@@ -67,6 +70,7 @@
     <link rel="prev" title="101: Swissmetro MNL Mode Choice" href="101_swissmetro_mnl.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
   
   
@@ -82,19 +86,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../search.html"
       method="get">
@@ -102,7 +95,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search these docs..."
          aria-label="Search these docs..."
          autocomplete="off"
@@ -110,8 +102,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -144,35 +136,31 @@
       
     
     
-    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.26 - Home"/>
-    <script>document.write(`<img src="../../_static/larch-logo.png" class="logo__image only-dark" alt="v6.0.26 - Home"/>`);</script>
+    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.32 - Home"/>
+    <img src="../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.32 - Home"/>
   
   
 </a></div>
     
       <div class="navbar-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-2"
-      type="button"
-      class="version-switcher__button btn btn-sm dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-2"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-2"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-2">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
     
   </div>
   
@@ -215,29 +203,21 @@ document.write(`
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
     </div>
     
@@ -246,15 +226,11 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
@@ -273,7 +249,8 @@ document.write(`
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -320,15 +297,11 @@ document.write(`
         
           <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
       </div>
     
@@ -410,8 +383,6 @@ document.write(`
       
         <div class="header-article-item">
 
-
-
 <nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
@@ -426,7 +397,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">Swissmetro Examples</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">102:...</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">102: Swissmetro Weighted MNL Mode Choice</span></li>
   </ul>
 </nav>
 </div>
@@ -495,14 +466,14 @@ First we create the Dataset and Model objects:</p>
   --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
 }
 
-html[theme=dark],
-html[data-theme=dark],
-body[data-theme=dark],
+html[theme="dark"],
+html[data-theme="dark"],
+body[data-theme="dark"],
 body.vscode-dark {
   --xr-font-color0: rgba(255, 255, 255, 1);
   --xr-font-color2: rgba(255, 255, 255, 0.54);
   --xr-font-color3: rgba(255, 255, 255, 0.38);
-  --xr-border-color: #1F1F1F;
+  --xr-border-color: #1f1f1f;
   --xr-disabled-color: #515151;
   --xr-background-color: #111111;
   --xr-background-color-row-even: #111111;
@@ -557,6 +528,7 @@ body.vscode-dark {
 .xr-section-item input {
   display: inline-block;
   opacity: 0;
+  height: 0;
 }
 
 .xr-section-item input + label {
@@ -593,7 +565,7 @@ body.vscode-dark {
 
 .xr-section-summary-in + label:before {
   display: inline-block;
-  content: '►';
+  content: "►";
   font-size: 11px;
   width: 15px;
   text-align: center;
@@ -604,7 +576,7 @@ body.vscode-dark {
 }
 
 .xr-section-summary-in:checked + label:before {
-  content: '▼';
+  content: "▼";
 }
 
 .xr-section-summary-in:checked + label > span {
@@ -676,15 +648,15 @@ body.vscode-dark {
 }
 
 .xr-dim-list:before {
-  content: '(';
+  content: "(";
 }
 
 .xr-dim-list:after {
-  content: ')';
+  content: ")";
 }
 
 .xr-dim-list li:not(:last-child):after {
-  content: ',';
+  content: ",";
   padding-right: 5px;
 }
 
@@ -856,10 +828,10 @@ Data variables: (12/28)
     CHOICE     (CASEID) int64 86kB 2 2 2 2 2 2 2 1 2 2 2 ... 3 3 2 2 3 2 3 3 2 3
 Attributes:
     _caseid_:  CASEID
-    _altid_:   _altid_</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-121ee9db-814b-49da-97bc-1865c5d021d0' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-121ee9db-814b-49da-97bc-1865c5d021d0' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>CASEID</span>: 10728</li><li><span class='xr-has-index'>_altid_</span>: 3</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-54b4023a-4160-450e-b06d-f46e9eccf3c8' class='xr-section-summary-in' type='checkbox'  checked><label for='section-54b4023a-4160-450e-b06d-f46e9eccf3c8' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>CASEID</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 ... 10724 10725 10726 10727</div><input id='attrs-3118ba2e-4e8a-48a4-b013-92b355995e27' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3118ba2e-4e8a-48a4-b013-92b355995e27' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-fe59509c-0813-449a-af26-0e0af6969d5a' class='xr-var-data-in' type='checkbox'><label for='data-fe59509c-0813-449a-af26-0e0af6969d5a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([    0,     1,     2, ..., 10725, 10726, 10727])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>_altid_</span></div><div class='xr-var-dims'>(_altid_)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2 3</div><input id='attrs-ef931741-2fdf-497b-81dc-659cba087da4' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-ef931741-2fdf-497b-81dc-659cba087da4' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-94b058bb-24ac-4ca5-993b-26addfd6b043' class='xr-var-data-in' type='checkbox'><label for='data-94b058bb-24ac-4ca5-993b-26addfd6b043' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2, 3])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>alt_names</span></div><div class='xr-var-dims'>(_altid_)</div><div class='xr-var-dtype'>&lt;U5</div><div class='xr-var-preview xr-preview'>&#x27;Train&#x27; &#x27;SM&#x27; &#x27;Car&#x27;</div><input id='attrs-8b312356-7b4d-4dd1-8662-fc4325bc3b8a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8b312356-7b4d-4dd1-8662-fc4325bc3b8a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a93a9e22-4a14-49bf-a160-41749935d76a' class='xr-var-data-in' type='checkbox'><label for='data-a93a9e22-4a14-49bf-a160-41749935d76a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;Train&#x27;, &#x27;SM&#x27;, &#x27;Car&#x27;], dtype=&#x27;&lt;U5&#x27;)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-f3c3b4c6-2e37-4615-b016-d251e7c2d829' class='xr-section-summary-in' type='checkbox'  ><label for='section-f3c3b4c6-2e37-4615-b016-d251e7c2d829' class='xr-section-summary' >Data variables: <span>(28)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>GROUP</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2 2 2 2 2 2 2 2 ... 3 3 3 3 3 3 3 3</div><input id='attrs-69737369-3b08-4e77-b648-ec92bad57fb2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-69737369-3b08-4e77-b648-ec92bad57fb2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c6370d1f-a801-455a-9120-790dfecfbf76' class='xr-var-data-in' type='checkbox'><label for='data-c6370d1f-a801-455a-9120-790dfecfbf76' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([2, 2, 2, ..., 3, 3, 3])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SURVEY</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 1 1 1 1 1 1 1 1</div><input id='attrs-2fbcdb3f-7ae1-4014-bce6-f7bdf3312dc8' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2fbcdb3f-7ae1-4014-bce6-f7bdf3312dc8' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-fbf7eee2-f350-4227-b12b-089cf943c7c4' class='xr-var-data-in' type='checkbox'><label for='data-fbf7eee2-f350-4227-b12b-089cf943c7c4' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SP</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-9af43610-c0d7-4e67-ac58-7655adba2066' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9af43610-c0d7-4e67-ac58-7655adba2066' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6256d17f-7773-45c9-ab8e-682ca0727881' class='xr-var-data-in' type='checkbox'><label for='data-6256d17f-7773-45c9-ab8e-682ca0727881' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>ID</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 ... 1192 1192 1192 1192</div><input id='attrs-1b3ea7b1-93ef-4d3e-81f0-f37381be6999' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1b3ea7b1-93ef-4d3e-81f0-f37381be6999' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-1c7fda92-8ec6-4c5d-a01f-ec575fef8ada' class='xr-var-data-in' type='checkbox'><label for='data-1c7fda92-8ec6-4c5d-a01f-ec575fef8ada' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   1,    1,    1, ..., 1192, 1192, 1192])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>PURPOSE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 4 4 4 4 4 4 4 4</div><input id='attrs-f9e00e16-6d25-43ad-985b-5eaedc10ac9d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f9e00e16-6d25-43ad-985b-5eaedc10ac9d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ab7fe00d-2842-4c95-83a5-794f703d3e39' class='xr-var-data-in' type='checkbox'><label for='data-ab7fe00d-2842-4c95-83a5-794f703d3e39' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 4, 4, 4])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>FIRST</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 1 1 1 1 1 1 1 1</div><input id='attrs-4833105e-f229-4627-9ea5-0f2647efc54e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4833105e-f229-4627-9ea5-0f2647efc54e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8dfc3974-399c-4bcd-bde4-c991bee62a39' class='xr-var-data-in' type='checkbox'><label for='data-8dfc3974-399c-4bcd-bde4-c991bee62a39' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>TICKET</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 7 7 7 7 7 7 7 7</div><input id='attrs-e3201afb-454c-44fb-9299-8565ca54f13d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e3201afb-454c-44fb-9299-8565ca54f13d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-1d0ae003-aa0a-4791-8ec8-11d20322c7ce' class='xr-var-data-in' type='checkbox'><label for='data-1d0ae003-aa0a-4791-8ec8-11d20322c7ce' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 7, 7, 7])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>WHO</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-2743e946-734b-426e-93c7-5eb7f632c3c7' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2743e946-734b-426e-93c7-5eb7f632c3c7' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-cbc0af67-d541-4839-9b19-0449757388d3' class='xr-var-data-in' type='checkbox'><label for='data-cbc0af67-d541-4839-9b19-0449757388d3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>LUGGAGE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 0 0 0 0 0 0 0 0</div><input id='attrs-47c4230f-be44-46ad-b4ce-b057c2df9be1' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-47c4230f-be44-46ad-b4ce-b057c2df9be1' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-de48c2fd-a129-4937-9dfd-ba93c9183a62' class='xr-var-data-in' type='checkbox'><label for='data-de48c2fd-a129-4937-9dfd-ba93c9183a62' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>AGE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>3 3 3 3 3 3 3 3 ... 5 5 5 5 5 5 5 5</div><input id='attrs-75d72d36-9af1-443d-8f3d-58b6f59c6183' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-75d72d36-9af1-443d-8f3d-58b6f59c6183' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-bf22b558-511f-42f6-9ae1-d1088926653b' class='xr-var-data-in' type='checkbox'><label for='data-bf22b558-511f-42f6-9ae1-d1088926653b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([3, 3, 3, ..., 5, 5, 5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>MALE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 1 1 1 1 1 1 1 1</div><input id='attrs-becc3f46-c8a8-4251-b7ea-f15161bfcac1' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-becc3f46-c8a8-4251-b7ea-f15161bfcac1' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e4c49e6f-6ef2-4379-b32d-ba4088696860' class='xr-var-data-in' type='checkbox'><label for='data-e4c49e6f-6ef2-4379-b32d-ba4088696860' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>INCOME</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2 2 2 2 2 2 2 2 ... 3 3 3 3 3 3 3 3</div><input id='attrs-e5e7e9b0-bacd-4cf6-a716-ddbe627e5143' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e5e7e9b0-bacd-4cf6-a716-ddbe627e5143' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-423a5a65-00f0-4ba1-93fe-9ea867c12fb3' class='xr-var-data-in' type='checkbox'><label for='data-423a5a65-00f0-4ba1-93fe-9ea867c12fb3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([2, 2, 2, ..., 3, 3, 3])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>GA</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 0 0 0 0 0 0 0 0</div><input id='attrs-fa90a0bf-f9c7-4f75-93d8-b51bec15d394' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-fa90a0bf-f9c7-4f75-93d8-b51bec15d394' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-bf7565da-02ee-42cb-9c53-ab0681be27e0' class='xr-var-data-in' type='checkbox'><label for='data-bf7565da-02ee-42cb-9c53-ab0681be27e0' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>ORIGIN</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2 2 2 2 2 2 2 2 ... 2 2 2 2 2 2 2 2</div><input id='attrs-36950210-18ea-4267-8858-a0a5f6a466f8' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-36950210-18ea-4267-8858-a0a5f6a466f8' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ad6aee7c-b225-4e17-8cb5-17496a3635da' class='xr-var-data-in' type='checkbox'><label for='data-ad6aee7c-b225-4e17-8cb5-17496a3635da' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([2, 2, 2, ..., 2, 2, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>DEST</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 ... 20 20 20 20 20 20</div><input id='attrs-7302da14-b405-4799-8a42-c2ced7f48acc' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7302da14-b405-4799-8a42-c2ced7f48acc' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ab1f1f5a-4cf1-4b94-af1e-4e717b174b5d' class='xr-var-data-in' type='checkbox'><label for='data-ab1f1f5a-4cf1-4b94-af1e-4e717b174b5d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1,  1,  1, ..., 20, 20, 20])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>TRAIN_AV</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-a352821e-8fae-4a2a-a5a3-5002bb96baa0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a352821e-8fae-4a2a-a5a3-5002bb96baa0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-cd3664c4-5ef2-4067-84d6-72ade5470d9e' class='xr-var-data-in' type='checkbox'><label for='data-cd3664c4-5ef2-4067-84d6-72ade5470d9e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>CAR_AV</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-78daf403-92fc-4057-bcbb-6011174de3ed' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-78daf403-92fc-4057-bcbb-6011174de3ed' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-3fe849f2-d99e-4f5c-88f5-bbc165cea308' class='xr-var-data-in' type='checkbox'><label for='data-3fe849f2-d99e-4f5c-88f5-bbc165cea308' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SM_AV</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-4d153e92-2717-45b6-b398-3eabbdd9fd67' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4d153e92-2717-45b6-b398-3eabbdd9fd67' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ece78115-d8da-43e1-b3ee-1a85a974b136' class='xr-var-data-in' type='checkbox'><label for='data-ece78115-d8da-43e1-b3ee-1a85a974b136' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>TRAIN_TT</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>112 103 130 103 ... 148 148 178 148</div><input id='attrs-35260f41-680e-4e78-b031-403b16978785' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-35260f41-680e-4e78-b031-403b16978785' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a3bfc4d6-d426-4076-99a6-3a5e3ce397a5' class='xr-var-data-in' type='checkbox'><label for='data-a3bfc4d6-d426-4076-99a6-3a5e3ce397a5' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([112, 103, 130, ..., 148, 178, 148])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>TRAIN_CO</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>48 48 48 40 36 ... 13 12 16 16 13</div><input id='attrs-c5247de6-f6b6-4f8a-893a-fd4dd214efc8' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c5247de6-f6b6-4f8a-893a-fd4dd214efc8' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f553b71b-583e-4b62-af6a-c21ebccea917' class='xr-var-data-in' type='checkbox'><label for='data-f553b71b-583e-4b62-af6a-c21ebccea917' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([48, 48, 48, ..., 16, 16, 13])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>TRAIN_HE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>120 30 60 30 60 ... 30 30 60 30 60</div><input id='attrs-9c1c4cf5-b09e-48ef-a079-e0e6be2f1cbb' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9c1c4cf5-b09e-48ef-a079-e0e6be2f1cbb' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-12f58f16-0194-4a70-b7b0-228e54b8d651' class='xr-var-data-in' type='checkbox'><label for='data-12f58f16-0194-4a70-b7b0-228e54b8d651' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([120,  30,  60, ...,  60,  30,  60])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SM_TT</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>63 60 67 63 63 ... 93 96 93 96 96</div><input id='attrs-e501c64f-cd27-4484-9179-8767fe2e3e5f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e501c64f-cd27-4484-9179-8767fe2e3e5f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-69699e9f-b357-45c7-9761-c1459ec92d99' class='xr-var-data-in' type='checkbox'><label for='data-69699e9f-b357-45c7-9761-c1459ec92d99' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([63, 60, 67, ..., 93, 96, 96])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SM_CO</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>52 49 58 52 42 ... 17 16 16 17 21</div><input id='attrs-b08a35f9-bc4b-495a-bbf5-2291208a3987' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b08a35f9-bc4b-495a-bbf5-2291208a3987' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-fdd1bdae-b6f2-46bf-93be-8c4cef80a4ce' class='xr-var-data-in' type='checkbox'><label for='data-fdd1bdae-b6f2-46bf-93be-8c4cef80a4ce' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([52, 49, 58, ..., 16, 17, 21])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SM_HE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>20 10 30 20 20 ... 30 10 20 30 30</div><input id='attrs-911efdc4-49d5-4a10-855e-fa24dc21bb84' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-911efdc4-49d5-4a10-855e-fa24dc21bb84' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9384db46-6899-4aa0-b688-b879594cd4f7' class='xr-var-data-in' type='checkbox'><label for='data-9384db46-6899-4aa0-b688-b879594cd4f7' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([20, 10, 30, ..., 20, 30, 30])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SM_SEATS</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 0 0 0 0 0 0 0 0</div><input id='attrs-e7b8d7c9-0ddd-46fc-b6de-44a0e6302e6f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e7b8d7c9-0ddd-46fc-b6de-44a0e6302e6f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6f6f0129-3037-44e4-a2ad-31515f73516d' class='xr-var-data-in' type='checkbox'><label for='data-6f6f0129-3037-44e4-a2ad-31515f73516d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>CAR_TT</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>117 117 117 72 90 ... 96 96 96 120</div><input id='attrs-6dd4af21-4e9f-4f27-be18-139306cfa3c3' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-6dd4af21-4e9f-4f27-be18-139306cfa3c3' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-421e8d39-f5a3-4421-9f0c-c8547716fa65' class='xr-var-data-in' type='checkbox'><label for='data-421e8d39-f5a3-4421-9f0c-c8547716fa65' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([117, 117, 117, ...,  96,  96, 120])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>CAR_CO</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>65 84 52 52 84 ... 56 70 56 91 70</div><input id='attrs-bdd481a2-3ac9-4e2b-82d5-d064d63bf4bd' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-bdd481a2-3ac9-4e2b-82d5-d064d63bf4bd' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2a5d4a50-08b1-4f51-b279-0579f2661edd' class='xr-var-data-in' type='checkbox'><label for='data-2a5d4a50-08b1-4f51-b279-0579f2661edd' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([65, 84, 52, ..., 56, 91, 70])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>CHOICE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2 2 2 2 2 2 2 1 ... 2 2 3 2 3 3 2 3</div><input id='attrs-ff11a8ba-72ce-4768-bf5b-a36f8e5739f2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-ff11a8ba-72ce-4768-bf5b-a36f8e5739f2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8d3fd320-89e9-4ed7-b420-22be2fdb1175' class='xr-var-data-in' type='checkbox'><label for='data-8d3fd320-89e9-4ed7-b420-22be2fdb1175' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([2, 2, 2, ..., 3, 2, 3])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-bf48d3a8-2cf2-492e-bbf6-16a8cc3210de' class='xr-section-summary-in' type='checkbox'  ><label for='section-bf48d3a8-2cf2-492e-bbf6-16a8cc3210de' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>CASEID</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-5d9f6f22-bbf5-4f61-af46-e25082722bd1' class='xr-index-data-in' type='checkbox'/><label for='index-5d9f6f22-bbf5-4f61-af46-e25082722bd1' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,
+    _altid_:   _altid_</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-db0fed7f-3509-46a7-b34b-552c8e3a2798' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-db0fed7f-3509-46a7-b34b-552c8e3a2798' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>CASEID</span>: 10728</li><li><span class='xr-has-index'>_altid_</span>: 3</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-60e832e8-3601-4936-90db-aac35cadea05' class='xr-section-summary-in' type='checkbox'  checked><label for='section-60e832e8-3601-4936-90db-aac35cadea05' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>CASEID</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 ... 10724 10725 10726 10727</div><input id='attrs-a589f067-26cc-4beb-af01-dcbc4e94fb2a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a589f067-26cc-4beb-af01-dcbc4e94fb2a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a9526bb0-9663-433c-9a02-fbd28b6705e5' class='xr-var-data-in' type='checkbox'><label for='data-a9526bb0-9663-433c-9a02-fbd28b6705e5' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([    0,     1,     2, ..., 10725, 10726, 10727])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>_altid_</span></div><div class='xr-var-dims'>(_altid_)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2 3</div><input id='attrs-5acfa9b7-cea5-4540-a911-4a63ca967e2f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-5acfa9b7-cea5-4540-a911-4a63ca967e2f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0cecc130-adee-42e7-b212-42169a275191' class='xr-var-data-in' type='checkbox'><label for='data-0cecc130-adee-42e7-b212-42169a275191' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2, 3])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>alt_names</span></div><div class='xr-var-dims'>(_altid_)</div><div class='xr-var-dtype'>&lt;U5</div><div class='xr-var-preview xr-preview'>&#x27;Train&#x27; &#x27;SM&#x27; &#x27;Car&#x27;</div><input id='attrs-d5a6e01a-2635-48dc-a351-0f7e1be631ec' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-d5a6e01a-2635-48dc-a351-0f7e1be631ec' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-19e17eee-53ce-44d4-9afa-37fc5ebd2693' class='xr-var-data-in' type='checkbox'><label for='data-19e17eee-53ce-44d4-9afa-37fc5ebd2693' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;Train&#x27;, &#x27;SM&#x27;, &#x27;Car&#x27;], dtype=&#x27;&lt;U5&#x27;)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-687c7203-0d6f-4afa-81c0-9353521359b9' class='xr-section-summary-in' type='checkbox'  ><label for='section-687c7203-0d6f-4afa-81c0-9353521359b9' class='xr-section-summary' >Data variables: <span>(28)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>GROUP</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2 2 2 2 2 2 2 2 ... 3 3 3 3 3 3 3 3</div><input id='attrs-dd767e50-e847-4f5a-9802-c5b60daac564' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-dd767e50-e847-4f5a-9802-c5b60daac564' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-43d6d1a5-c497-45ab-9530-87b5079b45d3' class='xr-var-data-in' type='checkbox'><label for='data-43d6d1a5-c497-45ab-9530-87b5079b45d3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([2, 2, 2, ..., 3, 3, 3])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SURVEY</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 1 1 1 1 1 1 1 1</div><input id='attrs-942fa142-cfbc-48cd-88a6-e4995591cf4b' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-942fa142-cfbc-48cd-88a6-e4995591cf4b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-1f0a4bde-fcd0-4d25-a48a-5d9b661f0ae9' class='xr-var-data-in' type='checkbox'><label for='data-1f0a4bde-fcd0-4d25-a48a-5d9b661f0ae9' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SP</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-772cc5a2-2539-4218-8feb-240a5354749d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-772cc5a2-2539-4218-8feb-240a5354749d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e8de8719-e9db-4403-8724-832b5ab62fa0' class='xr-var-data-in' type='checkbox'><label for='data-e8de8719-e9db-4403-8724-832b5ab62fa0' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>ID</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 ... 1192 1192 1192 1192</div><input id='attrs-88ab43ba-55e1-40d6-8185-4bea0839f487' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-88ab43ba-55e1-40d6-8185-4bea0839f487' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-23643e9e-71e9-42db-a8ac-af6c466079a3' class='xr-var-data-in' type='checkbox'><label for='data-23643e9e-71e9-42db-a8ac-af6c466079a3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   1,    1,    1, ..., 1192, 1192, 1192])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>PURPOSE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 4 4 4 4 4 4 4 4</div><input id='attrs-bb5a36c7-5d83-4ba2-832a-14c8a2b0d69a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-bb5a36c7-5d83-4ba2-832a-14c8a2b0d69a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9a48c305-aa1c-4ff8-a37f-34663c9eea1b' class='xr-var-data-in' type='checkbox'><label for='data-9a48c305-aa1c-4ff8-a37f-34663c9eea1b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 4, 4, 4])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>FIRST</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 1 1 1 1 1 1 1 1</div><input id='attrs-9d489229-1fe5-4482-a745-15eae1f2b920' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9d489229-1fe5-4482-a745-15eae1f2b920' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c1f7bfef-a7a9-497d-91ce-2bb123c1a041' class='xr-var-data-in' type='checkbox'><label for='data-c1f7bfef-a7a9-497d-91ce-2bb123c1a041' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>TICKET</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 7 7 7 7 7 7 7 7</div><input id='attrs-3ce0c2b5-d627-491b-9f04-0057d2235301' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3ce0c2b5-d627-491b-9f04-0057d2235301' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-44e39d2d-bd25-4fbb-901a-d566c39a2ed1' class='xr-var-data-in' type='checkbox'><label for='data-44e39d2d-bd25-4fbb-901a-d566c39a2ed1' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 7, 7, 7])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>WHO</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-8d377210-e82b-4440-b1ac-aedddbb5619a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8d377210-e82b-4440-b1ac-aedddbb5619a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2e6159ea-dedb-49b8-ab8b-8f3e6efa8319' class='xr-var-data-in' type='checkbox'><label for='data-2e6159ea-dedb-49b8-ab8b-8f3e6efa8319' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>LUGGAGE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 0 0 0 0 0 0 0 0</div><input id='attrs-4c7d0c1c-9836-41f9-9ca9-3740420634e2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4c7d0c1c-9836-41f9-9ca9-3740420634e2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7f1ad1f7-4622-4188-9312-52e527d10ef4' class='xr-var-data-in' type='checkbox'><label for='data-7f1ad1f7-4622-4188-9312-52e527d10ef4' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>AGE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>3 3 3 3 3 3 3 3 ... 5 5 5 5 5 5 5 5</div><input id='attrs-ce0c0aeb-fa43-4c54-b856-b64d3b1b6fb7' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-ce0c0aeb-fa43-4c54-b856-b64d3b1b6fb7' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d9d20cad-7335-4669-afcf-4d8c3d001a9a' class='xr-var-data-in' type='checkbox'><label for='data-d9d20cad-7335-4669-afcf-4d8c3d001a9a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([3, 3, 3, ..., 5, 5, 5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>MALE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 1 1 1 1 1 1 1 1</div><input id='attrs-5dc0f85b-eb9f-4428-b76f-3238060d15d2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-5dc0f85b-eb9f-4428-b76f-3238060d15d2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-fe553b92-faf7-4f2b-85aa-ddc533043e9a' class='xr-var-data-in' type='checkbox'><label for='data-fe553b92-faf7-4f2b-85aa-ddc533043e9a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>INCOME</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2 2 2 2 2 2 2 2 ... 3 3 3 3 3 3 3 3</div><input id='attrs-6c0a9cfd-efc6-4d56-abad-62ea8870e9f3' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-6c0a9cfd-efc6-4d56-abad-62ea8870e9f3' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f91d1966-5e9a-4922-8a57-46334f646e3d' class='xr-var-data-in' type='checkbox'><label for='data-f91d1966-5e9a-4922-8a57-46334f646e3d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([2, 2, 2, ..., 3, 3, 3])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>GA</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 0 0 0 0 0 0 0 0</div><input id='attrs-0e674c5e-1a3f-4ff9-91fd-8e0b76b35014' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-0e674c5e-1a3f-4ff9-91fd-8e0b76b35014' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-78385904-6971-4c69-b624-53c83cd6fe79' class='xr-var-data-in' type='checkbox'><label for='data-78385904-6971-4c69-b624-53c83cd6fe79' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>ORIGIN</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2 2 2 2 2 2 2 2 ... 2 2 2 2 2 2 2 2</div><input id='attrs-bbc2abb9-f6f5-469c-aa00-7369c9049c79' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-bbc2abb9-f6f5-469c-aa00-7369c9049c79' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-300caa10-c756-4cde-a6bc-e223f0d0a375' class='xr-var-data-in' type='checkbox'><label for='data-300caa10-c756-4cde-a6bc-e223f0d0a375' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([2, 2, 2, ..., 2, 2, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>DEST</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 ... 20 20 20 20 20 20</div><input id='attrs-2c527634-f243-4eb9-aa29-fe71e2f53fd2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2c527634-f243-4eb9-aa29-fe71e2f53fd2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9095de2d-16d0-4b02-bf6a-89629145de89' class='xr-var-data-in' type='checkbox'><label for='data-9095de2d-16d0-4b02-bf6a-89629145de89' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1,  1,  1, ..., 20, 20, 20])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>TRAIN_AV</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-2ed61254-e141-4b75-bce0-e8481f08bddd' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2ed61254-e141-4b75-bce0-e8481f08bddd' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ff70f770-5ef3-4b5d-bafb-c4009496a810' class='xr-var-data-in' type='checkbox'><label for='data-ff70f770-5ef3-4b5d-bafb-c4009496a810' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>CAR_AV</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-dd48a03e-f846-4d50-b693-a186d53d4d0e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-dd48a03e-f846-4d50-b693-a186d53d4d0e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e5589fdf-217d-45fe-b10b-c816a6e0f289' class='xr-var-data-in' type='checkbox'><label for='data-e5589fdf-217d-45fe-b10b-c816a6e0f289' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SM_AV</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1</div><input id='attrs-8869d21a-7492-4923-959c-c1973d26d263' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8869d21a-7492-4923-959c-c1973d26d263' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-77f6af1a-cf42-4aa3-95cb-3897e32d25cd' class='xr-var-data-in' type='checkbox'><label for='data-77f6af1a-cf42-4aa3-95cb-3897e32d25cd' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 1, 1, ..., 1, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>TRAIN_TT</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>112 103 130 103 ... 148 148 178 148</div><input id='attrs-927d902f-1056-4214-adef-23f37b5acabd' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-927d902f-1056-4214-adef-23f37b5acabd' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-78eeced4-d524-426a-974a-eb886e34c611' class='xr-var-data-in' type='checkbox'><label for='data-78eeced4-d524-426a-974a-eb886e34c611' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([112, 103, 130, ..., 148, 178, 148])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>TRAIN_CO</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>48 48 48 40 36 ... 13 12 16 16 13</div><input id='attrs-62171b67-be05-4712-9eda-4014dd3015ab' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-62171b67-be05-4712-9eda-4014dd3015ab' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-dc43a1a0-d395-4959-b33f-c2c822b5930b' class='xr-var-data-in' type='checkbox'><label for='data-dc43a1a0-d395-4959-b33f-c2c822b5930b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([48, 48, 48, ..., 16, 16, 13])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>TRAIN_HE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>120 30 60 30 60 ... 30 30 60 30 60</div><input id='attrs-7b7c3640-fe08-4cd3-aeb0-9f15a4467c29' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7b7c3640-fe08-4cd3-aeb0-9f15a4467c29' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-392ad30b-48bb-45be-815a-2c9a955c8123' class='xr-var-data-in' type='checkbox'><label for='data-392ad30b-48bb-45be-815a-2c9a955c8123' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([120,  30,  60, ...,  60,  30,  60])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SM_TT</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>63 60 67 63 63 ... 93 96 93 96 96</div><input id='attrs-f0e1c795-15e8-4477-9642-0288a2e2b474' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f0e1c795-15e8-4477-9642-0288a2e2b474' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-738ccc5d-ad00-4947-b47d-f93f36971447' class='xr-var-data-in' type='checkbox'><label for='data-738ccc5d-ad00-4947-b47d-f93f36971447' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([63, 60, 67, ..., 93, 96, 96])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SM_CO</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>52 49 58 52 42 ... 17 16 16 17 21</div><input id='attrs-1ca9a76d-e261-441c-a2d9-e7008c9a9f18' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1ca9a76d-e261-441c-a2d9-e7008c9a9f18' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e5cb5484-9290-4365-9ed0-b4451f5074bd' class='xr-var-data-in' type='checkbox'><label for='data-e5cb5484-9290-4365-9ed0-b4451f5074bd' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([52, 49, 58, ..., 16, 17, 21])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SM_HE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>20 10 30 20 20 ... 30 10 20 30 30</div><input id='attrs-4a92171b-9520-455d-9adb-3f89c0fbea35' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4a92171b-9520-455d-9adb-3f89c0fbea35' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f1a98b41-29b0-4353-9f58-994811288252' class='xr-var-data-in' type='checkbox'><label for='data-f1a98b41-29b0-4353-9f58-994811288252' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([20, 10, 30, ..., 20, 30, 30])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>SM_SEATS</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 0 0 0 0 0 0 ... 0 0 0 0 0 0 0 0</div><input id='attrs-210c8957-1b56-48ac-b996-a0519946a1a4' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-210c8957-1b56-48ac-b996-a0519946a1a4' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-bd16ab70-5222-4818-a93f-3ef9b49dcbf4' class='xr-var-data-in' type='checkbox'><label for='data-bd16ab70-5222-4818-a93f-3ef9b49dcbf4' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 0, ..., 0, 0, 0])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>CAR_TT</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>117 117 117 72 90 ... 96 96 96 120</div><input id='attrs-28ac9920-0f0a-4bd0-a14e-82f31e6a3bd7' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-28ac9920-0f0a-4bd0-a14e-82f31e6a3bd7' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-878f329b-9236-444b-b3fa-4c6b783df471' class='xr-var-data-in' type='checkbox'><label for='data-878f329b-9236-444b-b3fa-4c6b783df471' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([117, 117, 117, ...,  96,  96, 120])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>CAR_CO</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>65 84 52 52 84 ... 56 70 56 91 70</div><input id='attrs-aa542bf1-4f36-4430-9a11-ea85325649ff' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-aa542bf1-4f36-4430-9a11-ea85325649ff' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9e099b4f-734e-4e7a-951f-b44492091b81' class='xr-var-data-in' type='checkbox'><label for='data-9e099b4f-734e-4e7a-951f-b44492091b81' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([65, 84, 52, ..., 56, 91, 70])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>CHOICE</span></div><div class='xr-var-dims'>(CASEID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2 2 2 2 2 2 2 1 ... 2 2 3 2 3 3 2 3</div><input id='attrs-521aa692-a25a-42e9-9781-8c54a6329386' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-521aa692-a25a-42e9-9781-8c54a6329386' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-73b700ab-14fd-4938-ae32-2358e596e49b' class='xr-var-data-in' type='checkbox'><label for='data-73b700ab-14fd-4938-ae32-2358e596e49b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([2, 2, 2, ..., 3, 2, 3])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-3dabeade-13e0-4a55-ab44-708ae7bdc6f5' class='xr-section-summary-in' type='checkbox'  ><label for='section-3dabeade-13e0-4a55-ab44-708ae7bdc6f5' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>CASEID</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-c2257a04-54ff-470b-be3d-fec4bd1f28d1' class='xr-index-data-in' type='checkbox'/><label for='index-c2257a04-54ff-470b-be3d-fec4bd1f28d1' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,
        ...
        10718, 10719, 10720, 10721, 10722, 10723, 10724, 10725, 10726, 10727],
-      dtype=&#x27;int64&#x27;, name=&#x27;CASEID&#x27;, length=10728))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>_altid_</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-65fdb2a1-b793-4975-8ae7-0c07441cb269' class='xr-index-data-in' type='checkbox'/><label for='index-65fdb2a1-b793-4975-8ae7-0c07441cb269' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1, 2, 3], dtype=&#x27;int64&#x27;, name=&#x27;_altid_&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-6df8bb8e-e8eb-453e-b73c-ce6eac715974' class='xr-section-summary-in' type='checkbox'  checked><label for='section-6df8bb8e-e8eb-453e-b73c-ce6eac715974' class='xr-section-summary' >Attributes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>_caseid_ :</span></dt><dd>CASEID</dd><dt><span>_altid_ :</span></dt><dd>_altid_</dd></dl></div></li></ul></div></div></div></div>
+      dtype=&#x27;int64&#x27;, name=&#x27;CASEID&#x27;, length=10728))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>_altid_</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-0daba6c2-a7c4-4a5d-8f8a-54df8bb88f21' class='xr-index-data-in' type='checkbox'/><label for='index-0daba6c2-a7c4-4a5d-8f8a-54df8bb88f21' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1, 2, 3], dtype=&#x27;int64&#x27;, name=&#x27;_altid_&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-b110d37a-6fd8-4bdc-bc9f-40da41a05150' class='xr-section-summary-in' type='checkbox'  checked><label for='section-b110d37a-6fd8-4bdc-bc9f-40da41a05150' class='xr-section-summary' >Attributes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>_caseid_ :</span></dt><dd>CASEID</dd><dt><span>_altid_ :</span></dt><dd>_altid_</dd></dl></div></li></ul></div></div></div></div>
 </div>
 <p>The swissmetro example models exclude some observations.  We can use the
 <code class="docutils literal notranslate"><span class="pre">Dataset.query_cases</span></code> method to identify the observations we would like to keep.</p>
@@ -986,28 +958,28 @@ a rational order.  We can use the ordering method to do this:</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output text_html"><style type="text/css">
-#T_2e262 th {
+#T_9c350 th {
   vertical-align: top;
   text-align: left;
 }
-#T_2e262 td {
+#T_9c350 td {
   vertical-align: top;
   text-align: left;
 }
-#T_2e262_row0_col0, #T_2e262_row0_col1, #T_2e262_row0_col2, #T_2e262_row0_col3, #T_2e262_row0_col4, #T_2e262_row1_col0, #T_2e262_row1_col1, #T_2e262_row1_col2, #T_2e262_row1_col3, #T_2e262_row1_col4, #T_2e262_row2_col0, #T_2e262_row2_col1, #T_2e262_row2_col2, #T_2e262_row2_col3, #T_2e262_row2_col4, #T_2e262_row3_col0, #T_2e262_row3_col1, #T_2e262_row3_col2, #T_2e262_row3_col3, #T_2e262_row3_col4 {
+#T_9c350_row0_col0, #T_9c350_row0_col1, #T_9c350_row0_col2, #T_9c350_row0_col3, #T_9c350_row0_col4, #T_9c350_row1_col0, #T_9c350_row1_col1, #T_9c350_row1_col2, #T_9c350_row1_col3, #T_9c350_row1_col4, #T_9c350_row2_col0, #T_9c350_row2_col1, #T_9c350_row2_col2, #T_9c350_row2_col3, #T_9c350_row2_col4, #T_9c350_row3_col0, #T_9c350_row3_col1, #T_9c350_row3_col2, #T_9c350_row3_col3, #T_9c350_row3_col4 {
   font-family: monospace;
 }
 </style>
-<table id="T_2e262">
+<table id="T_9c350">
   <thead>
     <tr>
       <th class="blank" >&nbsp;</th>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_2e262_level0_col0" class="col_heading level0 col0" >Value</th>
-      <th id="T_2e262_level0_col1" class="col_heading level0 col1" >Std Err</th>
-      <th id="T_2e262_level0_col2" class="col_heading level0 col2" >t Stat</th>
-      <th id="T_2e262_level0_col3" class="col_heading level0 col3" >Signif</th>
-      <th id="T_2e262_level0_col4" class="col_heading level0 col4" >Null Value</th>
+      <th id="T_9c350_level0_col0" class="col_heading level0 col0" >Value</th>
+      <th id="T_9c350_level0_col1" class="col_heading level0 col1" >Std Err</th>
+      <th id="T_9c350_level0_col2" class="col_heading level0 col2" >t Stat</th>
+      <th id="T_9c350_level0_col3" class="col_heading level0 col3" >Signif</th>
+      <th id="T_9c350_level0_col4" class="col_heading level0 col4" >Null Value</th>
     </tr>
     <tr>
       <th class="index_name level0" >Category</th>
@@ -1021,38 +993,38 @@ a rational order.  We can use the ordering method to do this:</p>
   </thead>
   <tbody>
     <tr>
-      <th id="T_2e262_level0_row0" class="row_heading level0 row0" rowspan="2">ASCs</th>
-      <th id="T_2e262_level1_row0" class="row_heading level1 row0" >ASC_CAR</th>
-      <td id="T_2e262_row0_col0" class="data row0 col0" >-0.114</td>
-      <td id="T_2e262_row0_col1" class="data row0 col1" > 0.0407</td>
-      <td id="T_2e262_row0_col2" class="data row0 col2" >-2.81</td>
-      <td id="T_2e262_row0_col3" class="data row0 col3" >**</td>
-      <td id="T_2e262_row0_col4" class="data row0 col4" > 0.00</td>
+      <th id="T_9c350_level0_row0" class="row_heading level0 row0" rowspan="2">ASCs</th>
+      <th id="T_9c350_level1_row0" class="row_heading level1 row0" >ASC_CAR</th>
+      <td id="T_9c350_row0_col0" class="data row0 col0" >-0.114</td>
+      <td id="T_9c350_row0_col1" class="data row0 col1" > 0.0407</td>
+      <td id="T_9c350_row0_col2" class="data row0 col2" >-2.81</td>
+      <td id="T_9c350_row0_col3" class="data row0 col3" >**</td>
+      <td id="T_9c350_row0_col4" class="data row0 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_2e262_level1_row1" class="row_heading level1 row1" >ASC_TRAIN</th>
-      <td id="T_2e262_row1_col0" class="data row1 col0" >-0.756</td>
-      <td id="T_2e262_row1_col1" class="data row1 col1" > 0.0528</td>
-      <td id="T_2e262_row1_col2" class="data row1 col2" >-14.32</td>
-      <td id="T_2e262_row1_col3" class="data row1 col3" >***</td>
-      <td id="T_2e262_row1_col4" class="data row1 col4" > 0.00</td>
+      <th id="T_9c350_level1_row1" class="row_heading level1 row1" >ASC_TRAIN</th>
+      <td id="T_9c350_row1_col0" class="data row1 col0" >-0.756</td>
+      <td id="T_9c350_row1_col1" class="data row1 col1" > 0.0528</td>
+      <td id="T_9c350_row1_col2" class="data row1 col2" >-14.32</td>
+      <td id="T_9c350_row1_col3" class="data row1 col3" >***</td>
+      <td id="T_9c350_row1_col4" class="data row1 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_2e262_level0_row2" class="row_heading level0 row2" rowspan="2">LOS</th>
-      <th id="T_2e262_level1_row2" class="row_heading level1 row2" >B_COST</th>
-      <td id="T_2e262_row2_col0" class="data row2 col0" >-0.0112</td>
-      <td id="T_2e262_row2_col1" class="data row2 col1" > 0.000490</td>
-      <td id="T_2e262_row2_col2" class="data row2 col2" >-22.83</td>
-      <td id="T_2e262_row2_col3" class="data row2 col3" >***</td>
-      <td id="T_2e262_row2_col4" class="data row2 col4" > 0.00</td>
+      <th id="T_9c350_level0_row2" class="row_heading level0 row2" rowspan="2">LOS</th>
+      <th id="T_9c350_level1_row2" class="row_heading level1 row2" >B_COST</th>
+      <td id="T_9c350_row2_col0" class="data row2 col0" >-0.0112</td>
+      <td id="T_9c350_row2_col1" class="data row2 col1" > 0.000490</td>
+      <td id="T_9c350_row2_col2" class="data row2 col2" >-22.83</td>
+      <td id="T_9c350_row2_col3" class="data row2 col3" >***</td>
+      <td id="T_9c350_row2_col4" class="data row2 col4" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_2e262_level1_row3" class="row_heading level1 row3" >B_TIME</th>
-      <td id="T_2e262_row3_col0" class="data row3 col0" >-0.0132</td>
-      <td id="T_2e262_row3_col1" class="data row3 col1" > 0.000537</td>
-      <td id="T_2e262_row3_col2" class="data row3 col2" >-24.62</td>
-      <td id="T_2e262_row3_col3" class="data row3 col3" >***</td>
-      <td id="T_2e262_row3_col4" class="data row3 col4" > 0.00</td>
+      <th id="T_9c350_level1_row3" class="row_heading level1 row3" >B_TIME</th>
+      <td id="T_9c350_row3_col0" class="data row3 col0" >-0.0132</td>
+      <td id="T_9c350_row3_col1" class="data row3 col1" > 0.000537</td>
+      <td id="T_9c350_row3_col2" class="data row3 col2" >-24.62</td>
+      <td id="T_9c350_row3_col3" class="data row3 col3" >***</td>
+      <td id="T_9c350_row3_col4" class="data row3 col4" > 0.00</td>
     </tr>
   </tbody>
 </table>
@@ -1096,7 +1068,8 @@ a rational order.  We can use the ordering method to do this:</p>
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
   <div class="sidebar-secondary-item">
@@ -1121,8 +1094,8 @@ a rational order.  We can use the ordering method to do this:</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1130,7 +1103,7 @@ a rational order.  We can use the ordering method to do this:</p>
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-<p class="larch-version">🌳 Larch v6.0.26, © Copyright 2024.</p></div>
+<p class="larch-version">🌳 Larch v6.0.32, © Copyright 2024.</p></div>
       
     </div>
   
@@ -1140,7 +1113,7 @@ a rational order.  We can use the ordering method to do this:</p>
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
 </p></div>
       
     </div>

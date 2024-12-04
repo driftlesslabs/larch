@@ -3,4 +3,4 @@
 
 .. currentmodule:: larch
 
-.. autoproperty:: Dataset.dc.ALTID
+.. autoaccessorattribute:: Dataset.dc.ALTID

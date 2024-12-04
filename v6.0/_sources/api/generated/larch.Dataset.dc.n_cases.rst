@@ -1,6 +1,6 @@
-﻿larch.Dataset.dc.n\_cases
-=========================
+﻿larch.Dataset.dc.n_cases
+========================
 
 .. currentmodule:: larch
 
-.. autoproperty:: Dataset.dc.n_cases
+.. autoaccessorattribute:: Dataset.dc.n_cases
