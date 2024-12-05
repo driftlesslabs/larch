@@ -2721,6 +2721,13 @@ class NumbaModel(_BaseModel):
         result["partial_utility"] = result["data_value"] * result["parameter_value"]
         return result.set_index(["utility_type", "parameter_name", "data_expr"])
 
+    def release_memory(self):
+        """Release memory-intensive data structures."""
+        self._fixed_arrays = None
+        self._data_arrays = None
+        self._dataset = None
+        self.work_arrays = None
+
 
 @njit(cache=True)
 def _arr_inflate(arr, locks):
