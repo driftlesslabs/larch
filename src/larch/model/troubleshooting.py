@@ -229,7 +229,9 @@ def chosen_but_not_available(
                 chosen_but_not_available.values[:, : model.dataset["ch"].shape[1]]
             ] = 0
         elif repair == "!":
-            raise ValueError("some observed choices are not available")
+            raise ValueError(
+                "some observed choices are not available (try `repair_ch_av`)"
+            )
 
     return model, diagnosis
 
@@ -317,6 +319,7 @@ def chosen_but_zero_quantity(
         else:
             msg += tabulate(diagnosis, headers="keys", tablefmt="fancy_outline")
         if repair == "!":
+            msg += "\nTry `repair_ch_zq` to resolve."
             raise ValueError(msg)
         elif repair == "?":
             logger.warning(msg)
@@ -397,6 +400,7 @@ def nothing_chosen_but_nonzero_weight(
             else:
                 msg += tabulate(diagnosis, headers="keys", tablefmt="fancy_outline")
             if repair == "!":
+                msg += "\nTry `repair_noch_nzwt` to resolve."
                 raise ValueError(msg)
             elif repair == "?":
                 logger.warning(msg)
@@ -461,7 +465,9 @@ def nan_data_co(
             if repair == "?":
                 logger.warning(f"nan_data_co: {n} instances have NaN values")
             elif repair == "!":
-                raise ValueError(f"nan_data_co: {n} instances have NaN values")
+                raise ValueError(
+                    f"nan_data_co: {n} instances have NaN values, try `repair_nan_data_co`"
+                )
             if repair and repair != "?":
                 dataset["co"] = dataset["co"].fillna(0)
 
@@ -515,7 +521,9 @@ def nan_weight(
             if repair == "?":
                 logger.warning(f"nan_weight: {nan_wt} instances have NaN values")
             elif repair == "!":
-                raise ValueError(f"nan_weight: {nan_wt} instances have NaN values")
+                raise ValueError(
+                    f"nan_weight: {nan_wt} instances have NaN values, try `repair_nan_wt`"
+                )
             if repair and repair != "?":
                 dataset["wt"] = dataset["wt"].fillna(0)
 
@@ -617,11 +625,13 @@ def nan_utility(model: Model, repair: Literal["?", True, "!"] = "?", verbose: in
         diagnosis = nan_u.sum(dataset.dc.CASEID).to_pandas().rename("n").to_frame()
         if repair == "?":
             logger.warning(
-                f"nan_utility: {nan_util} available alternatives have NaN utility values"
+                f"nan_utility: {nan_util} available alternatives have NaN "
+                f"utility values"
             )
         elif repair == "!":
             raise ValueError(
-                f"nan_utility: {nan_util} available alternatives have NaN utility values"
+                f"nan_utility: {nan_util} available alternatives have NaN "
+                f"utility values, try `repair_nan_utility`"
             )
         elif repair:
             model.dataset["av"].data[nan_u] = 0
