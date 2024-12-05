@@ -74,6 +74,7 @@
       ~Model.probability
       ~Model.quantity
       ~Model.reflow_data_arrays
+      ~Model.release_memory
       ~Model.remove_unused_parameters
       ~Model.required_data
       ~Model.robust_covariance

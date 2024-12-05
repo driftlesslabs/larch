@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>larch.model.troubleshooting &#8212; v6.0.32</title>
+    <title>larch.model.troubleshooting &#8212; v6.0.33</title>
   
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.32 - Home"/>
-    <img src="../../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.32 - Home"/>
+    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.33 - Home"/>
+    <img src="../../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.33 - Home"/>
   
   
 </a></div>
@@ -589,7 +589,9 @@
                 <span class="n">chosen_but_not_available</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;ch&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
             <span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;some observed choices are not available&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;some observed choices are not available (try `repair_ch_av`)&quot;</span>
+            <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">diagnosis</span></div>
 
@@ -680,6 +682,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">+=</span> <span class="n">tabulate</span><span class="p">(</span><span class="n">diagnosis</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="s2">&quot;keys&quot;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;fancy_outline&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Try `repair_ch_zq` to resolve.&quot;</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -763,6 +766,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">+=</span> <span class="n">tabulate</span><span class="p">(</span><span class="n">diagnosis</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="s2">&quot;keys&quot;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;fancy_outline&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Try `repair_noch_nzwt` to resolve.&quot;</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -830,7 +834,9 @@
             <span class="k">if</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nan_data_co: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> instances have NaN values&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nan_data_co: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> instances have NaN values&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;nan_data_co: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> instances have NaN values, try `repair_nan_data_co`&quot;</span>
+                <span class="p">)</span>
             <span class="k">if</span> <span class="n">repair</span> <span class="ow">and</span> <span class="n">repair</span> <span class="o">!=</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
                 <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;co&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;co&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
@@ -887,7 +893,9 @@
             <span class="k">if</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nan_weight: </span><span class="si">{</span><span class="n">nan_wt</span><span class="si">}</span><span class="s2"> instances have NaN values&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nan_weight: </span><span class="si">{</span><span class="n">nan_wt</span><span class="si">}</span><span class="s2"> instances have NaN values&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;nan_weight: </span><span class="si">{</span><span class="n">nan_wt</span><span class="si">}</span><span class="s2"> instances have NaN values, try `repair_nan_wt`&quot;</span>
+                <span class="p">)</span>
             <span class="k">if</span> <span class="n">repair</span> <span class="ow">and</span> <span class="n">repair</span> <span class="o">!=</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
                 <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;wt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;wt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
@@ -993,11 +1001,13 @@
         <span class="n">diagnosis</span> <span class="o">=</span> <span class="n">nan_u</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">CASEID</span><span class="p">)</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;nan_utility: </span><span class="si">{</span><span class="n">nan_util</span><span class="si">}</span><span class="s2"> available alternatives have NaN utility values&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;nan_utility: </span><span class="si">{</span><span class="n">nan_util</span><span class="si">}</span><span class="s2"> available alternatives have NaN &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;utility values&quot;</span>
             <span class="p">)</span>
         <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;nan_utility: </span><span class="si">{</span><span class="n">nan_util</span><span class="si">}</span><span class="s2"> available alternatives have NaN utility values&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;nan_utility: </span><span class="si">{</span><span class="n">nan_util</span><span class="si">}</span><span class="s2"> available alternatives have NaN &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;utility values, try `repair_nan_utility`&quot;</span>
             <span class="p">)</span>
         <span class="k">elif</span> <span class="n">repair</span><span class="p">:</span>
             <span class="n">model</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;av&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">nan_u</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1121,7 +1131,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-<p class="larch-version">🌳 Larch v6.0.32, © Copyright 2024.</p></div>
+<p class="larch-version">🌳 Larch v6.0.33, © Copyright 2024.</p></div>
       
     </div>
   
