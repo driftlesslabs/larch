@@ -19,6 +19,9 @@ from .possible_overspec import (
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
+    from larch.util import dictx
+    from larch.util.excel import ExcelWriter
+
 
 class ModelGroup(ConstrainedModel, MutableSequence):
     def __init__(self, models, title=None):
@@ -503,3 +506,47 @@ class ModelGroup(ConstrainedModel, MutableSequence):
             # se = self.parameters["robust_std_err"]
 
         return se, hess, ihess
+
+    def to_xlsx(
+        self,
+        filename,
+        save_now=True,
+        data_statistics: bool = True,
+        nesting: bool = True,
+        embed_model: bool = True,
+    ) -> ExcelWriter:
+        """
+        Write the estimation results to an Excel file.
+
+        Parameters
+        ----------
+        filename : str
+            The name of the file to write.
+        save_now : bool, default True
+            Whether to save the file immediately.  If False, the
+            ExcelWriter object is returned.
+        data_statistics : bool, default True
+            Whether to include data statistics in the Excel file.
+        nesting : bool, default True
+            Whether to include nesting statistics in the Excel file.
+        embed_model : bool, default True
+            Whether to embed the model in the Excel file.
+
+        Returns
+        -------
+        larch.util.excel.ExcelWriter or None
+        """
+        from larch.util.excel import _make_excel_writer
+
+        result = _make_excel_writer(self, filename, save_now=False)
+        result._post_init(
+            filename,
+            model=self,
+            data_statistics=data_statistics,
+            nesting=nesting,
+            embed=embed_model,
+        )
+        if save_now:
+            result.close()
+        else:
+            return result
