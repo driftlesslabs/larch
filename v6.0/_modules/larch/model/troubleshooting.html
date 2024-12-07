@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>larch.model.troubleshooting &#8212; v6.0.33</title>
+    <title>larch.model.troubleshooting &#8212; v6.0.34</title>
   
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.33 - Home"/>
-    <img src="../../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.33 - Home"/>
+    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.34 - Home"/>
+    <img src="../../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.34 - Home"/>
   
   
 </a></div>
@@ -380,6 +380,7 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">repair_ch_av</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span>
     <span class="n">repair_ch_zq</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">repair_av_zq</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">repair_noch_nzwt</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span>
     <span class="n">repair_nan_wt</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span>
     <span class="n">repair_nan_data_co</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span>
@@ -413,6 +414,12 @@
 <span class="sd">        leaving no chosen alternative). A question mark (&#39;?&#39;) effects no repair, and</span>
 <span class="sd">        simply emits a warning. An exclamation mark (&#39;!&#39;) will raise an error if there</span>
 <span class="sd">        are any conflicts.</span>
+<span class="sd">    repair_av_zq : {&#39;?&#39;, &#39;-&#39;, &#39;!&#39;}, default None</span>
+<span class="sd">        How to repair the data if some observations are available but have zero quantity.</span>
+<span class="sd">        The minus (&#39;-&#39;) will make alternatives with zero quantity not available (possibly</span>
+<span class="sd">        leaving no available alternatives). A question mark (&#39;?&#39;) effects no repair, and</span>
+<span class="sd">        simply emits a warning. An exclamation mark (&#39;!&#39;) will raise an error if there are</span>
+<span class="sd">        any conflicts.</span>
 <span class="sd">    repair_noch_nzwt : {&#39;?&#39;, &#39;+&#39;, &#39;-&#39;}, default &#39;?&#39;</span>
 <span class="sd">        How to repair the data if some observations have no choice but have some weight.</span>
 <span class="sd">        Minus (&#39;-&#39;) will make the weight zero when there is no choice. Plus (&#39;+&#39;) will</span>
@@ -492,6 +499,7 @@
     <span class="n">apply_repair</span><span class="p">(</span><span class="n">repair_nan_wt</span><span class="p">,</span> <span class="n">nan_weight</span><span class="p">)</span>
     <span class="n">apply_repair</span><span class="p">(</span><span class="n">check_low_variance_data_co</span><span class="p">,</span> <span class="n">low_variance_data_co</span><span class="p">)</span>
     <span class="n">apply_repair</span><span class="p">(</span><span class="n">repair_ch_zq</span><span class="p">,</span> <span class="n">chosen_but_zero_quantity</span><span class="p">)</span>
+    <span class="n">apply_repair</span><span class="p">(</span><span class="n">repair_av_zq</span><span class="p">,</span> <span class="n">available_but_zero_quantity</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">problems</span><span class="p">:</span>
         <span class="c1"># Following are deep checks, which require actually evaluating the model.</span>
@@ -696,6 +704,104 @@
 
     <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">diagnosis</span></div>
 
+
+
+<span class="k">def</span> <span class="nf">available_but_zero_quantity</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span> <span class="n">repair</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if some observations are available but have zero quantity.</span>
+
+<span class="sd">    Alternatives that have zero quantity have utility values that end up as</span>
+<span class="sd">    negative infinity, regardless of whether the alternative would otherwise be</span>
+<span class="sd">    available.  Due to the mathematical structure of how quantities are used in</span>
+<span class="sd">    Larch, this situation is generally a result of a data problem, and not</span>
+<span class="sd">    due to the current values of model parameters.</span>
+
+<span class="sd">    If even one observation is available but has zero quantity, the first</span>
+<span class="sd">    derivative of the model log-likelihood may be incalculable, and the model</span>
+<span class="sd">    parameter estimation process may fail.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : BaseModel</span>
+<span class="sd">        The model to check.</span>
+<span class="sd">    repair : {&#39;?&#39;, &#39;-&#39;, &#39;!&#39;}</span>
+<span class="sd">        How to repair the data. The minus (&#39;-&#39;) will make alternatives with zero</span>
+<span class="sd">        quantity not available (possibly leaving no available alternatives). A</span>
+<span class="sd">        question mark (&#39;?&#39;) effects no repair, and simply emits a warning. An</span>
+<span class="sd">        exclamation mark (&#39;!&#39;) will raise an error if there are any conflicts.</span>
+<span class="sd">    verbose : int, default 3</span>
+<span class="sd">        The number of example rows to list for each problem.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model : BaseModel</span>
+<span class="sd">        The model with revised data</span>
+<span class="sd">    diagnosis : pd.DataFrame</span>
+<span class="sd">        The number of bad instances, by alternative, and some example rows.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the repair is set to &#39;!&#39; and there are any conflicts found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">repair</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;invalid repair setting &quot;</span><span class="si">{</span><span class="n">repair</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">model</span><span class="o">.</span><span class="n">quantity_ca</span><span class="p">:</span>
+        <span class="c1"># no quantities, so no problem</span>
+        <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="n">quant</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">quantity</span><span class="p">()</span>
+    <span class="n">zero_quantity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">quant</span><span class="p">[:,</span> <span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">n_elementals</span><span class="p">()]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">dataset</span>
+    <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data not loaded&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span>
+
+    <span class="n">av_and_zero_quantity</span> <span class="o">=</span> <span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;av&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">zero_quantity</span>
+    <span class="n">av_and_zero_quantity_sum</span> <span class="o">=</span> <span class="n">av_and_zero_quantity</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">CASEID</span><span class="p">)</span>
+    <span class="n">diagnosis</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">av_and_zero_quantity</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">av_and_zero_quantity</span><span class="p">)</span>
+        <span class="n">diagnosis</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">av_and_zero_quantity_sum</span><span class="p">[</span><span class="n">av_and_zero_quantity_sum</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">colnum</span><span class="p">,</span> <span class="n">colname</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">altids</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">av_and_zero_quantity_sum</span><span class="p">[</span><span class="n">colnum</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">diagnosis</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">colname</span><span class="p">,</span> <span class="s2">&quot;example rows&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">i1</span><span class="p">[</span><span class="n">i2</span> <span class="o">==</span> <span class="n">colnum</span><span class="p">][:</span><span class="n">verbose</span><span class="p">]</span>
+                <span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;available_but_zero_quantity: some available choices have zero quantity.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">diagnosis</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="n">tabulate</span><span class="p">(</span><span class="n">diagnosis</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="s2">&quot;keys&quot;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;fancy_outline&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;!&quot;</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Try `repair_av_zq` to resolve.&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">repair</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="s2">&quot;some available choices&quot;</span><span class="p">,</span> <span class="s2">&quot;zeroing out available choices that&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;av&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">av_and_zero_quantity</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">diagnosis</span>
 
 
 <div class="viewcode-block" id="nothing_chosen_but_nonzero_weight">
@@ -1131,7 +1237,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-<p class="larch-version">🌳 Larch v6.0.33, © Copyright 2024.</p></div>
+<p class="larch-version">🌳 Larch v6.0.34, © Copyright 2024.</p></div>
       
     </div>
   
