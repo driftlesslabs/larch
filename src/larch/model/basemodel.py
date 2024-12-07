@@ -431,6 +431,7 @@ class BaseModel:
             kwargs = {
                 "repair_ch_av": "!",
                 "repair_ch_zq": "!",
+                "repair_av_zq": "!",
                 "repair_noch_nzwt": "!",
                 "repair_nan_wt": "!",
                 "repair_nan_data_co": "!",

@@ -23,6 +23,7 @@ def doctor(
     *,
     repair_ch_av: Literal["?", "+", "-", "!"] | None = "?",
     repair_ch_zq: Literal["?", "-", "!"] | None = None,
+    repair_av_zq: Literal["?", "-", "!"] | None = None,
     repair_noch_nzwt: Literal["?", "+", "-"] | None = "?",
     repair_nan_wt: Literal["?", True, "!"] | None = "?",
     repair_nan_data_co: Literal["?", True, "!"] | None = "?",
@@ -56,6 +57,12 @@ def doctor(
         leaving no chosen alternative). A question mark ('?') effects no repair, and
         simply emits a warning. An exclamation mark ('!') will raise an error if there
         are any conflicts.
+    repair_av_zq : {'?', '-', '!'}, default None
+        How to repair the data if some observations are available but have zero quantity.
+        The minus ('-') will make alternatives with zero quantity not available (possibly
+        leaving no available alternatives). A question mark ('?') effects no repair, and
+        simply emits a warning. An exclamation mark ('!') will raise an error if there are
+        any conflicts.
     repair_noch_nzwt : {'?', '+', '-'}, default '?'
         How to repair the data if some observations have no choice but have some weight.
         Minus ('-') will make the weight zero when there is no choice. Plus ('+') will
@@ -135,6 +142,7 @@ def doctor(
     apply_repair(repair_nan_wt, nan_weight)
     apply_repair(check_low_variance_data_co, low_variance_data_co)
     apply_repair(repair_ch_zq, chosen_but_zero_quantity)
+    apply_repair(repair_av_zq, available_but_zero_quantity)
 
     if not problems:
         # Following are deep checks, which require actually evaluating the model.
@@ -330,6 +338,104 @@ def chosen_but_zero_quantity(
                 )
             )
             model.dataset["ch"].values[ch_and_zero_quantity] = 0
+
+    return model, diagnosis
+
+
+def available_but_zero_quantity(
+    model: Model, repair: Literal["?", "-", "!"] | None = None, verbose: int = 3
+):
+    """
+    Check if some observations are available but have zero quantity.
+
+    Alternatives that have zero quantity have utility values that end up as
+    negative infinity, regardless of whether the alternative would otherwise be
+    available.  Due to the mathematical structure of how quantities are used in
+    Larch, this situation is generally a result of a data problem, and not
+    due to the current values of model parameters.
+
+    If even one observation is available but has zero quantity, the first
+    derivative of the model log-likelihood may be incalculable, and the model
+    parameter estimation process may fail.
+
+    Parameters
+    ----------
+    model : BaseModel
+        The model to check.
+    repair : {'?', '-', '!'}
+        How to repair the data. The minus ('-') will make alternatives with zero
+        quantity not available (possibly leaving no available alternatives). A
+        question mark ('?') effects no repair, and simply emits a warning. An
+        exclamation mark ('!') will raise an error if there are any conflicts.
+    verbose : int, default 3
+        The number of example rows to list for each problem.
+
+    Returns
+    -------
+    model : BaseModel
+        The model with revised data
+    diagnosis : pd.DataFrame
+        The number of bad instances, by alternative, and some example rows.
+
+    Raises
+    ------
+    ValueError
+        If the repair is set to '!' and there are any conflicts found.
+    """
+    if repair not in ("?", "-", "!", None):
+        raise ValueError(f'invalid repair setting "{repair}"')
+
+    if not model.quantity_ca:
+        # no quantities, so no problem
+        return model, None
+
+    quant = model.quantity()
+    zero_quantity = np.asarray(quant[:, : model.graph.n_elementals()] == 0)
+
+    dataset = model.dataset
+    if dataset is None:
+        raise ValueError("data not loaded")
+    assert isinstance(dataset, xr.Dataset)
+
+    av_and_zero_quantity = (dataset["av"] > 0) & zero_quantity
+    av_and_zero_quantity_sum = av_and_zero_quantity.sum(dataset.dc.CASEID)
+    diagnosis = None
+    if av_and_zero_quantity.sum() > 0:
+        i1, i2 = np.where(av_and_zero_quantity)
+        diagnosis = (
+            av_and_zero_quantity_sum[av_and_zero_quantity_sum > 0]
+            .to_pandas()
+            .rename("n")
+            .to_frame()
+        )
+
+        for colnum, colname in enumerate(dataset.dc.altids()):
+            if av_and_zero_quantity_sum[colnum] > 0:
+                diagnosis.loc[colname, "example rows"] = ", ".join(
+                    str(j) for j in i1[i2 == colnum][:verbose]
+                )
+
+        msg = (
+            "available_but_zero_quantity: some available choices have zero quantity.\n"
+        )
+        try:
+            from tabulate import tabulate
+        except ImportError:
+            msg += diagnosis.to_string()
+        else:
+            msg += tabulate(diagnosis, headers="keys", tablefmt="fancy_outline")
+        if repair == "!":
+            msg += "\nTry `repair_av_zq` to resolve."
+            raise ValueError(msg)
+        elif repair == "?":
+            logger.warning(msg)
+        elif repair == "-":
+            logger.warning(
+                msg.replace(
+                    "some available choices", "zeroing out available choices that"
+                )
+            )
+            model.dataset["av"].values[av_and_zero_quantity] = 0
 
     return model, diagnosis
 
