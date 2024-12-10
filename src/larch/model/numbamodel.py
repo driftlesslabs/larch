@@ -2802,6 +2802,7 @@ class NumbaModel(_BaseModel):
         *,
         caption: str | bool = True,
         alt_labels: Literal["id", "name"] = "name",
+        bins=None,
     ) -> pd.io.formats.style.Styler:
         """
         Analyze predictions of the model based on idco attributes.
@@ -2830,6 +2831,17 @@ class NumbaModel(_BaseModel):
             be used.
         alt_labels : {'id', 'name'}, default 'name'
             The type of labels to use for the alternative IDs in the output.
+        bins : int, sequence of scalars, or IntervalIndex, optional
+            If provided, this value overrides `n` and is provided to `pandas.cut`
+            to control the binning.
+
+            * int : Defines the number of equal-width bins in the range of `q`. The
+              range of `q` is extended by .1% on each side to include the minimum
+              and maximum values of `q`.
+            * sequence of scalars : Defines the bin edges allowing for non-uniform
+              width. No extension of the range of `q` is done.
+            * IntervalIndex : Defines the exact bins to be used. Note that
+              IntervalIndex for `bins` must be non-overlapping.
 
         Returns
         -------
@@ -2869,8 +2881,11 @@ class NumbaModel(_BaseModel):
         def bold_if_signif(value):
             return "font-weight: bold" if value <= 0.05 else ""
 
+        # get probabilities and their variances
         pr = self.probability(return_format="dataframe")
         pr_v = pr * (1 - pr)
+
+        # prepare the slicer, which identifies the groups to analyze
         if isinstance(q, str):
             slicer = self.datatree.idco_subtree().eval(q).single_dim.to_pandas()
         else:
@@ -2878,24 +2893,38 @@ class NumbaModel(_BaseModel):
         if slicer.dtype == bool:
             pass
         elif not isinstance(slicer.dtype, pd.CategoricalDtype):
-            try:
-                slicer = pd.qcut(slicer, n)
-            except ValueError as err:
-                if "Bin edges must be unique" in str(err):
-                    # maybe there is not enough variation in the data to create
-                    # quantiles, if so just convert to categorical
-                    if len(slicer.value_counts()) <= n:
-                        slicer = pd.Categorical(slicer)
+            name = getattr(slicer, "name", None)
+            if bins is not None:
+                slicer = pd.cut(slicer, bins)
+            else:
+                try:
+                    slicer = pd.qcut(slicer, n)
+                except ValueError as err:
+                    if "Bin edges must be unique" in str(err):
+                        # maybe there is not enough variation in the data to create
+                        # quantiles, if so just convert to categorical
+                        if len(slicer.value_counts()) <= n:
+                            slicer = pd.Categorical(slicer)
+                        else:
+                            # otherwise try to drop duplicate bin edges
+                            slicer = pd.qcut(slicer, n, duplicates="drop")
                     else:
-                        # otherwise try to drop duplicate bin edges
-                        slicer = pd.qcut(slicer, n, duplicates="drop")
-                else:
-                    raise
+                        raise
+            if name:
+                slicer = slicer.rename(name)
+
+        # get the observed values
         obs = self.dataset.ch.to_pandas()
 
         if caption is True:
             if isinstance(q, str):
                 caption = f"Model Predictions by {q}"
+            else:
+                q_name = getattr(q, "name", None)
+                if q_name is None:
+                    caption = "Model Predictions"
+                else:
+                    caption = f"Model Predictions by {q_name}"
 
         result = pd.concat(
             [
@@ -2968,6 +2997,7 @@ class NumbaModel(_BaseModel):
         signif: float = 0.05,
         width: int = 400,
         alt_labels: Literal["id", "name"] = "name",
+        bins=None,
     ) -> altair.vegalite.v5.api.FacetChart:
         """
         Create an Altair figure of the model's predictions based on idco attributes.
@@ -2996,6 +3026,14 @@ class NumbaModel(_BaseModel):
             be used.
         alt_labels : {'id', 'name'}, default 'name'
             The type of labels to use for the alternative IDs in the output.
+        signif : float, default 0.05
+            The significance level to use for highlighting statistically
+            significant differences.
+        width : int, default 400
+            The width of the figure in pixels.
+        bins : int, sequence of scalars, or IntervalIndex, optional
+            If provided, this value overrides `n` and is provided to `pandas.cut`
+            to control the binning. See `pandas.cut` for more information.
 
         Returns
         -------
@@ -3039,7 +3077,7 @@ class NumbaModel(_BaseModel):
                 caption = f"Model Predictions by {q}"
 
         df = self.analyze_predictions_co(
-            q, n, caption=False, alt_labels=alt_labels
+            q, n, caption=False, alt_labels=alt_labels, bins=bins
         ).data
         altid_tag = df.index.names[1]
         sort_order = list(df.index.levels[1])

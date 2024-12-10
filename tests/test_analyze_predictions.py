@@ -41,6 +41,13 @@ def test_analyze_age_fig(model):
     assert isinstance(fig, alt.TopLevelMixin)
 
 
+def test_analyze_age_binned(model, dataframe_regression):
+    df = model.analyze_predictions_co("age", bins=[0, 25, 45, 65, 99])
+    assert isinstance(df, pd.io.formats.style.Styler)
+    df = df.data
+    dataframe_regression.check(df)
+
+
 def test_analyze_age_bool(model, dataframe_regression):
     df = model.analyze_predictions_co("age > 35")
     assert isinstance(df, pd.io.formats.style.Styler)
