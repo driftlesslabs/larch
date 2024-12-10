@@ -15,6 +15,8 @@
    
       ~Model.__init__
       ~Model.add_parameter_array
+      ~Model.analyze_predictions_co
+      ~Model.analyze_predictions_co_figure
       ~Model.apply_random_draws
       ~Model.bhhh
       ~Model.calculate_parameter_covariance

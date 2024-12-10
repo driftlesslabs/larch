@@ -1,0 +1,1532 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Model Analysis &#8212; v6.0.35</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=9d77a3fd" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../_static/documentation_options.js?v=c73c0f3e"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user-guide/analysis';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/driftlesslabs/larch/docs/docs/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '6.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="icon" href="../_static/larch_favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Compute Engines" href="compute-engines.html" />
+    <link rel="prev" title="Choice Models" href="choice-models.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search these docs..."
+         aria-label="Search these docs..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.35 - Home"/>
+    <img src="../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.35 - Home"/>
+  
+  
+</a></div>
+    
+      <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Examples
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Examples
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing Larch</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Data</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="data-fundamentals.html">Data for Discrete Choice</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-practicum.html">Data in Larch</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Models</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="linear-funcs.html">Linear Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="choice-models.html">Choice Models</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Model Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compute-engines.html">Compute Engines</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Model Analysis</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="model-analysis">
+<h1>Model Analysis<a class="headerlink" href="#model-analysis" title="Link to this heading">#</a></h1>
+<p>Larch includes several tools to support analysis of estimated model results.  We will demonstrate
+some of these features here using the simple example model for MTC mode choice:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">larch</span> <span class="k">as</span> <span class="nn">lx</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">example</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">parameter_summary</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style type="text/css">
+#T_1db43 th {
+  vertical-align: top;
+  text-align: left;
+}
+#T_1db43 td {
+  vertical-align: top;
+  text-align: left;
+}
+#T_1db43_row0_col0, #T_1db43_row0_col1, #T_1db43_row0_col2, #T_1db43_row0_col3, #T_1db43_row0_col4, #T_1db43_row1_col0, #T_1db43_row1_col1, #T_1db43_row1_col2, #T_1db43_row1_col3, #T_1db43_row1_col4, #T_1db43_row2_col0, #T_1db43_row2_col1, #T_1db43_row2_col2, #T_1db43_row2_col3, #T_1db43_row2_col4, #T_1db43_row3_col0, #T_1db43_row3_col1, #T_1db43_row3_col2, #T_1db43_row3_col3, #T_1db43_row3_col4, #T_1db43_row4_col0, #T_1db43_row4_col1, #T_1db43_row4_col2, #T_1db43_row4_col3, #T_1db43_row4_col4, #T_1db43_row5_col0, #T_1db43_row5_col1, #T_1db43_row5_col2, #T_1db43_row5_col3, #T_1db43_row5_col4, #T_1db43_row6_col0, #T_1db43_row6_col1, #T_1db43_row6_col2, #T_1db43_row6_col3, #T_1db43_row6_col4, #T_1db43_row7_col0, #T_1db43_row7_col1, #T_1db43_row7_col2, #T_1db43_row7_col3, #T_1db43_row7_col4, #T_1db43_row8_col0, #T_1db43_row8_col1, #T_1db43_row8_col2, #T_1db43_row8_col3, #T_1db43_row8_col4, #T_1db43_row9_col0, #T_1db43_row9_col1, #T_1db43_row9_col2, #T_1db43_row9_col3, #T_1db43_row9_col4, #T_1db43_row10_col0, #T_1db43_row10_col1, #T_1db43_row10_col2, #T_1db43_row10_col3, #T_1db43_row10_col4, #T_1db43_row11_col0, #T_1db43_row11_col1, #T_1db43_row11_col2, #T_1db43_row11_col3, #T_1db43_row11_col4 {
+  font-family: monospace;
+}
+</style>
+<table id="T_1db43">
+  <thead>
+    <tr>
+      <th class="blank level0" >&nbsp;</th>
+      <th id="T_1db43_level0_col0" class="col_heading level0 col0" >Value</th>
+      <th id="T_1db43_level0_col1" class="col_heading level0 col1" >Std Err</th>
+      <th id="T_1db43_level0_col2" class="col_heading level0 col2" >t Stat</th>
+      <th id="T_1db43_level0_col3" class="col_heading level0 col3" >Signif</th>
+      <th id="T_1db43_level0_col4" class="col_heading level0 col4" >Null Value</th>
+    </tr>
+    <tr>
+      <th class="index_name level0" >Parameter</th>
+      <th class="blank col0" >&nbsp;</th>
+      <th class="blank col1" >&nbsp;</th>
+      <th class="blank col2" >&nbsp;</th>
+      <th class="blank col3" >&nbsp;</th>
+      <th class="blank col4" >&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_1db43_level0_row0" class="row_heading level0 row0" >ASC_BIKE</th>
+      <td id="T_1db43_row0_col0" class="data row0 col0" >-2.38</td>
+      <td id="T_1db43_row0_col1" class="data row0 col1" > 0.305</td>
+      <td id="T_1db43_row0_col2" class="data row0 col2" >-7.80</td>
+      <td id="T_1db43_row0_col3" class="data row0 col3" >***</td>
+      <td id="T_1db43_row0_col4" class="data row0 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_1db43_level0_row1" class="row_heading level0 row1" >ASC_SR2</th>
+      <td id="T_1db43_row1_col0" class="data row1 col0" >-2.18</td>
+      <td id="T_1db43_row1_col1" class="data row1 col1" > 0.105</td>
+      <td id="T_1db43_row1_col2" class="data row1 col2" >-20.81</td>
+      <td id="T_1db43_row1_col3" class="data row1 col3" >***</td>
+      <td id="T_1db43_row1_col4" class="data row1 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_1db43_level0_row2" class="row_heading level0 row2" >ASC_SR3P</th>
+      <td id="T_1db43_row2_col0" class="data row2 col0" >-3.72</td>
+      <td id="T_1db43_row2_col1" class="data row2 col1" > 0.178</td>
+      <td id="T_1db43_row2_col2" class="data row2 col2" >-20.96</td>
+      <td id="T_1db43_row2_col3" class="data row2 col3" >***</td>
+      <td id="T_1db43_row2_col4" class="data row2 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_1db43_level0_row3" class="row_heading level0 row3" >ASC_TRAN</th>
+      <td id="T_1db43_row3_col0" class="data row3 col0" >-0.671</td>
+      <td id="T_1db43_row3_col1" class="data row3 col1" > 0.133</td>
+      <td id="T_1db43_row3_col2" class="data row3 col2" >-5.06</td>
+      <td id="T_1db43_row3_col3" class="data row3 col3" >***</td>
+      <td id="T_1db43_row3_col4" class="data row3 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_1db43_level0_row4" class="row_heading level0 row4" >ASC_WALK</th>
+      <td id="T_1db43_row4_col0" class="data row4 col0" >-0.207</td>
+      <td id="T_1db43_row4_col1" class="data row4 col1" > 0.194</td>
+      <td id="T_1db43_row4_col2" class="data row4 col2" >-1.07</td>
+      <td id="T_1db43_row4_col3" class="data row4 col3" ></td>
+      <td id="T_1db43_row4_col4" class="data row4 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_1db43_level0_row5" class="row_heading level0 row5" >hhinc#2</th>
+      <td id="T_1db43_row5_col0" class="data row5 col0" >-0.00217</td>
+      <td id="T_1db43_row5_col1" class="data row5 col1" > 0.00155</td>
+      <td id="T_1db43_row5_col2" class="data row5 col2" >-1.40</td>
+      <td id="T_1db43_row5_col3" class="data row5 col3" ></td>
+      <td id="T_1db43_row5_col4" class="data row5 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_1db43_level0_row6" class="row_heading level0 row6" >hhinc#3</th>
+      <td id="T_1db43_row6_col0" class="data row6 col0" > 0.000352</td>
+      <td id="T_1db43_row6_col1" class="data row6 col1" > 0.00254</td>
+      <td id="T_1db43_row6_col2" class="data row6 col2" > 0.14</td>
+      <td id="T_1db43_row6_col3" class="data row6 col3" ></td>
+      <td id="T_1db43_row6_col4" class="data row6 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_1db43_level0_row7" class="row_heading level0 row7" >hhinc#4</th>
+      <td id="T_1db43_row7_col0" class="data row7 col0" >-0.00529</td>
+      <td id="T_1db43_row7_col1" class="data row7 col1" > 0.00183</td>
+      <td id="T_1db43_row7_col2" class="data row7 col2" >-2.89</td>
+      <td id="T_1db43_row7_col3" class="data row7 col3" >**</td>
+      <td id="T_1db43_row7_col4" class="data row7 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_1db43_level0_row8" class="row_heading level0 row8" >hhinc#5</th>
+      <td id="T_1db43_row8_col0" class="data row8 col0" >-0.0128</td>
+      <td id="T_1db43_row8_col1" class="data row8 col1" > 0.00532</td>
+      <td id="T_1db43_row8_col2" class="data row8 col2" >-2.41</td>
+      <td id="T_1db43_row8_col3" class="data row8 col3" >*</td>
+      <td id="T_1db43_row8_col4" class="data row8 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_1db43_level0_row9" class="row_heading level0 row9" >hhinc#6</th>
+      <td id="T_1db43_row9_col0" class="data row9 col0" >-0.00968</td>
+      <td id="T_1db43_row9_col1" class="data row9 col1" > 0.00303</td>
+      <td id="T_1db43_row9_col2" class="data row9 col2" >-3.19</td>
+      <td id="T_1db43_row9_col3" class="data row9 col3" >**</td>
+      <td id="T_1db43_row9_col4" class="data row9 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_1db43_level0_row10" class="row_heading level0 row10" >totcost</th>
+      <td id="T_1db43_row10_col0" class="data row10 col0" >-0.00492</td>
+      <td id="T_1db43_row10_col1" class="data row10 col1" > 0.000239</td>
+      <td id="T_1db43_row10_col2" class="data row10 col2" >-20.60</td>
+      <td id="T_1db43_row10_col3" class="data row10 col3" >***</td>
+      <td id="T_1db43_row10_col4" class="data row10 col4" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_1db43_level0_row11" class="row_heading level0 row11" >tottime</th>
+      <td id="T_1db43_row11_col0" class="data row11 col0" >-0.0513</td>
+      <td id="T_1db43_row11_col1" class="data row11 col1" > 0.00310</td>
+      <td id="T_1db43_row11_col2" class="data row11 col2" >-16.56</td>
+      <td id="T_1db43_row11_col3" class="data row11 col3" >***</td>
+      <td id="T_1db43_row11_col4" class="data row11 col4" > 0.00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<section id="choice-and-availability-summary">
+<h2>Choice and Availability Summary<a class="headerlink" href="#choice-and-availability-summary" title="Link to this heading">#</a></h2>
+<p>A simple aggregate analysis of the data’s choice and availablity statistics is available
+via <code class="docutils literal notranslate"><span class="pre">choice_avail_summary</span></code> even without any model structure or parameters, as this
+summary can be constructed from the data alone.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">choice_avail_summary</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>chosen</th>
+      <th>available</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>DA</td>
+      <td>3637</td>
+      <td>4755</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>SR2</td>
+      <td>517</td>
+      <td>5029</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>SR3+</td>
+      <td>161</td>
+      <td>5029</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Transit</td>
+      <td>498</td>
+      <td>4003</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Bike</td>
+      <td>50</td>
+      <td>1738</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Walk</td>
+      <td>166</td>
+      <td>1479</td>
+    </tr>
+    <tr>
+      <th>&lt; Total All Alternatives &gt;</th>
+      <td></td>
+      <td>5029</td>
+      <td>&lt;NA&gt;</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="analyze-predictions">
+<h2>Analyze Predictions<a class="headerlink" href="#analyze-predictions" title="Link to this heading">#</a></h2>
+<p>Larch includes methods to analyze model predictions across various dimensions.  The <a class="reference internal" href="../api/generated/larch.Model.analyze_predictions_co.html#larch.Model.analyze_predictions_co" title="larch.Model.analyze_predictions_co"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">analyze_predictions_co</span></code></span></a>
+method can be used to examine how well the model predicts choices against any available (or computable)
+attibute of the chooser.  For example, consider the basic example model for MTC mode choice.
+This model includes a utility function that incorporates alternative specific constants, level of
+service variables (time and cost), as well as alternative-specific parameters to account for income.</p>
+<p>We may be interested in knowing how well the model predicts choices across various age levels. To
+see this, we can pass the “age” variable to <a class="reference internal" href="../api/generated/larch.Model.analyze_predictions_co.html#larch.Model.analyze_predictions_co" title="larch.Model.analyze_predictions_co"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">analyze_predictions_co</span></code></span></a>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">analyze_predictions_co</span><span class="p">(</span><span class="s2">&quot;age&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/larch/model/numbamodel.py:2931: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  pr.groupby(slicer).sum().stack().rename(&quot;mean-predicted&quot;),
+/opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/larch/model/numbamodel.py:2932: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  np.sqrt(pr_v.groupby(slicer).sum()).stack().rename(&quot;stdev-predicted&quot;),
+/opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/larch/model/numbamodel.py:2933: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  obs.groupby(slicer).sum().stack().rename(&quot;observed&quot;),
+/opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/larch/model/numbamodel.py:2953: FutureWarning: Styler.applymap has been deprecated. Use Styler.map instead.
+  result.style.text_gradient(
+</pre></div>
+</div>
+<div class="output text_html"><style type="text/css">
+#T_5fee3 th {
+  border: 1px solid #e5e5e5;
+}
+#T_5fee3 td {
+  border: 1px solid #e5e5e5;
+}
+#T_5fee3 caption {
+  text-align: left;
+  font-size: 1.2em;
+  font-weight: bold;
+  padding-bottom: 6px;
+}
+#T_5fee3_row0_col3, #T_5fee3_row1_col3 {
+  color: #ed6925;
+  font-weight: bold;
+}
+#T_5fee3_row2_col3, #T_5fee3_row3_col3, #T_5fee3_row5_col3, #T_5fee3_row6_col3, #T_5fee3_row7_col3, #T_5fee3_row8_col3, #T_5fee3_row9_col3, #T_5fee3_row10_col3, #T_5fee3_row11_col3, #T_5fee3_row12_col3, #T_5fee3_row13_col3, #T_5fee3_row14_col3, #T_5fee3_row15_col3, #T_5fee3_row16_col3, #T_5fee3_row17_col3, #T_5fee3_row20_col3, #T_5fee3_row21_col3, #T_5fee3_row22_col3, #T_5fee3_row23_col3, #T_5fee3_row24_col3, #T_5fee3_row25_col3, #T_5fee3_row27_col3, #T_5fee3_row28_col3, #T_5fee3_row29_col3 {
+  color: #000004;
+}
+#T_5fee3_row4_col3 {
+  color: #ec6726;
+  font-weight: bold;
+}
+#T_5fee3_row18_col3 {
+  color: #050417;
+  font-weight: bold;
+}
+#T_5fee3_row19_col3 {
+  color: #bc3754;
+  font-weight: bold;
+}
+#T_5fee3_row26_col3 {
+  color: #5a116e;
+  font-weight: bold;
+}
+</style>
+<table id="T_5fee3">
+  <caption>Model Predictions by age</caption>
+  <thead>
+    <tr>
+      <th class="blank" >&nbsp;</th>
+      <th class="blank level0" >&nbsp;</th>
+      <th id="T_5fee3_level0_col0" class="col_heading level0 col0" >mean-predicted</th>
+      <th id="T_5fee3_level0_col1" class="col_heading level0 col1" >stdev-predicted</th>
+      <th id="T_5fee3_level0_col2" class="col_heading level0 col2" >observed</th>
+      <th id="T_5fee3_level0_col3" class="col_heading level0 col3" >signif</th>
+    </tr>
+    <tr>
+      <th class="index_name level0" >age</th>
+      <th class="index_name level1" >alt_name</th>
+      <th class="blank col0" >&nbsp;</th>
+      <th class="blank col1" >&nbsp;</th>
+      <th class="blank col2" >&nbsp;</th>
+      <th class="blank col3" >&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_5fee3_level0_row0" class="row_heading level0 row0" rowspan="6">(17.999, 29.0]</th>
+      <th id="T_5fee3_level1_row0" class="row_heading level1 row0" >DA</th>
+      <td id="T_5fee3_row0_col0" class="data row0 col0" >805.212</td>
+      <td id="T_5fee3_row0_col1" class="data row0 col1" >12.578</td>
+      <td id="T_5fee3_row0_col2" class="data row0 col2" >753.000</td>
+      <td id="T_5fee3_row0_col3" class="data row0 col3" >0.000</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row1" class="row_heading level1 row1" >SR2</th>
+      <td id="T_5fee3_row1_col0" class="data row1 col0" >116.586</td>
+      <td id="T_5fee3_row1_col1" class="data row1 col1" >9.865</td>
+      <td id="T_5fee3_row1_col2" class="data row1 col2" >158.000</td>
+      <td id="T_5fee3_row1_col3" class="data row1 col3" >0.000</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row2" class="row_heading level1 row2" >SR3+</th>
+      <td id="T_5fee3_row2_col0" class="data row2 col0" >33.168</td>
+      <td id="T_5fee3_row2_col1" class="data row2 col1" >5.577</td>
+      <td id="T_5fee3_row2_col2" class="data row2 col2" >39.000</td>
+      <td id="T_5fee3_row2_col3" class="data row2 col3" >0.296</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row3" class="row_heading level1 row3" >Transit</th>
+      <td id="T_5fee3_row3_col0" class="data row3 col0" >118.050</td>
+      <td id="T_5fee3_row3_col1" class="data row3 col1" >8.748</td>
+      <td id="T_5fee3_row3_col2" class="data row3 col2" >106.000</td>
+      <td id="T_5fee3_row3_col3" class="data row3 col3" >0.168</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row4" class="row_heading level1 row4" >Bike</th>
+      <td id="T_5fee3_row4_col0" class="data row4 col0" >13.169</td>
+      <td id="T_5fee3_row4_col1" class="data row4 col1" >3.509</td>
+      <td id="T_5fee3_row4_col2" class="data row4 col2" >26.000</td>
+      <td id="T_5fee3_row4_col3" class="data row4 col3" >0.000</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row5" class="row_heading level1 row5" >Walk</th>
+      <td id="T_5fee3_row5_col0" class="data row5 col0" >46.816</td>
+      <td id="T_5fee3_row5_col1" class="data row5 col1" >5.863</td>
+      <td id="T_5fee3_row5_col2" class="data row5 col2" >51.000</td>
+      <td id="T_5fee3_row5_col3" class="data row5 col3" >0.475</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level0_row6" class="row_heading level0 row6" rowspan="6">(29.0, 35.0]</th>
+      <th id="T_5fee3_level1_row6" class="row_heading level1 row6" >DA</th>
+      <td id="T_5fee3_row6_col0" class="data row6 col0" >707.972</td>
+      <td id="T_5fee3_row6_col1" class="data row6 col1" >12.035</td>
+      <td id="T_5fee3_row6_col2" class="data row6 col2" >717.000</td>
+      <td id="T_5fee3_row6_col3" class="data row6 col3" >0.453</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row7" class="row_heading level1 row7" >SR2</th>
+      <td id="T_5fee3_row7_col0" class="data row7 col0" >105.193</td>
+      <td id="T_5fee3_row7_col1" class="data row7 col1" >9.398</td>
+      <td id="T_5fee3_row7_col2" class="data row7 col2" >107.000</td>
+      <td id="T_5fee3_row7_col3" class="data row7 col3" >0.848</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row8" class="row_heading level1 row8" >SR3+</th>
+      <td id="T_5fee3_row8_col0" class="data row8 col0" >34.192</td>
+      <td id="T_5fee3_row8_col1" class="data row8 col1" >5.602</td>
+      <td id="T_5fee3_row8_col2" class="data row8 col2" >32.000</td>
+      <td id="T_5fee3_row8_col3" class="data row8 col3" >0.696</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row9" class="row_heading level1 row9" >Transit</th>
+      <td id="T_5fee3_row9_col0" class="data row9 col0" >106.630</td>
+      <td id="T_5fee3_row9_col1" class="data row9 col1" >8.117</td>
+      <td id="T_5fee3_row9_col2" class="data row9 col2" >104.000</td>
+      <td id="T_5fee3_row9_col3" class="data row9 col3" >0.746</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row10" class="row_heading level1 row10" >Bike</th>
+      <td id="T_5fee3_row10_col0" class="data row10 col0" >11.384</td>
+      <td id="T_5fee3_row10_col1" class="data row10 col1" >3.260</td>
+      <td id="T_5fee3_row10_col2" class="data row10 col2" >11.000</td>
+      <td id="T_5fee3_row10_col3" class="data row10 col3" >0.906</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row11" class="row_heading level1 row11" >Walk</th>
+      <td id="T_5fee3_row11_col0" class="data row11 col0" >28.629</td>
+      <td id="T_5fee3_row11_col1" class="data row11 col1" >4.724</td>
+      <td id="T_5fee3_row11_col2" class="data row11 col2" >23.000</td>
+      <td id="T_5fee3_row11_col3" class="data row11 col3" >0.234</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level0_row12" class="row_heading level0 row12" rowspan="6">(35.0, 41.0]</th>
+      <th id="T_5fee3_level1_row12" class="row_heading level1 row12" >DA</th>
+      <td id="T_5fee3_row12_col0" class="data row12 col0" >683.659</td>
+      <td id="T_5fee3_row12_col1" class="data row12 col1" >11.876</td>
+      <td id="T_5fee3_row12_col2" class="data row12 col2" >681.000</td>
+      <td id="T_5fee3_row12_col3" class="data row12 col3" >0.823</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row13" class="row_heading level1 row13" >SR2</th>
+      <td id="T_5fee3_row13_col0" class="data row13 col0" >96.581</td>
+      <td id="T_5fee3_row13_col1" class="data row13 col1" >9.047</td>
+      <td id="T_5fee3_row13_col2" class="data row13 col2" >91.000</td>
+      <td id="T_5fee3_row13_col3" class="data row13 col3" >0.537</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row14" class="row_heading level1 row14" >SR3+</th>
+      <td id="T_5fee3_row14_col0" class="data row14 col0" >31.445</td>
+      <td id="T_5fee3_row14_col1" class="data row14 col1" >5.404</td>
+      <td id="T_5fee3_row14_col2" class="data row14 col2" >39.000</td>
+      <td id="T_5fee3_row14_col3" class="data row14 col3" >0.162</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row15" class="row_heading level1 row15" >Transit</th>
+      <td id="T_5fee3_row15_col0" class="data row15 col0" >92.564</td>
+      <td id="T_5fee3_row15_col1" class="data row15 col1" >7.745</td>
+      <td id="T_5fee3_row15_col2" class="data row15 col2" >102.000</td>
+      <td id="T_5fee3_row15_col3" class="data row15 col3" >0.223</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row16" class="row_heading level1 row16" >Bike</th>
+      <td id="T_5fee3_row16_col0" class="data row16 col0" >8.540</td>
+      <td id="T_5fee3_row16_col1" class="data row16 col1" >2.862</td>
+      <td id="T_5fee3_row16_col2" class="data row16 col2" >3.000</td>
+      <td id="T_5fee3_row16_col3" class="data row16 col3" >0.053</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row17" class="row_heading level1 row17" >Walk</th>
+      <td id="T_5fee3_row17_col0" class="data row17 col0" >27.211</td>
+      <td id="T_5fee3_row17_col1" class="data row17 col1" >4.671</td>
+      <td id="T_5fee3_row17_col2" class="data row17 col2" >24.000</td>
+      <td id="T_5fee3_row17_col3" class="data row17 col3" >0.492</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level0_row18" class="row_heading level0 row18" rowspan="6">(41.0, 50.0]</th>
+      <th id="T_5fee3_level1_row18" class="row_heading level1 row18" >DA</th>
+      <td id="T_5fee3_row18_col0" class="data row18 col0" >827.616</td>
+      <td id="T_5fee3_row18_col1" class="data row18 col1" >12.767</td>
+      <td id="T_5fee3_row18_col2" class="data row18 col2" >853.000</td>
+      <td id="T_5fee3_row18_col3" class="data row18 col3" >0.047</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row19" class="row_heading level1 row19" >SR2</th>
+      <td id="T_5fee3_row19_col0" class="data row19 col0" >112.626</td>
+      <td id="T_5fee3_row19_col1" class="data row19 col1" >9.844</td>
+      <td id="T_5fee3_row19_col2" class="data row19 col2" >88.000</td>
+      <td id="T_5fee3_row19_col3" class="data row19 col3" >0.012</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row20" class="row_heading level1 row20" >SR3+</th>
+      <td id="T_5fee3_row20_col0" class="data row20 col0" >35.374</td>
+      <td id="T_5fee3_row20_col1" class="data row20 col1" >5.726</td>
+      <td id="T_5fee3_row20_col2" class="data row20 col2" >35.000</td>
+      <td id="T_5fee3_row20_col3" class="data row20 col3" >0.948</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row21" class="row_heading level1 row21" >Transit</th>
+      <td id="T_5fee3_row21_col0" class="data row21 col0" >102.940</td>
+      <td id="T_5fee3_row21_col1" class="data row21 col1" >8.147</td>
+      <td id="T_5fee3_row21_col2" class="data row21 col2" >107.000</td>
+      <td id="T_5fee3_row21_col3" class="data row21 col3" >0.618</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row22" class="row_heading level1 row22" >Bike</th>
+      <td id="T_5fee3_row22_col0" class="data row22 col0" >10.472</td>
+      <td id="T_5fee3_row22_col1" class="data row22 col1" >3.161</td>
+      <td id="T_5fee3_row22_col2" class="data row22 col2" >7.000</td>
+      <td id="T_5fee3_row22_col3" class="data row22 col3" >0.272</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row23" class="row_heading level1 row23" >Walk</th>
+      <td id="T_5fee3_row23_col0" class="data row23 col0" >33.972</td>
+      <td id="T_5fee3_row23_col1" class="data row23 col1" >5.211</td>
+      <td id="T_5fee3_row23_col2" class="data row23 col2" >33.000</td>
+      <td id="T_5fee3_row23_col3" class="data row23 col3" >0.852</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level0_row24" class="row_heading level0 row24" rowspan="6">(50.0, 83.0]</th>
+      <th id="T_5fee3_level1_row24" class="row_heading level1 row24" >DA</th>
+      <td id="T_5fee3_row24_col0" class="data row24 col0" >612.531</td>
+      <td id="T_5fee3_row24_col1" class="data row24 col1" >10.918</td>
+      <td id="T_5fee3_row24_col2" class="data row24 col2" >633.000</td>
+      <td id="T_5fee3_row24_col3" class="data row24 col3" >0.061</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row25" class="row_heading level1 row25" >SR2</th>
+      <td id="T_5fee3_row25_col0" class="data row25 col0" >86.040</td>
+      <td id="T_5fee3_row25_col1" class="data row25 col1" >8.497</td>
+      <td id="T_5fee3_row25_col2" class="data row25 col2" >73.000</td>
+      <td id="T_5fee3_row25_col3" class="data row25 col3" >0.125</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row26" class="row_heading level1 row26" >SR3+</th>
+      <td id="T_5fee3_row26_col0" class="data row26 col0" >26.800</td>
+      <td id="T_5fee3_row26_col1" class="data row26 col1" >4.991</td>
+      <td id="T_5fee3_row26_col2" class="data row26 col2" >16.000</td>
+      <td id="T_5fee3_row26_col3" class="data row26 col3" >0.030</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row27" class="row_heading level1 row27" >Transit</th>
+      <td id="T_5fee3_row27_col0" class="data row27 col0" >77.828</td>
+      <td id="T_5fee3_row27_col1" class="data row27 col1" >7.175</td>
+      <td id="T_5fee3_row27_col2" class="data row27 col2" >79.000</td>
+      <td id="T_5fee3_row27_col3" class="data row27 col3" >0.870</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row28" class="row_heading level1 row28" >Bike</th>
+      <td id="T_5fee3_row28_col0" class="data row28 col0" >6.437</td>
+      <td id="T_5fee3_row28_col1" class="data row28 col1" >2.462</td>
+      <td id="T_5fee3_row28_col2" class="data row28 col2" >3.000</td>
+      <td id="T_5fee3_row28_col3" class="data row28 col3" >0.163</td>
+    </tr>
+    <tr>
+      <th id="T_5fee3_level1_row29" class="row_heading level1 row29" >Walk</th>
+      <td id="T_5fee3_row29_col0" class="data row29 col0" >29.365</td>
+      <td id="T_5fee3_row29_col1" class="data row29 col1" >4.776</td>
+      <td id="T_5fee3_row29_col2" class="data row29 col2" >35.000</td>
+      <td id="T_5fee3_row29_col3" class="data row29 col3" >0.238</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>This gives us a table of mode choices, segregated into five age categories. These
+categories were selected by the <code class="docutils literal notranslate"><span class="pre">pandas.qcut</span></code> functions to roughly divide the
+sample of observations into quintiles.  We can see the mean and standard deviation
+of the model predictions for each mode choice in each age group, as well as
+the actual observed count of choices in each group.  The <code class="docutils literal notranslate"><span class="pre">signif</span></code> column gives
+the level of significance of the difference between the predicted totals and
+the observed totals.  A small number in this column indicates that, assuming
+the model is correct, is would be very unlikely to actually collect the observed
+data.  We can see the very small significance values in the lowest age group
+are bold and highlighted in red, as these very small numbers are suggesting there
+is a problem in our model.</p>
+<p>We can also generate a figure to present this same information in a more
+visual representation, using <a class="reference internal" href="../api/generated/larch.Model.analyze_predictions_co_figure.html#larch.Model.analyze_predictions_co_figure" title="larch.Model.analyze_predictions_co_figure"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">analyze_predictions_co_figure</span></code></span></a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">analyze_predictions_co_figure</span><span class="p">(</span><span class="s2">&quot;age&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/larch/model/numbamodel.py:2931: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  pr.groupby(slicer).sum().stack().rename(&quot;mean-predicted&quot;),
+/opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/larch/model/numbamodel.py:2932: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  np.sqrt(pr_v.groupby(slicer).sum()).stack().rename(&quot;stdev-predicted&quot;),
+/opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/larch/model/numbamodel.py:2933: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  obs.groupby(slicer).sum().stack().rename(&quot;observed&quot;),
+/opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/larch/model/numbamodel.py:2953: FutureWarning: Styler.applymap has been deprecated. Use Styler.map instead.
+  result.style.text_gradient(
+</pre></div>
+</div>
+<div class="output text_html">
+<style>
+  #altair-viz-a3f461c33336417eb89e5d68412b45b6.vega-embed {
+    width: 100%;
+    display: flex;
+  }
+
+  #altair-viz-a3f461c33336417eb89e5d68412b45b6.vega-embed details,
+  #altair-viz-a3f461c33336417eb89e5d68412b45b6.vega-embed details summary {
+    position: relative;
+  }
+</style>
+<div id="altair-viz-a3f461c33336417eb89e5d68412b45b6"></div>
+<script type="text/javascript">
+  var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-a3f461c33336417eb89e5d68412b45b6") {
+      outputDiv = document.getElementById("altair-viz-a3f461c33336417eb89e5d68412b45b6");
+    }
+
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm/vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm/vega-lite@5.20.1?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm/vega-embed@6?noext",
+    };
+
+    function maybeLoadScript(lib, version) {
+      var key = `${lib.replace("-", "")}_version`;
+      return (VEGA_DEBUG[key] == version) ?
+        Promise.resolve(paths[lib]) :
+        new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          document.getElementsByTagName("head")[0].appendChild(s);
+          s.async = true;
+          s.onload = () => {
+            VEGA_DEBUG[key] = version;
+            return resolve(paths[lib]);
+          };
+          s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+          s.src = paths[lib];
+        });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      let deps = ["vega-embed"];
+      require(deps, displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else {
+      maybeLoadScript("vega", "5")
+        .then(() => maybeLoadScript("vega-lite", "5.20.1"))
+        .then(() => maybeLoadScript("vega-embed", "6"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}, "title": {"fontSize": 16}}, "data": {"name": "data-cb6a17522bfc82af16b8b88285531055"}, "facet": {"row": {"field": "alt_name", "sort": ["DA", "SR2", "SR3+", "Transit", "Bike", "Walk"], "title": "Alternative", "type": "nominal"}}, "spec": {"layer": [{"mark": {"type": "point", "filled": true, "size": 40}, "encoding": {"color": {"field": "Constant", "scale": {"range": ["black"]}, "title": "Predicted", "type": "nominal"}, "tooltip": [{"field": "observed", "title": "Count Observed", "type": "quantitative"}, {"field": "mean-predicted", "title": "Mean Predicted", "type": "quantitative"}, {"field": "stdev-predicted", "title": "Std Dev Predicted", "type": "quantitative"}, {"field": "signif", "title": "Significance", "type": "quantitative"}], "x": {"field": "mean-predicted", "title": "Number of Observations", "type": "quantitative"}, "y": {"field": "age", "title": "age", "type": "nominal"}}}, {"mark": {"type": "errorbar", "color": "black", "ticks": true}, "encoding": {"tooltip": [{"field": "observed", "title": "Count Observed", "type": "quantitative"}, {"field": "mean-predicted", "title": "Mean Predicted", "type": "quantitative"}, {"field": "stdev-predicted", "title": "Std Dev Predicted", "type": "quantitative"}, {"field": "signif", "title": "Significance", "type": "quantitative"}], "x": {"field": "mean-predicted-ciLow", "title": "Number of Observations", "type": "quantitative"}, "x2": {"field": "mean-predicted-ciHigh"}, "y": {"field": "age", "title": "age", "type": "nominal"}}}, {"mark": {"type": "point", "filled": false, "size": 60}, "encoding": {"color": {"field": "Significant", "scale": {"domain": ["Significantly Different", "Consistent"], "range": ["red", "#2E8B57"]}, "title": "Observed", "type": "nominal"}, "shape": {"field": "Significant", "scale": {"domain": ["Significantly Different", "Consistent"], "range": ["circle", "square"]}, "title": "Observed", "type": "nominal"}, "tooltip": [{"field": "observed", "title": "Count Observed", "type": "quantitative"}, {"field": "mean-predicted", "title": "Mean Predicted", "type": "quantitative"}, {"field": "stdev-predicted", "title": "Std Dev Predicted", "type": "quantitative"}, {"field": "signif", "title": "Significance", "type": "quantitative"}], "x": {"field": "observed", "title": "Number of Observations", "type": "quantitative"}, "y": {"field": "age", "title": "age", "type": "nominal"}}}], "resolve": {"scale": {"color": "independent", "shape": "independent"}}, "width": 400}, "resolve": {"scale": {"x": "independent"}}, "title": "Model Predictions by age", "$schema": "https://vega.github.io/schema/vega-lite/v5.20.1.json", "datasets": {"data-cb6a17522bfc82af16b8b88285531055": [{"age": "(17.999, 29.0]", "alt_name": "DA", "mean-predicted": 805.2124211525153, "stdev-predicted": 12.57809796838984, "observed": 753.0, "signif": 3.309410792340873e-05, "mean-predicted-ciLow": 780.5598021404547, "mean-predicted-ciHigh": 829.8650401645758, "Significant": "Significantly Different", "Constant": "Mean"}, {"age": "(17.999, 29.0]", "alt_name": "SR2", "mean-predicted": 116.58589511445533, "stdev-predicted": 9.86526748158976, "observed": 158.0, "signif": 2.6931733917596804e-05, "mean-predicted-ciLow": 97.25032615268523, "mean-predicted-ciHigh": 135.92146407622542, "Significant": "Significantly Different", "Constant": "Mean"}, {"age": "(17.999, 29.0]", "alt_name": "SR3+", "mean-predicted": 33.16761828573553, "stdev-predicted": 5.577185160177698, "observed": 39.0, "signif": 0.29567313165193465, "mean-predicted-ciLow": 22.236536236675988, "mean-predicted-ciHigh": 44.09870033479507, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(17.999, 29.0]", "alt_name": "Transit", "mean-predicted": 118.04962137497274, "stdev-predicted": 8.748348939212407, "observed": 106.0, "signif": 0.16840113297776116, "mean-predicted-ciLow": 100.90317252992725, "mean-predicted-ciHigh": 135.19607022001824, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(17.999, 29.0]", "alt_name": "Bike", "mean-predicted": 13.168932062600064, "stdev-predicted": 3.5094131610017065, "observed": 26.0, "signif": 0.00025599544986161136, "mean-predicted-ciLow": 6.290608660165852, "mean-predicted-ciHigh": 20.047255465034276, "Significant": "Significantly Different", "Constant": "Mean"}, {"age": "(17.999, 29.0]", "alt_name": "Walk", "mean-predicted": 46.81551200972109, "stdev-predicted": 5.863408253284498, "observed": 51.0, "signif": 0.47543659652497994, "mean-predicted-ciLow": 35.323443006628565, "mean-predicted-ciHigh": 58.307581012813614, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(29.0, 35.0]", "alt_name": "DA", "mean-predicted": 707.9718570739599, "stdev-predicted": 12.03470510556681, "observed": 717.0, "signif": 0.45314891208894115, "mean-predicted-ciLow": 684.3842685024887, "mean-predicted-ciHigh": 731.5594456454311, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(29.0, 35.0]", "alt_name": "SR2", "mean-predicted": 105.19306809591421, "stdev-predicted": 9.398048428002742, "observed": 107.0, "signif": 0.8475332890887528, "mean-predicted-ciLow": 86.77323165206556, "mean-predicted-ciHigh": 123.61290453976287, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(29.0, 35.0]", "alt_name": "SR3+", "mean-predicted": 34.192061656516586, "stdev-predicted": 5.601755963164703, "observed": 32.0, "signif": 0.695563024493017, "mean-predicted-ciLow": 23.212821718531288, "mean-predicted-ciHigh": 45.171301594501884, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(29.0, 35.0]", "alt_name": "Transit", "mean-predicted": 106.63048470359296, "stdev-predicted": 8.116609510295829, "observed": 104.0, "signif": 0.7458724413551584, "mean-predicted-ciLow": 90.72222238683784, "mean-predicted-ciHigh": 122.53874702034807, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(29.0, 35.0]", "alt_name": "Bike", "mean-predicted": 11.383846184631661, "stdev-predicted": 3.2599304029178326, "observed": 11.0, "signif": 0.9062683294660855, "mean-predicted-ciLow": 4.994500002805562, "mean-predicted-ciHigh": 17.77319236645776, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(29.0, 35.0]", "alt_name": "Walk", "mean-predicted": 28.62868228538468, "stdev-predicted": 4.724461568463822, "observed": 23.0, "signif": 0.2335000170555097, "mean-predicted-ciLow": 19.368907764851976, "mean-predicted-ciHigh": 37.888456805917386, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(35.0, 41.0]", "alt_name": "DA", "mean-predicted": 683.6587816510677, "stdev-predicted": 11.875928905435002, "observed": 681.0, "signif": 0.8228507644214528, "mean-predicted-ciLow": 660.3823887134569, "mean-predicted-ciHigh": 706.9351745886785, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(35.0, 41.0]", "alt_name": "SR2", "mean-predicted": 96.58067639754424, "stdev-predicted": 9.047264035933189, "observed": 91.0, "signif": 0.5373430324844162, "mean-predicted-ciLow": 78.8483647284907, "mean-predicted-ciHigh": 114.31298806659778, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(35.0, 41.0]", "alt_name": "SR3+", "mean-predicted": 31.445428732567738, "stdev-predicted": 5.404115912685072, "observed": 39.0, "signif": 0.16213433833883273, "mean-predicted-ciLow": 20.85355617542519, "mean-predicted-ciHigh": 42.037301289710285, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(35.0, 41.0]", "alt_name": "Transit", "mean-predicted": 92.56389482698106, "stdev-predicted": 7.745203268965995, "observed": 102.0, "signif": 0.22310390691318238, "mean-predicted-ciLow": 77.38357536686581, "mean-predicted-ciHigh": 107.7442142870963, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(35.0, 41.0]", "alt_name": "Bike", "mean-predicted": 8.539907826854844, "stdev-predicted": 2.8623145194638275, "observed": 3.0, "signif": 0.05293333435064868, "mean-predicted-ciLow": 2.92987445627967, "mean-predicted-ciHigh": 14.149941197430017, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(35.0, 41.0]", "alt_name": "Walk", "mean-predicted": 27.2113105649844, "stdev-predicted": 4.671454807421716, "observed": 24.0, "signif": 0.4918101276849951, "mean-predicted-ciLow": 18.055427387031344, "mean-predicted-ciHigh": 36.36719374293746, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(41.0, 50.0]", "alt_name": "DA", "mean-predicted": 827.6160944772622, "stdev-predicted": 12.766732390823151, "observed": 853.0, "signif": 0.046780152719031146, "mean-predicted-ciLow": 802.5937587909879, "mean-predicted-ciHigh": 852.6384301635366, "Significant": "Significantly Different", "Constant": "Mean"}, {"age": "(41.0, 50.0]", "alt_name": "SR2", "mean-predicted": 112.62621087478556, "stdev-predicted": 9.843577134473922, "observed": 88.0, "signif": 0.012357967498108208, "mean-predicted-ciLow": 93.33315421217468, "mean-predicted-ciHigh": 131.91926753739642, "Significant": "Significantly Different", "Constant": "Mean"}, {"age": "(41.0, 50.0]", "alt_name": "SR3+", "mean-predicted": 35.373835881073994, "stdev-predicted": 5.726267247896666, "observed": 35.0, "signif": 0.9479475684657191, "mean-predicted-ciLow": 24.150558309345236, "mean-predicted-ciHigh": 46.59711345280275, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(41.0, 50.0]", "alt_name": "Transit", "mean-predicted": 102.94028615107992, "stdev-predicted": 8.147121470071312, "observed": 107.0, "signif": 0.618272329300513, "mean-predicted-ciLow": 86.97222149206712, "mean-predicted-ciHigh": 118.90835081009271, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(41.0, 50.0]", "alt_name": "Bike", "mean-predicted": 10.471769536037815, "stdev-predicted": 3.1611376787352428, "observed": 7.0, "signif": 0.27208842260146826, "mean-predicted-ciLow": 4.276053535544191, "mean-predicted-ciHigh": 16.667485536531437, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(41.0, 50.0]", "alt_name": "Walk", "mean-predicted": 33.97180307976056, "stdev-predicted": 5.210565427877246, "observed": 33.0, "signif": 0.8520477688130743, "mean-predicted-ciLow": 23.759282502031624, "mean-predicted-ciHigh": 44.1843236574895, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(50.0, 83.0]", "alt_name": "DA", "mean-predicted": 612.5308404645054, "stdev-predicted": 10.918374785333981, "observed": 633.0, "signif": 0.06082792639197519, "mean-predicted-ciLow": 591.1312191155406, "mean-predicted-ciHigh": 633.9304618134703, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(50.0, 83.0]", "alt_name": "SR2", "mean-predicted": 86.0395106583954, "stdev-predicted": 8.496766701973021, "observed": 73.0, "signif": 0.12487133832970906, "mean-predicted-ciLow": 69.3861539374891, "mean-predicted-ciHigh": 102.6928673793017, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(50.0, 83.0]", "alt_name": "SR3+", "mean-predicted": 26.800154948954322, "stdev-predicted": 4.991089437673444, "observed": 16.0, "signif": 0.030473001372827324, "mean-predicted-ciLow": 17.0177994074961, "mean-predicted-ciHigh": 36.582510490412545, "Significant": "Significantly Different", "Constant": "Mean"}, {"age": "(50.0, 83.0]", "alt_name": "Transit", "mean-predicted": 77.82778534699544, "stdev-predicted": 7.174819440008765, "observed": 79.0, "signif": 0.8702200551958418, "mean-predicted-ciLow": 63.76539764900042, "mean-predicted-ciHigh": 91.89017304499046, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(50.0, 83.0]", "alt_name": "Bike", "mean-predicted": 6.436863422278671, "stdev-predicted": 2.461912717911974, "observed": 3.0, "signif": 0.16271042593168938, "mean-predicted-ciLow": 1.6116031620900841, "mean-predicted-ciHigh": 11.262123682467259, "Significant": "Consistent", "Constant": "Mean"}, {"age": "(50.0, 83.0]", "alt_name": "Walk", "mean-predicted": 29.36484515887066, "stdev-predicted": 4.776215639957189, "observed": 35.0, "signif": 0.2380651413788324, "mean-predicted-ciLow": 20.003634522157647, "mean-predicted-ciHigh": 38.726055795583676, "Significant": "Consistent", "Constant": "Mean"}]}}, {"mode": "vega-lite"});
+</script></div></div>
+</div>
+<p>If we prefer to analyze age using specific categorical breakpoints, we can do so
+by providing the preferred explicit bin breakpoints to the
+<a class="reference internal" href="../api/generated/larch.Model.analyze_predictions_co.html#larch.Model.analyze_predictions_co" title="larch.Model.analyze_predictions_co"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">analyze_predictions_co</span></code></span></a> method, which
+are then used by <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.cut.html#pandas.cut" title="pandas 2.2.3"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">pandas.cut</span></code></span></a> to categorize the data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">analyze_predictions_co</span><span class="p">(</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">99</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/larch/model/numbamodel.py:2931: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  pr.groupby(slicer).sum().stack().rename(&quot;mean-predicted&quot;),
+/opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/larch/model/numbamodel.py:2932: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  np.sqrt(pr_v.groupby(slicer).sum()).stack().rename(&quot;stdev-predicted&quot;),
+/opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/larch/model/numbamodel.py:2933: FutureWarning: The default of observed=False is deprecated and will be changed to True in a future version of pandas. Pass observed=False to retain current behavior or observed=True to adopt the future default and silence this warning.
+  obs.groupby(slicer).sum().stack().rename(&quot;observed&quot;),
+/opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/larch/model/numbamodel.py:2953: FutureWarning: Styler.applymap has been deprecated. Use Styler.map instead.
+  result.style.text_gradient(
+</pre></div>
+</div>
+<div class="output text_html"><style type="text/css">
+#T_a9bfd th {
+  border: 1px solid #e5e5e5;
+}
+#T_a9bfd td {
+  border: 1px solid #e5e5e5;
+}
+#T_a9bfd caption {
+  text-align: left;
+  font-size: 1.2em;
+  font-weight: bold;
+  padding-bottom: 6px;
+}
+#T_a9bfd_row0_col3 {
+  color: #eb6429;
+  font-weight: bold;
+}
+#T_a9bfd_row1_col3 {
+  color: #ec6726;
+  font-weight: bold;
+}
+#T_a9bfd_row2_col3 {
+  color: #8a226a;
+  font-weight: bold;
+}
+#T_a9bfd_row3_col3, #T_a9bfd_row4_col3, #T_a9bfd_row5_col3, #T_a9bfd_row6_col3, #T_a9bfd_row7_col3, #T_a9bfd_row8_col3, #T_a9bfd_row9_col3, #T_a9bfd_row10_col3, #T_a9bfd_row11_col3, #T_a9bfd_row13_col3, #T_a9bfd_row14_col3, #T_a9bfd_row15_col3, #T_a9bfd_row16_col3, #T_a9bfd_row17_col3, #T_a9bfd_row18_col3, #T_a9bfd_row19_col3, #T_a9bfd_row20_col3, #T_a9bfd_row21_col3, #T_a9bfd_row22_col3 {
+  color: #000004;
+}
+#T_a9bfd_row12_col3 {
+  color: #db503b;
+  font-weight: bold;
+}
+#T_a9bfd_row23_col3 {
+  color: #c43c4e;
+  font-weight: bold;
+}
+</style>
+<table id="T_a9bfd">
+  <caption>Model Predictions by age</caption>
+  <thead>
+    <tr>
+      <th class="blank" >&nbsp;</th>
+      <th class="blank level0" >&nbsp;</th>
+      <th id="T_a9bfd_level0_col0" class="col_heading level0 col0" >mean-predicted</th>
+      <th id="T_a9bfd_level0_col1" class="col_heading level0 col1" >stdev-predicted</th>
+      <th id="T_a9bfd_level0_col2" class="col_heading level0 col2" >observed</th>
+      <th id="T_a9bfd_level0_col3" class="col_heading level0 col3" >signif</th>
+    </tr>
+    <tr>
+      <th class="index_name level0" >age</th>
+      <th class="index_name level1" >alt_name</th>
+      <th class="blank col0" >&nbsp;</th>
+      <th class="blank col1" >&nbsp;</th>
+      <th class="blank col2" >&nbsp;</th>
+      <th class="blank col3" >&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_a9bfd_level0_row0" class="row_heading level0 row0" rowspan="6">(0, 25]</th>
+      <th id="T_a9bfd_level1_row0" class="row_heading level1 row0" >DA</th>
+      <td id="T_a9bfd_row0_col0" class="data row0 col0" >418.199</td>
+      <td id="T_a9bfd_row0_col1" class="data row0 col1" >9.070</td>
+      <td id="T_a9bfd_row0_col2" class="data row0 col2" >388.000</td>
+      <td id="T_a9bfd_row0_col3" class="data row0 col3" >0.001</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row1" class="row_heading level1 row1" >SR2</th>
+      <td id="T_a9bfd_row1_col0" class="data row1 col0" >63.365</td>
+      <td id="T_a9bfd_row1_col1" class="data row1 col1" >7.247</td>
+      <td id="T_a9bfd_row1_col2" class="data row1 col2" >89.000</td>
+      <td id="T_a9bfd_row1_col3" class="data row1 col3" >0.000</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row2" class="row_heading level1 row2" >SR3+</th>
+      <td id="T_a9bfd_row2_col0" class="data row2 col0" >16.805</td>
+      <td id="T_a9bfd_row2_col1" class="data row2 col1" >4.005</td>
+      <td id="T_a9bfd_row2_col2" class="data row2 col2" >26.000</td>
+      <td id="T_a9bfd_row2_col3" class="data row2 col3" >0.022</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row3" class="row_heading level1 row3" >Transit</th>
+      <td id="T_a9bfd_row3_col0" class="data row3 col0" >68.248</td>
+      <td id="T_a9bfd_row3_col1" class="data row3 col1" >6.581</td>
+      <td id="T_a9bfd_row3_col2" class="data row3 col2" >56.000</td>
+      <td id="T_a9bfd_row3_col3" class="data row3 col3" >0.063</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row4" class="row_heading level1 row4" >Bike</th>
+      <td id="T_a9bfd_row4_col0" class="data row4 col0" >8.281</td>
+      <td id="T_a9bfd_row4_col1" class="data row4 col1" >2.763</td>
+      <td id="T_a9bfd_row4_col2" class="data row4 col2" >12.000</td>
+      <td id="T_a9bfd_row4_col3" class="data row4 col3" >0.178</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row5" class="row_heading level1 row5" >Walk</th>
+      <td id="T_a9bfd_row5_col0" class="data row5 col0" >28.103</td>
+      <td id="T_a9bfd_row5_col1" class="data row5 col1" >4.602</td>
+      <td id="T_a9bfd_row5_col2" class="data row5 col2" >32.000</td>
+      <td id="T_a9bfd_row5_col3" class="data row5 col3" >0.397</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level0_row6" class="row_heading level0 row6" rowspan="6">(25, 45]</th>
+      <th id="T_a9bfd_level1_row6" class="row_heading level1 row6" >DA</th>
+      <td id="T_a9bfd_row6_col0" class="data row6 col0" >2170.556</td>
+      <td id="T_a9bfd_row6_col1" class="data row6 col1" >20.973</td>
+      <td id="T_a9bfd_row6_col2" class="data row6 col2" >2166.000</td>
+      <td id="T_a9bfd_row6_col3" class="data row6 col3" >0.828</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row7" class="row_heading level1 row7" >SR2</th>
+      <td id="T_a9bfd_row7_col0" class="data row7 col0" >310.702</td>
+      <td id="T_a9bfd_row7_col1" class="data row7 col1" >16.200</td>
+      <td id="T_a9bfd_row7_col2" class="data row7 col2" >304.000</td>
+      <td id="T_a9bfd_row7_col3" class="data row7 col3" >0.679</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row8" class="row_heading level1 row8" >SR3+</th>
+      <td id="T_a9bfd_row8_col0" class="data row8 col0" >100.291</td>
+      <td id="T_a9bfd_row8_col1" class="data row8 col1" >9.610</td>
+      <td id="T_a9bfd_row8_col2" class="data row8 col2" >102.000</td>
+      <td id="T_a9bfd_row8_col3" class="data row8 col3" >0.859</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row9" class="row_heading level1 row9" >Transit</th>
+      <td id="T_a9bfd_row9_col0" class="data row9 col0" >304.320</td>
+      <td id="T_a9bfd_row9_col1" class="data row9 col1" >13.869</td>
+      <td id="T_a9bfd_row9_col2" class="data row9 col2" >322.000</td>
+      <td id="T_a9bfd_row9_col3" class="data row9 col3" >0.202</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row10" class="row_heading level1 row10" >Bike</th>
+      <td id="T_a9bfd_row10_col0" class="data row10 col0" >30.105</td>
+      <td id="T_a9bfd_row10_col1" class="data row10 col1" >5.342</td>
+      <td id="T_a9bfd_row10_col2" class="data row10 col2" >32.000</td>
+      <td id="T_a9bfd_row10_col3" class="data row10 col3" >0.723</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row11" class="row_heading level1 row11" >Walk</th>
+      <td id="T_a9bfd_row11_col0" class="data row11 col0" >92.027</td>
+      <td id="T_a9bfd_row11_col1" class="data row11 col1" >8.427</td>
+      <td id="T_a9bfd_row11_col2" class="data row11 col2" >82.000</td>
+      <td id="T_a9bfd_row11_col3" class="data row11 col3" >0.234</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level0_row12" class="row_heading level0 row12" rowspan="6">(45, 65]</th>
+      <th id="T_a9bfd_level1_row12" class="row_heading level1 row12" >DA</th>
+      <td id="T_a9bfd_row12_col0" class="data row12 col0" >1006.936</td>
+      <td id="T_a9bfd_row12_col1" class="data row12 col1" >13.983</td>
+      <td id="T_a9bfd_row12_col2" class="data row12 col2" >1046.000</td>
+      <td id="T_a9bfd_row12_col3" class="data row12 col3" >0.005</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row13" class="row_heading level1 row13" >SR2</th>
+      <td id="T_a9bfd_row13_col0" class="data row13 col0" >137.491</td>
+      <td id="T_a9bfd_row13_col1" class="data row13 col1" >10.809</td>
+      <td id="T_a9bfd_row13_col2" class="data row13 col2" >118.000</td>
+      <td id="T_a9bfd_row13_col3" class="data row13 col3" >0.071</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row14" class="row_heading level1 row14" >SR3+</th>
+      <td id="T_a9bfd_row14_col0" class="data row14 col0" >42.324</td>
+      <td id="T_a9bfd_row14_col1" class="data row14 col1" >6.286</td>
+      <td id="T_a9bfd_row14_col2" class="data row14 col2" >32.000</td>
+      <td id="T_a9bfd_row14_col3" class="data row14 col3" >0.101</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row15" class="row_heading level1 row15" >Transit</th>
+      <td id="T_a9bfd_row15_col0" class="data row15 col0" >118.311</td>
+      <td id="T_a9bfd_row15_col1" class="data row15 col1" >8.950</td>
+      <td id="T_a9bfd_row15_col2" class="data row15 col2" >113.000</td>
+      <td id="T_a9bfd_row15_col3" class="data row15 col3" >0.553</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row16" class="row_heading level1 row16" >Bike</th>
+      <td id="T_a9bfd_row16_col0" class="data row16 col0" >11.205</td>
+      <td id="T_a9bfd_row16_col1" class="data row16 col1" >3.263</td>
+      <td id="T_a9bfd_row16_col2" class="data row16 col2" >6.000</td>
+      <td id="T_a9bfd_row16_col3" class="data row16 col3" >0.111</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row17" class="row_heading level1 row17" >Walk</th>
+      <td id="T_a9bfd_row17_col0" class="data row17 col0" >40.732</td>
+      <td id="T_a9bfd_row17_col1" class="data row17 col1" >5.715</td>
+      <td id="T_a9bfd_row17_col2" class="data row17 col2" >42.000</td>
+      <td id="T_a9bfd_row17_col3" class="data row17 col3" >0.824</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level0_row18" class="row_heading level0 row18" rowspan="6">(65, 99]</th>
+      <th id="T_a9bfd_level1_row18" class="row_heading level1 row18" >DA</th>
+      <td id="T_a9bfd_row18_col0" class="data row18 col0" >41.299</td>
+      <td id="T_a9bfd_row18_col1" class="data row18 col1" >2.935</td>
+      <td id="T_a9bfd_row18_col2" class="data row18 col2" >37.000</td>
+      <td id="T_a9bfd_row18_col3" class="data row18 col3" >0.143</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row19" class="row_heading level1 row19" >SR2</th>
+      <td id="T_a9bfd_row19_col0" class="data row19 col0" >5.467</td>
+      <td id="T_a9bfd_row19_col1" class="data row19 col1" >2.187</td>
+      <td id="T_a9bfd_row19_col2" class="data row19 col2" >6.000</td>
+      <td id="T_a9bfd_row19_col3" class="data row19 col3" >0.808</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row20" class="row_heading level1 row20" >SR3+</th>
+      <td id="T_a9bfd_row20_col0" class="data row20 col0" >1.559</td>
+      <td id="T_a9bfd_row20_col1" class="data row20 col1" >1.221</td>
+      <td id="T_a9bfd_row20_col2" class="data row20 col2" >1.000</td>
+      <td id="T_a9bfd_row20_col3" class="data row20 col3" >0.647</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row21" class="row_heading level1 row21" >Transit</th>
+      <td id="T_a9bfd_row21_col0" class="data row21 col0" >7.134</td>
+      <td id="T_a9bfd_row21_col1" class="data row21 col1" >2.121</td>
+      <td id="T_a9bfd_row21_col2" class="data row21 col2" >7.000</td>
+      <td id="T_a9bfd_row21_col3" class="data row21 col3" >0.950</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row22" class="row_heading level1 row22" >Bike</th>
+      <td id="T_a9bfd_row22_col0" class="data row22 col0" >0.411</td>
+      <td id="T_a9bfd_row22_col1" class="data row22 col1" >0.613</td>
+      <td id="T_a9bfd_row22_col2" class="data row22 col2" >0.000</td>
+      <td id="T_a9bfd_row22_col3" class="data row22 col3" >0.503</td>
+    </tr>
+    <tr>
+      <th id="T_a9bfd_level1_row23" class="row_heading level1 row23" >Walk</th>
+      <td id="T_a9bfd_row23_col0" class="data row23 col0" >5.130</td>
+      <td id="T_a9bfd_row23_col1" class="data row23 col1" >1.905</td>
+      <td id="T_a9bfd_row23_col2" class="data row23 col2" >10.000</td>
+      <td id="T_a9bfd_row23_col3" class="data row23 col3" >0.011</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="full-probability-array">
+<h2>Full Probability Array<a class="headerlink" href="#full-probability-array" title="Link to this heading">#</a></h2>
+<p>In addition to the pre-packaged analysis above, Larch makes available the full
+<a class="reference internal" href="../api/generated/larch.Model.probability.html#larch.Model.probability" title="larch.Model.probability"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">probability</span></code></span></a> array (among other internals), so that
+advanced users can slice and analyze the results in arbitrarily complex ways.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">probability</span><span class="p">(</span><span class="n">return_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>altid</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+    </tr>
+    <tr>
+      <th>caseid</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>0.817453</td>
+      <td>0.077714</td>
+      <td>0.017906</td>
+      <td>0.071428</td>
+      <td>0.015500</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.336943</td>
+      <td>0.074346</td>
+      <td>0.052077</td>
+      <td>0.498070</td>
+      <td>0.038564</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.823138</td>
+      <td>0.077032</td>
+      <td>0.015894</td>
+      <td>0.083936</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.340369</td>
+      <td>0.073518</td>
+      <td>0.058212</td>
+      <td>0.527902</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0.000000</td>
+      <td>0.448105</td>
+      <td>0.114347</td>
+      <td>0.343652</td>
+      <td>0.093896</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>5025</th>
+      <td>0.847974</td>
+      <td>0.120205</td>
+      <td>0.031822</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>5026</th>
+      <td>0.791097</td>
+      <td>0.071897</td>
+      <td>0.015698</td>
+      <td>0.121308</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>5027</th>
+      <td>0.885338</td>
+      <td>0.092190</td>
+      <td>0.022471</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>5028</th>
+      <td>0.710697</td>
+      <td>0.062881</td>
+      <td>0.014049</td>
+      <td>0.157473</td>
+      <td>0.000000</td>
+      <td>0.054900</td>
+    </tr>
+    <tr>
+      <th>5029</th>
+      <td>0.581633</td>
+      <td>0.047285</td>
+      <td>0.010365</td>
+      <td>0.120865</td>
+      <td>0.031087</td>
+      <td>0.208765</td>
+    </tr>
+  </tbody>
+</table>
+<p>5029 rows × 6 columns</p>
+</div></div></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="choice-models.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Choice Models</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="compute-engines.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Compute Engines</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choice-and-availability-summary">Choice and Availability Summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analyze-predictions">Analyze Predictions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#full-probability-array">Full Probability Array</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/user-guide/analysis.ipynb">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item"><!-- This will display the version of the docs -->
+<p class="larch-version">🌳 Larch v6.0.35, © Copyright 2024.</p></div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
