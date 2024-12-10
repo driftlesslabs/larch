@@ -194,6 +194,7 @@ class OptimizeMixin(BucketAccess):
         stderr=False,
         dashboard=True,
         dashboard_update=1.0,
+        quiet: bool = False,
         **kwargs,
     ):
         from .model.dashboard import Dashboard
@@ -201,6 +202,8 @@ class OptimizeMixin(BucketAccess):
         if self.dataset is None:
             raise MissingDataError("No dataset attached to model")
 
+        if quiet:
+            dashboard = False
         self._latest_gradient = np.full_like(self.pvals, np.nan)
         self.dashboard = Dashboard(
             status="[yellow]compiling objective function...",
