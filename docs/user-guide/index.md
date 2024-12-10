@@ -19,6 +19,7 @@ data-practicum
 
 linear-funcs
 choice-models
+analysis
 compute-engines
 ```
 

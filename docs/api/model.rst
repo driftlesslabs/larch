@@ -119,6 +119,16 @@ Model Fitness
     Model.rho_sq_null
 
 
+Model Analysis
+--------------
+
+.. autosummary::
+    :toctree: generated/
+
+    Model.analyze_predictions_co
+    Model.analyze_predictions_co_figure
+    Model.histogram_on_idca_variable
+
 Reporting
 ---------
 
