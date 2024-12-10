@@ -1349,7 +1349,7 @@ def distribution_on_idco_variable(
         discrete, discrete_values = seems_like_discrete_data(x, return_uniques=True)
 
     pr = model.probability(
-        return_dataframe="names",
+        return_format="names",
         include_nests=bool(include_nests),
     ).loc[filter_, :]
 

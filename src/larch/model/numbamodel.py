@@ -5,7 +5,7 @@ import pathlib
 import warnings
 from collections import namedtuple
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 import pandas as pd
@@ -27,6 +27,9 @@ from ..util import dictx
 from ..util.simple_attribute import SimpleAttribute
 from .basemodel import BaseModel as _BaseModel
 from .numba_stream import ModelStreamer
+
+if TYPE_CHECKING:
+    import altair.vegalite.v5.api
 
 if not list(Path(__file__).parent.glob("__pycache__/numbamodel.*.nbc")):
     warnings.warn(  ## Good news, everyone! ##  )
@@ -1756,10 +1759,28 @@ class NumbaModel(_BaseModel):
         self,
         arr,
         return_type: Literal["dataframe", "names", "idce", "idca", "dataarray", None],
-        start_case=None,
-        stop_case=None,
-        step_case=None,
+        start_case: int | None = None,
+        stop_case: int | None = None,
+        step_case: int | None = None,
     ):
+        """
+        Wrap the given array as a DataFrame or DataArray.
+
+        Parameters
+        ----------
+        arr : array-like
+            The array to wrap.
+        return_type : {"dataframe", "names", "idca", "dataarray", None}, default None
+            Return the result in the indicated format.
+            - 'dataframe' gives a pandas DataFrame indexed by cases and with
+                alternative codes as columns.
+            - 'names' gives a pandas DataFrame indexed by cases and with
+                alternative names as columns.
+            - 'idca' gives a pandas DataFrame containing a single columns and
+                with a two-level multi-index giving cases and alternatives.
+            - 'dataarray' gives a two-dimension DataArray, with cases and
+                alternatives as dimensions.
+        """
         if return_type:
             idx = self.datatree.caseids()
             if idx is not None:
@@ -1767,7 +1788,9 @@ class NumbaModel(_BaseModel):
             if return_type == "names":
                 return pd.DataFrame(
                     data=arr,
-                    columns=self.graph.standard_sort_names[: arr.shape[1]],
+                    columns=pd.Index(
+                        self.graph.standard_sort_names[: arr.shape[1]], name="alt_name"
+                    ),
                     index=idx,
                 )
             if return_type == "dataarray":
@@ -1784,7 +1807,10 @@ class NumbaModel(_BaseModel):
                 )
             result = pd.DataFrame(
                 data=arr,
-                columns=self.graph.standard_sort[: arr.shape[1]],
+                columns=pd.Index(
+                    self.graph.standard_sort[: arr.shape[1]],
+                    name=self.datatree.dc.ALTID,
+                ),
                 index=idx,
             )
             if return_type == "idce":
@@ -1799,12 +1825,53 @@ class NumbaModel(_BaseModel):
         self,
         x=None,
         *,
-        start_case=None,
-        stop_case=None,
-        step_case=None,
-        return_dataframe=False,
+        start_case: int | None = None,
+        stop_case: int | None = None,
+        step_case: int | None = None,
+        return_format: Literal[
+            "dataframe", "names", "idce", "idca", "dataarray", None
+        ] = False,
         include_nests=False,
     ):
+        """
+        Compute values for the probability function embodied by the model.
+
+        Parameters
+        ----------
+        x : array-like or dict, optional
+            New values to set for the parameters before evaluating
+            the probability.  If given as array-like, the array must
+            be a vector with length equal to the length of the
+            parameter frame, and the given vector will replace
+            the current values.  If given as a dictionary,
+            the dictionary is used to update the parameters.
+        start_case : int, default 0
+            The first case to include in the probability computation.
+            To include all cases, start from 0 (the default).
+        stop_case : int, default -1
+            One past the last case to include in the probability
+            computation.  This is processed as usual for Python slicing
+            and iterating, and negative values count backward from the
+            end.  To include all cases, end at -1 (the default).
+        step_case : int, default 1
+            The step size of the case iterator to use in probability
+            calculation.  This is processed as usual for Python slicing
+            and iterating.  To include all cases, step by 1 (the default).
+        return_format : {"dataframe", "names", "idca", "dataarray", None}, default None
+            Return the result in the indicated format.
+            - 'dataframe' gives a pandas DataFrame indexed by cases and with
+                alternative codes as columns.
+            - 'names' gives a pandas DataFrame indexed by cases and with
+                alternative names as columns.
+            - 'idca' gives a pandas DataFrame containing a single columns and
+                with a two-level multi-index giving cases and alternatives.
+            - 'dataarray' gives a two-dimension DataArray, with cases and
+                alternatives as dimensions.
+
+        Returns
+        -------
+        array or DataFrame or DataArray
+        """
         result_arrays, penalty = self._loglike_runner(
             x,
             start_case=start_case,
@@ -1817,7 +1884,7 @@ class NumbaModel(_BaseModel):
             pr = pr[:, : self.graph.n_elementals()]
         return self._wrap_as_dataframe(
             pr,
-            return_dataframe,
+            return_format,
             start_case=start_case,
             stop_case=stop_case,
             step_case=step_case,
@@ -2727,6 +2794,329 @@ class NumbaModel(_BaseModel):
         self._data_arrays = None
         self._dataset = None
         self.work_arrays = None
+
+    def analyze_predictions_co(
+        self,
+        q: Any = None,
+        n: int = 5,
+        *,
+        caption: str | bool = True,
+        alt_labels: Literal["id", "name"] = "name",
+    ) -> pd.io.formats.style.Styler:
+        """
+        Analyze predictions of the model based on idco attributes.
+
+        This method provides a summary of the model's predictions, broken down
+        into categories by some measure in the `idco` data.  The analysis
+        includes the mean predicted counts within each category, the standard
+        deviation of the predicted counts, the observed values, and a two-tailed
+        p-value for the difference between the observed and predicted values.
+        Statistically significant differences are highlighted in the output.
+
+        Parameters
+        ----------
+        q : str or array-like, optional
+            The quantiles to use for slicing the data.  If given as a string,
+            the string evaluated against the `idca` portion of this model's
+            datatree, and then the result is categorized into `n` quantiles.
+            If given as an array-like, the array is used to slice the data,
+            as the `by` argument to `DataFrame.groupby`, against an `idca`
+            formatted dataframe of probabilities.
+        n : int, default 5
+            The number of quantiles to use when `q` is a string.
+        caption : str or bool, default True
+            The caption to use for the styled DataFrame.  If True, the caption
+            will be "Model Predictions by {q}", and if False no caption will
+            be used.
+        alt_labels : {'id', 'name'}, default 'name'
+            The type of labels to use for the alternative IDs in the output.
+
+        Returns
+        -------
+        pandas.io.formats.style.Styler
+            A styled DataFrame containing the results of the analysis.
+
+        Notes
+        -----
+        This method is typically used to analyze the model's predictions
+        against attributes in the observed data that are not used in the
+        model itself.  For example, if the model estimates the probability of
+        choosing a particular alternative conditional on cost, time, and
+        income, this method can be used to analyze the model's predictions
+        against the distribution of observed choices by age or other
+        characteristics. Technically, nothing prevents a user from using
+        this method to analyze the model's predictions against the same
+        attributes used in the model, but the results are likely to provide
+        less useful informative.
+
+        This method requires the `scipy` package to be installed, as it uses
+        the `scipy.stats.norm.sf` function to calculate the p-values.
+
+        The standard deviation of the predicted counts is calculated via a
+        normal approximation to the underlying variable-p binomial-like
+        distribution, and may be slightly biased especially for small sample
+        sizes.
+
+        """
+        try:
+            import scipy.stats as stats
+        except ImportError as err:
+            raise ImportError("scipy is required for this method") from err
+
+        def signif(x):
+            return stats.norm.sf(np.absolute(x)) * 2
+
+        def bold_if_signif(value):
+            return "font-weight: bold" if value <= 0.05 else ""
+
+        pr = self.probability(return_format="dataframe")
+        pr_v = pr * (1 - pr)
+        if isinstance(q, str):
+            slicer = self.datatree.idco_subtree().eval(q).single_dim.to_pandas()
+        else:
+            slicer = q
+        if not isinstance(slicer.dtype, pd.CategoricalDtype):
+            slicer = pd.qcut(slicer, n)
+        obs = self.dataset.ch.to_pandas()
+
+        if caption is True:
+            if isinstance(q, str):
+                caption = f"Model Predictions by {q}"
+
+        result = pd.concat(
+            [
+                pr.groupby(slicer).sum().stack().rename("mean-predicted"),
+                np.sqrt(pr_v.groupby(slicer).sum()).stack().rename("stdev-predicted"),
+                obs.groupby(slicer).sum().stack().rename("observed"),
+            ],
+            axis=1,
+        )
+        if isinstance(q, str):
+            result.index.names = [
+                q,
+            ] + result.index.names[1:]
+        result["signif"] = signif(
+            (result["observed"] - result["mean-predicted"]) / result["stdev-predicted"]
+        )
+
+        if alt_labels == "name":
+            a_map = self.datatree.dc.alts_mapping()
+            result.index = result.index.set_levels(
+                [a_map.get(i, i) for i in result.index.levels[1]], level=1
+            )
+            result.index.names = [result.index.names[0], "alt_name"]
+
+        output = (
+            result.style.text_gradient(
+                cmap="inferno_r",
+                axis=0,
+                subset=["signif"],
+                low=0.5,
+                vmin=0.0,
+                vmax=0.05,
+            )
+            .format("{:.3f}")
+            .set_table_styles(
+                [
+                    {"selector": "th", "props": [("border", "1px solid #e5e5e5")]},
+                    {"selector": "td", "props": [("border", "1px solid #e5e5e5")]},
+                ]
+            )
+            .applymap(bold_if_signif)
+        )
+        if caption:
+            output.set_caption(caption).set_table_styles(
+                [
+                    {"selector": "th", "props": [("border", "1px solid #e5e5e5")]},
+                    {"selector": "td", "props": [("border", "1px solid #e5e5e5")]},
+                    {
+                        "selector": "caption",
+                        "props": [
+                            ("text-align", "left"),  # Adjust font size
+                            ("font-size", "1.2em"),  # Adjust font size
+                            ("font-weight", "bold"),  # Make the caption bold
+                            (
+                                "padding-bottom",
+                                "6px",
+                            ),  # Add some space below the caption
+                        ],
+                    },
+                ]
+            )
+        return output
+
+    def analyze_predictions_co_figure(
+        self,
+        q: Any = None,
+        n: int = 5,
+        *,
+        caption: str | bool = True,
+        signif: float = 0.05,
+        width: int = 400,
+        alt_labels: Literal["id", "name"] = "name",
+    ) -> altair.vegalite.v5.api.FacetChart:
+        """
+        Create an Altair figure of the model's predictions based on idco attributes.
+
+        This method provides a summary of the model's predictions, broken down
+        into categories by some measure in the `idco` data.  The analysis
+        includes the mean predicted counts within each category, the standard
+        deviation of the predicted counts, the observed values, and a two-tailed
+        p-value for the difference between the observed and predicted values.
+        Statistically significant differences are highlighted in the output.
+
+        Parameters
+        ----------
+        q : str or array-like, optional
+            The quantiles to use for slicing the data.  If given as a string,
+            the string evaluated against the `idca` portion of this model's
+            datatree, and then the result is categorized into `n` quantiles.
+            If given as an array-like, the array is used to slice the data,
+            as the `by` argument to `DataFrame.groupby`, against an `idca`
+            formatted dataframe of probabilities.
+        n : int, default 5
+            The number of quantiles to use when `q` is a string.
+        caption : str or bool, default True
+            The caption to use for the figure.  If True, the caption
+            will be "Model Predictions by {q}", and if False no caption will
+            be used.
+        alt_labels : {'id', 'name'}, default 'name'
+            The type of labels to use for the alternative IDs in the output.
+
+        Returns
+        -------
+        pandas.io.formats.style.Styler
+            A styled DataFrame containing the results of the analysis.
+
+        Notes
+        -----
+        This method is typically used to analyze the model's predictions
+        against attributes in the observed data that are not used in the
+        model itself.  For example, if the model estimates the probability of
+        choosing a particular alternative conditional on cost, time, and
+        income, this method can be used to analyze the model's predictions
+        against the distribution of observed choices by age or other
+        characteristics. Technically, nothing prevents a user from using
+        this method to analyze the model's predictions against the same
+        attributes used in the model, but the results are likely to provide
+        less useful informative.
+
+        This method requires the `scipy` package to be installed, as it uses
+        the `scipy.stats.norm.sf` function to calculate the p-values.
+
+        The standard deviation of the predicted counts is calculated via a
+        normal approximation to the underlying variable-p binomial-like
+        distribution, and may be slightly biased especially for small sample
+        sizes.
+
+        """
+        try:
+            import scipy.stats as stats
+        except ImportError as err:
+            raise ImportError("scipy is required for this method") from err
+
+        try:
+            import altair as alt
+        except ImportError as err:
+            raise ImportError("altair is required for this method") from err
+
+        if caption is True:
+            if isinstance(q, str):
+                caption = f"Model Predictions by {q}"
+
+        df = self.analyze_predictions_co(
+            q, n, caption=False, alt_labels=alt_labels
+        ).data
+        altid_tag = df.index.names[1]
+        sort_order = list(df.index.levels[1])
+        df = df.reset_index()
+        q_ = df.columns[0]
+        df[q_] = df[q_].astype(str)
+
+        y = alt.Y(f"{q_}:N", title=q_)
+        r = alt.Row(f"{altid_tag}:N", sort=sort_order, title="Alternative")
+
+        threshold = stats.norm.ppf(1 - (signif / 2))
+        # Calculate error bar extents
+        df["mean-predicted-ciLow"] = (
+            df["mean-predicted"] - df["stdev-predicted"] * threshold
+        )
+        df["mean-predicted-ciHigh"] = (
+            df["mean-predicted"] + df["stdev-predicted"] * threshold
+        )
+        df["Significant"] = np.where(
+            df["signif"] <= signif, "Significantly Different", "Consistent"
+        )
+        df["Constant"] = "Mean"
+
+        tooltip = [
+            alt.Tooltip("observed", title="Count Observed"),
+            alt.Tooltip("mean-predicted", title="Mean Predicted"),
+            alt.Tooltip("stdev-predicted", title="Std Dev Predicted"),
+            alt.Tooltip("signif", title="Significance"),
+        ]
+
+        # Create base bar chart
+        points = (
+            alt.Chart(df)
+            .mark_point(filled=True, size=40)
+            .encode(
+                x=alt.X("mean-predicted", title="Number of Observations"),
+                y=y,
+                tooltip=tooltip,
+                color=alt.Color("Constant:N", title="Predicted").scale(range=["black"]),
+            )
+        )
+
+        # Create error bars
+        error_bars = (
+            alt.Chart(df)
+            .mark_errorbar(ticks=True, color="black")
+            .encode(
+                x=alt.X("mean-predicted-ciLow:Q", title="Number of Observations"),
+                x2="mean-predicted-ciHigh:Q",
+                y=y,
+                tooltip=tooltip,
+            )
+        )
+
+        obs_points = (
+            alt.Chart(df)
+            .mark_point(filled=False, size=60)
+            .encode(
+                x=alt.X("observed", title="Number of Observations"),
+                y=y,
+                color=alt.Color(
+                    "Significant:N",
+                    title="Observed",
+                    scale=alt.Scale(
+                        domain=["Significantly Different", "Consistent"],
+                        range=["red", "#2E8B57"],
+                    ),
+                ),
+                shape=alt.Shape(
+                    "Significant:N",
+                    title="Observed",
+                    scale=alt.Scale(
+                        domain=["Significantly Different", "Consistent"],
+                        range=["circle", "square"],
+                    ),
+                ),
+                tooltip=tooltip,
+            )
+        )
+
+        # Combine the layers
+        chart = (points + error_bars + obs_points).resolve_scale(
+            color="independent", shape="independent"
+        )
+        return (
+            chart.properties(width=width)
+            .facet(row=r)
+            .resolve_scale(x="independent")
+            .properties(title=caption)
+            .configure_title(fontSize=16)
+        )
 
 
 @njit(cache=True)
