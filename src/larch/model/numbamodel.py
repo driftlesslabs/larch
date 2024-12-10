@@ -2875,8 +2875,22 @@ class NumbaModel(_BaseModel):
             slicer = self.datatree.idco_subtree().eval(q).single_dim.to_pandas()
         else:
             slicer = q
-        if not isinstance(slicer.dtype, pd.CategoricalDtype):
-            slicer = pd.qcut(slicer, n)
+        if slicer.dtype == bool:
+            pass
+        elif not isinstance(slicer.dtype, pd.CategoricalDtype):
+            try:
+                slicer = pd.qcut(slicer, n)
+            except ValueError as err:
+                if "Bin edges must be unique" in str(err):
+                    # maybe there is not enough variation in the data to create
+                    # quantiles, if so just convert to categorical
+                    if len(slicer.value_counts()) <= n:
+                        slicer = pd.Categorical(slicer)
+                    else:
+                        # otherwise try to drop duplicate bin edges
+                        slicer = pd.qcut(slicer, n, duplicates="drop")
+                else:
+                    raise
         obs = self.dataset.ch.to_pandas()
 
         if caption is True:
@@ -2922,7 +2936,7 @@ class NumbaModel(_BaseModel):
                     {"selector": "td", "props": [("border", "1px solid #e5e5e5")]},
                 ]
             )
-            .applymap(bold_if_signif)
+            .applymap(bold_if_signif, subset=["signif"])
         )
         if caption:
             output.set_caption(caption).set_table_styles(
@@ -3038,8 +3052,8 @@ class NumbaModel(_BaseModel):
 
         threshold = stats.norm.ppf(1 - (signif / 2))
         # Calculate error bar extents
-        df["mean-predicted-ciLow"] = (
-            df["mean-predicted"] - df["stdev-predicted"] * threshold
+        df["mean-predicted-ciLow"] = np.clip(
+            df["mean-predicted"] - df["stdev-predicted"] * threshold, 0, np.inf
         )
         df["mean-predicted-ciHigh"] = (
             df["mean-predicted"] + df["stdev-predicted"] * threshold
