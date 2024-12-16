@@ -70,3 +70,10 @@ def test_analyze_few_values(model, dataframe_regression):
 def test_analyze_few_values_fig(model):
     fig = model.analyze_predictions_co_figure("age // 70")
     assert isinstance(fig, alt.TopLevelMixin)
+
+
+def test_analyze_age_weighted(model, dataframe_regression):
+    df = model.analyze_predictions_co("age", wgt="1.5 if wkccbd else 1.0")
+    assert isinstance(df, pd.io.formats.style.Styler)
+    df = df.data
+    dataframe_regression.check(df)

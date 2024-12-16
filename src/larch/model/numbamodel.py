@@ -2803,6 +2803,7 @@ class NumbaModel(_BaseModel):
         caption: str | bool = True,
         alt_labels: Literal["id", "name"] = "name",
         bins=None,
+        wgt: Any = None,
     ) -> pd.io.formats.style.Styler:
         """
         Analyze predictions of the model based on idco attributes.
@@ -2842,6 +2843,11 @@ class NumbaModel(_BaseModel):
               width. No extension of the range of `q` is done.
             * IntervalIndex : Defines the exact bins to be used. Note that
               IntervalIndex for `bins` must be non-overlapping.
+        wgt : array-like or str or bool, optional
+            If given, this value is used to weight the cases.  This can be done
+            whether the model was estimated with weights or not; the estimation
+            weights are ignored in this analysis, unless the value of this
+            argument is `True`, in which case the estimation weights are used.
 
         Returns
         -------
@@ -2925,6 +2931,18 @@ class NumbaModel(_BaseModel):
                     caption = "Model Predictions"
                 else:
                     caption = f"Model Predictions by {q_name}"
+
+        if wgt:
+            if isinstance(wgt, str):
+                wgt = self.datatree.idco_subtree().eval(wgt).single_dim.to_pandas()
+            elif wgt is True:
+                wgt = self.dataset.wt.to_pandas()
+
+            w = np.asarray(wgt).reshape(-1, 1)
+            # scale obs and probs by the weight
+            obs = obs * w
+            pr = pr * w
+            pr_v = pr_v * w
 
         result = pd.concat(
             [
