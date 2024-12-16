@@ -2817,7 +2817,7 @@ class NumbaModel(_BaseModel):
 
         Parameters
         ----------
-        q : str or array-like, optional
+        q : str or array-like
             The quantiles to use for slicing the data.  If given as a string,
             the string evaluated against the `idca` portion of this model's
             datatree, and then the result is categorized into `n` quantiles.
@@ -2830,7 +2830,7 @@ class NumbaModel(_BaseModel):
             The caption to use for the styled DataFrame.  If True, the caption
             will be "Model Predictions by {q}", and if False no caption will
             be used.
-        alt_labels : {'id', 'name'}, default 'name'
+        alt_labels : {'name', 'id'}, default 'name'
             The type of labels to use for the alternative IDs in the output.
         bins : int, sequence of scalars, or IntervalIndex, optional
             If provided, this value overrides `n` and is provided to `pandas.cut`
@@ -3187,6 +3187,250 @@ class NumbaModel(_BaseModel):
             .properties(title=caption)
             .configure_title(fontSize=16)
         )
+
+    def analyze_elasticity(
+        self,
+        variable,
+        altid: int | None = None,
+        q: Any = None,
+        n: int = 5,
+        *,
+        caption: str | bool = True,
+        alt_labels: Literal["id", "name"] = "name",
+        bins=None,
+        wgt: Any = None,
+        multiplier: float = 1.01,
+        _return_full_probabilities: bool = False,
+    ) -> pd.io.formats.style.Styler:
+        """
+        Analyze elasticity of the model.
+
+        This method provides a summary of the model's aggregate elasticity of
+        alternative choices given the data, optionally broken down into segments
+        based on chooser attributes.  The computed elasticity is ratio between
+        the percentage change in the probability of choosing an alternative
+        and the percentage change in the value of the variable of interest. It
+        is computed numerically, giving the arc elasticity via finite differences,
+        and therefore is agnostic to model structure.
+
+        Parameters
+        ----------
+        variable : str
+            The name of the variable to analyze. This should be a named
+            variable in the model's datatree.
+        altid : int, optional
+            The alternative ID to analyze.  If given, the elasticity is
+            calculated for changes in the variable value for this alternative
+            only.  If not given, the elasticity is calculated for changes in
+            the variable value for all alternatives. This occurs implicitly
+            when computing elasticity with respect to `idco` format variables,
+            and providing an `altid` for these elasticities will raise an
+            error.
+        q : str or array-like, optional
+            The quantiles to use for slicing the data.  If given as a string,
+            the string evaluated against the `idca` portion of this model's
+            datatree, and then the result is categorized into `n` quantiles.
+            If given as an array-like, the array is used to slice the data,
+            as the `by` argument to `DataFrame.groupby`, against an `idca`
+            formatted dataframe of probabilities.
+        n : int, default 5
+            The number of quantiles to use when `q` is a string.
+        caption : str or bool, default True
+            The caption to use for the styled DataFrame.  If True, the caption
+            will be "Model Predictions by {q}", and if False no caption will
+            be used.
+        alt_labels : {'id', 'name'}, default 'name'
+            The type of labels to use for the alternative IDs in the output.
+        bins : int, sequence of scalars, or IntervalIndex, optional
+            If provided, this value overrides `n` and is provided to `pandas.cut`
+            to control the binning.
+
+            * int : Defines the number of equal-width bins in the range of `q`. The
+              range of `q` is extended by .1% on each side to include the minimum
+              and maximum values of `q`.
+            * sequence of scalars : Defines the bin edges allowing for non-uniform
+              width. No extension of the range of `q` is done.
+            * IntervalIndex : Defines the exact bins to be used. Note that
+              IntervalIndex for `bins` must be non-overlapping.
+        wgt : array-like or str or bool, optional
+            If given, this value is used to weight the cases.  This can be done
+            whether the model was estimated with weights or not; the estimation
+            weights are ignored in this analysis, unless the value of this
+            argument is `True`, in which case the estimation weights are used.
+
+        Returns
+        -------
+        pandas.io.formats.style.Styler
+            A styled DataFrame containing the results of the analysis.
+
+        Notes
+        -----
+        This method is typically used to analyze the model's predictions
+        against attributes in the observed data that are not used in the
+        model itself.  For example, if the model estimates the probability of
+        choosing a particular alternative conditional on cost, time, and
+        income, this method can be used to analyze the model's predictions
+        against the distribution of observed choices by age or other
+        characteristics. Technically, nothing prevents a user from using
+        this method to analyze the model's predictions against the same
+        attributes used in the model, but the results are likely to provide
+        less useful informative.
+
+        This method requires the `scipy` package to be installed, as it uses
+        the `scipy.stats.norm.sf` function to calculate the p-values.
+
+        The standard deviation of the predicted counts is calculated via a
+        normal approximation to the underlying variable-p binomial-like
+        distribution, and may be slightly biased especially for small sample
+        sizes.
+
+        """
+        try:
+            import scipy.stats as stats
+        except ImportError as err:
+            raise ImportError("scipy is required for this method") from err
+
+        def signif(x):
+            return stats.norm.sf(np.absolute(x)) * 2
+
+        def bold_if_signif(value):
+            return "font-weight: bold" if value <= 0.05 else ""
+
+        # get baseline probabilities
+        pr = self.probability(return_format="dataframe")
+
+        # get alternate probabilities
+        existing_datatree = self.datatree
+        temp_var = self.data[variable].copy().astype(float)
+        if altid is not None:
+            temp_var.loc[{"altid": altid}] *= multiplier
+        else:
+            temp_var *= multiplier
+        self.datatree = self.datatree.replace_datasets(
+            {self.datatree.root_node_name: self.data.assign({variable: temp_var})}
+        )
+        pr_change = self.probability(return_format="dataframe")
+        self.datatree = existing_datatree
+
+        if _return_full_probabilities:
+            return pr, pr_change
+
+        pr_avg = (pr_change + pr) / 2
+        pr_change -= pr
+
+        if caption is True:
+            if isinstance(q, str):
+                caption = f"Model Elasticity by {q}"
+            else:
+                q_name = getattr(q, "name", None)
+                if q_name is None:
+                    caption = "Model Elasticity"
+                else:
+                    caption = f"Model Elasticity by {q_name}"
+
+        if q is None:
+            slicer = None
+        else:
+            # prepare the slicer, which identifies the groups to analyze
+            if isinstance(q, str):
+                slicer = self.datatree.idco_subtree().eval(q).single_dim.to_pandas()
+            else:
+                slicer = q
+            if slicer.dtype == bool:
+                pass
+            elif not isinstance(slicer.dtype, pd.CategoricalDtype):
+                name = getattr(slicer, "name", None)
+                if bins is not None:
+                    slicer = pd.cut(slicer, bins)
+                else:
+                    try:
+                        slicer = pd.qcut(slicer, n)
+                    except ValueError as err:
+                        if "Bin edges must be unique" in str(err):
+                            # maybe there is not enough variation in the data to create
+                            # quantiles, if so just convert to categorical
+                            if len(slicer.value_counts()) <= n:
+                                slicer = pd.Categorical(slicer)
+                            else:
+                                # otherwise try to drop duplicate bin edges
+                                slicer = pd.qcut(slicer, n, duplicates="drop")
+                        else:
+                            raise
+                if name:
+                    slicer = slicer.rename(name)
+
+        if wgt:
+            if isinstance(wgt, str):
+                wgt = self.datatree.idco_subtree().eval(wgt).single_dim.to_pandas()
+            elif wgt is True:
+                wgt = self.dataset.wt.to_pandas()
+
+            w = np.asarray(wgt).reshape(-1, 1)
+            # scale obs and probs by the weight
+            pr_change = pr_change * w
+
+        out_name = variable
+        a_map = self.datatree.dc.alts_mapping()
+
+        if altid:
+            if alt_labels == "name":
+                out_name += f"[{a_map.get(altid, altid)}]"
+            else:
+                out_name += f"[{altid}]"
+        if slicer is None:
+            result = (pr_change.sum() / pr_avg.sum()).rename(out_name)
+        else:
+            result = (
+                (pr_change.groupby(slicer).sum() / pr_avg.groupby(slicer).sum())
+                .stack()
+                .rename(out_name)
+            )
+        result /= multiplier - 1
+        if isinstance(q, str):
+            result.index.names = [
+                q,
+            ] + result.index.names[1:]
+
+        if alt_labels == "name":
+            if len(result.index.names) > 1:
+                result.index = result.index.set_levels(
+                    [a_map.get(i, i) for i in result.index.levels[1]], level=1
+                )
+                result.index.names = [result.index.names[0], "alt_name"]
+            else:
+                result.index = [a_map.get(x, x) for x in result.index]
+                result.index.name = "alt_name"
+
+        output = (
+            pd.DataFrame(result)
+            .style.format("{:.3f}")
+            .set_table_styles(
+                [
+                    {"selector": "th", "props": [("border", "1px solid #e5e5e5")]},
+                    {"selector": "td", "props": [("border", "1px solid #e5e5e5")]},
+                ]
+            )
+        )
+        if caption:
+            output.set_caption(caption).set_table_styles(
+                [
+                    {"selector": "th", "props": [("border", "1px solid #e5e5e5")]},
+                    {"selector": "td", "props": [("border", "1px solid #e5e5e5")]},
+                    {
+                        "selector": "caption",
+                        "props": [
+                            ("text-align", "left"),  # Adjust font size
+                            ("font-size", "1.2em"),  # Adjust font size
+                            ("font-weight", "bold"),  # Make the caption bold
+                            (
+                                "padding-bottom",
+                                "6px",
+                            ),  # Add some space below the caption
+                        ],
+                    },
+                ]
+            )
+        return output
 
 
 @njit(cache=True)

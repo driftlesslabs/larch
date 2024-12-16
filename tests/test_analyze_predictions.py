@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import altair as alt
 import pandas as pd
-from pytest import fixture
+from pytest import fixture, raises
 
 import larch as lx
 
@@ -77,3 +77,42 @@ def test_analyze_age_weighted(model, dataframe_regression):
     assert isinstance(df, pd.io.formats.style.Styler)
     df = df.data
     dataframe_regression.check(df)
+
+
+def test_analyze_elasticity_hhinc(model, dataframe_regression):
+    df = model.analyze_elasticity("hhinc")
+    assert isinstance(df, pd.io.formats.style.Styler)
+    df = df.data
+    dataframe_regression.check(df)
+
+
+def test_analyze_elasticity_totcost_1(model, dataframe_regression):
+    df = model.analyze_elasticity("totcost", altid=1)
+    assert isinstance(df, pd.io.formats.style.Styler)
+    df = df.data
+    dataframe_regression.check(df)
+
+
+# variants that should fail
+def test_analyze_elasticity_idco_with_altid(model):
+    with raises(KeyError):
+        # giving an altid when the variable is idco
+        model.analyze_elasticity("hhinc", altid=1)
+
+
+def test_analyze_elasticity_missing_name(model):
+    with raises(KeyError):
+        # giving a variable that is not in the model
+        model.analyze_elasticity("missing_name")
+
+
+def test_analyze_elasticity_expression(model):
+    with raises(KeyError):
+        # giving a variable is not a simple name
+        model.analyze_elasticity("hhinc ** 2")
+
+
+def test_analyze_elasticity_altid_as_string(model):
+    with raises(KeyError):
+        # giving a variable is not a simple name
+        model.analyze_elasticity("totcost", altid="DA")
