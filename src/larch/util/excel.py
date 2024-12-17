@@ -6,8 +6,6 @@ import os
 import time
 from typing import TYPE_CHECKING
 
-import matplotlib.axes
-import matplotlib.figure
 import numpy as np
 import pandas as pd
 from pandas.io.formats.style import Styler
@@ -464,6 +462,9 @@ class ExcelWriter(_XlsxWriter):
 
         # Render matplotlib.Figure into an Elem
         if not success and "matplotlib" in str(type(content)):
+            import matplotlib.axes
+            import matplotlib.figure
+
             logger.debug("writing as matplotlib (%s)", type(content))
             if isinstance(content, matplotlib.axes.Axes):
                 content = content.get_figure()
