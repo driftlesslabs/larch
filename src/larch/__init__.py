@@ -6,7 +6,6 @@ from xmle import NumberedCaption, Reporter
 from xmle import load_metadata as read_metadata
 
 from . import examples
-from ._version import version as _install_version
 from .dataset import DataArray, Dataset, DataTree
 from .examples import example, example_file
 from .model import mixtures
@@ -19,6 +18,11 @@ from .model.saving import load_model
 from .model.tree import NestingTree
 from .shorts import PX, P, X
 from .util import figures
+
+try:
+    from ._version import version as _install_version
+except ImportError:
+    _install_version = "999.404"
 
 # Get decorated version when in development
 try:
