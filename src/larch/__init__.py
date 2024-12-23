@@ -29,7 +29,9 @@ try:
     top_package = __import__(__name__.split(".")[0])
     import setuptools_scm
 
-    __version__ = setuptools_scm.get_version(os.path.dirname(top_package.__path__[0]))
+    __version__ = setuptools_scm.get_version(
+        os.path.dirname(top_package.__path__[0]), fallback_version=_install_version
+    )
 except Exception:
     __version__ = _install_version
 
