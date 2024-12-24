@@ -135,6 +135,11 @@ class ExcelWriter(_XlsxWriter):
                     )
                 except FileNotFoundError:
                     pass
+                except PermissionError as e:
+                    # if the file is open, we can't archive it
+                    # so we'll just log the error and continue
+                    # this happens on Windows sometimes
+                    self.log(f"could not archive existing file: {e}")
                 else:
                     self.log(f"archived existing file to {new_name}")
                     setattr(self, "__file_archived", new_name)
