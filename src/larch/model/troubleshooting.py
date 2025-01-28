@@ -737,7 +737,8 @@ def nan_utility(model: Model, repair: Literal["?", True, "!"] = "?", verbose: in
         elif repair == "!":
             raise ValueError(
                 f"nan_utility: {nan_util} available alternatives have NaN "
-                f"utility values, try `repair_nan_utility`"
+                f"utility values,\ntry using the Model.doctor `repair_nan_utility` "
+                f"argument, set it to True to make them unavailable"
             )
         elif repair:
             model.dataset["av"].data[nan_u] = 0
