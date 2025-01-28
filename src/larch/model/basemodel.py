@@ -1615,6 +1615,57 @@ class BaseModel:
             self._availability_co_vars = None
             self._availability_ca_var = None
 
+    def availability_def(self, new_def: dict | None = None, **kwargs) -> dict:
+        """
+        Get or set the definition of the availability variable.
+
+        This method can be used to check what the availability variable is currently
+        set to, or to set the availability variable in a dynamic fashion.  The
+        availability variable can be set in one of three ways:
+
+        * availability_ca_var : A single |idca| variable or expression that
+            evaluates to an indicator value
+        * availability_co_vars : A dictionary of |idco| expressions, where each
+            key is an alternative code and the value is a variable name or other
+            expression that evaluates to an indicator value
+        * availability_any : A flag for setting availability to "True" for all
+            alternatives, which may used when the availability variable is not
+            otherwise explicitly defined
+
+        Returns
+        -------
+        dict
+        """
+        if len(kwargs) and new_def is None:
+            new_def = kwargs
+        if new_def is not None:
+            if len(kwargs):
+                raise ValueError("cannot give both new_def and other keyword args")
+            if not isinstance(new_def, dict):
+                raise TypeError("new availability definition must be given by a dictionary")
+            if len(new_def) > 1:
+                raise ValueError("new availability definition must have only one key")
+            key, value = new_def.popitem()
+            if key == "availability_ca_var":
+                self.availability_ca_var = value
+            elif key == "availability_co_vars":
+                self.availability_co_vars = value
+            elif key == "availability_any":
+                self.availability_any = value
+            else:
+                raise ValueError("invalid key in new_def")
+
+        if self._availability_ca_var:
+            return {"availability_ca_var": self._availability_ca_var}
+        elif self._availability_co_vars:
+            return {"availability_co_vars": self._availability_co_vars}
+        elif self._availability_any:
+            return {"availability_any": True}
+        else:
+            raise ValueError("no availability variable defined")
+
+
+
     def parameter_summary(self):
         """
         Create a tabular summary of parameter values.
