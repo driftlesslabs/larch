@@ -41,7 +41,7 @@ class dictx(dict):
 
     def __setattr__(self, name, value):
         if hasattr(dictx, name):
-            raise AttributeError("'dictx' object attribute " f"'{name}' is read-only")
+            raise AttributeError(f"'dictx' object attribute '{name}' is read-only")
         else:
             self[name] = value
 

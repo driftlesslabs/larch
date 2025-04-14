@@ -193,9 +193,9 @@ def test_mtc_17(compute_engine):
     print(compute_engine, "====>", m.loglike(expected_x))
 
     for k in expected_x:
-        assert revealed_x[k] == approx(
-            expected_x[k], 0.1
-        ), f"{k}, {revealed_x[k] / expected_x[k]}"
+        assert revealed_x[k] == approx(expected_x[k], 0.1), (
+            f"{k}, {revealed_x[k] / expected_x[k]}"
+        )
     m.parameter_summary()
 
 
