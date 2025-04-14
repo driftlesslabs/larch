@@ -395,7 +395,7 @@ class ExcelWriter(_XlsxWriter):
         self.tocsheet.write_url(
             self.sheet_startrow["Contents"],
             0,
-            f"internal:'{target_sheet}'!A{target_row+1}",
+            f"internal:'{target_sheet}'!A{target_row + 1}",
             string=heading,
         )
         self.sheet_startrow["Contents"] += 1

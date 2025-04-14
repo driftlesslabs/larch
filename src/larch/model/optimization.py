@@ -176,8 +176,8 @@ def maximize_loglike(
                     (
                         f"Currently using {method}, "
                         f"Best LL = {model._cached_loglike_best}, "
-                        f'Current Total LL = {status["total_loglike"]}, '
-                        f'Constraint Penalty = {status["penalty"]}'
+                        f"Current Total LL = {status['total_loglike']}, "
+                        f"Constraint Penalty = {status['penalty']}"
                     ),
                     model.pf,
                 )

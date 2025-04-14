@@ -180,7 +180,7 @@ class _DatasetConstruct:
         """
         if df.index.nlevels != 1:
             raise ValueError(
-                "source idco dataframe must have a one " "level Index giving case id's"
+                "source idco dataframe must have a one level Index giving case id's"
             )
         caseidname = df.index.name or "index"
         ds = cls()(df, caseid=caseidname, alts=alts)

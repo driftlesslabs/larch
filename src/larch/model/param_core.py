@@ -255,7 +255,7 @@ class ParameterBucket:
             dims = [self.index_name]
         else:
             dims = [self.index_name] + [
-                f"{self.index_name}_{j+2}" for j in range(values.ndim - 1)
+                f"{self.index_name}_{j + 2}" for j in range(values.ndim - 1)
             ]
         self._params = self._params.assign(
             {name: xr.DataArray(np.asarray(values), dims=dims)}

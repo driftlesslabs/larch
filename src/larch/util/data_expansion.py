@@ -333,11 +333,11 @@ def piecewise_linear_parameter_names(basename, breaks):
     for i in range(len(breaks) - 1):
         b0 = breaks[i]
         b1 = breaks[i + 1]
-        z += [P(f"{basename}[{i+2:{width}d}]: {b0} to {b1}")]
+        z += [P(f"{basename}[{i + 2:{width}d}]: {b0} to {b1}")]
     # last leg
     i = len(breaks) - 1
     b0 = breaks[i]
-    z += [P(f"{basename}[{i+2:{width}d}]: over {b0}")]
+    z += [P(f"{basename}[{i + 2:{width}d}]: over {b0}")]
     return z
 
 
