@@ -15,7 +15,7 @@ def test_bad_avail_declaration():
     m = lx.Model(d)
     with pytest.raises(TypeError):
         m.unknown_attr = 123
-    with pytest.raises(TypeError):
+    with pytest.raises(NotImplementedError):
         m.availability_var = "avail"
 
 
