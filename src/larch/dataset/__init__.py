@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import warnings
 
 import numpy as np
@@ -417,7 +418,17 @@ class DataTree(_sharrow_DataTree):
         if "dim_exclude" not in kwargs:
             if "_exclude_dims_" in self.root_dataset.attrs:
                 kwargs["dim_exclude"] = self.root_dataset.attrs["_exclude_dims_"]
-        return super().setup_flow(*args, **kwargs)
+        try:
+            return super().setup_flow(*args, **kwargs)
+        except ValueError as err:
+            regex = re.match("^unable to rewrite (.*) to itself$", str(err))
+            if regex:
+                raise ValueError(
+                    f"Setup failed for variable {regex.group(1)}.  Check the expression "
+                    f"and the names of the variables in the dataset."
+                ) from err
+            else:
+                raise err
 
 
 def merge(
