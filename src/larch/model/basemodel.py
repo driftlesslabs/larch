@@ -1642,7 +1642,9 @@ class BaseModel:
             if len(kwargs):
                 raise ValueError("cannot give both new_def and other keyword args")
             if not isinstance(new_def, dict):
-                raise TypeError("new availability definition must be given by a dictionary")
+                raise TypeError(
+                    "new availability definition must be given by a dictionary"
+                )
             if len(new_def) > 1:
                 raise ValueError("new availability definition must have only one key")
             key, value = new_def.popitem()
@@ -1663,8 +1665,6 @@ class BaseModel:
             return {"availability_any": True}
         else:
             raise ValueError("no availability variable defined")
-
-
 
     def parameter_summary(self):
         """
