@@ -45,3 +45,11 @@ You can change the install directory by changing the `-d` argument.  The script
 will clone the larch repository and install it in the specified directory.  It
 will also install the required dependencies and create a new uv virtual
 environment for development.
+
+To run the test suite, you'll need to run with the `--extra test` flag, which
+will ensure that all the extra dependencies needed for testing are installed.  
+To do this, from the `larch` directory, run the following command:
+
+```shell
+uv run --extra test pytest .
+```
