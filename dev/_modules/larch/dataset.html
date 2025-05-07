@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>larch.dataset &#8212; v6.0.37.dev11+gd911e2d</title>
+    <title>larch.dataset &#8212; v6.0.37.dev16+g8c0943e</title>
   
   
   
@@ -134,8 +134,8 @@
       
     
     
-    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.37.dev11+gd911e2d - Home"/>
-    <img src="../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.37.dev11+gd911e2d - Home"/>
+    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.37.dev16+g8c0943e - Home"/>
+    <img src="../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.37.dev16+g8c0943e - Home"/>
   
   
 </a></div>
@@ -361,6 +361,7 @@
   <h1>Source code for larch.dataset</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -788,7 +789,17 @@
         <span class="k">if</span> <span class="s2">&quot;dim_exclude&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="k">if</span> <span class="s2">&quot;_exclude_dims_&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dim_exclude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;_exclude_dims_&quot;</span><span class="p">]</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup_flow</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup_flow</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;^unable to rewrite (.*) to itself$&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">regex</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Setup failed for variable </span><span class="si">{</span><span class="n">regex</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">.  Check the expression &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;and the names of the variables in the dataset.&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">err</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">err</span></div>
 </div>
 
 
@@ -965,7 +976,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-<p class="larch-version">🌳 Larch v6.0.37.dev11+gd911e2d, © Copyright 2024.</p></div>
+<p class="larch-version">🌳 Larch v6.0.37.dev16+g8c0943e, © Copyright 2024.</p></div>
       
     </div>
   

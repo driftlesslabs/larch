@@ -108,6 +108,7 @@
       ~Model.availability_any
       ~Model.availability_ca_var
       ~Model.availability_co_vars
+      ~Model.availability_var
       ~Model.choice_any
       ~Model.choice_ca_var
       ~Model.choice_co_code

@@ -1,0 +1,1296 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>larch.model.latent_class &#8212; v6.0.37.dev16+g8c0943e</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=9d77a3fd" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=c73c0f3e"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/larch/model/latent_class';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/driftlesslabs/larch/docs/docs/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '6.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="icon" href="../../../_static/larch_favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search these docs..."
+         aria-label="Search these docs..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.37.dev16+g8c0943e - Home"/>
+    <img src="../../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.37.dev16+g8c0943e - Home"/>
+  
+  
+</a></div>
+    
+      <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Examples
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Examples
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">larch.model.latent_class</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for larch.model.latent_class</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._optional</span><span class="w"> </span><span class="kn">import</span> <span class="n">jax</span><span class="p">,</span> <span class="n">jnp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..compiled</span><span class="w"> </span><span class="kn">import</span> <span class="n">jitmethod</span><span class="p">,</span> <span class="n">reset_compiled_methods</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataTree</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MissingDataError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..folding</span><span class="w"> </span><span class="kn">import</span> <span class="n">dissolve_zero_variance</span><span class="p">,</span> <span class="n">fold_dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptimizeMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..util.simple_attribute</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleAttribute</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.basemodel</span><span class="w"> </span><span class="kn">import</span> <span class="n">MANGLE_DATA</span><span class="p">,</span> <span class="n">BaseModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.jaxmodel</span><span class="w"> </span><span class="kn">import</span> <span class="n">PanelMixin</span><span class="p">,</span> <span class="n">_get_jnp_array</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.mixtures</span><span class="w"> </span><span class="kn">import</span> <span class="n">MixtureList</span>
+
+
+<div class="viewcode-block" id="LatentClass">
+<a class="viewcode-back" href="../../../api/generated/larch.LatentClass.html#larch.LatentClass">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LatentClass</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">OptimizeMixin</span><span class="p">,</span> <span class="n">PanelMixin</span><span class="p">):</span>
+    <span class="n">compute_engine</span> <span class="o">=</span> <span class="s2">&quot;jax&quot;</span>
+    <span class="n">float_dtype</span> <span class="o">=</span> <span class="n">SimpleAttribute</span><span class="p">()</span>
+    <span class="n">dataflows</span> <span class="o">=</span> <span class="n">SimpleAttribute</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LatentClass.__init__">
+<a class="viewcode-back" href="../../../api/generated/larch.LatentClass.html#larch.LatentClass.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">classmodel</span><span class="p">:</span> <span class="n">BaseModel</span><span class="p">,</span>
+        <span class="n">choicemodels</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">BaseModel</span><span class="p">],</span>
+        <span class="n">datatree</span><span class="p">:</span> <span class="n">DataTree</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">float_dtype</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the latent class model structure.</span>
+
+<span class="sd">        This structure is used to connect two or more discrete classes, as well as</span>
+<span class="sd">        a class membership model that determines the probability of each decision</span>
+<span class="sd">        maker being a member of each class.</span>
+<span class="sd">        </span>
+<span class="sd">        The estimation of latent class models cannot be done with the</span>
+<span class="sd">        `numba` compute engine, and must be done with the `jax` compute engine.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        classmodel : BaseModel</span>
+<span class="sd">            The class membership model.</span>
+<span class="sd">        choicemodels : dict</span>
+<span class="sd">            A dictionary of choice models.  The keys of this dictionary will be</span>
+<span class="sd">            the altids of the choice models used in the class membership model.</span>
+<span class="sd">        datatree : DataTree, optional</span>
+<span class="sd">            A DataTree to use for all submodels.  For the choice models, this will</span>
+<span class="sd">            override any existing datatree set on those models.  For the class</span>
+<span class="sd">            membership model, this will be used to set the datatree only if it is</span>
+<span class="sd">            not already set, as it may be desirable in some situations to have the</span>
+<span class="sd">            class membership model use a different datatree than the choice models.</span>
+<span class="sd">        float_dtype : type, optional</span>
+<span class="sd">            The float type to use for the model.  Defaults to np.float32.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model_subtype</span> <span class="o">=</span> <span class="s2">&quot;latent-class&quot;</span>
+        <span class="n">classmodel</span><span class="o">.</span><span class="n">_model_subtype</span> <span class="o">=</span> <span class="s2">&quot;class-membership&quot;</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">choicemodels</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">ident</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="n">PanelMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_mangled</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">choicemodels_keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">choicemodels</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">classmodel</span><span class="o">.</span><span class="n">datatree</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datatree</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">groupid</span>
+        <span class="p">):</span>
+            <span class="c1"># We have not assigned data to the class model yet, but we have been</span>
+            <span class="c1"># given a datatree and a groupid, so we will use that to create the</span>
+            <span class="c1"># necessary data for the class model.</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">datatree</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;ingroup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groupid</span><span class="p">)</span><span class="o">.</span><span class="n">cumcount</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">classdata</span> <span class="o">=</span> <span class="n">dissolve_zero_variance</span><span class="p">(</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">groupid</span><span class="p">,</span> <span class="s2">&quot;ingroup&quot;</span><span class="p">],</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">(),</span>
+                <span class="s2">&quot;ingroup&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">classdata</span> <span class="o">=</span> <span class="n">classdata</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">set_altids</span><span class="p">(</span><span class="n">choicemodels_keys</span><span class="p">)</span><span class="o">.</span><span class="n">drop_dims</span><span class="p">(</span><span class="s2">&quot;ingroup&quot;</span><span class="p">)</span>
+            <span class="n">classdata</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">CASEID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">groupid</span>
+            <span class="n">classmodel</span><span class="o">.</span><span class="n">datatree</span> <span class="o">=</span> <span class="n">classdata</span>
+        <span class="k">elif</span> <span class="n">classmodel</span><span class="o">.</span><span class="n">datatree</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datatree</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
+            <span class="c1"># The class model has not been assigned data yet, but there is no</span>
+            <span class="c1"># groupid, so we will simply assign the datatree to the class model.</span>
+            <span class="c1"># We still need to set the altids to match the choicemodels.</span>
+            <span class="n">classmodel</span><span class="o">.</span><span class="n">datatree</span> <span class="o">=</span> <span class="n">datatree</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">set_altids</span><span class="p">(</span><span class="n">choicemodels_keys</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ident</span> <span class="o">=</span> <span class="s2">&quot;latent-class&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">datatree</span><span class="o">=</span><span class="n">datatree</span><span class="p">,</span>
+            <span class="n">submodels</span><span class="o">=</span><span class="n">choicemodels</span><span class="p">,</span>
+            <span class="n">named_submodels</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;classmodel&quot;</span><span class="p">:</span> <span class="n">classmodel</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="c1"># self.datatree = datatree</span>
+        <span class="k">if</span> <span class="n">classmodel</span><span class="o">.</span><span class="n">dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">classmodel</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">altids</span><span class="p">())</span> <span class="o">==</span> <span class="n">choicemodels_keys</span>
+        <span class="k">if</span> <span class="n">float_dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_models</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">v</span><span class="o">.</span><span class="n">float_dtype</span> <span class="o">=</span> <span class="n">float_dtype</span>
+        <span class="k">for</span> <span class="n">_k</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">_model_subtype</span> <span class="o">==</span> <span class="s2">&quot;latent-class&quot;</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="n">m</span><span class="o">.</span><span class="n">_model_subtype</span> <span class="o">==</span> <span class="s2">&quot;class-membership&quot;</span><span class="p">:</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">groupid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">groupid</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">datatree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatree</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">groupid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">groupid</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_models</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_bucket</span><span class="o">.</span><span class="n">_models</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;yaml&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.saving</span><span class="w"> </span><span class="kn">import</span> <span class="n">save_model</span>
+
+        <span class="k">return</span> <span class="n">save_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="n">_models</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_models&quot;</span><span class="p">)</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.saving</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_model</span>
+
+        <span class="n">classmodel</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">choicemodels</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">_model_subtype</span> <span class="o">==</span> <span class="s2">&quot;class-membership&quot;</span><span class="p">:</span>
+                <span class="n">classmodel</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">choicemodels</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">classmodel</span><span class="p">,</span> <span class="n">choicemodels</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">loadthis</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">wrapper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">injector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">wrapper</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">i</span> <span class="o">=</span> <span class="n">wrapper</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">injector</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">injector</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;float_dtype&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">np</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;compute_engine&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;index_name&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;parameters&quot;</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_parameters</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;availability_any&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;availability_ca_var&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;availability_co_vars&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;choice_any&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;choice_ca_var&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;choice_co_code&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;choice_co_vars&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;constraint_intensity&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;constraint_sharpness&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;constraints&quot;</span><span class="p">)</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.tree</span><span class="w"> </span><span class="kn">import</span> <span class="n">NestingTree</span>
+
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;graph&quot;</span><span class="p">,</span> <span class="n">NestingTree</span><span class="o">.</span><span class="n">from_dict</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;groupid&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;logsum_parameter&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;quantity_ca&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;quantity_scale&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;utility_ca&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;utility_co&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;weight_co_var&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;weight_normalization&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+
+    <span class="nd">@jitmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">jax_probability</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="n">classmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_membership_model</span>
+        <span class="n">pr_parts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">classmodel</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">altids</span><span class="p">()):</span>
+            <span class="n">class_pr</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">classmodel</span><span class="o">.</span><span class="n">jax_probability</span><span class="p">(</span><span class="n">params</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="n">n</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">inclass_pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_models</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">jax_probability</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">inclass_pr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="n">class_pr</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
+                <span class="n">inclass_pr</span> <span class="o">=</span> <span class="n">inclass_pr</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                    <span class="n">class_pr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">inclass_pr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">class_pr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="o">*</span><span class="n">inclass_pr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                <span class="p">)</span>
+            <span class="n">pr_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inclass_pr</span> <span class="o">*</span> <span class="n">class_pr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">pr_parts</span><span class="p">)</span>
+
+    <span class="nd">@jitmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">jax_loglike_casewise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="n">n_alts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">n_alts</span>
+        <span class="n">ch</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;ch&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">ch</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jax_probability</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+            <span class="n">masked_pr</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ch</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">n_alts</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pr</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">n_alts</span><span class="p">],</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="n">log_pr</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">masked_pr</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">log_pr</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">n_alts</span><span class="p">]</span> <span class="o">*</span> <span class="n">ch</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">n_alts</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">ch</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">classmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_membership_model</span>
+            <span class="n">class_pr</span> <span class="o">=</span> <span class="n">classmodel</span><span class="o">.</span><span class="n">jax_probability</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+            <span class="n">likely_parts</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">classmodel</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">altids</span><span class="p">()):</span>
+                <span class="n">_yo_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_models</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">dataset</span>
+                <span class="n">k_pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_models</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">jax_probability</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>  <span class="c1"># .reshape(ch.shape)</span>
+                <span class="n">masked_k_pr</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ch</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">n_alts</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">k_pr</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">n_alts</span><span class="p">],</span> <span class="mf">1.0</span><span class="p">)</span>
+                <span class="n">k_likely</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">masked_k_pr</span><span class="p">,</span> <span class="n">ch</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">n_alts</span><span class="p">])</span><span class="o">.</span><span class="n">prod</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">likely_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k_likely</span> <span class="o">*</span> <span class="n">class_pr</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">likely_parts</span><span class="p">))</span>
+
+    <span class="nd">@jitmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">jax_loglike</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">jax_loglike_casewise</span><span class="p">(</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">loglike</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">start_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">stop_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">step_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">check_if_best</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_engine</span> <span class="o">!=</span> <span class="s2">&quot;jax&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;latent class with engine=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_engine</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unmangle</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">start_case</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">start_case</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">start_case</span><span class="si">=}</span><span class="s2"> with engine=jax&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stop_case</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">stop_case</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stop_case</span><span class="si">=}</span><span class="s2"> with engine=jax&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">step_case</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">step_case</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">step_case</span><span class="si">=}</span><span class="s2"> with engine=jax&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pvals</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jax_loglike</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pvals</span><span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">check_if_best</span>
+            <span class="ow">and</span> <span class="n">start_case</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">stop_case</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">step_case</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_if_best</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">neg_loglike</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">start_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">stop_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">step_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loglike</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="n">start_case</span><span class="o">=</span><span class="n">start_case</span><span class="p">,</span>
+            <span class="n">stop_case</span><span class="o">=</span><span class="n">stop_case</span><span class="p">,</span>
+            <span class="n">step_case</span><span class="o">=</span><span class="n">step_case</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">result</span>
+
+    <span class="nd">@jitmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">jax_d_loglike</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jax_loglike</span><span class="p">)(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">d_loglike</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">start_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">stop_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">step_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">return_series</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_engine</span> <span class="o">!=</span> <span class="s2">&quot;jax&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;latent class with engine=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_engine</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unmangle</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">start_case</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">start_case</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">start_case</span><span class="si">=}</span><span class="s2"> with engine=jax&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stop_case</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">stop_case</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stop_case</span><span class="si">=}</span><span class="s2"> with engine=jax&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">step_case</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">step_case</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">step_case</span><span class="si">=}</span><span class="s2"> with engine=jax&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pvals</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jax_d_loglike</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pvals</span><span class="p">)</span>
+
+        <span class="c1"># print(&quot;converge?=&quot;, jnp.max(jnp.absolute(result)))</span>
+
+        <span class="k">if</span> <span class="n">return_series</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pnames</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">neg_d_loglike</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_case</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop_case</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">step_case</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_loglike</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">start_case</span><span class="o">=</span><span class="n">start_case</span><span class="p">,</span> <span class="n">stop_case</span><span class="o">=</span><span class="n">stop_case</span><span class="p">,</span> <span class="n">step_case</span><span class="o">=</span><span class="n">step_case</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">maximize_loglike</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Maximize the log likelihood.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method : str, optional</span>
+<span class="sd">            The optimization method to use.  See scipy.optimize for</span>
+<span class="sd">            most possibilities, or use &#39;BHHH&#39;. Defaults to SLSQP if</span>
+<span class="sd">            there are any constraints or finite parameter bounds,</span>
+<span class="sd">            otherwise defaults to BHHH.</span>
+<span class="sd">        quiet : bool, default False</span>
+<span class="sd">            Whether to suppress the dashboard.</span>
+<span class="sd">        options : dict, optional</span>
+<span class="sd">            These options are passed through to the `scipy.optimize.minimize`</span>
+<span class="sd">            function.</span>
+<span class="sd">        maxiter : int, optional</span>
+<span class="sd">            Maximum number of iterations.  This argument is just added to</span>
+<span class="sd">            `options` for most methods.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dictx</span>
+<span class="sd">            A dictionary of results, including final log likelihood,</span>
+<span class="sd">            elapsed time, and other statistics.  The exact items</span>
+<span class="sd">            included in output will vary by estimation method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.optimization</span><span class="w"> </span><span class="kn">import</span> <span class="n">maximize_loglike</span>
+
+        <span class="k">return</span> <span class="n">maximize_loglike</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">reflow_data_arrays</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reload the internal data_arrays so they are consistent with the datatree.&quot;&quot;&quot;</span>
+        <span class="n">datatree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatree</span>
+        <span class="k">if</span> <span class="n">datatree</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;missing datatree&quot;</span><span class="p">)</span>
+
+        <span class="n">classmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_membership_model</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="n">classmodel</span><span class="o">.</span><span class="n">required_data</span><span class="p">()</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;avail_any&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_kname</span><span class="p">,</span> <span class="n">kmodel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">kmodel</span><span class="o">.</span><span class="n">_model_subtype</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;class-membership&quot;</span><span class="p">,</span> <span class="s2">&quot;latent-class&quot;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">kreq</span> <span class="o">=</span> <span class="n">kmodel</span><span class="o">.</span><span class="n">required_data</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kreq</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">request</span><span class="p">:</span>
+                    <span class="n">request</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                        <span class="n">request</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">)):</span>
+                        <span class="n">request</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">request</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">request</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">v</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;incompatible requests&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groupid</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;group_co&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">groupid</span>
+
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.data_arrays</span><span class="w"> </span><span class="kn">import</span> <span class="n">prepare_data</span>
+
+        <span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataflows</span> <span class="o">=</span> <span class="n">prepare_data</span><span class="p">(</span>
+            <span class="n">datasource</span><span class="o">=</span><span class="n">datatree</span><span class="p">,</span>
+            <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span>
+            <span class="n">float_dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+            <span class="n">cache_dir</span><span class="o">=</span><span class="n">datatree</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span>
+            <span class="n">flows</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataflows</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groupid</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">fold_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">groupid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">fold_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">groupid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+
+        <span class="k">for</span> <span class="n">_kname</span><span class="p">,</span> <span class="n">kmodel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">kmodel</span><span class="o">.</span><span class="n">_model_subtype</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;class-membership&quot;</span><span class="p">,</span> <span class="s2">&quot;latent-class&quot;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">kmodel</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span>
+            <span class="c1"># kmodel.reflow_data_arrays() # not full reflow, just...</span>
+            <span class="n">kmodel</span><span class="o">.</span><span class="n">_data_arrays</span> <span class="o">=</span> <span class="n">kmodel</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">to_arrays</span><span class="p">(</span>
+                <span class="n">kmodel</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span>
+                <span class="n">float_dtype</span><span class="o">=</span><span class="n">kmodel</span><span class="o">.</span><span class="n">float_dtype</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="c1"># if kmodel.work_arrays is not None:</span>
+            <span class="n">kmodel</span><span class="o">.</span><span class="n">_rebuild_fixed_arrays</span><span class="p">()</span>
+            <span class="n">kmodel</span><span class="o">.</span><span class="n">_rebuild_work_arrays</span><span class="p">()</span>
+        <span class="n">classmodel_ids</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">kid</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">kid</span><span class="p">,</span> <span class="n">km</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_models</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">km</span><span class="o">.</span><span class="n">_model_subtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;latent-class&quot;</span><span class="p">,</span> <span class="s2">&quot;class-membership&quot;</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">classmodel_data</span> <span class="o">=</span> <span class="n">dissolve_zero_variance</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">drop_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">ALTID</span><span class="p">)</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">set_altids</span><span class="p">(</span><span class="n">classmodel_ids</span><span class="p">),</span>
+            <span class="s2">&quot;ingroup&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">classmodel</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">classmodel_data</span>
+        <span class="n">classmodel</span><span class="o">.</span><span class="n">reflow_data_arrays</span><span class="p">()</span>
+        <span class="c1"># classmodel._data_arrays = classmodel.dataset.dc.to_arrays(</span>
+        <span class="c1">#     classmodel.graph,</span>
+        <span class="c1">#     float_dtype=classmodel.float_dtype,</span>
+        <span class="c1"># )</span>
+        <span class="c1"># if classmodel.work_arrays is not None:</span>
+        <span class="c1">#     classmodel._rebuild_work_arrays()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">mangle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">mangle</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="n">structure</span><span class="p">)</span>
+        <span class="n">reset_compiled_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_mangled</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">unmangle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">structure_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_mangled</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">unmangle</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">structure_only</span><span class="o">=</span><span class="n">structure_only</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">structure_only</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reflow_data_arrays</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_is_mangled</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_is_mangled</span> <span class="o">=</span> <span class="n">MANGLE_DATA</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;xarray.Dataset : Data arrays as loaded for model computation.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">unmangle</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reflow_data_arrays</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@dataset</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">_Dataset</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_arrays</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mangle</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">_Dataset</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_arrays</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mangle</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dataset must be Dataset not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">datatree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;DataTree : A source for data for the model.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatree</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@datatree</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">datatree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">tree</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatree</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">DataTree</span><span class="p">)</span> <span class="ow">or</span> <span class="n">tree</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_datatree</span> <span class="o">=</span> <span class="n">tree</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mangle</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_datatree</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">as_tree</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mangle</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_datatree</span> <span class="o">=</span> <span class="n">DataTree</span><span class="p">(</span><span class="n">main</span><span class="o">=</span><span class="n">Dataset</span><span class="o">.</span><span class="n">construct</span><span class="p">(</span><span class="n">tree</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;datatree must be DataTree not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">err</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mangle</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">data_as_loaded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">class_membership_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># TODO optimize this</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_models</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">_model_subtype</span> <span class="o">==</span> <span class="s2">&quot;class-membership&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">m</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">total_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the total weight of cases in the loaded data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_membership_model</span><span class="o">.</span><span class="n">_data_arrays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_membership_model</span><span class="o">.</span><span class="n">_data_arrays</span><span class="o">.</span><span class="n">wt</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="n">MissingDataError</span><span class="p">(</span><span class="s2">&quot;no data_arrays are set&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">logloss</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">start_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">stop_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">step_case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">check_if_best</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loglike</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="n">start_case</span><span class="o">=</span><span class="n">start_case</span><span class="p">,</span>
+            <span class="n">stop_case</span><span class="o">=</span><span class="n">stop_case</span><span class="p">,</span>
+            <span class="n">step_case</span><span class="o">=</span><span class="n">step_case</span><span class="p">,</span>
+            <span class="n">check_if_best</span><span class="o">=</span><span class="n">check_if_best</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">result</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_weight</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">d_logloss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_case</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop_case</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">step_case</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_loglike</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">start_case</span><span class="o">=</span><span class="n">start_case</span><span class="p">,</span> <span class="n">stop_case</span><span class="o">=</span><span class="n">stop_case</span><span class="p">,</span> <span class="n">step_case</span><span class="o">=</span><span class="n">step_case</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_weight</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">simple_fit_bhhh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_parameter_covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pvals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pvals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pvals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pvals</span>
+        <span class="n">locks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pholdfast</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_engine</span> <span class="o">==</span> <span class="s2">&quot;jax&quot;</span><span class="p">:</span>
+            <span class="n">se</span><span class="p">,</span> <span class="n">hess</span><span class="p">,</span> <span class="n">ihess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jax_param_cov</span><span class="p">(</span><span class="n">pvals</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;compute_engine=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_engine</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># hess = -self.d2_loglike(pvals)</span>
+            <span class="c1"># if self.parameters[&quot;holdfast&quot;].sum():</span>
+            <span class="c1">#     free = self.pholdfast == 0</span>
+            <span class="c1">#     hess_ = hess[free][:, free]</span>
+            <span class="c1">#     ihess_ = np.linalg.inv(hess_)</span>
+            <span class="c1">#     ihess = _arr_inflate(ihess_, locks)</span>
+            <span class="c1"># else:</span>
+            <span class="c1">#     ihess = np.linalg.inv(hess)</span>
+            <span class="c1"># se = np.sqrt(ihess.diagonal())</span>
+            <span class="c1"># self.pstderr = se</span>
+        <span class="n">hess</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">hess</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">hess</span><span class="p">[</span><span class="n">locks</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">hess</span><span class="p">[:,</span> <span class="n">locks</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">ihess</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ihess</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">ihess</span><span class="p">[</span><span class="n">locks</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">ihess</span><span class="p">[:,</span> <span class="n">locks</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter_array</span><span class="p">(</span><span class="s2">&quot;hess&quot;</span><span class="p">,</span> <span class="n">hess</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter_array</span><span class="p">(</span><span class="s2">&quot;ihess&quot;</span><span class="p">,</span> <span class="n">ihess</span><span class="p">)</span>
+
+        <span class="c1"># constrained covariance</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">:</span>
+            <span class="n">constraints</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">constraints</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">constraints</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_bounds_constraints</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="n">constraints</span><span class="p">:</span>
+            <span class="n">binding_constraints</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter_array</span><span class="p">(</span><span class="s2">&quot;unconstrained_std_err&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pstderr</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter_array</span><span class="p">(</span><span class="s2">&quot;unconstrained_covariance_matrix&quot;</span><span class="p">,</span> <span class="n">ihess</span><span class="p">)</span>
+
+            <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ihess</span><span class="p">)</span>
+            <span class="n">pvals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pvals</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">constraints</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">fun</span><span class="p">(</span><span class="n">pvals</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">c</span><span class="o">.</span><span class="n">binding_tol</span><span class="p">:</span>
+                    <span class="n">binding_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                    <span class="n">b</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">jac</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pf</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                    <span class="n">den</span> <span class="o">=</span> <span class="n">b</span> <span class="o">@</span> <span class="n">s</span> <span class="o">@</span> <span class="n">b</span>
+                    <span class="k">if</span> <span class="n">den</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">den</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span> <span class="o">@</span> <span class="n">b</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">@</span> <span class="n">b</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">@</span> <span class="n">s</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter_array</span><span class="p">(</span><span class="s2">&quot;covariance_matrix&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pstderr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">diagonal</span><span class="p">())</span>
+
+            <span class="c1"># Fix numerical issues on some constraints, add constrained notes</span>
+            <span class="k">if</span> <span class="n">binding_constraints</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pholdfast</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">notes</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">binding_constraints</span><span class="p">:</span>
+                    <span class="n">pa</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_parameters</span><span class="p">()</span>
+                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pa</span><span class="p">:</span>
+                        <span class="c1"># if self.pf.loc[p, &#39;t_stat&#39;] &gt; 1e5:</span>
+                        <span class="c1">#     self.pf.loc[p, &#39;t_stat&#39;] = np.inf</span>
+                        <span class="c1">#     self.pf.loc[p, &#39;std_err&#39;] = np.nan</span>
+                        <span class="c1"># if self.pf.loc[p, &#39;t_stat&#39;] &lt; -1e5:</span>
+                        <span class="c1">#     self.pf.loc[p, &#39;t_stat&#39;] = -np.inf</span>
+                        <span class="c1">#     self.pf.loc[p, &#39;std_err&#39;] = np.nan</span>
+                        <span class="n">n</span> <span class="o">=</span> <span class="n">notes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">[])</span>
+                        <span class="n">n</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_binding_note</span><span class="p">(</span><span class="n">pvals</span><span class="p">))</span>
+                        <span class="n">notes</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span>
+                <span class="n">constrained_note</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">notes</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pnames</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">constrained_note</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pholdfast</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;fixed value&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter_array</span><span class="p">(</span><span class="s2">&quot;constrained&quot;</span><span class="p">,</span> <span class="n">constrained_note</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">robust</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">robust_covariance</span><span class="p">()</span>
+            <span class="n">se</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;robust_std_err&quot;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">se</span><span class="p">,</span> <span class="n">hess</span><span class="p">,</span> <span class="n">ihess</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">robust_covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MixedLatentClass</span><span class="p">(</span><span class="n">LatentClass</span><span class="p">):</span>
+    <span class="n">mixtures</span> <span class="o">=</span> <span class="n">MixtureList</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">n_draws</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">prerolled_draws</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">common_draws</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_draws</span> <span class="o">=</span> <span class="n">n_draws</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_draws</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prerolled_draws</span> <span class="o">=</span> <span class="n">prerolled_draws</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">common_draws</span> <span class="o">=</span> <span class="n">common_draws</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">loadthis</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">wrapper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">injector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">wrapper</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">i</span> <span class="o">=</span> <span class="n">wrapper</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">injector</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">injector</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;mixtures&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixtures</span><span class="o">.</span><span class="n">from_list</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;n_draws&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;prerolled_draws&quot;</span><span class="p">)</span>
+        <span class="n">loadthis</span><span class="p">(</span><span class="s2">&quot;common_draws&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_random_draws</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">draws</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># if draws is None:</span>
+        <span class="c1">#     draws = self._draws</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span>
+            <span class="n">parameters</span><span class="p">,</span> <span class="p">[</span><span class="o">*</span><span class="n">draws</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">parameters</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">mix_n</span><span class="p">,</span> <span class="n">mix</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mixtures</span><span class="p">):</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">draws</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">mix_n</span><span class="p">]</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="n">mix</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parameters</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_random_draws_out</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_draws</span><span class="p">,</span> <span class="n">n_mixtures</span><span class="p">,</span> <span class="n">random_key</span><span class="p">):</span>
+        <span class="n">draws</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span>
+            <span class="n">random_key</span><span class="p">,</span>
+            <span class="p">[</span><span class="n">n_draws</span><span class="p">,</span> <span class="n">n_mixtures</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">body</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">carry</span><span class="p">):</span>
+            <span class="n">draws</span><span class="p">,</span> <span class="n">rnd_key</span> <span class="o">=</span> <span class="n">carry</span>
+            <span class="n">rnd_key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rnd_key</span><span class="p">)</span>
+            <span class="n">draws</span> <span class="o">=</span> <span class="n">draws</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">subkey</span><span class="p">,</span> <span class="n">draws</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">return</span> <span class="n">draws</span><span class="p">,</span> <span class="n">rnd_key</span>
+
+        <span class="n">draws</span><span class="p">,</span> <span class="n">random_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">fori_loop</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="n">draws</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">body</span><span class="p">,</span> <span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">random_key</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">draws</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">n_draws</span><span class="p">),</span> <span class="n">random_key</span>
+
+    <span class="nd">@jitmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_jax_probability_by_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">databundle</span><span class="p">):</span>
+        <span class="c1"># classmodel = self[&#39;classmodel&#39;]</span>
+        <span class="n">pr_parts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">_n</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">class_membership_model</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">altids</span><span class="p">()):</span>
+            <span class="n">pr_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_models</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">_jax_probability</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">databundle</span><span class="p">)</span>
+                <span class="c1"># * jnp.expand_dims(classmodel._jax_probability(params, databundle)[..., n], -1)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">pr_parts</span><span class="p">)</span>
+
+    <span class="nd">@jitmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_jax_likelihood_by_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">databundle</span><span class="p">):</span>
+        <span class="n">n_alts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">n_alts</span>
+        <span class="n">ch</span> <span class="o">=</span> <span class="n">databundle</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ch&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">n_alts</span><span class="p">]</span>
+        <span class="n">pr_parts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jax_probability_by_class</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">databundle</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">n_alts</span><span class="p">]</span>
+        <span class="n">likely</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">jnp</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">pr_parts</span><span class="p">,</span> <span class="mf">1.0</span>
+        <span class="p">)</span>  <span class="c1"># TODO make power if needed</span>
+        <span class="k">return</span> <span class="n">likely</span>
+
+    <span class="nd">@jitmethod</span><span class="p">(</span><span class="n">static_argnums</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,),</span> <span class="n">static_argnames</span><span class="o">=</span><span class="s2">&quot;n_draws&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_jax_loglike_casewise_mixed</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">databundle</span><span class="p">,</span> <span class="n">groupbundle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_draws</span><span class="o">=</span><span class="mi">100</span>
+    <span class="p">):</span>
+        <span class="n">classmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_membership_model</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prerolled_draws</span><span class="p">:</span>
+            <span class="n">draws</span> <span class="o">=</span> <span class="n">groupbundle</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;draws&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rk</span> <span class="o">=</span> <span class="n">groupbundle</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rk&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">draws</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_random_draws_out</span><span class="p">(</span><span class="n">n_draws</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mixtures</span><span class="p">),</span> <span class="n">rk</span><span class="p">)</span>
+        <span class="n">ch</span> <span class="o">=</span> <span class="n">databundle</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ch&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">rand_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_random_draws</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">draws</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ch</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># PANEL DATA</span>
+            <span class="c1"># vmap over ingroup</span>
+            <span class="n">likelihood_f</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_jax_likelihood_by_class</span><span class="p">,</span>
+                <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="c1"># vmap over draws</span>
+            <span class="n">likelihood</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span>
+                <span class="n">likelihood_f</span><span class="p">,</span>
+                <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                <span class="n">out_axes</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)(</span><span class="n">rand_params</span><span class="p">,</span> <span class="n">databundle</span><span class="p">)</span>
+            <span class="c1"># collapse likelihood over all alternatives over all cases-within-panel</span>
+            <span class="n">likelihood</span> <span class="o">=</span> <span class="n">likelihood</span><span class="o">.</span><span class="n">prod</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+            <span class="c1"># likelihood.shape is now (n_classes, n_draws)</span>
+            <span class="c1">################</span>
+            <span class="n">class_pr</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span>
+                <span class="n">classmodel</span><span class="o">.</span><span class="n">_jax_probability</span><span class="p">,</span>
+                <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                <span class="n">out_axes</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)(</span>
+                <span class="n">rand_params</span><span class="p">,</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;co&quot;</span><span class="p">:</span> <span class="n">databundle</span><span class="p">[</span><span class="s2">&quot;co&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+            <span class="c1"># class_pr.shape = (nclasses, ndraws)</span>
+            <span class="n">meta_likely</span> <span class="o">=</span> <span class="p">(</span><span class="n">likelihood</span> <span class="o">*</span> <span class="n">class_pr</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">meta_likely</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># vmap over draws</span>
+            <span class="n">likelihood</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_jax_likelihood_by_class</span><span class="p">,</span>
+                <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                <span class="n">out_axes</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)(</span><span class="n">rand_params</span><span class="p">,</span> <span class="n">databundle</span><span class="p">)</span>
+            <span class="c1"># collapse likelihood over all alternatives</span>
+            <span class="n">likelihood</span> <span class="o">=</span> <span class="n">likelihood</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="c1"># average over all draws</span>
+            <span class="n">likelihood</span> <span class="o">=</span> <span class="n">likelihood</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">likelihood</span><span class="p">)</span>
+
+    <span class="nd">@jitmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">jax_loglike_casewise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mixtures</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">jax_loglike_casewise</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">ca</span> <span class="o">=</span> <span class="n">_get_jnp_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;ca&quot;</span><span class="p">)</span>
+        <span class="n">co</span> <span class="o">=</span> <span class="n">_get_jnp_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;co&quot;</span><span class="p">)</span>
+        <span class="n">av</span> <span class="o">=</span> <span class="n">_get_jnp_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;av&quot;</span><span class="p">)</span>
+        <span class="n">ch</span> <span class="o">=</span> <span class="n">_get_jnp_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;ch&quot;</span><span class="p">)</span>
+        <span class="n">n_draws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_draws</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="ow">or</span> <span class="mi">42</span>
+        <span class="k">if</span> <span class="n">av</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">depth</span> <span class="o">=</span> <span class="n">av</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="n">av</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">co</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">depth</span> <span class="o">=</span> <span class="n">co</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="n">co</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">ca</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">depth</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">2</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">ch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">depth</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;missing data&quot;</span><span class="p">)</span>
+        <span class="n">random_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">groupid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_jax_loglike_casewise_mixed</span>
+        <span class="p">)</span>  <span class="c1"># params, databundle, groupbundle=None, n_draws=100</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">keysplit</span>
+
+        <span class="n">commons</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">common_draws</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">depth</span><span class="p">):</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">commons</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">prerolled_draws</span><span class="p">:</span>
+                <span class="n">random_key</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">keysplit</span><span class="p">(</span><span class="n">random_key</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prerolled_draws</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="p">(</span>
+                <span class="n">params</span><span class="p">,</span>
+                <span class="p">{</span><span class="s2">&quot;ca&quot;</span><span class="p">:</span> <span class="n">ca</span><span class="p">,</span> <span class="s2">&quot;co&quot;</span><span class="p">:</span> <span class="n">co</span><span class="p">,</span> <span class="s2">&quot;av&quot;</span><span class="p">:</span> <span class="n">av</span><span class="p">,</span> <span class="s2">&quot;ch&quot;</span><span class="p">:</span> <span class="n">ch</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&quot;draws&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draws</span><span class="p">},</span>
+                <span class="n">n_draws</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="p">(</span>
+                <span class="n">params</span><span class="p">,</span>
+                <span class="p">{</span><span class="s2">&quot;ca&quot;</span><span class="p">:</span> <span class="n">ca</span><span class="p">,</span> <span class="s2">&quot;co&quot;</span><span class="p">:</span> <span class="n">co</span><span class="p">,</span> <span class="s2">&quot;av&quot;</span><span class="p">:</span> <span class="n">av</span><span class="p">,</span> <span class="s2">&quot;ch&quot;</span><span class="p">:</span> <span class="n">ch</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&quot;rk&quot;</span><span class="p">:</span> <span class="n">random_key</span><span class="p">},</span>
+                <span class="n">n_draws</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_random_draws</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;numpy&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unmangle</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixtures</span><span class="p">:</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">prep</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">n_panels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">n_panels</span>
+        <span class="n">n_mixtures</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mixtures</span><span class="p">)</span>
+        <span class="n">n_draws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_draws</span>
+        <span class="n">draws</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draws</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">common_draws</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draws</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">n_draws</span><span class="p">,</span> <span class="n">n_mixtures</span><span class="p">):</span>
+                <span class="n">draws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draws</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">common_draws</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draws</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span>
+                <span class="n">n_panels</span><span class="p">,</span>
+                <span class="n">n_draws</span><span class="p">,</span>
+                <span class="n">n_mixtures</span><span class="p">,</span>
+            <span class="p">):</span>
+                <span class="n">draws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draws</span>
+        <span class="k">if</span> <span class="n">draws</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;numpy&quot;</span><span class="p">:</span>
+                <span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="ow">or</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">common_draws</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">n_draws</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n_mixtures</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">draws</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_random_draws_numpy</span><span class="p">(</span>
+                            <span class="n">n_draws</span><span class="p">,</span> <span class="n">n_mixtures</span><span class="p">,</span> <span class="n">seed</span>
+                        <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">n_draws</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n_mixtures</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n_panels</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">draws</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_random_draws_numpy_2</span><span class="p">(</span>
+                            <span class="n">n_draws</span><span class="p">,</span> <span class="n">n_mixtures</span><span class="p">,</span> <span class="n">n_panels</span><span class="p">,</span> <span class="n">seed</span>
+                        <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">draws</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;jax&quot;</span><span class="p">:</span>
+                <span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="ow">or</span> <span class="mi">0</span>
+                <span class="n">rk</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">common_draws</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">n_draws</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n_mixtures</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">draws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_random_draws_out</span><span class="p">(</span><span class="n">n_draws</span><span class="p">,</span> <span class="n">n_mixtures</span><span class="p">,</span> <span class="n">rk</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">n_draws</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n_mixtures</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n_panels</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">draws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_random_draws_out_2</span><span class="p">(</span>
+                            <span class="n">n_draws</span><span class="p">,</span> <span class="n">n_mixtures</span><span class="p">,</span> <span class="n">n_panels</span><span class="p">,</span> <span class="n">rk</span>
+                        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">draws</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unknown random engine </span><span class="si">{</span><span class="n">engine</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prerolled_draws</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_draws</span> <span class="o">=</span> <span class="n">draws</span>
+        <span class="k">return</span> <span class="n">draws</span>
+
+    <span class="c1"># @jitmethod(static_argnums=(0,1,2), static_argnames=(&#39;n_draws&#39;, &#39;n_mixtures&#39;, &#39;n_cases&#39;))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_random_draws_out_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_draws</span><span class="p">,</span> <span class="n">n_mixtures</span><span class="p">,</span> <span class="n">n_cases</span><span class="p">,</span> <span class="n">random_key</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">body</span><span class="p">(</span><span class="n">carry</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+            <span class="n">rkey</span> <span class="o">=</span> <span class="n">carry</span>
+            <span class="n">draws</span><span class="p">,</span> <span class="n">rkey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_random_draws_out</span><span class="p">(</span><span class="n">n_draws</span><span class="p">,</span> <span class="n">n_mixtures</span><span class="p">,</span> <span class="n">rkey</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">rkey</span><span class="p">,</span> <span class="n">draws</span>
+
+        <span class="n">random_key</span><span class="p">,</span> <span class="n">draws</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">random_key</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n_cases</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">draws</span><span class="p">,</span> <span class="n">random_key</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item"><!-- This will display the version of the docs -->
+<p class="larch-version">🌳 Larch v6.0.37.dev16+g8c0943e, © Copyright 2024.</p></div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

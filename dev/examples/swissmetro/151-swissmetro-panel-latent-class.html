@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>&lt;no title&gt; &#8212; v6.0.37.dev11+gd911e2d</title>
+    <title>&lt;no title&gt; &#8212; v6.0.37.dev16+g8c0943e</title>
   
   
   
@@ -137,8 +137,8 @@
       
     
     
-    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.37.dev11+gd911e2d - Home"/>
-    <img src="../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.37.dev11+gd911e2d - Home"/>
+    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.37.dev16+g8c0943e - Home"/>
+    <img src="../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.37.dev16+g8c0943e - Home"/>
   
   
 </a></div>
@@ -434,7 +434,7 @@
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
 <span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="ne">----&gt; </span><span class="mi">3</span> <span class="kn">from</span><span class="w"> </span><span class="nn">pytest</span><span class="w"> </span><span class="kn">import</span> <span class="n">approx</span>
@@ -446,6 +446,12 @@
 </div>
 </div>
 </div>
+<p>This example is a latent class mode choice model (also known as a discrete mixture model) built using the Swissmetro example dataset.
+This model is similar to the simple latent class model shown in <a class="reference internal" href="107-swissmetro-latent-class.html"><span class="doc std std-doc">Example 107</span></a>. The key difference is
+that the class membership is determined per-respondent instead of per-observation. The underlying data is from a stated preference
+survey, where respondents made repeated choices with various different alternative attributes.</p>
+<p>As before, the first step is to load the data and do some pre-processing, so that the format and scale of the
+data matches that from the Biogeme example.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">raw</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">lx</span><span class="o">.</span><span class="n">example_file</span><span class="p">(</span><span class="s2">&quot;swissmetro.csv.gz&quot;</span><span class="p">))</span>
@@ -453,23 +459,19 @@
 <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;TRAIN_COST&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s2">&quot;TRAIN_CO * (GA == 0)&quot;</span><span class="p">)</span>
 <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;TRAIN_COST_SCALED&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;TRAIN_COST&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span>
 <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;TRAIN_TT_SCALED&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;TRAIN_TT&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span>
-
 <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;SM_COST_SCALED&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s2">&quot;SM_COST / 100&quot;</span><span class="p">)</span>
 <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;SM_TT_SCALED&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;SM_TT&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span>
-
 <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;CAR_CO_SCALED&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;CAR_CO&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span>
 <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;CAR_TT_SCALED&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;CAR_TT&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span>
 <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;CAR_AV_SP&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s2">&quot;CAR_AV * (SP!=0)&quot;</span><span class="p">)</span>
 <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;TRAIN_AV_SP&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s2">&quot;TRAIN_AV * (SP!=0)&quot;</span><span class="p">)</span>
-
-<span class="n">raw</span><span class="p">[</span><span class="s2">&quot;keep&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s2">&quot;PURPOSE in (1,3) and CHOICE != 0&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">raw</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">lx</span><span class="o">.</span><span class="n">example_file</span><span class="p">(</span><span class="s2">&quot;swissmetro.csv.gz&quot;</span><span class="p">))</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;SM_COST&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;SM_CO&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">&quot;GA&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
 <span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;TRAIN_COST&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s2">&quot;TRAIN_CO * (GA == 0)&quot;</span><span class="p">)</span>
@@ -488,7 +490,7 @@
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">raw</span>
 
 <span class="ne">NameError</span>: name &#39;raw&#39; is not defined
@@ -496,23 +498,48 @@
 </div>
 </div>
 </div>
+<p>We now have a pandas DataFrame in “wide” or <a class="reference internal" href="../../user-guide/data-fundamentals.html#idco"><span class="std std-ref">idco</span></a> format, with one row per choice observation.
+For this example, it is relevant to note there is more than one row per respondent, and the various
+respondents can be identified by the “ID” column.</p>
+<p>We can convert this to a Larch Dataset, filtering to include only the cases of interest,
+following the same filter applied in the Biogeme example.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">construct</span><span class="o">.</span><span class="n">from_idco</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">query_cases</span><span class="p">(</span><span class="s2">&quot;keep&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">construct</span><span class="o">.</span><span class="n">from_idco</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">query_cases</span><span class="p">(</span><span class="s2">&quot;PURPOSE in (1,3) and CHOICE != 0&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">data</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">construct</span><span class="o">.</span><span class="n">from_idco</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span><span class="o">.</span><span class="n">dc</span><span class="o">.</span><span class="n">query_cases</span><span class="p">(</span><span class="s2">&quot;keep&quot;</span><span class="p">)</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="nn">----&gt; 1 data = lx.Dataset.construct.from_idco(raw).dc.query_cases(&quot;PURPOSE</span> in <span class="nt">(1,3) and CHOICE != 0&quot;)</span>
 
 <span class="ne">NameError</span>: name &#39;lx&#39; is not defined
 </pre></div>
 </div>
 </div>
 </div>
+<p>The result is a Dataset with 6,768 cases.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">data</span>
+
+<span class="ne">NameError</span>: name &#39;data&#39; is not defined
+</pre></div>
+</div>
+</div>
+</div>
+<p>For convenience, we can collect the names of the variables that define alternative availability
+into a dictionary, keyed on the codes we will use to represent each alternative.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">availability_co_vars</span> <span class="o">=</span> <span class="p">{</span>
@@ -524,7 +551,11 @@
 </div>
 </div>
 </div>
-<p>Class 1 chooses based on cost, and includes a set of alternative specific constants.</p>
+<p>Then we can contruct choice models for each of the classes.  This is done in the
+usual manner for Larch choice models, assigning utility functions, alternative
+availability conditions, and choice markers in the usual manner.</p>
+<p>In this example, Class 1 chooses based on cost, and the utility functions include
+a set of alternative specific constants.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m1</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Model1&quot;</span><span class="p">)</span>
@@ -539,7 +570,7 @@
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">m1</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Model1&quot;</span><span class="p">)</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">m1</span><span class="o">.</span><span class="n">availability_co_vars</span> <span class="o">=</span> <span class="n">availability_co_vars</span>
 <span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">m1</span><span class="o">.</span><span class="n">choice_co_code</span> <span class="o">=</span> <span class="s2">&quot;CHOICE&quot;</span>
@@ -549,7 +580,8 @@
 </div>
 </div>
 </div>
-<p>Class 2 is the same model, but adds travel time to the utility.</p>
+<p>Class 2 is the nearly same model, defined completely seperately but in a similar manner.
+The only difference is in the utility functions, which adds travel time to the utility.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m2</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Model2&quot;</span><span class="p">)</span>
@@ -570,7 +602,7 @@
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">m2</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Model2&quot;</span><span class="p">)</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">m2</span><span class="o">.</span><span class="n">availability_co_vars</span> <span class="o">=</span> <span class="n">availability_co_vars</span>
 <span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">m2</span><span class="o">.</span><span class="n">choice_co_code</span> <span class="o">=</span> <span class="s2">&quot;CHOICE&quot;</span>
@@ -580,9 +612,20 @@
 </div>
 </div>
 </div>
-<p>Class 3 represents a lexicographic or non-compensatory choice system, where
+<p>For this example, we will also add a third choice class.
+Class 3 represents a lexicographic or non-compensatory choice system, where
 the choice of mode is based exclusively on cost, without regard to any other
-choice attribute.</p>
+choice attribute. When two modes have the same cost, they are considered to be
+equally likely.  This lexicographic is still represented in the same mathematical
+manner as the other classes that employ typical multinomial logit models, except
+we will constrain the <code class="docutils literal notranslate"><span class="pre">Z_COST</span></code> parameter to enforce the desired choice rule for this
+class.</p>
+<p>The use of this kind of choice model in a latent class structure can be challenging
+with cross-sectional data, as it is very easy to create over-specified models, i.e.
+it is hard to tell from one choice observation whether a decision maker is choosing
+based on a simple choice rule or considering trade-offs between various attributes.
+In a panel data study as shown in this example, it is much easier to mathematically
+disambiguate between compensatory and non-compensatory choice processes.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m3</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Model3&quot;</span><span class="p">)</span>
@@ -597,7 +640,7 @@ choice attribute.</p>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">m3</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Model3&quot;</span><span class="p">)</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">m3</span><span class="o">.</span><span class="n">availability_co_vars</span> <span class="o">=</span> <span class="n">availability_co_vars</span>
 <span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">m3</span><span class="o">.</span><span class="n">choice_co_code</span> <span class="o">=</span> <span class="s2">&quot;CHOICE&quot;</span>
@@ -607,7 +650,9 @@ choice attribute.</p>
 </div>
 </div>
 </div>
-<p>The class membership model for this latent class model is relatively simple, just constants for each class.</p>
+<p>The class membership model for this latent class model is relatively simple, just constants for each class.
+One class (the first one, which we label as model 101) is a reference point, and the other classes are
+evaluated as more or less likely than the reference, similar to a typical MNL model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mk</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
@@ -619,7 +664,7 @@ choice attribute.</p>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">mk</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">mk</span><span class="o">.</span><span class="n">utility_co</span><span class="p">[</span><span class="mi">102</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="s2">&quot;W_OTHER&quot;</span><span class="p">)</span>
 <span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">mk</span><span class="o">.</span><span class="n">utility_co</span><span class="p">[</span><span class="mi">103</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="s2">&quot;W_COST&quot;</span><span class="p">)</span>
@@ -629,7 +674,8 @@ choice attribute.</p>
 </div>
 </div>
 </div>
-<p>Finally, we assembled all the component models into one LatentClass structure.</p>
+<p>Finally, we assembled all the component models into one LatentClass structure.  We add the <code class="docutils literal notranslate"><span class="pre">groupid</span></code>
+argument to indicate how our panel data is structured.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">b</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">LatentClass</span><span class="p">(</span>
@@ -644,7 +690,7 @@ choice attribute.</p>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">12</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">b</span> <span class="o">=</span> <span class="n">lx</span><span class="o">.</span><span class="n">LatentClass</span><span class="p">(</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span>     <span class="n">mk</span><span class="p">,</span>
 <span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="p">{</span><span class="mi">101</span><span class="p">:</span> <span class="n">m1</span><span class="p">,</span> <span class="mi">102</span><span class="p">:</span> <span class="n">m2</span><span class="p">,</span> <span class="mi">103</span><span class="p">:</span> <span class="n">m3</span><span class="p">},</span>
@@ -657,17 +703,19 @@ choice attribute.</p>
 </div>
 </div>
 </div>
+<p>After creating the <code class="docutils literal notranslate"><span class="pre">LatentClass</span></code> structure, we can add contraints on parameters, such as that
+needed for the lexicographic choice class.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">b</span><span class="o">.</span><span class="n">lock_value</span><span class="p">(</span><span class="n">Z_COST</span><span class="o">=-</span><span class="mi">10000</span><span class="p">)</span>  <span class="c1"># set the lexicographic parameter</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">b</span><span class="o">.</span><span class="n">lock_value</span><span class="p">(</span><span class="n">Z_COST</span><span class="o">=-</span><span class="mi">10000</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">b</span><span class="o">.</span><span class="n">lock_value</span><span class="p">(</span><span class="n">Z_COST</span><span class="o">=-</span><span class="mi">10000</span><span class="p">)</span>  <span class="c1"># set the lexicographic parameter</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">b</span><span class="o">.</span><span class="n">lock_value</span><span class="p">(</span><span class="n">Z_COST</span><span class="o">=-</span><span class="mi">10000</span><span class="p">)</span>
 
 <span class="ne">NameError</span>: name &#39;b&#39; is not defined
 </pre></div>
@@ -683,7 +731,7 @@ choice attribute.</p>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">12</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">14</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">b</span><span class="o">.</span><span class="n">set_cap</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
 
 <span class="ne">NameError</span>: name &#39;b&#39; is not defined
@@ -700,7 +748,7 @@ choice attribute.</p>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">15</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">17</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">result</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">maximize_loglike</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;slsqp&quot;</span><span class="p">)</span>
 
 <span class="ne">NameError</span>: name &#39;b&#39; is not defined
@@ -717,7 +765,7 @@ choice attribute.</p>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">18</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">b</span><span class="o">.</span><span class="n">calculate_parameter_covariance</span><span class="p">();</span>
 
 <span class="ne">NameError</span>: name &#39;b&#39; is not defined
@@ -734,7 +782,7 @@ choice attribute.</p>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">17</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">19</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">b</span><span class="o">.</span><span class="n">parameter_summary</span><span class="p">()</span>
 
 <span class="ne">NameError</span>: name &#39;b&#39; is not defined
@@ -825,7 +873,7 @@ choice attribute.</p>
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-<p class="larch-version">🌳 Larch v6.0.37.dev11+gd911e2d, © Copyright 2024.</p></div>
+<p class="larch-version">🌳 Larch v6.0.37.dev16+g8c0943e, © Copyright 2024.</p></div>
       
     </div>
   
