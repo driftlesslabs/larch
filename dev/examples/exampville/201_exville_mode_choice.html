@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>201: Exampville Mode Choice &#8212; v6.0.37.dev20+gaa9c8eb</title>
+    <title>201: Exampville Mode Choice &#8212; v6.0.37.dev22+gb97334f</title>
   
   
   
@@ -137,8 +137,8 @@
       
     
     
-    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.37.dev20+gaa9c8eb - Home"/>
-    <img src="../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.37.dev20+gaa9c8eb - Home"/>
+    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.37.dev22+gb97334f - Home"/>
+    <img src="../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.37.dev22+gb97334f - Home"/>
   
   
 </a></div>
@@ -784,6 +784,17 @@ before we estimate the model.</p>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1560,</span> in <span class="ni">NumpyIndexingAdapter._safe_setitem</span><span class="nt">(self, array, key, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1559</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1560</span>     <span class="n">array</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+<span class="g g-Whitespace">   </span><span class="mi">1561</span> <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1562</span>     <span class="c1"># More informative exception if read-only view</span>
+
+<span class="ne">ValueError</span>: assignment destination is read-only
+
+<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
+
+<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">m</span><span class="o">.</span><span class="n">choice_avail_summary</span><span class="p">()</span>
 
@@ -827,39 +838,50 @@ before we estimate the model.</p>
 <span class="g g-Whitespace">    </span><span class="mi">208</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groupid</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
 <span class="g g-Whitespace">    </span><span class="mi">209</span>     <span class="n">dataset</span> <span class="o">=</span> <span class="n">fold_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/data_arrays.py:245,</span> in <span class="ni">prepare_data</span><span class="nt">(datasource, request, float_dtype, cache_dir, flows, make_unused_flows)</span>
-<span class="g g-Whitespace">    </span><span class="mi">243</span> <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">244</span>     <span class="n">choicecodes</span> <span class="o">=</span> <span class="n">datasource</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request</span><span class="p">[</span><span class="s2">&quot;choice_co_code&quot;</span><span class="p">])</span>
-<span class="ne">--&gt; </span><span class="mi">245</span> <span class="n">da_ch</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">246</span>     <span class="n">float_dtype</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-<span class="g g-Whitespace">    </span><span class="mi">247</span>     <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">,</span> <span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">248</span>     <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
-<span class="g g-Whitespace">    </span><span class="mi">249</span>         <span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">:</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">250</span>         <span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">:</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">251</span>     <span class="p">},</span>
-<span class="g g-Whitespace">    </span><span class="mi">252</span>     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ch&quot;</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">253</span> <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">254</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">]):</span>
-<span class="g g-Whitespace">    </span><span class="mi">255</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/data_arrays.py:260,</span> in <span class="ni">prepare_data</span><span class="nt">(datasource, request, float_dtype, cache_dir, flows, make_unused_flows)</span>
+<span class="g g-Whitespace">    </span><span class="mi">258</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">259</span>         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="ne">--&gt; </span><span class="mi">260</span>     <span class="n">da_ch</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">choicecodes</span> <span class="o">==</span> <span class="n">a</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">261</span> <span class="n">model_dataset</span> <span class="o">=</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">da_ch</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">262</span> <span class="k">if</span> <span class="n">make_unused_flows</span><span class="p">:</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:479,</span> in <span class="ni">DataArray.__init__</span><span class="nt">(self, data, coords, dims, name, attrs, indexes, fastpath)</span>
-<span class="g g-Whitespace">    </span><span class="mi">477</span> <span class="n">data</span> <span class="o">=</span> <span class="n">_check_data_shape</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">478</span> <span class="n">data</span> <span class="o">=</span> <span class="n">as_compatible_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">479</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span> <span class="o">=</span> <span class="n">_infer_coords_and_dims</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">480</span> <span class="n">variable</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">fastpath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">482</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">Coordinates</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:923,</span> in <span class="ni">DataArray.__setitem__</span><span class="nt">(self, key, value)</span>
+<span class="g g-Whitespace">    </span><span class="mi">918</span> <span class="c1"># DataArray key -&gt; Variable key</span>
+<span class="g g-Whitespace">    </span><span class="mi">919</span> <span class="n">key</span> <span class="o">=</span> <span class="p">{</span>
+<span class="g g-Whitespace">    </span><span class="mi">920</span>     <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">variable</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span>
+<span class="nn">    921     for k, v</span> in <span class="ni">self._item_key_to_dict(key).items</span><span class="nt">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">922</span> <span class="p">}</span>
+<span class="ne">--&gt; </span><span class="mi">923</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:184,</span> in <span class="ni">_infer_coords_and_dims</span><span class="nt">(shape, coords, dims)</span>
-<span class="g g-Whitespace">    </span><span class="mi">182</span> <span class="n">dims_tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">183</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims_tuple</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">184</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">185</span>         <span class="s2">&quot;different number of dimensions on data &quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">186</span>         <span class="sa">f</span><span class="s2">&quot;and dims: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dims_tuple</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">187</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">188</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dims_tuple</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">189</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">hashable</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/variable.py:860,</span> in <span class="ni">Variable.__setitem__</span><span class="nt">(self, key, value)</span>
+<span class="g g-Whitespace">    </span><span class="mi">857</span>     <span class="n">value</span> <span class="o">=</span> <span class="n">duck_array_ops</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">new_order</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_order</span><span class="p">)))</span>
+<span class="g g-Whitespace">    </span><span class="mi">859</span> <span class="n">indexable</span> <span class="o">=</span> <span class="n">as_indexable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">860</span> <span class="n">indexing</span><span class="o">.</span><span class="n">set_with_indexer</span><span class="p">(</span><span class="n">indexable</span><span class="p">,</span> <span class="n">index_tuple</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
-<span class="ne">ValueError</span>: different number of dimensions on data and dims: 0 vs 2
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1040,</span> in <span class="ni">set_with_indexer</span><span class="nt">(indexable, indexer, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1038</span>     <span class="n">indexable</span><span class="o">.</span><span class="n">oindex</span><span class="p">[</span><span class="n">indexer</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+<span class="g g-Whitespace">   </span><span class="mi">1039</span> <span class="k">else</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1040</span>     <span class="n">indexable</span><span class="p">[</span><span class="n">indexer</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1586,</span> in <span class="ni">NumpyIndexingAdapter.__setitem__</span><span class="nt">(self, indexer, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1582</span> <span class="c1"># We want 0d slices rather than scalars. This is achieved by</span>
+<span class="g g-Whitespace">   </span><span class="mi">1583</span> <span class="c1"># appending an ellipsis (see</span>
+<span class="g g-Whitespace">   </span><span class="mi">1584</span> <span class="c1"># https://numpy.org/doc/stable/reference/arrays.indexing.html#detailed-notes).</span>
+<span class="g g-Whitespace">   </span><span class="mi">1585</span> <span class="n">key</span> <span class="o">=</span> <span class="n">indexer</span><span class="o">.</span><span class="n">tuple</span> <span class="o">+</span> <span class="p">(</span><span class="bp">Ellipsis</span><span class="p">,)</span>
+<span class="ne">-&gt; </span><span class="mi">1586</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_setitem</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1564,</span> in <span class="ni">NumpyIndexingAdapter._safe_setitem</span><span class="nt">(self, array, key, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1561</span> <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1562</span>     <span class="c1"># More informative exception if read-only view</span>
+<span class="g g-Whitespace">   </span><span class="mi">1563</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">array</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">writeable</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">array</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">owndata</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1564</span>         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1565</span>             <span class="s2">&quot;Assignment destination is a view.  &quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">1566</span>             <span class="s2">&quot;Do you want to .copy() array first?&quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">1567</span>         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<span class="g g-Whitespace">   </span><span class="mi">1568</span>     <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1569</span>         <span class="k">raise</span> <span class="n">exc</span>
+
+<span class="ne">ValueError</span>: Assignment destination is a view.  Do you want to .copy() array first?
 </pre></div>
 </div>
 </div>
@@ -882,6 +904,13 @@ can go ahead and estimate the model.</p>
 <div class="cell_output docutils container">
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>error in maximize_loglike
 Traceback (most recent call last):
+  File &quot;/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py&quot;, line 1560, in _safe_setitem
+    array[key] = value
+ValueError: assignment destination is read-only
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
   File &quot;/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/optimization.py&quot;, line 125, in maximize_loglike
     model.unmangle(force=True)
   File &quot;/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/jaxmodel.py&quot;, line 165, in unmangle
@@ -892,16 +921,33 @@ Traceback (most recent call last):
     return super().reflow_data_arrays()
   File &quot;/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/numbamodel.py&quot;, line 1058, in reflow_data_arrays
     self.dataset, self.dataflows = prepare_data(
-  File &quot;/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/data_arrays.py&quot;, line 245, in prepare_data
-    da_ch = DataArray(
-  File &quot;/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py&quot;, line 479, in __init__
-    coords, dims = _infer_coords_and_dims(data.shape, coords, dims)
-  File &quot;/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py&quot;, line 184, in _infer_coords_and_dims
+  File &quot;/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/data_arrays.py&quot;, line 260, in prepare_data
+    da_ch[:, i] = np.asarray(choicecodes == a)
+  File &quot;/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py&quot;, line 923, in __setitem__
+    self.variable[key] = value
+  File &quot;/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/variable.py&quot;, line 860, in __setitem__
+    indexing.set_with_indexer(indexable, index_tuple, value)
+  File &quot;/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py&quot;, line 1040, in set_with_indexer
+    indexable[indexer] = value
+  File &quot;/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py&quot;, line 1586, in __setitem__
+    self._safe_setitem(array, key, value)
+  File &quot;/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py&quot;, line 1564, in _safe_setitem
     raise ValueError(
-ValueError: different number of dimensions on data and dims: 0 vs 2
+ValueError: Assignment destination is a view.  Do you want to .copy() array first?
 </pre></div>
 </div>
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1560,</span> in <span class="ni">NumpyIndexingAdapter._safe_setitem</span><span class="nt">(self, array, key, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1559</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1560</span>     <span class="n">array</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+<span class="g g-Whitespace">   </span><span class="mi">1561</span> <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1562</span>     <span class="c1"># More informative exception if read-only view</span>
+
+<span class="ne">ValueError</span>: assignment destination is read-only
+
+<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
+
 <span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">20</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">result</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">maximize_loglike</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;bhhh&quot;</span><span class="p">)</span>
@@ -972,39 +1018,50 @@ ValueError: different number of dimensions on data and dims: 0 vs 2
 <span class="g g-Whitespace">   </span><span class="mi">1069</span>     <span class="c1"># get rid of the dataset now</span>
 <span class="g g-Whitespace">   </span><span class="mi">1070</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="kc">None</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/data_arrays.py:245,</span> in <span class="ni">prepare_data</span><span class="nt">(datasource, request, float_dtype, cache_dir, flows, make_unused_flows)</span>
-<span class="g g-Whitespace">    </span><span class="mi">243</span> <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">244</span>     <span class="n">choicecodes</span> <span class="o">=</span> <span class="n">datasource</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request</span><span class="p">[</span><span class="s2">&quot;choice_co_code&quot;</span><span class="p">])</span>
-<span class="ne">--&gt; </span><span class="mi">245</span> <span class="n">da_ch</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">246</span>     <span class="n">float_dtype</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-<span class="g g-Whitespace">    </span><span class="mi">247</span>     <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">,</span> <span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">248</span>     <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
-<span class="g g-Whitespace">    </span><span class="mi">249</span>         <span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">:</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">250</span>         <span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">:</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">251</span>     <span class="p">},</span>
-<span class="g g-Whitespace">    </span><span class="mi">252</span>     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ch&quot;</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">253</span> <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">254</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">]):</span>
-<span class="g g-Whitespace">    </span><span class="mi">255</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/data_arrays.py:260,</span> in <span class="ni">prepare_data</span><span class="nt">(datasource, request, float_dtype, cache_dir, flows, make_unused_flows)</span>
+<span class="g g-Whitespace">    </span><span class="mi">258</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">259</span>         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="ne">--&gt; </span><span class="mi">260</span>     <span class="n">da_ch</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">choicecodes</span> <span class="o">==</span> <span class="n">a</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">261</span> <span class="n">model_dataset</span> <span class="o">=</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">da_ch</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">262</span> <span class="k">if</span> <span class="n">make_unused_flows</span><span class="p">:</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:479,</span> in <span class="ni">DataArray.__init__</span><span class="nt">(self, data, coords, dims, name, attrs, indexes, fastpath)</span>
-<span class="g g-Whitespace">    </span><span class="mi">477</span> <span class="n">data</span> <span class="o">=</span> <span class="n">_check_data_shape</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">478</span> <span class="n">data</span> <span class="o">=</span> <span class="n">as_compatible_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">479</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span> <span class="o">=</span> <span class="n">_infer_coords_and_dims</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">480</span> <span class="n">variable</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">fastpath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">482</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">Coordinates</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:923,</span> in <span class="ni">DataArray.__setitem__</span><span class="nt">(self, key, value)</span>
+<span class="g g-Whitespace">    </span><span class="mi">918</span> <span class="c1"># DataArray key -&gt; Variable key</span>
+<span class="g g-Whitespace">    </span><span class="mi">919</span> <span class="n">key</span> <span class="o">=</span> <span class="p">{</span>
+<span class="g g-Whitespace">    </span><span class="mi">920</span>     <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">variable</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span>
+<span class="nn">    921     for k, v</span> in <span class="ni">self._item_key_to_dict(key).items</span><span class="nt">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">922</span> <span class="p">}</span>
+<span class="ne">--&gt; </span><span class="mi">923</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:184,</span> in <span class="ni">_infer_coords_and_dims</span><span class="nt">(shape, coords, dims)</span>
-<span class="g g-Whitespace">    </span><span class="mi">182</span> <span class="n">dims_tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">183</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims_tuple</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">184</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">185</span>         <span class="s2">&quot;different number of dimensions on data &quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">186</span>         <span class="sa">f</span><span class="s2">&quot;and dims: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dims_tuple</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">187</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">188</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dims_tuple</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">189</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">hashable</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/variable.py:860,</span> in <span class="ni">Variable.__setitem__</span><span class="nt">(self, key, value)</span>
+<span class="g g-Whitespace">    </span><span class="mi">857</span>     <span class="n">value</span> <span class="o">=</span> <span class="n">duck_array_ops</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">new_order</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_order</span><span class="p">)))</span>
+<span class="g g-Whitespace">    </span><span class="mi">859</span> <span class="n">indexable</span> <span class="o">=</span> <span class="n">as_indexable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">860</span> <span class="n">indexing</span><span class="o">.</span><span class="n">set_with_indexer</span><span class="p">(</span><span class="n">indexable</span><span class="p">,</span> <span class="n">index_tuple</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
-<span class="ne">ValueError</span>: different number of dimensions on data and dims: 0 vs 2
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1040,</span> in <span class="ni">set_with_indexer</span><span class="nt">(indexable, indexer, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1038</span>     <span class="n">indexable</span><span class="o">.</span><span class="n">oindex</span><span class="p">[</span><span class="n">indexer</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+<span class="g g-Whitespace">   </span><span class="mi">1039</span> <span class="k">else</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1040</span>     <span class="n">indexable</span><span class="p">[</span><span class="n">indexer</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1586,</span> in <span class="ni">NumpyIndexingAdapter.__setitem__</span><span class="nt">(self, indexer, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1582</span> <span class="c1"># We want 0d slices rather than scalars. This is achieved by</span>
+<span class="g g-Whitespace">   </span><span class="mi">1583</span> <span class="c1"># appending an ellipsis (see</span>
+<span class="g g-Whitespace">   </span><span class="mi">1584</span> <span class="c1"># https://numpy.org/doc/stable/reference/arrays.indexing.html#detailed-notes).</span>
+<span class="g g-Whitespace">   </span><span class="mi">1585</span> <span class="n">key</span> <span class="o">=</span> <span class="n">indexer</span><span class="o">.</span><span class="n">tuple</span> <span class="o">+</span> <span class="p">(</span><span class="bp">Ellipsis</span><span class="p">,)</span>
+<span class="ne">-&gt; </span><span class="mi">1586</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_setitem</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1564,</span> in <span class="ni">NumpyIndexingAdapter._safe_setitem</span><span class="nt">(self, array, key, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1561</span> <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1562</span>     <span class="c1"># More informative exception if read-only view</span>
+<span class="g g-Whitespace">   </span><span class="mi">1563</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">array</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">writeable</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">array</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">owndata</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1564</span>         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1565</span>             <span class="s2">&quot;Assignment destination is a view.  &quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">1566</span>             <span class="s2">&quot;Do you want to .copy() array first?&quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">1567</span>         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<span class="g g-Whitespace">   </span><span class="mi">1568</span>     <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1569</span>         <span class="k">raise</span> <span class="n">exc</span>
+
+<span class="ne">ValueError</span>: Assignment destination is a view.  Do you want to .copy() array first?
 </pre></div>
 </div>
 </div>
@@ -1020,6 +1077,17 @@ the estimates and t statistics, using <code class="docutils literal notranslate"
 </div>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1560,</span> in <span class="ni">NumpyIndexingAdapter._safe_setitem</span><span class="nt">(self, array, key, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1559</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1560</span>     <span class="n">array</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+<span class="g g-Whitespace">   </span><span class="mi">1561</span> <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1562</span>     <span class="c1"># More informative exception if read-only view</span>
+
+<span class="ne">ValueError</span>: assignment destination is read-only
+
+<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
+
 <span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">22</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">m</span><span class="o">.</span><span class="n">calculate_parameter_covariance</span><span class="p">();</span>
@@ -1174,39 +1242,50 @@ the estimates and t statistics, using <code class="docutils literal notranslate"
 <span class="g g-Whitespace">   </span><span class="mi">1069</span>     <span class="c1"># get rid of the dataset now</span>
 <span class="g g-Whitespace">   </span><span class="mi">1070</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="kc">None</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/data_arrays.py:245,</span> in <span class="ni">prepare_data</span><span class="nt">(datasource, request, float_dtype, cache_dir, flows, make_unused_flows)</span>
-<span class="g g-Whitespace">    </span><span class="mi">243</span> <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">244</span>     <span class="n">choicecodes</span> <span class="o">=</span> <span class="n">datasource</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request</span><span class="p">[</span><span class="s2">&quot;choice_co_code&quot;</span><span class="p">])</span>
-<span class="ne">--&gt; </span><span class="mi">245</span> <span class="n">da_ch</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">246</span>     <span class="n">float_dtype</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-<span class="g g-Whitespace">    </span><span class="mi">247</span>     <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">,</span> <span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">248</span>     <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
-<span class="g g-Whitespace">    </span><span class="mi">249</span>         <span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">:</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">250</span>         <span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">:</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">251</span>     <span class="p">},</span>
-<span class="g g-Whitespace">    </span><span class="mi">252</span>     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ch&quot;</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">253</span> <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">254</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">]):</span>
-<span class="g g-Whitespace">    </span><span class="mi">255</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/data_arrays.py:260,</span> in <span class="ni">prepare_data</span><span class="nt">(datasource, request, float_dtype, cache_dir, flows, make_unused_flows)</span>
+<span class="g g-Whitespace">    </span><span class="mi">258</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">259</span>         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="ne">--&gt; </span><span class="mi">260</span>     <span class="n">da_ch</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">choicecodes</span> <span class="o">==</span> <span class="n">a</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">261</span> <span class="n">model_dataset</span> <span class="o">=</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">da_ch</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">262</span> <span class="k">if</span> <span class="n">make_unused_flows</span><span class="p">:</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:479,</span> in <span class="ni">DataArray.__init__</span><span class="nt">(self, data, coords, dims, name, attrs, indexes, fastpath)</span>
-<span class="g g-Whitespace">    </span><span class="mi">477</span> <span class="n">data</span> <span class="o">=</span> <span class="n">_check_data_shape</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">478</span> <span class="n">data</span> <span class="o">=</span> <span class="n">as_compatible_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">479</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span> <span class="o">=</span> <span class="n">_infer_coords_and_dims</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">480</span> <span class="n">variable</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">fastpath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">482</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">Coordinates</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:923,</span> in <span class="ni">DataArray.__setitem__</span><span class="nt">(self, key, value)</span>
+<span class="g g-Whitespace">    </span><span class="mi">918</span> <span class="c1"># DataArray key -&gt; Variable key</span>
+<span class="g g-Whitespace">    </span><span class="mi">919</span> <span class="n">key</span> <span class="o">=</span> <span class="p">{</span>
+<span class="g g-Whitespace">    </span><span class="mi">920</span>     <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">variable</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span>
+<span class="nn">    921     for k, v</span> in <span class="ni">self._item_key_to_dict(key).items</span><span class="nt">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">922</span> <span class="p">}</span>
+<span class="ne">--&gt; </span><span class="mi">923</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:184,</span> in <span class="ni">_infer_coords_and_dims</span><span class="nt">(shape, coords, dims)</span>
-<span class="g g-Whitespace">    </span><span class="mi">182</span> <span class="n">dims_tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">183</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims_tuple</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">184</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">185</span>         <span class="s2">&quot;different number of dimensions on data &quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">186</span>         <span class="sa">f</span><span class="s2">&quot;and dims: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dims_tuple</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">187</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">188</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dims_tuple</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">189</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">hashable</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/variable.py:860,</span> in <span class="ni">Variable.__setitem__</span><span class="nt">(self, key, value)</span>
+<span class="g g-Whitespace">    </span><span class="mi">857</span>     <span class="n">value</span> <span class="o">=</span> <span class="n">duck_array_ops</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">new_order</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_order</span><span class="p">)))</span>
+<span class="g g-Whitespace">    </span><span class="mi">859</span> <span class="n">indexable</span> <span class="o">=</span> <span class="n">as_indexable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">860</span> <span class="n">indexing</span><span class="o">.</span><span class="n">set_with_indexer</span><span class="p">(</span><span class="n">indexable</span><span class="p">,</span> <span class="n">index_tuple</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
-<span class="ne">ValueError</span>: different number of dimensions on data and dims: 0 vs 2
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1040,</span> in <span class="ni">set_with_indexer</span><span class="nt">(indexable, indexer, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1038</span>     <span class="n">indexable</span><span class="o">.</span><span class="n">oindex</span><span class="p">[</span><span class="n">indexer</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+<span class="g g-Whitespace">   </span><span class="mi">1039</span> <span class="k">else</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1040</span>     <span class="n">indexable</span><span class="p">[</span><span class="n">indexer</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1586,</span> in <span class="ni">NumpyIndexingAdapter.__setitem__</span><span class="nt">(self, indexer, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1582</span> <span class="c1"># We want 0d slices rather than scalars. This is achieved by</span>
+<span class="g g-Whitespace">   </span><span class="mi">1583</span> <span class="c1"># appending an ellipsis (see</span>
+<span class="g g-Whitespace">   </span><span class="mi">1584</span> <span class="c1"># https://numpy.org/doc/stable/reference/arrays.indexing.html#detailed-notes).</span>
+<span class="g g-Whitespace">   </span><span class="mi">1585</span> <span class="n">key</span> <span class="o">=</span> <span class="n">indexer</span><span class="o">.</span><span class="n">tuple</span> <span class="o">+</span> <span class="p">(</span><span class="bp">Ellipsis</span><span class="p">,)</span>
+<span class="ne">-&gt; </span><span class="mi">1586</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_setitem</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1564,</span> in <span class="ni">NumpyIndexingAdapter._safe_setitem</span><span class="nt">(self, array, key, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1561</span> <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1562</span>     <span class="c1"># More informative exception if read-only view</span>
+<span class="g g-Whitespace">   </span><span class="mi">1563</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">array</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">writeable</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">array</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">owndata</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1564</span>         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1565</span>             <span class="s2">&quot;Assignment destination is a view.  &quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">1566</span>             <span class="s2">&quot;Do you want to .copy() array first?&quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">1567</span>         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<span class="g g-Whitespace">   </span><span class="mi">1568</span>     <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1569</span>         <span class="k">raise</span> <span class="n">exc</span>
+
+<span class="ne">ValueError</span>: Assignment destination is a view.  Do you want to .copy() array first?
 </pre></div>
 </div>
 </div>
@@ -1220,24 +1299,24 @@ the estimates and t statistics, using <code class="docutils literal notranslate"
 </div>
 <div class="cell_output docutils container">
 <div class="output text_html"><style type="text/css">
-#T_ab1ae th {
+#T_b3571 th {
   vertical-align: top;
   text-align: left;
 }
-#T_ab1ae td {
+#T_b3571 td {
   vertical-align: top;
   text-align: left;
 }
-#T_ab1ae_row0_col0, #T_ab1ae_row0_col1, #T_ab1ae_row1_col0, #T_ab1ae_row1_col1, #T_ab1ae_row2_col0, #T_ab1ae_row2_col1, #T_ab1ae_row3_col0, #T_ab1ae_row3_col1, #T_ab1ae_row4_col0, #T_ab1ae_row4_col1, #T_ab1ae_row5_col0, #T_ab1ae_row5_col1, #T_ab1ae_row6_col0, #T_ab1ae_row6_col1, #T_ab1ae_row7_col0, #T_ab1ae_row7_col1, #T_ab1ae_row8_col0, #T_ab1ae_row8_col1, #T_ab1ae_row9_col0, #T_ab1ae_row9_col1, #T_ab1ae_row10_col0, #T_ab1ae_row10_col1, #T_ab1ae_row11_col0, #T_ab1ae_row11_col1, #T_ab1ae_row12_col0, #T_ab1ae_row12_col1, #T_ab1ae_row13_col0, #T_ab1ae_row13_col1, #T_ab1ae_row14_col0, #T_ab1ae_row14_col1 {
+#T_b3571_row0_col0, #T_b3571_row0_col1, #T_b3571_row1_col0, #T_b3571_row1_col1, #T_b3571_row2_col0, #T_b3571_row2_col1, #T_b3571_row3_col0, #T_b3571_row3_col1, #T_b3571_row4_col0, #T_b3571_row4_col1, #T_b3571_row5_col0, #T_b3571_row5_col1, #T_b3571_row6_col0, #T_b3571_row6_col1, #T_b3571_row7_col0, #T_b3571_row7_col1, #T_b3571_row8_col0, #T_b3571_row8_col1, #T_b3571_row9_col0, #T_b3571_row9_col1, #T_b3571_row10_col0, #T_b3571_row10_col1, #T_b3571_row11_col0, #T_b3571_row11_col1, #T_b3571_row12_col0, #T_b3571_row12_col1, #T_b3571_row13_col0, #T_b3571_row13_col1, #T_b3571_row14_col0, #T_b3571_row14_col1 {
   font-family: monospace;
 }
 </style>
-<table id="T_ab1ae">
+<table id="T_b3571">
   <thead>
     <tr>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_ab1ae_level0_col0" class="col_heading level0 col0" >Value</th>
-      <th id="T_ab1ae_level0_col1" class="col_heading level0 col1" >Null Value</th>
+      <th id="T_b3571_level0_col0" class="col_heading level0 col0" >Value</th>
+      <th id="T_b3571_level0_col1" class="col_heading level0 col1" >Null Value</th>
     </tr>
     <tr>
       <th class="index_name level0" >Parameter</th>
@@ -1247,79 +1326,79 @@ the estimates and t statistics, using <code class="docutils literal notranslate"
   </thead>
   <tbody>
     <tr>
-      <th id="T_ab1ae_level0_row0" class="row_heading level0 row0" >ASC_Bike</th>
-      <td id="T_ab1ae_row0_col0" class="data row0 col0" > 0.00</td>
-      <td id="T_ab1ae_row0_col1" class="data row0 col1" > 0.00</td>
+      <th id="T_b3571_level0_row0" class="row_heading level0 row0" >ASC_Bike</th>
+      <td id="T_b3571_row0_col0" class="data row0 col0" > 0.00</td>
+      <td id="T_b3571_row0_col1" class="data row0 col1" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_ab1ae_level0_row1" class="row_heading level0 row1" >ASC_SR</th>
-      <td id="T_ab1ae_row1_col0" class="data row1 col0" > 0.00</td>
-      <td id="T_ab1ae_row1_col1" class="data row1 col1" > 0.00</td>
+      <th id="T_b3571_level0_row1" class="row_heading level0 row1" >ASC_SR</th>
+      <td id="T_b3571_row1_col0" class="data row1 col0" > 0.00</td>
+      <td id="T_b3571_row1_col1" class="data row1 col1" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_ab1ae_level0_row2" class="row_heading level0 row2" >ASC_Transit</th>
-      <td id="T_ab1ae_row2_col0" class="data row2 col0" > 0.00</td>
-      <td id="T_ab1ae_row2_col1" class="data row2 col1" > 0.00</td>
+      <th id="T_b3571_level0_row2" class="row_heading level0 row2" >ASC_Transit</th>
+      <td id="T_b3571_row2_col0" class="data row2 col0" > 0.00</td>
+      <td id="T_b3571_row2_col1" class="data row2 col1" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_ab1ae_level0_row3" class="row_heading level0 row3" >ASC_Walk</th>
-      <td id="T_ab1ae_row3_col0" class="data row3 col0" > 0.00</td>
-      <td id="T_ab1ae_row3_col1" class="data row3 col1" > 0.00</td>
+      <th id="T_b3571_level0_row3" class="row_heading level0 row3" >ASC_Walk</th>
+      <td id="T_b3571_row3_col0" class="data row3 col0" > 0.00</td>
+      <td id="T_b3571_row3_col1" class="data row3 col1" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_ab1ae_level0_row4" class="row_heading level0 row4" >Cost</th>
-      <td id="T_ab1ae_row4_col0" class="data row4 col0" > 0.00</td>
-      <td id="T_ab1ae_row4_col1" class="data row4 col1" > 0.00</td>
+      <th id="T_b3571_level0_row4" class="row_heading level0 row4" >Cost</th>
+      <td id="T_b3571_row4_col0" class="data row4 col0" > 0.00</td>
+      <td id="T_b3571_row4_col1" class="data row4 col1" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_ab1ae_level0_row5" class="row_heading level0 row5" >InVehTime</th>
-      <td id="T_ab1ae_row5_col0" class="data row5 col0" > 0.00</td>
-      <td id="T_ab1ae_row5_col1" class="data row5 col1" > 0.00</td>
+      <th id="T_b3571_level0_row5" class="row_heading level0 row5" >InVehTime</th>
+      <td id="T_b3571_row5_col0" class="data row5 col0" > 0.00</td>
+      <td id="T_b3571_row5_col1" class="data row5 col1" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_ab1ae_level0_row6" class="row_heading level0 row6" >LogIncome:Bike</th>
-      <td id="T_ab1ae_row6_col0" class="data row6 col0" > 0.00</td>
-      <td id="T_ab1ae_row6_col1" class="data row6 col1" > 0.00</td>
+      <th id="T_b3571_level0_row6" class="row_heading level0 row6" >LogIncome:Bike</th>
+      <td id="T_b3571_row6_col0" class="data row6 col0" > 0.00</td>
+      <td id="T_b3571_row6_col1" class="data row6 col1" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_ab1ae_level0_row7" class="row_heading level0 row7" >LogIncome:SR</th>
-      <td id="T_ab1ae_row7_col0" class="data row7 col0" > 0.00</td>
-      <td id="T_ab1ae_row7_col1" class="data row7 col1" > 0.00</td>
+      <th id="T_b3571_level0_row7" class="row_heading level0 row7" >LogIncome:SR</th>
+      <td id="T_b3571_row7_col0" class="data row7 col0" > 0.00</td>
+      <td id="T_b3571_row7_col1" class="data row7 col1" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_ab1ae_level0_row8" class="row_heading level0 row8" >LogIncome:Transit</th>
-      <td id="T_ab1ae_row8_col0" class="data row8 col0" > 0.00</td>
-      <td id="T_ab1ae_row8_col1" class="data row8 col1" > 0.00</td>
+      <th id="T_b3571_level0_row8" class="row_heading level0 row8" >LogIncome:Transit</th>
+      <td id="T_b3571_row8_col0" class="data row8 col0" > 0.00</td>
+      <td id="T_b3571_row8_col1" class="data row8 col1" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_ab1ae_level0_row9" class="row_heading level0 row9" >LogIncome:Walk</th>
-      <td id="T_ab1ae_row9_col0" class="data row9 col0" > 0.00</td>
-      <td id="T_ab1ae_row9_col1" class="data row9 col1" > 0.00</td>
+      <th id="T_b3571_level0_row9" class="row_heading level0 row9" >LogIncome:Walk</th>
+      <td id="T_b3571_row9_col0" class="data row9 col0" > 0.00</td>
+      <td id="T_b3571_row9_col1" class="data row9 col1" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_ab1ae_level0_row10" class="row_heading level0 row10" >Mu:Car</th>
-      <td id="T_ab1ae_row10_col0" class="data row10 col0" > 1.00</td>
-      <td id="T_ab1ae_row10_col1" class="data row10 col1" > 1.00</td>
+      <th id="T_b3571_level0_row10" class="row_heading level0 row10" >Mu:Car</th>
+      <td id="T_b3571_row10_col0" class="data row10 col0" > 1.00</td>
+      <td id="T_b3571_row10_col1" class="data row10 col1" > 1.00</td>
     </tr>
     <tr>
-      <th id="T_ab1ae_level0_row11" class="row_heading level0 row11" >Mu:Motor</th>
-      <td id="T_ab1ae_row11_col0" class="data row11 col0" > 1.00</td>
-      <td id="T_ab1ae_row11_col1" class="data row11 col1" > 1.00</td>
+      <th id="T_b3571_level0_row11" class="row_heading level0 row11" >Mu:Motor</th>
+      <td id="T_b3571_row11_col0" class="data row11 col0" > 1.00</td>
+      <td id="T_b3571_row11_col1" class="data row11 col1" > 1.00</td>
     </tr>
     <tr>
-      <th id="T_ab1ae_level0_row12" class="row_heading level0 row12" >Mu:NonMotor</th>
-      <td id="T_ab1ae_row12_col0" class="data row12 col0" > 1.00</td>
-      <td id="T_ab1ae_row12_col1" class="data row12 col1" > 1.00</td>
+      <th id="T_b3571_level0_row12" class="row_heading level0 row12" >Mu:NonMotor</th>
+      <td id="T_b3571_row12_col0" class="data row12 col0" > 1.00</td>
+      <td id="T_b3571_row12_col1" class="data row12 col1" > 1.00</td>
     </tr>
     <tr>
-      <th id="T_ab1ae_level0_row13" class="row_heading level0 row13" >NonMotorTime</th>
-      <td id="T_ab1ae_row13_col0" class="data row13 col0" > 0.00</td>
-      <td id="T_ab1ae_row13_col1" class="data row13 col1" > 0.00</td>
+      <th id="T_b3571_level0_row13" class="row_heading level0 row13" >NonMotorTime</th>
+      <td id="T_b3571_row13_col0" class="data row13 col0" > 0.00</td>
+      <td id="T_b3571_row13_col1" class="data row13 col1" > 0.00</td>
     </tr>
     <tr>
-      <th id="T_ab1ae_level0_row14" class="row_heading level0 row14" >OutVehTime</th>
-      <td id="T_ab1ae_row14_col0" class="data row14 col0" > 0.00</td>
-      <td id="T_ab1ae_row14_col1" class="data row14 col1" > 0.00</td>
+      <th id="T_b3571_level0_row14" class="row_heading level0 row14" >OutVehTime</th>
+      <td id="T_b3571_row14_col0" class="data row14 col0" > 0.00</td>
+      <td id="T_b3571_row14_col1" class="data row14 col1" > 0.00</td>
     </tr>
   </tbody>
 </table>
@@ -1333,6 +1412,17 @@ the estimates and t statistics, using <code class="docutils literal notranslate"
 </div>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1560,</span> in <span class="ni">NumpyIndexingAdapter._safe_setitem</span><span class="nt">(self, array, key, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1559</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1560</span>     <span class="n">array</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+<span class="g g-Whitespace">   </span><span class="mi">1561</span> <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1562</span>     <span class="c1"># More informative exception if read-only view</span>
+
+<span class="ne">ValueError</span>: assignment destination is read-only
+
+<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
+
 <span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">32</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">m</span><span class="o">.</span><span class="n">estimation_statistics</span><span class="p">()</span>
@@ -1456,39 +1546,50 @@ the estimates and t statistics, using <code class="docutils literal notranslate"
 <span class="g g-Whitespace">   </span><span class="mi">1069</span>     <span class="c1"># get rid of the dataset now</span>
 <span class="g g-Whitespace">   </span><span class="mi">1070</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="kc">None</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/data_arrays.py:245,</span> in <span class="ni">prepare_data</span><span class="nt">(datasource, request, float_dtype, cache_dir, flows, make_unused_flows)</span>
-<span class="g g-Whitespace">    </span><span class="mi">243</span> <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">244</span>     <span class="n">choicecodes</span> <span class="o">=</span> <span class="n">datasource</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request</span><span class="p">[</span><span class="s2">&quot;choice_co_code&quot;</span><span class="p">])</span>
-<span class="ne">--&gt; </span><span class="mi">245</span> <span class="n">da_ch</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">246</span>     <span class="n">float_dtype</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-<span class="g g-Whitespace">    </span><span class="mi">247</span>     <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">,</span> <span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">248</span>     <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
-<span class="g g-Whitespace">    </span><span class="mi">249</span>         <span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">:</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">250</span>         <span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">:</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">251</span>     <span class="p">},</span>
-<span class="g g-Whitespace">    </span><span class="mi">252</span>     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ch&quot;</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">253</span> <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">254</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">]):</span>
-<span class="g g-Whitespace">    </span><span class="mi">255</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/data_arrays.py:260,</span> in <span class="ni">prepare_data</span><span class="nt">(datasource, request, float_dtype, cache_dir, flows, make_unused_flows)</span>
+<span class="g g-Whitespace">    </span><span class="mi">258</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">259</span>         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="ne">--&gt; </span><span class="mi">260</span>     <span class="n">da_ch</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">choicecodes</span> <span class="o">==</span> <span class="n">a</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">261</span> <span class="n">model_dataset</span> <span class="o">=</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">da_ch</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">262</span> <span class="k">if</span> <span class="n">make_unused_flows</span><span class="p">:</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:479,</span> in <span class="ni">DataArray.__init__</span><span class="nt">(self, data, coords, dims, name, attrs, indexes, fastpath)</span>
-<span class="g g-Whitespace">    </span><span class="mi">477</span> <span class="n">data</span> <span class="o">=</span> <span class="n">_check_data_shape</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">478</span> <span class="n">data</span> <span class="o">=</span> <span class="n">as_compatible_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">479</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span> <span class="o">=</span> <span class="n">_infer_coords_and_dims</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">480</span> <span class="n">variable</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">fastpath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">482</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">Coordinates</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:923,</span> in <span class="ni">DataArray.__setitem__</span><span class="nt">(self, key, value)</span>
+<span class="g g-Whitespace">    </span><span class="mi">918</span> <span class="c1"># DataArray key -&gt; Variable key</span>
+<span class="g g-Whitespace">    </span><span class="mi">919</span> <span class="n">key</span> <span class="o">=</span> <span class="p">{</span>
+<span class="g g-Whitespace">    </span><span class="mi">920</span>     <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">variable</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span>
+<span class="nn">    921     for k, v</span> in <span class="ni">self._item_key_to_dict(key).items</span><span class="nt">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">922</span> <span class="p">}</span>
+<span class="ne">--&gt; </span><span class="mi">923</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:184,</span> in <span class="ni">_infer_coords_and_dims</span><span class="nt">(shape, coords, dims)</span>
-<span class="g g-Whitespace">    </span><span class="mi">182</span> <span class="n">dims_tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">183</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims_tuple</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">184</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">185</span>         <span class="s2">&quot;different number of dimensions on data &quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">186</span>         <span class="sa">f</span><span class="s2">&quot;and dims: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dims_tuple</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">187</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">188</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dims_tuple</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">189</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">hashable</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/variable.py:860,</span> in <span class="ni">Variable.__setitem__</span><span class="nt">(self, key, value)</span>
+<span class="g g-Whitespace">    </span><span class="mi">857</span>     <span class="n">value</span> <span class="o">=</span> <span class="n">duck_array_ops</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">new_order</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_order</span><span class="p">)))</span>
+<span class="g g-Whitespace">    </span><span class="mi">859</span> <span class="n">indexable</span> <span class="o">=</span> <span class="n">as_indexable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">860</span> <span class="n">indexing</span><span class="o">.</span><span class="n">set_with_indexer</span><span class="p">(</span><span class="n">indexable</span><span class="p">,</span> <span class="n">index_tuple</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
-<span class="ne">ValueError</span>: different number of dimensions on data and dims: 0 vs 2
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1040,</span> in <span class="ni">set_with_indexer</span><span class="nt">(indexable, indexer, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1038</span>     <span class="n">indexable</span><span class="o">.</span><span class="n">oindex</span><span class="p">[</span><span class="n">indexer</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+<span class="g g-Whitespace">   </span><span class="mi">1039</span> <span class="k">else</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1040</span>     <span class="n">indexable</span><span class="p">[</span><span class="n">indexer</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1586,</span> in <span class="ni">NumpyIndexingAdapter.__setitem__</span><span class="nt">(self, indexer, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1582</span> <span class="c1"># We want 0d slices rather than scalars. This is achieved by</span>
+<span class="g g-Whitespace">   </span><span class="mi">1583</span> <span class="c1"># appending an ellipsis (see</span>
+<span class="g g-Whitespace">   </span><span class="mi">1584</span> <span class="c1"># https://numpy.org/doc/stable/reference/arrays.indexing.html#detailed-notes).</span>
+<span class="g g-Whitespace">   </span><span class="mi">1585</span> <span class="n">key</span> <span class="o">=</span> <span class="n">indexer</span><span class="o">.</span><span class="n">tuple</span> <span class="o">+</span> <span class="p">(</span><span class="bp">Ellipsis</span><span class="p">,)</span>
+<span class="ne">-&gt; </span><span class="mi">1586</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_setitem</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1564,</span> in <span class="ni">NumpyIndexingAdapter._safe_setitem</span><span class="nt">(self, array, key, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1561</span> <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1562</span>     <span class="c1"># More informative exception if read-only view</span>
+<span class="g g-Whitespace">   </span><span class="mi">1563</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">array</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">writeable</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">array</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">owndata</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1564</span>         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1565</span>             <span class="s2">&quot;Assignment destination is a view.  &quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">1566</span>             <span class="s2">&quot;Do you want to .copy() array first?&quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">1567</span>         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<span class="g g-Whitespace">   </span><span class="mi">1568</span>     <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1569</span>         <span class="k">raise</span> <span class="n">exc</span>
+
+<span class="ne">ValueError</span>: Assignment destination is a view.  Do you want to .copy() array first?
 </pre></div>
 </div>
 </div>
@@ -1513,24 +1614,24 @@ the estimates and t statistics, using <code class="docutils literal notranslate"
 </div>
 <div class="cell_output docutils container">
 <div class="output text_html"><h1><a name="rx1" reftxt="Parameter Summary" class="toc" toclevel="1"></a>Parameter Summary</h1><div><style type="text/css">
-#T_061d3 th {
+#T_4c3d9 th {
   vertical-align: top;
   text-align: left;
 }
-#T_061d3 td {
+#T_4c3d9 td {
   vertical-align: top;
   text-align: left;
 }
-#T_061d3_row0_col0, #T_061d3_row0_col1, #T_061d3_row1_col0, #T_061d3_row1_col1, #T_061d3_row2_col0, #T_061d3_row2_col1, #T_061d3_row3_col0, #T_061d3_row3_col1, #T_061d3_row4_col0, #T_061d3_row4_col1, #T_061d3_row5_col0, #T_061d3_row5_col1, #T_061d3_row6_col0, #T_061d3_row6_col1, #T_061d3_row7_col0, #T_061d3_row7_col1, #T_061d3_row8_col0, #T_061d3_row8_col1, #T_061d3_row9_col0, #T_061d3_row9_col1, #T_061d3_row10_col0, #T_061d3_row10_col1, #T_061d3_row11_col0, #T_061d3_row11_col1, #T_061d3_row12_col0, #T_061d3_row12_col1, #T_061d3_row13_col0, #T_061d3_row13_col1, #T_061d3_row14_col0, #T_061d3_row14_col1 {
+#T_4c3d9_row0_col0, #T_4c3d9_row0_col1, #T_4c3d9_row1_col0, #T_4c3d9_row1_col1, #T_4c3d9_row2_col0, #T_4c3d9_row2_col1, #T_4c3d9_row3_col0, #T_4c3d9_row3_col1, #T_4c3d9_row4_col0, #T_4c3d9_row4_col1, #T_4c3d9_row5_col0, #T_4c3d9_row5_col1, #T_4c3d9_row6_col0, #T_4c3d9_row6_col1, #T_4c3d9_row7_col0, #T_4c3d9_row7_col1, #T_4c3d9_row8_col0, #T_4c3d9_row8_col1, #T_4c3d9_row9_col0, #T_4c3d9_row9_col1, #T_4c3d9_row10_col0, #T_4c3d9_row10_col1, #T_4c3d9_row11_col0, #T_4c3d9_row11_col1, #T_4c3d9_row12_col0, #T_4c3d9_row12_col1, #T_4c3d9_row13_col0, #T_4c3d9_row13_col1, #T_4c3d9_row14_col0, #T_4c3d9_row14_col1 {
   font-family: monospace;
 }
 </style>
-<table id="T_061d3">
+<table id="T_4c3d9">
   <thead>
     <tr>
       <th class="blank level0"> </th>
-      <th id="T_061d3_level0_col0" class="col_heading level0 col0">Value</th>
-      <th id="T_061d3_level0_col1" class="col_heading level0 col1">Null Value</th>
+      <th id="T_4c3d9_level0_col0" class="col_heading level0 col0">Value</th>
+      <th id="T_4c3d9_level0_col1" class="col_heading level0 col1">Null Value</th>
     </tr>
     <tr>
       <th class="index_name level0">Parameter</th>
@@ -1540,79 +1641,79 @@ the estimates and t statistics, using <code class="docutils literal notranslate"
   </thead>
   <tbody>
     <tr>
-      <th id="T_061d3_level0_row0" class="row_heading level0 row0">ASC_Bike</th>
-      <td id="T_061d3_row0_col0" class="data row0 col0"> 0.00</td>
-      <td id="T_061d3_row0_col1" class="data row0 col1"> 0.00</td>
+      <th id="T_4c3d9_level0_row0" class="row_heading level0 row0">ASC_Bike</th>
+      <td id="T_4c3d9_row0_col0" class="data row0 col0"> 0.00</td>
+      <td id="T_4c3d9_row0_col1" class="data row0 col1"> 0.00</td>
     </tr>
     <tr>
-      <th id="T_061d3_level0_row1" class="row_heading level0 row1">ASC_SR</th>
-      <td id="T_061d3_row1_col0" class="data row1 col0"> 0.00</td>
-      <td id="T_061d3_row1_col1" class="data row1 col1"> 0.00</td>
+      <th id="T_4c3d9_level0_row1" class="row_heading level0 row1">ASC_SR</th>
+      <td id="T_4c3d9_row1_col0" class="data row1 col0"> 0.00</td>
+      <td id="T_4c3d9_row1_col1" class="data row1 col1"> 0.00</td>
     </tr>
     <tr>
-      <th id="T_061d3_level0_row2" class="row_heading level0 row2">ASC_Transit</th>
-      <td id="T_061d3_row2_col0" class="data row2 col0"> 0.00</td>
-      <td id="T_061d3_row2_col1" class="data row2 col1"> 0.00</td>
+      <th id="T_4c3d9_level0_row2" class="row_heading level0 row2">ASC_Transit</th>
+      <td id="T_4c3d9_row2_col0" class="data row2 col0"> 0.00</td>
+      <td id="T_4c3d9_row2_col1" class="data row2 col1"> 0.00</td>
     </tr>
     <tr>
-      <th id="T_061d3_level0_row3" class="row_heading level0 row3">ASC_Walk</th>
-      <td id="T_061d3_row3_col0" class="data row3 col0"> 0.00</td>
-      <td id="T_061d3_row3_col1" class="data row3 col1"> 0.00</td>
+      <th id="T_4c3d9_level0_row3" class="row_heading level0 row3">ASC_Walk</th>
+      <td id="T_4c3d9_row3_col0" class="data row3 col0"> 0.00</td>
+      <td id="T_4c3d9_row3_col1" class="data row3 col1"> 0.00</td>
     </tr>
     <tr>
-      <th id="T_061d3_level0_row4" class="row_heading level0 row4">Cost</th>
-      <td id="T_061d3_row4_col0" class="data row4 col0"> 0.00</td>
-      <td id="T_061d3_row4_col1" class="data row4 col1"> 0.00</td>
+      <th id="T_4c3d9_level0_row4" class="row_heading level0 row4">Cost</th>
+      <td id="T_4c3d9_row4_col0" class="data row4 col0"> 0.00</td>
+      <td id="T_4c3d9_row4_col1" class="data row4 col1"> 0.00</td>
     </tr>
     <tr>
-      <th id="T_061d3_level0_row5" class="row_heading level0 row5">InVehTime</th>
-      <td id="T_061d3_row5_col0" class="data row5 col0"> 0.00</td>
-      <td id="T_061d3_row5_col1" class="data row5 col1"> 0.00</td>
+      <th id="T_4c3d9_level0_row5" class="row_heading level0 row5">InVehTime</th>
+      <td id="T_4c3d9_row5_col0" class="data row5 col0"> 0.00</td>
+      <td id="T_4c3d9_row5_col1" class="data row5 col1"> 0.00</td>
     </tr>
     <tr>
-      <th id="T_061d3_level0_row6" class="row_heading level0 row6">LogIncome:Bike</th>
-      <td id="T_061d3_row6_col0" class="data row6 col0"> 0.00</td>
-      <td id="T_061d3_row6_col1" class="data row6 col1"> 0.00</td>
+      <th id="T_4c3d9_level0_row6" class="row_heading level0 row6">LogIncome:Bike</th>
+      <td id="T_4c3d9_row6_col0" class="data row6 col0"> 0.00</td>
+      <td id="T_4c3d9_row6_col1" class="data row6 col1"> 0.00</td>
     </tr>
     <tr>
-      <th id="T_061d3_level0_row7" class="row_heading level0 row7">LogIncome:SR</th>
-      <td id="T_061d3_row7_col0" class="data row7 col0"> 0.00</td>
-      <td id="T_061d3_row7_col1" class="data row7 col1"> 0.00</td>
+      <th id="T_4c3d9_level0_row7" class="row_heading level0 row7">LogIncome:SR</th>
+      <td id="T_4c3d9_row7_col0" class="data row7 col0"> 0.00</td>
+      <td id="T_4c3d9_row7_col1" class="data row7 col1"> 0.00</td>
     </tr>
     <tr>
-      <th id="T_061d3_level0_row8" class="row_heading level0 row8">LogIncome:Transit</th>
-      <td id="T_061d3_row8_col0" class="data row8 col0"> 0.00</td>
-      <td id="T_061d3_row8_col1" class="data row8 col1"> 0.00</td>
+      <th id="T_4c3d9_level0_row8" class="row_heading level0 row8">LogIncome:Transit</th>
+      <td id="T_4c3d9_row8_col0" class="data row8 col0"> 0.00</td>
+      <td id="T_4c3d9_row8_col1" class="data row8 col1"> 0.00</td>
     </tr>
     <tr>
-      <th id="T_061d3_level0_row9" class="row_heading level0 row9">LogIncome:Walk</th>
-      <td id="T_061d3_row9_col0" class="data row9 col0"> 0.00</td>
-      <td id="T_061d3_row9_col1" class="data row9 col1"> 0.00</td>
+      <th id="T_4c3d9_level0_row9" class="row_heading level0 row9">LogIncome:Walk</th>
+      <td id="T_4c3d9_row9_col0" class="data row9 col0"> 0.00</td>
+      <td id="T_4c3d9_row9_col1" class="data row9 col1"> 0.00</td>
     </tr>
     <tr>
-      <th id="T_061d3_level0_row10" class="row_heading level0 row10">Mu:Car</th>
-      <td id="T_061d3_row10_col0" class="data row10 col0"> 1.00</td>
-      <td id="T_061d3_row10_col1" class="data row10 col1"> 1.00</td>
+      <th id="T_4c3d9_level0_row10" class="row_heading level0 row10">Mu:Car</th>
+      <td id="T_4c3d9_row10_col0" class="data row10 col0"> 1.00</td>
+      <td id="T_4c3d9_row10_col1" class="data row10 col1"> 1.00</td>
     </tr>
     <tr>
-      <th id="T_061d3_level0_row11" class="row_heading level0 row11">Mu:Motor</th>
-      <td id="T_061d3_row11_col0" class="data row11 col0"> 1.00</td>
-      <td id="T_061d3_row11_col1" class="data row11 col1"> 1.00</td>
+      <th id="T_4c3d9_level0_row11" class="row_heading level0 row11">Mu:Motor</th>
+      <td id="T_4c3d9_row11_col0" class="data row11 col0"> 1.00</td>
+      <td id="T_4c3d9_row11_col1" class="data row11 col1"> 1.00</td>
     </tr>
     <tr>
-      <th id="T_061d3_level0_row12" class="row_heading level0 row12">Mu:NonMotor</th>
-      <td id="T_061d3_row12_col0" class="data row12 col0"> 1.00</td>
-      <td id="T_061d3_row12_col1" class="data row12 col1"> 1.00</td>
+      <th id="T_4c3d9_level0_row12" class="row_heading level0 row12">Mu:NonMotor</th>
+      <td id="T_4c3d9_row12_col0" class="data row12 col0"> 1.00</td>
+      <td id="T_4c3d9_row12_col1" class="data row12 col1"> 1.00</td>
     </tr>
     <tr>
-      <th id="T_061d3_level0_row13" class="row_heading level0 row13">NonMotorTime</th>
-      <td id="T_061d3_row13_col0" class="data row13 col0"> 0.00</td>
-      <td id="T_061d3_row13_col1" class="data row13 col1"> 0.00</td>
+      <th id="T_4c3d9_level0_row13" class="row_heading level0 row13">NonMotorTime</th>
+      <td id="T_4c3d9_row13_col0" class="data row13 col0"> 0.00</td>
+      <td id="T_4c3d9_row13_col1" class="data row13 col1"> 0.00</td>
     </tr>
     <tr>
-      <th id="T_061d3_level0_row14" class="row_heading level0 row14">OutVehTime</th>
-      <td id="T_061d3_row14_col0" class="data row14 col0"> 0.00</td>
-      <td id="T_061d3_row14_col1" class="data row14 col1"> 0.00</td>
+      <th id="T_4c3d9_level0_row14" class="row_heading level0 row14">OutVehTime</th>
+      <td id="T_4c3d9_row14_col0" class="data row14 col0"> 0.00</td>
+      <td id="T_4c3d9_row14_col1" class="data row14 col1"> 0.00</td>
     </tr>
   </tbody>
 </table>
@@ -1626,6 +1727,17 @@ the estimates and t statistics, using <code class="docutils literal notranslate"
 </div>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1560,</span> in <span class="ni">NumpyIndexingAdapter._safe_setitem</span><span class="nt">(self, array, key, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1559</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1560</span>     <span class="n">array</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+<span class="g g-Whitespace">   </span><span class="mi">1561</span> <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1562</span>     <span class="c1"># More informative exception if read-only view</span>
+
+<span class="ne">ValueError</span>: assignment destination is read-only
+
+<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
+
 <span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">38</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">report</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;# Estimation Statistics&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">m</span><span class="o">.</span><span class="n">estimation_statistics</span><span class="p">()</span>
@@ -1749,39 +1861,50 @@ the estimates and t statistics, using <code class="docutils literal notranslate"
 <span class="g g-Whitespace">   </span><span class="mi">1069</span>     <span class="c1"># get rid of the dataset now</span>
 <span class="g g-Whitespace">   </span><span class="mi">1070</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="kc">None</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/data_arrays.py:245,</span> in <span class="ni">prepare_data</span><span class="nt">(datasource, request, float_dtype, cache_dir, flows, make_unused_flows)</span>
-<span class="g g-Whitespace">    </span><span class="mi">243</span> <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">244</span>     <span class="n">choicecodes</span> <span class="o">=</span> <span class="n">datasource</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request</span><span class="p">[</span><span class="s2">&quot;choice_co_code&quot;</span><span class="p">])</span>
-<span class="ne">--&gt; </span><span class="mi">245</span> <span class="n">da_ch</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">246</span>     <span class="n">float_dtype</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-<span class="g g-Whitespace">    </span><span class="mi">247</span>     <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">,</span> <span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">248</span>     <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
-<span class="g g-Whitespace">    </span><span class="mi">249</span>         <span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">:</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">250</span>         <span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">:</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">251</span>     <span class="p">},</span>
-<span class="g g-Whitespace">    </span><span class="mi">252</span>     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ch&quot;</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">253</span> <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">254</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">]):</span>
-<span class="g g-Whitespace">    </span><span class="mi">255</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/data_arrays.py:260,</span> in <span class="ni">prepare_data</span><span class="nt">(datasource, request, float_dtype, cache_dir, flows, make_unused_flows)</span>
+<span class="g g-Whitespace">    </span><span class="mi">258</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">259</span>         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="ne">--&gt; </span><span class="mi">260</span>     <span class="n">da_ch</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">choicecodes</span> <span class="o">==</span> <span class="n">a</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">261</span> <span class="n">model_dataset</span> <span class="o">=</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">da_ch</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">262</span> <span class="k">if</span> <span class="n">make_unused_flows</span><span class="p">:</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:479,</span> in <span class="ni">DataArray.__init__</span><span class="nt">(self, data, coords, dims, name, attrs, indexes, fastpath)</span>
-<span class="g g-Whitespace">    </span><span class="mi">477</span> <span class="n">data</span> <span class="o">=</span> <span class="n">_check_data_shape</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">478</span> <span class="n">data</span> <span class="o">=</span> <span class="n">as_compatible_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">479</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span> <span class="o">=</span> <span class="n">_infer_coords_and_dims</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">480</span> <span class="n">variable</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">fastpath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">482</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">Coordinates</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:923,</span> in <span class="ni">DataArray.__setitem__</span><span class="nt">(self, key, value)</span>
+<span class="g g-Whitespace">    </span><span class="mi">918</span> <span class="c1"># DataArray key -&gt; Variable key</span>
+<span class="g g-Whitespace">    </span><span class="mi">919</span> <span class="n">key</span> <span class="o">=</span> <span class="p">{</span>
+<span class="g g-Whitespace">    </span><span class="mi">920</span>     <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">variable</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span>
+<span class="nn">    921     for k, v</span> in <span class="ni">self._item_key_to_dict(key).items</span><span class="nt">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">922</span> <span class="p">}</span>
+<span class="ne">--&gt; </span><span class="mi">923</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:184,</span> in <span class="ni">_infer_coords_and_dims</span><span class="nt">(shape, coords, dims)</span>
-<span class="g g-Whitespace">    </span><span class="mi">182</span> <span class="n">dims_tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">183</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims_tuple</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">184</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">185</span>         <span class="s2">&quot;different number of dimensions on data &quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">186</span>         <span class="sa">f</span><span class="s2">&quot;and dims: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dims_tuple</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">187</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">188</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dims_tuple</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">189</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">hashable</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/variable.py:860,</span> in <span class="ni">Variable.__setitem__</span><span class="nt">(self, key, value)</span>
+<span class="g g-Whitespace">    </span><span class="mi">857</span>     <span class="n">value</span> <span class="o">=</span> <span class="n">duck_array_ops</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">new_order</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_order</span><span class="p">)))</span>
+<span class="g g-Whitespace">    </span><span class="mi">859</span> <span class="n">indexable</span> <span class="o">=</span> <span class="n">as_indexable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">860</span> <span class="n">indexing</span><span class="o">.</span><span class="n">set_with_indexer</span><span class="p">(</span><span class="n">indexable</span><span class="p">,</span> <span class="n">index_tuple</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
-<span class="ne">ValueError</span>: different number of dimensions on data and dims: 0 vs 2
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1040,</span> in <span class="ni">set_with_indexer</span><span class="nt">(indexable, indexer, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1038</span>     <span class="n">indexable</span><span class="o">.</span><span class="n">oindex</span><span class="p">[</span><span class="n">indexer</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+<span class="g g-Whitespace">   </span><span class="mi">1039</span> <span class="k">else</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1040</span>     <span class="n">indexable</span><span class="p">[</span><span class="n">indexer</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1586,</span> in <span class="ni">NumpyIndexingAdapter.__setitem__</span><span class="nt">(self, indexer, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1582</span> <span class="c1"># We want 0d slices rather than scalars. This is achieved by</span>
+<span class="g g-Whitespace">   </span><span class="mi">1583</span> <span class="c1"># appending an ellipsis (see</span>
+<span class="g g-Whitespace">   </span><span class="mi">1584</span> <span class="c1"># https://numpy.org/doc/stable/reference/arrays.indexing.html#detailed-notes).</span>
+<span class="g g-Whitespace">   </span><span class="mi">1585</span> <span class="n">key</span> <span class="o">=</span> <span class="n">indexer</span><span class="o">.</span><span class="n">tuple</span> <span class="o">+</span> <span class="p">(</span><span class="bp">Ellipsis</span><span class="p">,)</span>
+<span class="ne">-&gt; </span><span class="mi">1586</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_setitem</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1564,</span> in <span class="ni">NumpyIndexingAdapter._safe_setitem</span><span class="nt">(self, array, key, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1561</span> <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1562</span>     <span class="c1"># More informative exception if read-only view</span>
+<span class="g g-Whitespace">   </span><span class="mi">1563</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">array</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">writeable</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">array</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">owndata</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1564</span>         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1565</span>             <span class="s2">&quot;Assignment destination is a view.  &quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">1566</span>             <span class="s2">&quot;Do you want to .copy() array first?&quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">1567</span>         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<span class="g g-Whitespace">   </span><span class="mi">1568</span>     <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1569</span>         <span class="k">raise</span> <span class="n">exc</span>
+
+<span class="ne">ValueError</span>: Assignment destination is a view.  Do you want to .copy() array first?
 </pre></div>
 </div>
 </div>
@@ -1899,7 +2022,7 @@ the estimates and t statistics, using <code class="docutils literal notranslate"
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-<p class="larch-version">🌳 Larch v6.0.37.dev20+gaa9c8eb, © Copyright 2024.</p></div>
+<p class="larch-version">🌳 Larch v6.0.37.dev22+gb97334f, © Copyright 2024.</p></div>
       
     </div>
   

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>202: Exampville Mode Choice Logsums &#8212; v6.0.37.dev20+gaa9c8eb</title>
+    <title>202: Exampville Mode Choice Logsums &#8212; v6.0.37.dev22+gb97334f</title>
   
   
   
@@ -137,8 +137,8 @@
       
     
     
-    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.37.dev20+gaa9c8eb - Home"/>
-    <img src="../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.37.dev20+gaa9c8eb - Home"/>
+    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.37.dev22+gb97334f - Home"/>
+    <img src="../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.37.dev22+gb97334f - Home"/>
   
   
 </a></div>
@@ -533,6 +533,17 @@ zones, dropping in the zone as the destination and computing the logsums.</p>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1560,</span> in <span class="ni">NumpyIndexingAdapter._safe_setitem</span><span class="nt">(self, array, key, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1559</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1560</span>     <span class="n">array</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+<span class="g g-Whitespace">   </span><span class="mi">1561</span> <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1562</span>     <span class="c1"># More informative exception if read-only view</span>
+
+<span class="ne">ValueError</span>: assignment destination is read-only
+
+<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
+
+<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
 <span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="k">for</span> <span class="n">dtaz</span> <span class="ow">in</span> <span class="n">logsums</span><span class="o">.</span><span class="n">TAZ_ID</span><span class="p">:</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span>     <span class="n">m</span><span class="o">.</span><span class="n">datatree</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">replace_datasets</span><span class="p">(</span>
@@ -623,39 +634,50 @@ zones, dropping in the zone as the destination and computing the logsums.</p>
 <span class="g g-Whitespace">   </span><span class="mi">1069</span>     <span class="c1"># get rid of the dataset now</span>
 <span class="g g-Whitespace">   </span><span class="mi">1070</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="kc">None</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/data_arrays.py:245,</span> in <span class="ni">prepare_data</span><span class="nt">(datasource, request, float_dtype, cache_dir, flows, make_unused_flows)</span>
-<span class="g g-Whitespace">    </span><span class="mi">243</span> <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">244</span>     <span class="n">choicecodes</span> <span class="o">=</span> <span class="n">datasource</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request</span><span class="p">[</span><span class="s2">&quot;choice_co_code&quot;</span><span class="p">])</span>
-<span class="ne">--&gt; </span><span class="mi">245</span> <span class="n">da_ch</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">246</span>     <span class="n">float_dtype</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-<span class="g g-Whitespace">    </span><span class="mi">247</span>     <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">,</span> <span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">248</span>     <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
-<span class="g g-Whitespace">    </span><span class="mi">249</span>         <span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">:</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">CASEID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">250</span>         <span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">:</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">251</span>     <span class="p">},</span>
-<span class="g g-Whitespace">    </span><span class="mi">252</span>     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ch&quot;</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">253</span> <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">254</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">model_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">datatree</span><span class="o">.</span><span class="n">ALTID</span><span class="p">]):</span>
-<span class="g g-Whitespace">    </span><span class="mi">255</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/data_arrays.py:260,</span> in <span class="ni">prepare_data</span><span class="nt">(datasource, request, float_dtype, cache_dir, flows, make_unused_flows)</span>
+<span class="g g-Whitespace">    </span><span class="mi">258</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">259</span>         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="ne">--&gt; </span><span class="mi">260</span>     <span class="n">da_ch</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">choicecodes</span> <span class="o">==</span> <span class="n">a</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">261</span> <span class="n">model_dataset</span> <span class="o">=</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">da_ch</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">262</span> <span class="k">if</span> <span class="n">make_unused_flows</span><span class="p">:</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:479,</span> in <span class="ni">DataArray.__init__</span><span class="nt">(self, data, coords, dims, name, attrs, indexes, fastpath)</span>
-<span class="g g-Whitespace">    </span><span class="mi">477</span> <span class="n">data</span> <span class="o">=</span> <span class="n">_check_data_shape</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">478</span> <span class="n">data</span> <span class="o">=</span> <span class="n">as_compatible_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">479</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span> <span class="o">=</span> <span class="n">_infer_coords_and_dims</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">480</span> <span class="n">variable</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">fastpath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">482</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">Coordinates</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:923,</span> in <span class="ni">DataArray.__setitem__</span><span class="nt">(self, key, value)</span>
+<span class="g g-Whitespace">    </span><span class="mi">918</span> <span class="c1"># DataArray key -&gt; Variable key</span>
+<span class="g g-Whitespace">    </span><span class="mi">919</span> <span class="n">key</span> <span class="o">=</span> <span class="p">{</span>
+<span class="g g-Whitespace">    </span><span class="mi">920</span>     <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">variable</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span>
+<span class="nn">    921     for k, v</span> in <span class="ni">self._item_key_to_dict(key).items</span><span class="nt">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">922</span> <span class="p">}</span>
+<span class="ne">--&gt; </span><span class="mi">923</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:184,</span> in <span class="ni">_infer_coords_and_dims</span><span class="nt">(shape, coords, dims)</span>
-<span class="g g-Whitespace">    </span><span class="mi">182</span> <span class="n">dims_tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">183</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims_tuple</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">184</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">185</span>         <span class="s2">&quot;different number of dimensions on data &quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">186</span>         <span class="sa">f</span><span class="s2">&quot;and dims: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dims_tuple</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">187</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">188</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dims_tuple</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">189</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">hashable</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/variable.py:860,</span> in <span class="ni">Variable.__setitem__</span><span class="nt">(self, key, value)</span>
+<span class="g g-Whitespace">    </span><span class="mi">857</span>     <span class="n">value</span> <span class="o">=</span> <span class="n">duck_array_ops</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">new_order</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_order</span><span class="p">)))</span>
+<span class="g g-Whitespace">    </span><span class="mi">859</span> <span class="n">indexable</span> <span class="o">=</span> <span class="n">as_indexable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">860</span> <span class="n">indexing</span><span class="o">.</span><span class="n">set_with_indexer</span><span class="p">(</span><span class="n">indexable</span><span class="p">,</span> <span class="n">index_tuple</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
-<span class="ne">ValueError</span>: different number of dimensions on data and dims: 0 vs 2
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1040,</span> in <span class="ni">set_with_indexer</span><span class="nt">(indexable, indexer, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1038</span>     <span class="n">indexable</span><span class="o">.</span><span class="n">oindex</span><span class="p">[</span><span class="n">indexer</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+<span class="g g-Whitespace">   </span><span class="mi">1039</span> <span class="k">else</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1040</span>     <span class="n">indexable</span><span class="p">[</span><span class="n">indexer</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1586,</span> in <span class="ni">NumpyIndexingAdapter.__setitem__</span><span class="nt">(self, indexer, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1582</span> <span class="c1"># We want 0d slices rather than scalars. This is achieved by</span>
+<span class="g g-Whitespace">   </span><span class="mi">1583</span> <span class="c1"># appending an ellipsis (see</span>
+<span class="g g-Whitespace">   </span><span class="mi">1584</span> <span class="c1"># https://numpy.org/doc/stable/reference/arrays.indexing.html#detailed-notes).</span>
+<span class="g g-Whitespace">   </span><span class="mi">1585</span> <span class="n">key</span> <span class="o">=</span> <span class="n">indexer</span><span class="o">.</span><span class="n">tuple</span> <span class="o">+</span> <span class="p">(</span><span class="bp">Ellipsis</span><span class="p">,)</span>
+<span class="ne">-&gt; </span><span class="mi">1586</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_setitem</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1564,</span> in <span class="ni">NumpyIndexingAdapter._safe_setitem</span><span class="nt">(self, array, key, value)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1561</span> <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1562</span>     <span class="c1"># More informative exception if read-only view</span>
+<span class="g g-Whitespace">   </span><span class="mi">1563</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">array</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">writeable</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">array</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">owndata</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1564</span>         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1565</span>             <span class="s2">&quot;Assignment destination is a view.  &quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">1566</span>             <span class="s2">&quot;Do you want to .copy() array first?&quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">1567</span>         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<span class="g g-Whitespace">   </span><span class="mi">1568</span>     <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1569</span>         <span class="k">raise</span> <span class="n">exc</span>
+
+<span class="ne">ValueError</span>: Assignment destination is a view.  Do you want to .copy() array first?
 </pre></div>
 </div>
 </div>
@@ -669,7 +691,7 @@ example, where we will estimate a destination choice model.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;xarray.backends.zarr.ZarrStore at 0x7fe167e1f880&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;xarray.backends.zarr.ZarrStore at 0x7f60ac5fa950&gt;
 </pre></div>
 </div>
 </div>
@@ -1056,7 +1078,7 @@ dl.xr-attrs {
 dask.array&lt;open_dataset-logsums, shape=(7564, 40), dtype=float64, chunksize=(1891, 20), chunktype=numpy.ndarray&gt;
 Coordinates:
   * TAZ_ID   (TAZ_ID) int64 320B 1 2 3 4 5 6 7 8 9 ... 33 34 35 36 37 38 39 40
-  * TOURID   (TOURID) int64 61kB 0 1 3 7 10 13 ... 20728 20729 20731 20734 20736</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'logsums'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>TOURID</span>: 7564</li><li><span class='xr-has-index'>TAZ_ID</span>: 40</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-a3468eb9-80fe-454a-92ca-d07952e3153b' class='xr-array-in' type='checkbox' checked><label for='section-a3468eb9-80fe-454a-92ca-d07952e3153b' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>dask.array&lt;chunksize=(1891, 20), meta=np.ndarray&gt;</span></div><div class='xr-array-data'><table>
+  * TOURID   (TOURID) int64 61kB 0 1 3 7 10 13 ... 20728 20729 20731 20734 20736</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'logsums'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>TOURID</span>: 7564</li><li><span class='xr-has-index'>TAZ_ID</span>: 40</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-ada5317a-ffcc-4373-96af-6d4d0759c933' class='xr-array-in' type='checkbox' checked><label for='section-ada5317a-ffcc-4373-96af-6d4d0759c933' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>dask.array&lt;chunksize=(1891, 20), meta=np.ndarray&gt;</span></div><div class='xr-array-data'><table>
     <tr>
         <td>
             <table style="border-collapse: collapse;">
@@ -1115,15 +1137,15 @@ Coordinates:
 </svg>
         </td>
     </tr>
-</table></div></div></li><li class='xr-section-item'><input id='section-49d00f76-9176-4e0e-8157-15eb3f0ad465' class='xr-section-summary-in' type='checkbox'  checked><label for='section-49d00f76-9176-4e0e-8157-15eb3f0ad465' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>TAZ_ID</span></div><div class='xr-var-dims'>(TAZ_ID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2 3 4 5 6 7 ... 35 36 37 38 39 40</div><input id='attrs-b7865c82-7be7-4b7f-86c4-2e54d62727aa' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b7865c82-7be7-4b7f-86c4-2e54d62727aa' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c14d6bdd-37a1-4149-a043-f6538f3eb5a6' class='xr-var-data-in' type='checkbox'><label for='data-c14d6bdd-37a1-4149-a043-f6538f3eb5a6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+</table></div></div></li><li class='xr-section-item'><input id='section-513a5463-23a2-444d-844f-39463b78bd98' class='xr-section-summary-in' type='checkbox'  checked><label for='section-513a5463-23a2-444d-844f-39463b78bd98' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>TAZ_ID</span></div><div class='xr-var-dims'>(TAZ_ID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2 3 4 5 6 7 ... 35 36 37 38 39 40</div><input id='attrs-9d70383d-d730-4a91-a8ed-4e6336b1d1ac' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9d70383d-d730-4a91-a8ed-4e6336b1d1ac' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-eb429c11-50e1-421f-8113-d90066686e02' class='xr-var-data-in' type='checkbox'><label for='data-eb429c11-50e1-421f-8113-d90066686e02' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
        19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
-       37, 38, 39, 40])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>TOURID</span></div><div class='xr-var-dims'>(TOURID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 3 7 ... 20729 20731 20734 20736</div><input id='attrs-43f9d438-5a71-4e0b-b5aa-272139bf5d4b' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-43f9d438-5a71-4e0b-b5aa-272139bf5d4b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c0c8aac0-f407-43c7-9b12-a173fae5f4e2' class='xr-var-data-in' type='checkbox'><label for='data-c0c8aac0-f407-43c7-9b12-a173fae5f4e2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([    0,     1,     3, ..., 20731, 20734, 20736], shape=(7564,))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-cc9e3e9b-003b-4ac9-8d9f-332878daf401' class='xr-section-summary-in' type='checkbox'  ><label for='section-cc9e3e9b-003b-4ac9-8d9f-332878daf401' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>TAZ_ID</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-93d8712a-3069-4d4a-ba0a-aa08be521426' class='xr-index-data-in' type='checkbox'/><label for='index-93d8712a-3069-4d4a-ba0a-aa08be521426' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+       37, 38, 39, 40])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>TOURID</span></div><div class='xr-var-dims'>(TOURID)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 3 7 ... 20729 20731 20734 20736</div><input id='attrs-0ffa4b15-fbc1-4fb3-b2d3-aee6114eada6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-0ffa4b15-fbc1-4fb3-b2d3-aee6114eada6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-48273dad-f3cd-47cf-ac05-ccf100a64005' class='xr-var-data-in' type='checkbox'><label for='data-48273dad-f3cd-47cf-ac05-ccf100a64005' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([    0,     1,     3, ..., 20731, 20734, 20736], shape=(7564,))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-83bdfec1-a1fd-4172-9751-969eb21ee52b' class='xr-section-summary-in' type='checkbox'  ><label for='section-83bdfec1-a1fd-4172-9751-969eb21ee52b' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>TAZ_ID</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-e7c03a16-ca36-4295-abc7-ff9fcc0f3d31' class='xr-index-data-in' type='checkbox'/><label for='index-e7c03a16-ca36-4295-abc7-ff9fcc0f3d31' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
        19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
        37, 38, 39, 40],
-      dtype=&#x27;int64&#x27;, name=&#x27;TAZ_ID&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>TOURID</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-dd360ca4-764a-42d0-b012-e3bc13ed8f9c' class='xr-index-data-in' type='checkbox'/><label for='index-dd360ca4-764a-42d0-b012-e3bc13ed8f9c' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([    0,     1,     3,     7,    10,    13,    16,    18,    23,    25,
+      dtype=&#x27;int64&#x27;, name=&#x27;TAZ_ID&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>TOURID</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-4d1245cc-f050-46fc-8335-22196a91955e' class='xr-index-data-in' type='checkbox'/><label for='index-4d1245cc-f050-46fc-8335-22196a91955e' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([    0,     1,     3,     7,    10,    13,    16,    18,    23,    25,
        ...
        20720, 20721, 20723, 20724, 20726, 20728, 20729, 20731, 20734, 20736],
-      dtype=&#x27;int64&#x27;, name=&#x27;TOURID&#x27;, length=7564))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-0bbb2174-ecd3-43df-bc82-2d63c1f90d20' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-0bbb2174-ecd3-43df-bc82-2d63c1f90d20' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
+      dtype=&#x27;int64&#x27;, name=&#x27;TOURID&#x27;, length=7564))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-33b39afb-c978-49a6-bc27-1122f0179e0d' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-33b39afb-c978-49a6-bc27-1122f0179e0d' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
 </div>
 </section>
 
@@ -1197,7 +1219,7 @@ Coordinates:
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-<p class="larch-version">🌳 Larch v6.0.37.dev20+gaa9c8eb, © Copyright 2024.</p></div>
+<p class="larch-version">🌳 Larch v6.0.37.dev22+gb97334f, © Copyright 2024.</p></div>
       
     </div>
   
