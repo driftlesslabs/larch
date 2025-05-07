@@ -11,20 +11,50 @@ from ..exceptions import MissingDataError
 from ..folding import dissolve_zero_variance, fold_dataset
 from ..optimize import OptimizeMixin
 from ..util.simple_attribute import SimpleAttribute
-from .basemodel import MANGLE_DATA
-from .basemodel import BaseModel as _BaseModel
+from .basemodel import MANGLE_DATA, BaseModel
 from .jaxmodel import PanelMixin, _get_jnp_array
 from .mixtures import MixtureList
 
 
-class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
+class LatentClass(BaseModel, OptimizeMixin, PanelMixin):
     compute_engine = "jax"
     float_dtype = SimpleAttribute()
     dataflows = SimpleAttribute(dict)
 
     def __init__(
-        self, classmodel, choicemodels, datatree=None, float_dtype=np.float32, **kwargs
+        self,
+        classmodel: BaseModel,
+        choicemodels: dict[int, BaseModel],
+        datatree: DataTree | None = None,
+        float_dtype: type = np.float32,
+        **kwargs,
     ):
+        """
+        Initialize the latent class model structure.
+
+        This structure is used to connect two or more discrete classes, as well as
+        a class membership model that determines the probability of each decision
+        maker being a member of each class.
+        
+        The estimation of latent class models cannot be done with the
+        `numba` compute engine, and must be done with the `jax` compute engine.
+
+        Parameters
+        ----------
+        classmodel : BaseModel
+            The class membership model.
+        choicemodels : dict
+            A dictionary of choice models.  The keys of this dictionary will be
+            the altids of the choice models used in the class membership model.
+        datatree : DataTree, optional
+            A DataTree to use for all submodels.  For the choice models, this will
+            override any existing datatree set on those models.  For the class
+            membership model, this will be used to set the datatree only if it is
+            not already set, as it may be desirable in some situations to have the
+            class membership model use a different datatree than the choice models.
+        float_dtype : type, optional
+            The float type to use for the model.  Defaults to np.float32.
+        """
         self._model_subtype = "latent-class"
         classmodel._model_subtype = "class-membership"
         for k, m in choicemodels.items():
@@ -38,6 +68,9 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
             and isinstance(datatree, Dataset)
             and self.groupid
         ):
+            # We have not assigned data to the class model yet, but we have been
+            # given a datatree and a groupid, so we will use that to create the
+            # necessary data for the class model.
             df = datatree.to_dataframe()
             df["ingroup"] = df.groupby(self.groupid).cumcount() + 1
             classdata = dissolve_zero_variance(
@@ -47,6 +80,11 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
             classdata = classdata.dc.set_altids(choicemodels_keys).drop_dims("ingroup")
             classdata.dc.CASEID = self.groupid
             classmodel.datatree = classdata
+        elif classmodel.datatree is None and isinstance(datatree, Dataset):
+            # The class model has not been assigned data yet, but there is no
+            # groupid, so we will simply assign the datatree to the class model.
+            # We still need to set the altids to match the choicemodels.
+            classmodel.datatree = datatree.dc.set_altids(choicemodels_keys)
         else:
             pass
         self._ident = "latent-class"
@@ -152,8 +190,6 @@ class LatentClass(_BaseModel, OptimizeMixin, PanelMixin):
                     inclass_pr.shape[0] // class_pr.shape[0],
                     *inclass_pr.shape[1:],
                 )
-            print(f"{class_pr.shape=}")
-            print(f"{inclass_pr.shape=}")
             pr_parts.append(inclass_pr * class_pr)
         return sum(pr_parts)
 

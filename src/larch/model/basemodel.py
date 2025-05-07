@@ -864,7 +864,7 @@ class BaseModel:
                 s += " (MNL)"
             else:
                 s += " (GEV)"
-        if self.title != "Untitled":
+        if self.title != "Untitled" and self.title is not None:
             s += f' "{self.title}"'
         s += ">"
         return s
