@@ -69,6 +69,12 @@ def versions() -> dict:
     import pandas as pd
     import sharrow as sh
     import xarray as xr
+    try:
+        import jax
+    except ImportError:
+        jax_version = "not installed"
+    else:
+        jax_version = jax.__version__
 
     return {
         "larch": __version__,
@@ -77,4 +83,5 @@ def versions() -> dict:
         "pandas": pd.__version__,
         "xarray": xr.__version__,
         "numba": nb.__version__,
+        "jax": jax_version,
     }
