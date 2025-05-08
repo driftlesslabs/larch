@@ -554,6 +554,11 @@ class NestingTree(nx.DiGraph):
     def __xml__(self, use_viz=True, use_dot=True, output="svg", figsize=None, **format):
         viz = None
         dot = None
+
+        if output != "svg":
+            # viz only supports svg presently, always use dot for other formats
+            use_viz = False
+
         if use_viz:
             try:
                 import pygraphviz as viz
