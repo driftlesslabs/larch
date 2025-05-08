@@ -14,6 +14,7 @@ model
 linear
 nesting
 mixtures
+modelgroup
 latentclass
 troubleshooting
 ```

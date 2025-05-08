@@ -24,6 +24,33 @@ if TYPE_CHECKING:
 
 
 class ModelGroup(ConstrainedModel, MutableSequence):
+    """
+    A group of models that can be treated as a single model for estimation.
+
+    This structure collects a group of models for simultaneous estimation.
+    Each component model is a separate `Model` object, but they can share
+    parameters. This sharing is controlled by parameter names, in that if
+    two models in the group have a parameter with the same name, they will
+    be treated as a common parameter. There is no requirement that the
+    linked parameters be used in the same way in each model, but since they
+    are treated as a single parameter, they will be estimated together, and
+    must have the same bounds and constraints.
+
+    The model group object acts like a list of Model objects (i.e., a
+    MutableSequence), and can be indexed, sliced, and iterated over.
+
+    Parameters
+    ----------
+    models : list of Model or ModelGroup
+        A list of models to include in the group.  Each model can be a
+        `Model` object or another `ModelGroup` object.  If a `ModelGroup`
+        is included, its submodels are each included in the group, and the
+        `ModelGroup` itself is not included.
+    title : str, optional
+        A title for the model group.  This is used for display purposes
+        and does not affect the estimation.
+    """
+
     def __init__(self, models, title=None):
         self._submodels = list()
         super().__init__(title=title)
