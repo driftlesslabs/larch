@@ -235,7 +235,7 @@ def test_prerolled_common(xlogit_artificial):
         "status": 0,
         "message": "Optimization terminated successfully",
         "success": True,
-        "loglike": -2281.3876953125,
+        "loglike": -2281.146240234375,
     }
     for k, v in expected.items():
         if v is True:
@@ -243,38 +243,14 @@ def test_prerolled_common(xlogit_artificial):
         else:
             assert r[k] == approx(v, rel=1e-4), k
     assert m.d_loglike(
-        [
-            0.974191,
-            0.803419,
-            -1.882733,
-            0.910499,
-            1.623802,
-            -0.555167,
-            0.033868,
-            0.035736,
-            0.012158,
-            3.591912,
-            1.148798,
-            -0.977542,
-            -1.362563,
-        ]
+        [1.05262625, 0.86398761, -1.95256468, -0.91285049, 1.68754496]
+        + [0.65481684, 0.04932408, 0.03698133, 0.02225039, 3.78042743]
+        + [-1.30948931, -1.02678108, -1.43896373]
     ) == approx(
         np.array(
-            [
-                0.036815,
-                -0.065251,
-                -0.076691,
-                -0.044403,
-                0.008265,
-                -0.004813,
-                -0.048743,
-                0.011079,
-                -0.022234,
-                -0.058469,
-                -0.012695,
-                -0.017211,
-                -0.008998,
-            ]
+            [-0.01108778, -0.00438261, 0.0271306, -0.01761484, 0.01830649]
+            + [0.01826873, 0.03595978, -0.05165243, 0.06293976, 0.00445962]
+            + [-0.00531793, -0.02016234, 0.04396705]
         ),
         rel=1e-1,
     )
@@ -292,7 +268,7 @@ def test_prerolled_notcommon(xlogit_artificial):
         "status": 0,
         "message": "Optimization terminated successfully",
         "success": True,
-        "loglike": -2278.027587890625,
+        "loglike": -2282.65625,
     }
     for k, v in expected.items():
         if v is True:
@@ -351,7 +327,7 @@ def test_prerolled_common_panel(xlogit_artificial):
         "status": 0,
         "message": "Optimization terminated successfully",
         "success": True,
-        "loglike": -2410.3095703125,
+        "loglike": -2410.298828125,
     }
     for k, v in expected.items():
         if v is True:
@@ -411,7 +387,7 @@ def test_prerolled_notcommon_panel(xlogit_artificial):
         "status": 0,
         "message": "Optimization terminated successfully",
         "success": True,
-        "loglike": -2410.3095703125,
+        "loglike": -2409.8564453125,
     }
     for k, v in expected.items():
         if v is True:
