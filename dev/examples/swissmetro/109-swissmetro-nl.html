@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>109: Swissmetro Nested Logit Mode Choice &#8212; v6.0.37.dev22+gb97334f</title>
+    <title>109: Swissmetro Nested Logit Mode Choice &#8212; v6.0.37.dev23+g7a06251</title>
   
   
   
@@ -137,8 +137,8 @@
       
     
     
-    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.37.dev22+gb97334f - Home"/>
-    <img src="../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.37.dev22+gb97334f - Home"/>
+    <img src="../../_static/larch-logo.png" class="logo__image only-light" alt="v6.0.37.dev23+g7a06251 - Home"/>
+    <img src="../../_static/larch-logo.png" class="logo__image only-dark pst-js-only" alt="v6.0.37.dev23+g7a06251 - Home"/>
   
   
 </a></div>
@@ -600,107 +600,38 @@ a rational order.  We can use the ordering method to do this:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1560,</span> in <span class="ni">NumpyIndexingAdapter._safe_setitem</span><span class="nt">(self, array, key, value)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1559</span> <span class="k">try</span><span class="p">:</span>
-<span class="ne">-&gt; </span><span class="mi">1560</span>     <span class="n">array</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-<span class="g g-Whitespace">   </span><span class="mi">1561</span> <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1562</span>     <span class="c1"># More informative exception if read-only view</span>
-
-<span class="ne">ValueError</span>: assignment destination is read-only
-
-<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
-
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">m</span><span class="o">.</span><span class="n">set_cap</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">result</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">maximize_loglike</span><span class="p">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">result</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/basemodel.py:615,</span> in <span class="ni">BaseModel.set_cap</span><span class="nt">(self, cap)</span>
-<span class="g g-Whitespace">    </span><span class="mi">604</span> <span class="k">def</span><span class="w"> </span><span class="nf">set_cap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cap</span><span class="o">=</span><span class="mi">25</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">605</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">606</span><span class="sd">     Set limiting values for one or more parameters.</span>
-<span class="g g-Whitespace">    </span><span class="mi">607</span><span class="sd"> </span>
-<span class="sd">   (...)</span>
-<span class="g g-Whitespace">    </span><span class="mi">613</span><span class="sd">         the existing bounds are entirely outside this range.</span>
-<span class="g g-Whitespace">    </span><span class="mi">614</span><span class="sd">     &quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">615</span>     <span class="bp">self</span><span class="o">.</span><span class="n">unmangle</span><span class="p">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">616</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_bucket</span><span class="o">.</span><span class="n">set_cap</span><span class="p">(</span><span class="n">cap</span><span class="o">=</span><span class="n">cap</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/jaxmodel.py:165,</span> in <span class="ni">Model.unmangle</span><span class="nt">(self, force, structure_only)</span>
-<span class="g g-Whitespace">    </span><span class="mi">163</span> <span class="k">try</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">164</span>     <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">marker</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">165</span>     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">unmangle</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">structure_only</span><span class="o">=</span><span class="n">structure_only</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">166</span>     <span class="k">for</span> <span class="n">mix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixtures</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">167</span>         <span class="n">mix</span><span class="o">.</span><span class="n">prep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameter_bucket</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/numbamodel.py:1192,</span> in <span class="ni">NumbaModel.unmangle</span><span class="nt">(self, force, structure_only)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1190</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">structure_only</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1191</span>     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">force</span><span class="p">:</span>
-<span class="ne">-&gt; </span><span class="mi">1192</span>         <span class="bp">self</span><span class="o">.</span><span class="n">reflow_data_arrays</span><span class="p">()</span>
-<span class="g g-Whitespace">   </span><span class="mi">1193</span>     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_arrays</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">force</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1194</span>         <span class="bp">self</span><span class="o">.</span><span class="n">_rebuild_fixed_arrays</span><span class="p">()</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/jaxmodel.py:200,</span> in <span class="ni">Model.reflow_data_arrays</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">    </span><span class="mi">196</span>     <span class="n">request</span><span class="p">[</span><span class="s2">&quot;group_co&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">groupid</span>
-<span class="g g-Whitespace">    </span><span class="mi">198</span> <span class="kn">from</span><span class="w"> </span><span class="nn">.data_arrays</span><span class="w"> </span><span class="kn">import</span> <span class="n">prepare_data</span>
-<span class="ne">--&gt; </span><span class="mi">200</span> <span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataflows</span> <span class="o">=</span> <span class="n">prepare_data</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">201</span>     <span class="n">datasource</span><span class="o">=</span><span class="n">datatree</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">202</span>     <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">203</span>     <span class="n">float_dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">float_dtype</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">204</span>     <span class="n">cache_dir</span><span class="o">=</span><span class="n">datatree</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">205</span>     <span class="n">flows</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataflows</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">206</span>     <span class="n">make_unused_flows</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_streaming</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">207</span> <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">208</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groupid</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">209</span>     <span class="n">dataset</span> <span class="o">=</span> <span class="n">fold_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/data_arrays.py:260,</span> in <span class="ni">prepare_data</span><span class="nt">(datasource, request, float_dtype, cache_dir, flows, make_unused_flows)</span>
-<span class="g g-Whitespace">    </span><span class="mi">258</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">259</span>         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-<span class="ne">--&gt; </span><span class="mi">260</span>     <span class="n">da_ch</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">choicecodes</span> <span class="o">==</span> <span class="n">a</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">261</span> <span class="n">model_dataset</span> <span class="o">=</span> <span class="n">model_dataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">da_ch</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">262</span> <span class="k">if</span> <span class="n">make_unused_flows</span><span class="p">:</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/dataarray.py:923,</span> in <span class="ni">DataArray.__setitem__</span><span class="nt">(self, key, value)</span>
-<span class="g g-Whitespace">    </span><span class="mi">918</span> <span class="c1"># DataArray key -&gt; Variable key</span>
-<span class="g g-Whitespace">    </span><span class="mi">919</span> <span class="n">key</span> <span class="o">=</span> <span class="p">{</span>
-<span class="g g-Whitespace">    </span><span class="mi">920</span>     <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">variable</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span>
-<span class="nn">    921     for k, v</span> in <span class="ni">self._item_key_to_dict(key).items</span><span class="nt">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">922</span> <span class="p">}</span>
-<span class="ne">--&gt; </span><span class="mi">923</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/variable.py:860,</span> in <span class="ni">Variable.__setitem__</span><span class="nt">(self, key, value)</span>
-<span class="g g-Whitespace">    </span><span class="mi">857</span>     <span class="n">value</span> <span class="o">=</span> <span class="n">duck_array_ops</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">new_order</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_order</span><span class="p">)))</span>
-<span class="g g-Whitespace">    </span><span class="mi">859</span> <span class="n">indexable</span> <span class="o">=</span> <span class="n">as_indexable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">860</span> <span class="n">indexing</span><span class="o">.</span><span class="n">set_with_indexer</span><span class="p">(</span><span class="n">indexable</span><span class="p">,</span> <span class="n">index_tuple</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1040,</span> in <span class="ni">set_with_indexer</span><span class="nt">(indexable, indexer, value)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1038</span>     <span class="n">indexable</span><span class="o">.</span><span class="n">oindex</span><span class="p">[</span><span class="n">indexer</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-<span class="g g-Whitespace">   </span><span class="mi">1039</span> <span class="k">else</span><span class="p">:</span>
-<span class="ne">-&gt; </span><span class="mi">1040</span>     <span class="n">indexable</span><span class="p">[</span><span class="n">indexer</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1586,</span> in <span class="ni">NumpyIndexingAdapter.__setitem__</span><span class="nt">(self, indexer, value)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1582</span> <span class="c1"># We want 0d slices rather than scalars. This is achieved by</span>
-<span class="g g-Whitespace">   </span><span class="mi">1583</span> <span class="c1"># appending an ellipsis (see</span>
-<span class="g g-Whitespace">   </span><span class="mi">1584</span> <span class="c1"># https://numpy.org/doc/stable/reference/arrays.indexing.html#detailed-notes).</span>
-<span class="g g-Whitespace">   </span><span class="mi">1585</span> <span class="n">key</span> <span class="o">=</span> <span class="n">indexer</span><span class="o">.</span><span class="n">tuple</span> <span class="o">+</span> <span class="p">(</span><span class="bp">Ellipsis</span><span class="p">,)</span>
-<span class="ne">-&gt; </span><span class="mi">1586</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_setitem</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/xarray/core/indexing.py:1564,</span> in <span class="ni">NumpyIndexingAdapter._safe_setitem</span><span class="nt">(self, array, key, value)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1561</span> <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1562</span>     <span class="c1"># More informative exception if read-only view</span>
-<span class="g g-Whitespace">   </span><span class="mi">1563</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">array</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">writeable</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">array</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">owndata</span><span class="p">:</span>
-<span class="ne">-&gt; </span><span class="mi">1564</span>         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">1565</span>             <span class="s2">&quot;Assignment destination is a view.  &quot;</span>
-<span class="g g-Whitespace">   </span><span class="mi">1566</span>             <span class="s2">&quot;Do you want to .copy() array first?&quot;</span>
-<span class="g g-Whitespace">   </span><span class="mi">1567</span>         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<span class="g g-Whitespace">   </span><span class="mi">1568</span>     <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1569</span>         <span class="k">raise</span> <span class="n">exc</span>
-
-<span class="ne">ValueError</span>: Assignment destination is a view.  Do you want to .copy() array first?
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style="font-weight: bold"> </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">Larch Model Dashboard</span><span style="font-weight: bold">                                                                 </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ <span style="color: #008000; text-decoration-color: #008000">optimization complete</span>                                                                 │
+│ Log Likelihood <span style="color: #808000; text-decoration-color: #808000">Current =      -5236.899902 </span><span style="color: #008000; text-decoration-color: #008000">Best =      -5236.899902</span>                   │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓ │
+│ ┃<span style="font-weight: bold"> Parameter                      </span>┃<span style="font-weight: bold"> Value          </span>┃<span style="font-weight: bold"> Gradient       </span>┃<span style="font-weight: bold"> Best           </span>┃ │
+│ ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩ │
+│ │ ASC_CAR                        │ -0.16718941    │  0.084960938   │ -0.16718941    │ │
+│ │ ASC_TRAIN                      │ -0.51194449    │ -0.063713074   │ -0.51194449    │ │
+│ │ B_COST                         │ -0.0085665424  │ -1.6259766     │ -0.0085665424  │ │
+│ │ B_TIME                         │ -0.0089865975  │ -1.1230469     │ -0.0089865975  │ │
+│ │ existing                       │  0.48685183    │ -0.083129883   │  0.48685183    │ │
+│ └────────────────────────────────┴────────────────┴────────────────┴────────────────┘ │
+└───────────────────────────────────────────────────────────────────────────────────────┘
+</pre>
+</div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/jax/_src/interpreters/xla.py:115: RuntimeWarning: overflow encountered in cast
+  return np.asarray(
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>      message: Optimization terminated successfully
+      success: True
+       status: 0
+            x: [-1.672e-01 -5.119e-01 -8.567e-03 -8.987e-03  4.869e-01]
+          nit: 16
+          jac: [ 8.496e-02 -6.371e-02 -1.626e+00 -1.123e+00 -8.313e-02]
+         nfev: 47
+         njev: 16
+      n_cases: 6768
+ total_weight: 6768.0
+      logloss: 0.7737736262328235
+      loglike: -5236.89990234375
 </pre></div>
 </div>
 </div>
@@ -713,58 +644,108 @@ a rational order.  We can use the ordering method to do this:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">m</span><span class="o">.</span><span class="n">calculate_parameter_covariance</span><span class="p">(</span><span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">m</span><span class="o">.</span><span class="n">parameter_summary</span><span class="p">()</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/numbamodel.py:2612,</span> in <span class="ni">NumbaModel.calculate_parameter_covariance</span><span class="nt">(self, pvals, robust)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2610</span> <span class="n">locks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pholdfast</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">))</span>
-<span class="g g-Whitespace">   </span><span class="mi">2611</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_engine</span> <span class="o">==</span> <span class="s2">&quot;jax&quot;</span><span class="p">:</span>
-<span class="ne">-&gt; </span><span class="mi">2612</span>     <span class="n">se</span><span class="p">,</span> <span class="n">hess</span><span class="p">,</span> <span class="n">ihess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jax_param_cov</span><span class="p">(</span><span class="n">pvals</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2613</span> <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">2614</span>     <span class="n">hess</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">d2_loglike</span><span class="p">(</span><span class="n">pvals</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/optimize.py:282,</span> in <span class="ni">OptimizeMixin.jax_param_cov</span><span class="nt">(self, params)</span>
-<span class="g g-Whitespace">    </span><span class="mi">281</span> <span class="k">def</span><span class="w"> </span><span class="nf">jax_param_cov</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">282</span>     <span class="n">hess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jax_d2_loglike</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">283</span>     <span class="n">hess</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">hess</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">284</span>     <span class="n">holds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;holdfast&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span>
-
-    <span class="p">[</span><span class="o">...</span> <span class="n">skipping</span> <span class="n">hidden</span> <span class="mi">14</span> <span class="n">frame</span><span class="p">]</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/compiled.py:110,</span> in <span class="ni">jitmethod.__get__.&lt;locals&gt;.func</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">109</span> <span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">110</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrapped_method</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/optimize.py:93,</span> in <span class="ni">OptimizeMixin.jax_d2_loglike</span><span class="nt">(self, params)</span>
-<span class="g g-Whitespace">     </span><span class="mi">91</span> <span class="nd">@jitmethod</span>
-<span class="g g-Whitespace">     </span><span class="mi">92</span> <span class="k">def</span><span class="w"> </span><span class="nf">jax_d2_loglike</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-<span class="ne">---&gt; </span><span class="mi">93</span>     <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">jacfwd</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">jacrev</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jax_neg_loglike</span><span class="p">))(</span><span class="n">params</span><span class="p">)</span>
-
-    <span class="p">[</span><span class="o">...</span> <span class="n">skipping</span> <span class="n">hidden</span> <span class="mi">30</span> <span class="n">frame</span><span class="p">]</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/optimize.py:137,</span> in <span class="ni">OptimizeMixin.jax_neg_loglike</span><span class="nt">(self, params)</span>
-<span class="g g-Whitespace">    </span><span class="mi">136</span> <span class="k">def</span><span class="w"> </span><span class="nf">jax_neg_loglike</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">137</span>     <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">jax_loglike</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-
-    <span class="p">[</span><span class="o">...</span> <span class="n">skipping</span> <span class="n">hidden</span> <span class="mi">14</span> <span class="n">frame</span><span class="p">]</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/compiled.py:110,</span> in <span class="ni">jitmethod.__get__.&lt;locals&gt;.func</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">109</span> <span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">110</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrapped_method</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/larch/model/jaxmodel.py:965,</span> in <span class="ni">Model.jax_loglike</span><span class="nt">(self, params)</span>
-<span class="g g-Whitespace">    </span><span class="mi">963</span> <span class="nd">@jitmethod</span>
-<span class="g g-Whitespace">    </span><span class="mi">964</span> <span class="k">def</span><span class="w"> </span><span class="nf">jax_loglike</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">965</span>     <span class="n">wt</span> <span class="o">=</span> <span class="n">_as_jnp_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_arrays</span><span class="o">.</span><span class="n">wt</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">966</span>     <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jax_loglike_casewise</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">*</span> <span class="n">wt</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-
-<span class="ne">AttributeError</span>: &#39;NoneType&#39; object has no attribute &#39;wt&#39;
-</pre></div>
-</div>
-</div>
+<div class="output text_html"><style type="text/css">
+#T_7612b th {
+  vertical-align: top;
+  text-align: left;
+}
+#T_7612b td {
+  vertical-align: top;
+  text-align: left;
+}
+#T_7612b_row0_col0, #T_7612b_row0_col1, #T_7612b_row0_col2, #T_7612b_row0_col3, #T_7612b_row0_col4, #T_7612b_row0_col5, #T_7612b_row0_col6, #T_7612b_row0_col7, #T_7612b_row1_col0, #T_7612b_row1_col1, #T_7612b_row1_col2, #T_7612b_row1_col3, #T_7612b_row1_col4, #T_7612b_row1_col5, #T_7612b_row1_col6, #T_7612b_row1_col7, #T_7612b_row2_col0, #T_7612b_row2_col1, #T_7612b_row2_col2, #T_7612b_row2_col3, #T_7612b_row2_col4, #T_7612b_row2_col5, #T_7612b_row2_col6, #T_7612b_row2_col7, #T_7612b_row3_col0, #T_7612b_row3_col1, #T_7612b_row3_col2, #T_7612b_row3_col3, #T_7612b_row3_col4, #T_7612b_row3_col5, #T_7612b_row3_col6, #T_7612b_row3_col7, #T_7612b_row4_col0, #T_7612b_row4_col1, #T_7612b_row4_col2, #T_7612b_row4_col3, #T_7612b_row4_col4, #T_7612b_row4_col5, #T_7612b_row4_col6, #T_7612b_row4_col7 {
+  font-family: monospace;
+}
+</style>
+<table id="T_7612b">
+  <thead>
+    <tr>
+      <th class="blank" >&nbsp;</th>
+      <th class="blank level0" >&nbsp;</th>
+      <th id="T_7612b_level0_col0" class="col_heading level0 col0" >Value</th>
+      <th id="T_7612b_level0_col1" class="col_heading level0 col1" >Std Err</th>
+      <th id="T_7612b_level0_col2" class="col_heading level0 col2" >t Stat</th>
+      <th id="T_7612b_level0_col3" class="col_heading level0 col3" >Signif</th>
+      <th id="T_7612b_level0_col4" class="col_heading level0 col4" >Robust Std Err</th>
+      <th id="T_7612b_level0_col5" class="col_heading level0 col5" >Robust t Stat</th>
+      <th id="T_7612b_level0_col6" class="col_heading level0 col6" >Robust Signif</th>
+      <th id="T_7612b_level0_col7" class="col_heading level0 col7" >Null Value</th>
+    </tr>
+    <tr>
+      <th class="index_name level0" >Category</th>
+      <th class="index_name level1" >Parameter</th>
+      <th class="blank col0" >&nbsp;</th>
+      <th class="blank col1" >&nbsp;</th>
+      <th class="blank col2" >&nbsp;</th>
+      <th class="blank col3" >&nbsp;</th>
+      <th class="blank col4" >&nbsp;</th>
+      <th class="blank col5" >&nbsp;</th>
+      <th class="blank col6" >&nbsp;</th>
+      <th class="blank col7" >&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_7612b_level0_row0" class="row_heading level0 row0" rowspan="2">ASCs</th>
+      <th id="T_7612b_level1_row0" class="row_heading level1 row0" >ASC_CAR</th>
+      <td id="T_7612b_row0_col0" class="data row0 col0" >-0.167</td>
+      <td id="T_7612b_row0_col1" class="data row0 col1" > 0.0371</td>
+      <td id="T_7612b_row0_col2" class="data row0 col2" >-4.50</td>
+      <td id="T_7612b_row0_col3" class="data row0 col3" >***</td>
+      <td id="T_7612b_row0_col4" class="data row0 col4" > 0.0545</td>
+      <td id="T_7612b_row0_col5" class="data row0 col5" >-3.07</td>
+      <td id="T_7612b_row0_col6" class="data row0 col6" >**</td>
+      <td id="T_7612b_row0_col7" class="data row0 col7" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_7612b_level1_row1" class="row_heading level1 row1" >ASC_TRAIN</th>
+      <td id="T_7612b_row1_col0" class="data row1 col0" >-0.512</td>
+      <td id="T_7612b_row1_col1" class="data row1 col1" > 0.0452</td>
+      <td id="T_7612b_row1_col2" class="data row1 col2" >-11.33</td>
+      <td id="T_7612b_row1_col3" class="data row1 col3" >***</td>
+      <td id="T_7612b_row1_col4" class="data row1 col4" > 0.0791</td>
+      <td id="T_7612b_row1_col5" class="data row1 col5" >-6.47</td>
+      <td id="T_7612b_row1_col6" class="data row1 col6" >***</td>
+      <td id="T_7612b_row1_col7" class="data row1 col7" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_7612b_level0_row2" class="row_heading level0 row2" rowspan="2">LOS</th>
+      <th id="T_7612b_level1_row2" class="row_heading level1 row2" >B_COST</th>
+      <td id="T_7612b_row2_col0" class="data row2 col0" >-0.00857</td>
+      <td id="T_7612b_row2_col1" class="data row2 col1" > 0.000463</td>
+      <td id="T_7612b_row2_col2" class="data row2 col2" >-18.51</td>
+      <td id="T_7612b_row2_col3" class="data row2 col3" >***</td>
+      <td id="T_7612b_row2_col4" class="data row2 col4" > 0.000600</td>
+      <td id="T_7612b_row2_col5" class="data row2 col5" >-14.27</td>
+      <td id="T_7612b_row2_col6" class="data row2 col6" >***</td>
+      <td id="T_7612b_row2_col7" class="data row2 col7" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_7612b_level1_row3" class="row_heading level1 row3" >B_TIME</th>
+      <td id="T_7612b_row3_col0" class="data row3 col0" >-0.00899</td>
+      <td id="T_7612b_row3_col1" class="data row3 col1" > 0.000570</td>
+      <td id="T_7612b_row3_col2" class="data row3 col2" >-15.77</td>
+      <td id="T_7612b_row3_col3" class="data row3 col3" >***</td>
+      <td id="T_7612b_row3_col4" class="data row3 col4" > 0.00107</td>
+      <td id="T_7612b_row3_col5" class="data row3 col5" >-8.39</td>
+      <td id="T_7612b_row3_col6" class="data row3 col6" >***</td>
+      <td id="T_7612b_row3_col7" class="data row3 col7" > 0.00</td>
+    </tr>
+    <tr>
+      <th id="T_7612b_level0_row4" class="row_heading level0 row4" >LogSums</th>
+      <th id="T_7612b_level1_row4" class="row_heading level1 row4" >existing</th>
+      <td id="T_7612b_row4_col0" class="data row4 col0" > 0.487</td>
+      <td id="T_7612b_row4_col1" class="data row4 col1" > 0.0279</td>
+      <td id="T_7612b_row4_col2" class="data row4 col2" >-18.39</td>
+      <td id="T_7612b_row4_col3" class="data row4 col3" >***</td>
+      <td id="T_7612b_row4_col4" class="data row4 col4" > 0.0389</td>
+      <td id="T_7612b_row4_col5" class="data row4 col5" >-13.18</td>
+      <td id="T_7612b_row4_col6" class="data row4 col6" >***</td>
+      <td id="T_7612b_row4_col7" class="data row4 col7" > 1.00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
 </div>
 </section>
 
@@ -838,7 +819,7 @@ a rational order.  We can use the ordering method to do this:</p>
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-<p class="larch-version">🌳 Larch v6.0.37.dev22+gb97334f, © Copyright 2024.</p></div>
+<p class="larch-version">🌳 Larch v6.0.37.dev23+g7a06251, © Copyright 2024.</p></div>
       
     </div>
   
