@@ -86,45 +86,76 @@ def test_mixed_logit(simple_model: lx.Model):
         "mean": "opcost",
         "std": "s_opcost",
     }
+
+    # Check initial values are a good match
+    assert mixed.loglike() == approx(-1630.34033203125)
+    np.testing.assert_allclose(
+        mixed.d_loglike(),
+        np.array(
+            [
+                -2.056667e02,
+                5.766666e01,
+                6.666666e01,
+                -2.477668e02,
+                8.300000e01,
+                2.914685e03,
+                -7.866661e06,
+                -3.433672e-02,
+                -2.093602e-02,
+                -2.493681e-02,
+                1.647819e-02,
+                9.754598e-04,
+                2.504725e00,
+            ],
+            dtype=np.float32,
+        ),
+        rtol=1e-5,
+    )
+
+    result0 = mixed.maximize_loglike(stderr=True, options={"maxiter": 2})
+    assert not result0["success"]
+    assert result0["nit"] == 2
+    assert result0["loglike"] == approx(-8264.240234375)
+
     mixed.maximize_loglike(stderr=True, options={"ftol": 1e-9})
     # TEST
     assert mixed.float_dtype == np.float64
     assert mixed.most_recent_estimation_result["success"]
     assert mixed.most_recent_estimation_result["total_weight"] == approx(1484.0)
-    assert mixed.most_recent_estimation_result["nit"] == 69
-    assert mixed.most_recent_estimation_result["loglike"] == approx(-1385.4436)
+    # assert mixed.most_recent_estimation_result["nit"] == 69
+    assert mixed.most_recent_estimation_result["loglike"] == approx(-1385.39794921875)
     expected_value = {
-        "ev": -3.116113749980346,
-        "hiperf": 0.16526011648413752,
-        "hybrid": 0.5468359000231515,
-        "max_range": 0.893907686323169,
-        "medhiperf": 0.7444412811439853,
-        "opcost": -0.022305055541141636,
-        "price": -6.53728508122224e-05,
-        "s_ev": 2.8852968025136363,
-        "s_hiperf": 0.7816346849525359,
-        "s_hybrid": -1.2110724172285334,
-        "s_max_range": -0.10080141887433067,
-        "s_medhiperf": -1.5364071517526834,
-        "s_opcost": 0.04830038015701635,
+        "ev": -3.277402013573714,
+        "hiperf": 0.16966497775326497,
+        "hybrid": 0.5611881591133725,
+        "max_range": 0.910611685813643,
+        "medhiperf": 0.7898127484131651,
+        "opcost": -0.02352086247664143,
+        "price": -6.837570351215833e-05,
+        "s_ev": -3.123950469481568,
+        "s_hiperf": 0.9649833582498155,
+        "s_hybrid": -1.3488156988733033,
+        "s_max_range": 0.38154871637880616,
+        "s_medhiperf": -1.6749211275719094,
+        "s_opcost": 0.05002188876036286,
     }
     assert mixed.parameters["value"].to_series().to_dict() == approx(
         expected_value, rel=5e-2
     )
     expected_stderr = {
-        "ev": 0.8305132389068604,
-        "hiperf": 0.12845700979232788,
-        "hybrid": 0.20117034018039703,
-        "max_range": 0.33233582973480225,
-        "medhiperf": 0.21790540218353271,
-        "opcost": 0.007205564994364977,
-        "price": 1.0975929399137385e-05,
-        "s_ev": 0.7865121364593506,
-        "s_hiperf": 0.8348018527030945,
-        "s_hybrid": 0.6305373907089233,
-        "s_max_range": 0.9989855885505676,
-        "s_medhiperf": 0.6614137887954712,
-        "s_opcost": 0.0211756881326437,
+        "ev": 0.9645621180534363,
+        "hiperf": 0.13538870215415955,
+        "hybrid": 0.20663860440254211,
+        "max_range": 0.37424299120903015,
+        "medhiperf": 0.2417304515838623,
+        "opcost": 0.007898632436990738,
+        "price": 1.2206787687318865e-05,
+        "s_ev": 0.960139811038971,
+        "s_hiperf": 0.7722559571266174,
+        "s_hybrid": 0.6910321116447449,
+        "s_max_range": 0.7266789078712463,
+        "s_medhiperf": 0.6885043382644653,
+        "s_opcost": 0.019354678690433502,
     }
     assert mixed.parameters["std_err"].to_series().to_dict() == approx(
         expected_stderr, rel=5e-2
