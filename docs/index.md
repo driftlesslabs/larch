@@ -1,6 +1,6 @@
 # Larch Documentation
 
-[![PyPI - Version](https://img.shields.io/pypi/v/larch6)](https://pypi.org/project/larch6)
+[![PyPI - Version](https://img.shields.io/pypi/v/larch)](https://pypi.org/project/larch)
 [![conda-forge](https://img.shields.io/conda/dn/conda-forge/larch)](https://anaconda.org/conda-forge/larch)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/driftlesslabs/larch/ci.yml?branch=main)
 
