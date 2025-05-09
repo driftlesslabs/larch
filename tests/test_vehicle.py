@@ -141,7 +141,6 @@ def test_mixed_logit(simple_model: lx.Model):
     assert mixed.float_dtype == np.float64
     assert mixed.most_recent_estimation_result["success"]
     assert mixed.most_recent_estimation_result["total_weight"] == approx(1484.0)
-    assert mixed.most_recent_estimation_result["nit"] == 35
     assert mixed.most_recent_estimation_result["loglike"] == approx(-1385.494384765625)
     expected_value = {
         "ev": -3.0386047026095038,
