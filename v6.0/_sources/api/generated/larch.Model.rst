@@ -19,6 +19,7 @@
       ~Model.analyze_predictions_co
       ~Model.analyze_predictions_co_figure
       ~Model.apply_random_draws
+      ~Model.availability_def
       ~Model.bhhh
       ~Model.calculate_parameter_covariance
       ~Model.check_d_loglike
@@ -107,6 +108,7 @@
       ~Model.availability_any
       ~Model.availability_ca_var
       ~Model.availability_co_vars
+      ~Model.availability_var
       ~Model.choice_any
       ~Model.choice_ca_var
       ~Model.choice_co_code

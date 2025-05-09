@@ -154,6 +154,7 @@ Ancillary Computation
     Model.d_loglike_casewise
     Model.loglike
     Model.loglike_casewise
+    Model.logloss
     Model.logsums
     Model.probability
     Model.quantity

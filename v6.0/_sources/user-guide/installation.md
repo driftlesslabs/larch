@@ -8,30 +8,19 @@ working environment, see the [New Users](#new-users) section below.
 
 ## Quick Start
 
-Larch v6 is available via `pip`.  Since it is not yet feature complete, it is not
-the default "Larch" for most users, and must be installed as the `larch6` package.
+Larch is available via `pip`.
 
 ```shell
-python -m pip install larch6
+python -m pip install larch
 ```
 
-This will install the package and all of its required dependencies.  Note that
-while the installation name (using pip) is "larch6", the package import name
-(from within Python) is still just "larch", and you cannot install both
-Larch v5 and Larch v6 in the same environment.
-
-Once installed, use larch as you normally would, import it in Python as just `larch`:
+This will install the package and all of its required dependencies.
+Once installed, use larch as you normally would. A common shorthand is to import
+it in Python as just `lx`:
 
 ```python
 import larch as lx
 ```
-
-Version 6 is a work in progress, not a production-ready tool. A lot of things are
-working, but not everything. The interface is quite similar to Larch v5 and existing
-users will likely find it familiar. If you want to try it out, please do, and feel
-free to open issues in the issue tracker. But, please don't expect it to work
-perfectly yet, especially for more advanced models.
-
 
 ## New Users
 
@@ -71,5 +60,5 @@ Users of the Google Colab platform can install and use Larch by running the
 following cell at the top of their notebook:
 
 ```shell
-!python -m pip install larch6
+!python -m pip install larch
 ```
