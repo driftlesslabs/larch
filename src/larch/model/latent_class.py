@@ -35,7 +35,7 @@ class LatentClass(BaseModel, OptimizeMixin, PanelMixin):
         This structure is used to connect two or more discrete classes, as well as
         a class membership model that determines the probability of each decision
         maker being a member of each class.
-        
+
         The estimation of latent class models cannot be done with the
         `numba` compute engine, and must be done with the `jax` compute engine.
 
