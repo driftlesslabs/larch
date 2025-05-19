@@ -9,6 +9,3 @@ Latent Class Model
     :toctree: generated/
 
     LatentClass
-
-
-

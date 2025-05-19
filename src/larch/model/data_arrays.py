@@ -243,10 +243,13 @@ def prepare_data(
         else:
             choicecodes = datasource.get(request["choice_co_code"])
         da_ch = DataArray(
-            np.zeros(shape=(
-                model_dataset.sizes[datatree.CASEID],
-                model_dataset.sizes[datatree.ALTID],
-            ), dtype=float_dtype,),
+            np.zeros(
+                shape=(
+                    model_dataset.sizes[datatree.CASEID],
+                    model_dataset.sizes[datatree.ALTID],
+                ),
+                dtype=float_dtype,
+            ),
             dims=[datatree.CASEID, datatree.ALTID],
             coords={
                 datatree.CASEID: model_dataset.coords[datatree.CASEID],
@@ -268,10 +271,13 @@ def prepare_data(
     if "choice_co" in request:
         log.debug(f"requested choice_co_vars data: {request['choice_co']}")
         da_ch = DataArray(
-            np.zeros(shape=(
-                model_dataset.sizes[datatree.CASEID],
-                model_dataset.sizes[datatree.ALTID],
-            ), dtype=float_dtype,),
+            np.zeros(
+                shape=(
+                    model_dataset.sizes[datatree.CASEID],
+                    model_dataset.sizes[datatree.ALTID],
+                ),
+                dtype=float_dtype,
+            ),
             dims=[datatree.CASEID, datatree.ALTID],
             coords={
                 datatree.CASEID: model_dataset.coords[datatree.CASEID],

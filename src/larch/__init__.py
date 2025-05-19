@@ -69,6 +69,7 @@ def versions() -> dict:
     import pandas as pd
     import sharrow as sh
     import xarray as xr
+
     try:
         import jax
     except ImportError:

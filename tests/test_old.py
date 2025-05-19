@@ -1,6 +1,9 @@
-import larch
+from __future__ import annotations
+
 import pytest
-from larch import P, X, PX
+
+import larch
+from larch import PX, P, X
 
 
 def test_old_commands():
@@ -19,10 +22,10 @@ def test_old_commands():
     m.utility_ca = PX("tottime") + PX("totcost")
 
     with pytest.raises(NotImplementedError):
-        m.availability_var = '_avail_'
+        m.availability_var = "_avail_"
 
-    m.availability_ca_var = '_avail_'
-    m.choice_ca_var = '_choice_'
+    m.availability_ca_var = "_avail_"
+    m.choice_ca_var = "_choice_"
     m.title = "MTC Example 1 (Simple MNL)"
 
     with pytest.warns(DeprecationWarning):
@@ -31,12 +34,6 @@ def test_old_commands():
     with pytest.raises(ValueError):
         m.maximize_loglike()
 
-    m.choice_ca_var = 'chose'
+    m.choice_ca_var = "chose"
     result = m.maximize_loglike()
     assert result.loglike == pytest.approx(-3626.18625551293)
-
-
-
-
-
-

@@ -199,10 +199,12 @@ class BaseModel:
         cache_dir=None,
         autoscale_weights=False,
         graph: NestingTree | None = None,
-        dataservice = NotImplemented,
+        dataservice=NotImplemented,
     ):
         if dataservice is not NotImplemented:
-            raise NotImplementedError("dataservice is no longer supported, use `datatree` instead")
+            raise NotImplementedError(
+                "dataservice is no longer supported, use `datatree` instead"
+            )
         if not hasattr(self, "_ident"):
             self._ident = _unique_ident()
         self._mangled = 0x3
@@ -1620,9 +1622,11 @@ class BaseModel:
 
     @property
     def availability_var(self):
-        raise NotImplementedError("availability_var is no longer supported, use "
-                                  "`availability_ca_var`, `availability_co_vars`, "
-                                  "or `availability_any` instead.")
+        raise NotImplementedError(
+            "availability_var is no longer supported, use "
+            "`availability_ca_var`, `availability_co_vars`, "
+            "or `availability_any` instead."
+        )
 
     def availability_def(self, new_def: dict | None = None, **kwargs) -> dict:
         """
