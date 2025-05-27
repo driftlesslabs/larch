@@ -277,7 +277,7 @@ class _GenericFlow:
         obj.coords["alt_names"] = names
         return obj
 
-    def as_tree(self, label="main", exclude_dims=()) -> DataTree:
+    def as_tree(self, label="main", exclude_dims=(), extra_vars=None) -> DataTree:
         """
         Convert this Dataset to a DataTree.
 
@@ -291,6 +291,9 @@ class _GenericFlow:
         exclude_dims : Tuple[str], optional
             Exclude these dimensions, in addition to any
             dimensions listed in the `_exclude_dims_` attribute.
+        extra_vars : dict, optional
+            Extra variables to add to the tree, which can be referenced
+            in expressions.
 
         Returns
         -------
@@ -305,7 +308,7 @@ class _GenericFlow:
             obj = self._obj.assign(
                 {"_case_index_": xr.DataArray(case_index, dims=(self.CASEALT))}
             )
-            tree = DataTree(**{label: obj.drop_dims(self.CASEID)})
+            tree = DataTree(**{label: obj.drop_dims(self.CASEID)}, extra_vars=extra_vars)
             ds = obj.keep_dims(self.CASEID)
             ds.attrs.pop("_exclude_dims_", None)
             ds.attrs.pop("_caseptr_", None)
@@ -317,7 +320,7 @@ class _GenericFlow:
                 relationships=(f"{label}._case_index_ -> idcoVars.{self.CASEID}"),
             )
         else:
-            tree = DataTree(**{label: self._obj})
+            tree = DataTree(**{label: self._obj}, extra_vars=extra_vars)
         return tree
 
     def setup_flow(self, *args, **kwargs) -> sh.Flow:
