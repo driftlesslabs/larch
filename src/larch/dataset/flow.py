@@ -901,7 +901,12 @@ class _DatasetDC(_GenericFlow):
             if k not in dtypes:
                 continue
             try:
-                obj.merge({k: obj[k].astype(dtypes[k])}, compat="override", join="override", combine_attrs="override")
+                obj.merge(
+                    {k: obj[k].astype(dtypes[k])},
+                    compat="override",
+                    join="override",
+                    combine_attrs="override",
+                )
             except Exception as err:
                 if on_error == "warn":
                     warnings.warn(
