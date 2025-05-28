@@ -901,6 +901,11 @@ class _DatasetDC(_GenericFlow):
             if k not in dtypes:
                 continue
             try:
+                # we use the various "override" options here because we know
+                # that the change in dtype will not change the shape, dimension
+                # names, indexes, or coordinates of the data, so we can safely
+                # override all the various checks that xarray does in favor of
+                # a faster conversion.
                 obj.merge(
                     {k: obj[k].astype(dtypes[k])},
                     compat="override",
