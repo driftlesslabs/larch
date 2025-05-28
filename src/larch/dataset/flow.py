@@ -308,7 +308,9 @@ class _GenericFlow:
             obj = self._obj.assign(
                 {"_case_index_": xr.DataArray(case_index, dims=(self.CASEALT))}
             )
-            tree = DataTree(**{label: obj.drop_dims(self.CASEID)}, extra_vars=extra_vars)
+            tree = DataTree(
+                **{label: obj.drop_dims(self.CASEID)}, extra_vars=extra_vars
+            )
             ds = obj.keep_dims(self.CASEID)
             ds.attrs.pop("_exclude_dims_", None)
             ds.attrs.pop("_caseptr_", None)
