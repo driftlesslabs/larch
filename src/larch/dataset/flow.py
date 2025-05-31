@@ -901,17 +901,22 @@ class _DatasetDC(_GenericFlow):
             if k not in dtypes:
                 continue
             try:
-                # we use the various "override" options here because we know
-                # that the change in dtype will not change the shape, dimension
-                # names, indexes, or coordinates of the data, so we can safely
-                # override all the various checks that xarray does in favor of
-                # a faster conversion.
-                obj.merge(
-                    {k: obj[k].astype(dtypes[k])},
-                    compat="override",
-                    join="override",
-                    combine_attrs="override",
-                )
+                # originally, this used `obj[k] = obj[k].astype(dtypes[k])`
+                # to convert the dtype of each variable in the Dataset.
+                # However, this was found to be slow, as it checks all the
+                # dimensions, indexes, and coordinates every time.  We know
+                # that none of that changes so we don't need to do any checks.
+                #
+                # The `merge` method with `compat`, `join`, and `combine_attrs`
+                # all set to "override" was also tried, but it was found to be
+                # unsuccessful, as the dtype conversion did not work correctly.
+                #
+                # So we use the `data` attribute to directly set the data on
+                # the variable we want to convert, which is much faster.  By
+                # using `copy=False`, we avoid unnecessary copying of the data
+                # when the dtype is already correct.
+                obj[k].data = obj[k].astype(dtype=dtypes[k], copy=False).data
+
             except Exception as err:
                 if on_error == "warn":
                     warnings.warn(
