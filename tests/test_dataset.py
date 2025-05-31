@@ -51,17 +51,17 @@ def test_dataset_dtypes():
     )
 
     # set some variables with different dtypes
-    ca['ovtt_round'] = ca['ovtt'].round().astype(np.int8)
-    ca['ivtt_round'] = ca['ivtt'].round().astype(np.uint8)
-    ca['male'] = ca['femdum'] == 0
+    ca["ovtt_round"] = ca["ovtt"].round().astype(np.int8)
+    ca["ivtt_round"] = ca["ivtt"].round().astype(np.uint8)
+    ca["male"] = ca["femdum"] == 0
 
     # initialize the Dataset from the DataFrame
     ds = lx.Dataset.dc.from_idca(ca)
 
     # check the dtypes
-    assert ds['ovtt_round'].dtype == ca['ovtt_round'].dtype
-    assert ds['ivtt_round'].dtype == ca['ivtt_round'].dtype
-    assert ds['male'].dtype == ca['male'].dtype
-    assert ds['chose'].dtype == ca['chose'].dtype
-    assert ds['ivtt'].dtype == ca['ivtt'].dtype
-    assert ds['hhid'].dtype == ca['hhid'].dtype
+    assert ds["ovtt_round"].dtype == ca["ovtt_round"].dtype
+    assert ds["ivtt_round"].dtype == ca["ivtt_round"].dtype
+    assert ds["male"].dtype == ca["male"].dtype
+    assert ds["chose"].dtype == ca["chose"].dtype
+    assert ds["ivtt"].dtype == ca["ivtt"].dtype
+    assert ds["hhid"].dtype == ca["hhid"].dtype
