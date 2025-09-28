@@ -116,3 +116,42 @@ def test_model_gradient_check():
     }
     assert chk.data.analytic.to_dict() == approx(dll)
     assert chk.data.finite_diff.to_dict() == approx(dll, rel=1e-5)
+
+
+def test_nested_logit_with_unavailable_nest(compute_engine="numba"):
+    d = lx.examples.MTC(format="dataset")
+    m = lx.Model(d, compute_engine=compute_engine)
+    m.availability_ca_var = "avail"
+    m.choice_ca_var = "chose"
+    m.utility_co[2] = P("ASC_SR2") + P("hhinc#2") * X("hhinc")
+    m.utility_co[3] = P("ASC_SR3P") + P("hhinc#3") * X("hhinc")
+    m.utility_co[4] = P("ASC_TRAN") + P("hhinc#4") * X("hhinc")
+    m.utility_co[5] = P("ASC_BIKE") + P("hhinc#5") * X("hhinc")
+    m.utility_co[6] = P("ASC_WALK") + P("hhinc#6") * X("hhinc")
+    m.utility_ca = PX("tottime") + PX("totcost")
+
+    # create nests
+    sr = m.graph.new_node(parameter="mu_sr", children=[2, 3], name="SR")
+    _car = m.graph.new_node(parameter="mu_car", children=[1, sr], name="Car")
+    non_mot = m.graph.new_node(
+        parameter="mu_nonmotor", children=[5, 6], name="Nonmotorized"
+    )
+    _happy = m.graph.new_node(parameter="mu_happy", children=[4, non_mot], name="Happy")
+
+    # add a utility term that will make the nonmotorized nest always unavailable
+    # for some observations
+    m.utility_ca += X("tottime * (altid >= 5)") * P("nonmotorized_time")
+
+    m.pvals = {"mu_car": 0.5, "mu_nonmotor": 0.5, "mu_happy": 0.65, "mu_sr": 0.2}
+
+    assert m.utility()[:3, 6:] == approx(
+        np.asarray(
+            [
+                [0.13862944, 0.42067753, 0.0, 0.45054567, 1.12887029],
+                [0.13862944, 0.42067753, 0.0, 0.45054567, 1.12887029],
+                [0.13862944, 0.42067753, -np.inf, 0.0, 0.92544593],
+            ]
+        ),
+        rel=1e-5,
+    )
+    assert m.loglike() == approx(-6936.470346687585)

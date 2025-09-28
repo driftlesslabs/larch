@@ -308,6 +308,15 @@ def _numba_utility_to_loglike(
                         #     if z > shifter:
                         #         shifter = z
                         #         shifter_position = child
+
+                # # if shifter_position is still -1, all children were -inf,
+                # # so the parent is also -inf
+                if shifter_position == -1:
+                    utility[up] = -np.inf
+                    continue
+
+                # otherwise, there was some child with non -inf utility, so
+                # we can compute the parent's utility
                 for n in range(n_children_for_parent):
                     edge = start_slots[up_nest] + n
                     dn = dnslots[edge]
