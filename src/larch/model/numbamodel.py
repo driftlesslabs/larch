@@ -375,8 +375,10 @@ def _numba_utility_to_loglike(
             mu_up = 1.0
         else:
             mu_up = parameter_arr[mu_slots[up - n_alts]]
-        if np.isinf(utility[up]) and utility[up] < 0:
+        if np.isneginf(utility[up]):
             logprob[dn] = -np.inf
+        elif utility[dn] == utility[up]:
+            logprob[dn] = 0.0
         else:
             logprob[dn] = (utility[dn] - utility[up]) / mu_up
         if array_ch[dn]:
