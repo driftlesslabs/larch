@@ -28,7 +28,7 @@ dependencies = [
     "sparse",
     "scipy >=1.15,<1.16",
     "Jinja2",
-    # sharrow is not here because it is part of the wheel for larch
+    "sharrow >=2.15"
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
@@ -57,13 +57,12 @@ jax = [
 ]
 
 [tool.setuptools.packages.find]
-where = ["src", "subs/sharrow"]
-include = ["larch*", "sharrow*"]
+where = ["src"]
+include = ["larch*"]
 namespaces = false
 
 [tool.setuptools.package-data]
 data_warehouse = ["*.csv.gz", "*.omx", "*.zarr.zip", "*.parquet"]
-sharrow = ["example_data/*"]
 
 [tool.setuptools_scm]
 fallback_version = "6.0"
@@ -128,3 +127,9 @@ ignore-overlong-task-comments = true
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
+
+[tool.uv.sources]
+sharrow = { workspace = true }
+
+[tool.uv.workspace]
+members = ["subs/*"]
