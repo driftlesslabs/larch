@@ -246,7 +246,7 @@ def _type_signatures(sig):
     ]
 
 
-@njit(error_model="numpy", fastmath=True, cache=True)
+@njit(error_model="numpy", fastmath=False, cache=True)
 def _numba_utility_to_loglike(
     n_alts,
     edgeslots,  # int input shape=[edges, 4]
@@ -645,7 +645,7 @@ _numba_master_vectorized = guvectorize(
     _type_signatures("fiii fii ifii I iii bf fbffF Fij b fffFff"),
     _master_shape_signature,
     nopython=True,
-    fastmath=True,
+    fastmath=False,
     target="parallel",
     cache=True,
 )(
