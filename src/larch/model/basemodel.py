@@ -1805,10 +1805,8 @@ class BaseModel:
                 monospace_cols.append("Signif")
         for z in ["Std Err", "Robust Std Err"]:
             if z in result.columns:
-                _fmt_s = (
-                    lambda x: f"{x: #.3g}".replace(" ", NBSP)
-                    if np.isfinite(x)
-                    else NBSP + "NA"
+                _fmt_s = lambda x: (
+                    f"{x: #.3g}".replace(" ", NBSP) if np.isfinite(x) else NBSP + "NA"
                 )
                 result[z] = result[z].apply(_fmt_s)
                 monospace_cols.append(z)
