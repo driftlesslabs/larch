@@ -96,7 +96,7 @@ cd -- "${TARGET_DIR}"
 eval "$(conda shell.bash hook)"
 
 # create a conda environment
-conda create -p .env/${TARGET_KERNEL} python=3.10 --yes
+conda create -p .env/${TARGET_KERNEL} python=3.11 --yes
 
 # activate the conda environment
 conda activate .env/${TARGET_KERNEL}

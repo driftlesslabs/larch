@@ -6,6 +6,10 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+env:
+  # Temporary until Sharrow publishes its Python 3.14 AST compatibility fixes.
+  SHARROW_REVISION: 56a41c760d020537dc551afa946ebf2f83d1c85a
+
 jobs:
   test-dev-install:
     name: developer install
@@ -13,17 +17,36 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
+        working-directory: larch
     steps:
         - name: checkout
           uses: actions/checkout@v4
+          with:
+            path: larch
+        - name: checkout compatible Sharrow
+          uses: actions/checkout@v4
+          with:
+            repository: outerl/sharrow
+            ref: ${{ env.SHARROW_REVISION }}
+            path: sharrow
+        - name: Install uv
+          uses: astral-sh/setup-uv@v3
+          with:
+            enable-cache: true
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version-file: "larch/.python-version"
         - name: setup graphviz
           uses: ts-graphviz/setup-graphviz@v2
-        - name: run developer install script
-          run: bash envs/uv-dev.sh -d .
+        - name: install developer dependencies
+          run: uv sync --locked --all-extras
+        - name: generate example modules
+          run: uv run --no-sync python tools/rip_examples.py
         - name: review environment
           run: uv pip list
         - name: run tests
-          run: uv run pytest
+          run: uv run --no-sync pytest
 
   build-wheel:
     name: 🛞 build wheel
@@ -37,7 +60,6 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
-          submodules: recursive
       - name: Install uv
         uses: astral-sh/setup-uv@v3
         with:
@@ -45,41 +67,100 @@ jobs:
       - name: "Set up Python"
         uses: actions/setup-python@v5
         with:
-          python-version-file: "pyproject.toml"
+          python-version: "3.14"
       - name: build wheel
-        run: uv build
+        run: |
+          python tools/rip_examples.py
+          uv build --no-sources
       - name: Upload wheel artifact
         uses: actions/upload-artifact@v4
         with:
           name: wheels
           path: dist
 
+  build-sharrow-wheel:
+    name: 🛞 build compatible Sharrow wheel
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout compatible Sharrow
+        uses: actions/checkout@v4
+        with:
+          repository: outerl/sharrow
+          ref: ${{ env.SHARROW_REVISION }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: build dependency wheel
+        env:
+          SETUPTOOLS_SCM_PRETEND_VERSION_FOR_SHARROW: 2.16.2+py314.56a41c7
+        run: uv build --wheel --no-sources
+      - name: Upload dependency wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: sharrow-py314-wheel
+          path: dist/*.whl
+
   test-wheel:
     name: 🧪 test wheel
-    needs: build-wheel
+    needs: [build-wheel, build-sharrow-wheel]
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ '3.10', '3.11', '3.12', '3.13' ]
+        python-version: [ '3.11', '3.12', '3.13', '3.14' ]
+      fail-fast: false
     defaults:
       run:
         shell: bash -l {0}
     steps:
+      - name: checkout tests
+        uses: actions/checkout@v4
       - name: Install uv
         uses: astral-sh/setup-uv@v3
       - name: "Set up Python"
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: setup graphviz
+        uses: ts-graphviz/setup-graphviz@v2
       - name: Download wheel artifact
         uses: actions/download-artifact@v4
         with:
           name: wheels
           path: dist
+      - name: Download compatible Sharrow wheel
+        if: matrix.python-version == '3.14'
+        uses: actions/download-artifact@v4
+        with:
+          name: sharrow-py314-wheel
+          path: dependencies
       - name: Install wheel
         run: |
-          uv venv
-          uv pip install dist/*.whl
+          uv venv --python "${{ matrix.python-version }}"
+          wheels=(dist/*.whl)
+          dependency_wheels=()
+          if [[ "${{ matrix.python-version }}" == "3.14" ]]; then
+            dependency_wheels=(dependencies/*.whl)
+          fi
+          uv pip install --only-binary :all: "${wheels[0]}[test]" "${dependency_wheels[@]}"
+          uv pip check
+      - name: Verify installed wheel
+        run: |
+          .venv/bin/python - <<'PY'
+          from pathlib import Path
+          import sys
+          import larch
+          from sharrow.aster import expression_for_numba
+
+          assert Path(larch.__file__).is_relative_to(Path(sys.prefix))
+          assert larch.examples.ex, "Generated examples are missing from the wheel"
+          expression_for_numba(
+              "skims['DIST']", spacename="skims", dim_slots=(0,), spacevars={"DIST"}
+          )
+          print(larch.versions())
+          PY
       - name: Run tests
         run: |
-          uv run python -c "import larch; print(larch.versions())"
+          .venv/bin/python -m pytest tests -o addopts=''

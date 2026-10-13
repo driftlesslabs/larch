@@ -148,7 +148,7 @@ class OptimizeMixin(BucketAccess):
                     params=self.__rich_table(params),
                     bestloglike=self._cached_loglike_best,
                 )
-        return result
+        return float(result)
 
     def jax_neg_d_loglike(self, *args, **kwargs):
         return -self.jax_d_loglike(*args, **kwargs)
@@ -157,7 +157,9 @@ class OptimizeMixin(BucketAccess):
         result = self.jax_neg_d_loglike(*args, **kwargs)
         result = result.at[self.pholdfast != 0].set(0)  # zero out holdfast parameters
         self._latest_gradient = -result
-        return result
+        # SciPy's SLSQP implementation requires double precision inputs,
+        # including when JAX computes the gradient in single precision.
+        return np.asarray(result, dtype=np.float64)
 
     def _check_if_best(self, computed_ll, pvalues=None):
         if np.isnan(computed_ll):
@@ -229,7 +231,7 @@ class OptimizeMixin(BucketAccess):
             self.dashboard.update_content(status="[yellow]optimizing parameters...")
             result = minimize(
                 self.__neg_loglike,
-                self.pvals,
+                np.asarray(self.pvals, dtype=np.float64),
                 jac=self.__neg_d_loglike,
                 method=method,
                 **kwargs,

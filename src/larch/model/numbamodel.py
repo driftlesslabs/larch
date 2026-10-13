@@ -2992,8 +2992,11 @@ class NumbaModel(_BaseModel):
                     {"selector": "td", "props": [("border", "1px solid #e5e5e5")]},
                 ]
             )
-            .applymap(bold_if_signif, subset=["signif"])
         )
+        if hasattr(output, "map"):
+            output = output.map(bold_if_signif, subset=["signif"])
+        else:
+            output = output.applymap(bold_if_signif, subset=["signif"])
         if caption:
             output.set_caption(caption).set_table_styles(
                 [
