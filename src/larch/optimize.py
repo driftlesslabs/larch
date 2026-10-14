@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from rich.table import Table
-from scipy.optimize import Bounds, minimize
+from scipy.optimize import Bounds, LinearConstraint, NonlinearConstraint, minimize
 
 from ._optional import jax, jnp
 from .compiled import jitmethod
@@ -214,11 +214,41 @@ class OptimizeMixin(BucketAccess):
             throttle=dashboard_update if dashboard else 9999,
         )
         try:
+            model_constraints = getattr(self, "constraints", ())
+            if model_constraints:
+                if method.lower() in {"slsqp", "cobyla"}:
+                    constraints = [
+                        constraint
+                        for model_constraint in model_constraints
+                        for constraint in model_constraint.as_constraint_dicts()
+                    ]
+                elif method.lower() == "trust-constr":
+                    constraints = [
+                        constraint
+                        for model_constraint in model_constraints
+                        for constraint in model_constraint.as_linear_constraints()
+                    ]
+                else:
+                    raise ValueError(
+                        f"{method} does not support model constraints; "
+                        "use SLSQP, COBYLA, or trust-constr"
+                    )
+                supplied_constraints = kwargs.get("constraints")
+                if supplied_constraints is not None:
+                    if isinstance(
+                        supplied_constraints,
+                        (dict, LinearConstraint, NonlinearConstraint),
+                    ):
+                        constraints.append(supplied_constraints)
+                    else:
+                        constraints.extend(supplied_constraints)
+                kwargs["constraints"] = constraints
             if method.lower() in {
                 "nelder-mead",
                 "l-bfgs-b",
                 "tnc",
                 "slsqp",
+                "cobyla",
                 "powell",
                 "trust-constr",
             }:
@@ -229,13 +259,41 @@ class OptimizeMixin(BucketAccess):
             )
             self.__neg_d_loglike(self.pvals)
             self.dashboard.update_content(status="[yellow]optimizing parameters...")
+            objective = self.__neg_loglike
+            gradient = self.__neg_d_loglike
+            objective_scale = 1
+            optimizer_constraints = kwargs.get("constraints")
+            if isinstance(
+                optimizer_constraints, (dict, LinearConstraint, NonlinearConstraint)
+            ) or optimizer_constraints:
+                # Precondition constrained fits using mean logloss, as Numba
+                # does. Large total gradients can prevent SLSQP from reaching
+                # feasibility; leave unconstrained optimizer trajectories intact.
+                objective_scale = (
+                    self.total_weight() if hasattr(self, "total_weight") else 1
+                )
+                objective = lambda params: self.__neg_loglike(params) / objective_scale
+                gradient = lambda params: self.__neg_d_loglike(params) / objective_scale
             result = minimize(
-                self.__neg_loglike,
+                objective,
                 np.asarray(self.pvals, dtype=np.float64),
-                jac=self.__neg_d_loglike,
+                jac=gradient if method.lower() != "cobyla" else None,
                 method=method,
                 **kwargs,
             )
+            # Restore total units for likelihood derivatives and multipliers.
+            # Solver-specific inverse Hessian approximations remain on the
+            # normalized optimizer scale.
+            if objective_scale != 1:
+                if "fun" in result:
+                    result["fun"] *= objective_scale
+                if "jac" in result and method.lower() != "trust-constr":
+                    result["jac"] *= objective_scale
+                for key in ("grad", "lagrangian_grad", "multipliers"):
+                    if key in result:
+                        result[key] *= objective_scale
+                if "v" in result:
+                    result["v"] = [values * objective_scale for values in result["v"]]
 
             try:
                 result["n_cases"] = self.n_cases
@@ -249,7 +307,9 @@ class OptimizeMixin(BucketAccess):
                     result["logloss"] = result["fun"] / self.total_weight()
                 result["loglike"] = -result["fun"]
                 del result["fun"]
-            if "jac" in result:
+            # trust-constr's jac describes the constraints; its grad retains
+            # SciPy's minimized-objective sign. Other jac results describe LL.
+            if "jac" in result and method.lower() != "trust-constr":
                 result["jac"] = -result["jac"]
             self.dashboard.update_content(
                 loglike=result["loglike"],
@@ -260,16 +320,11 @@ class OptimizeMixin(BucketAccess):
                 self.dashboard.update_content(
                     status="[yellow]computing standard errors..."
                 )
-                se, hess, ihess = self.jax_param_cov(result.x)
-                result["stderr"] = np.asarray(se)
-                hess = np.asarray(hess).copy()
-                hess[self.pholdfast.astype(bool), :] = 0
-                hess[:, self.pholdfast.astype(bool)] = 0
-                ihess = np.asarray(ihess).copy()
-                ihess[self.pholdfast.astype(bool), :] = 0
-                ihess[:, self.pholdfast.astype(bool)] = 0
-                self.add_parameter_array("hess", hess)
-                self.add_parameter_array("ihess", ihess)
+                self.calculate_parameter_covariance(result.x)
+                # The covariance calculation projects binding constraints into
+                # pstderr while retaining the unprojected inverse Hessian.
+                se = np.asarray(self.pstderr).copy()
+                result["stderr"] = se
                 self.dashboard.update_content(
                     params=self.__rich_table(result.x, se),
                 )
