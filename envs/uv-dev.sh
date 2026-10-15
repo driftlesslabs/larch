@@ -116,6 +116,11 @@ fi
 echo "Creating/syncing the UV python venv ..."
 uv sync --all-extras
 
+# Graphviz renders notebook graphs and diagrams in Excel reports.
+if command -v apt-get >/dev/null 2>&1 && ! command -v dot >/dev/null 2>&1; then
+    bash envs/install-graphviz.sh .venv
+fi
+
 # install sharrow in editable mode in the UV virtual environment
 echo "Installing sharrow in editable mode ..."
 uv pip install -e ./subs/sharrow
