@@ -29,7 +29,7 @@ from .basemodel import BaseModel as _BaseModel
 from .numba_stream import ModelStreamer
 
 if TYPE_CHECKING:
-    import altair.vegalite.v5.api
+    import altair
 
 if not list(Path(__file__).parent.glob("__pycache__/numbamodel.*.nbc")):
     warnings.warn(  ## Good news, everyone! ##  )
@@ -2138,13 +2138,17 @@ class NumbaModel(_BaseModel):
         )
         return -result / self.total_weight()
 
-    def neg_d_loglike(self, x=None, start_case=0, stop_case=-1, step_case=1, **kwargs):
+    def neg_d_loglike(
+        self, x=None, start_case=None, stop_case=None, step_case=None, **kwargs
+    ):
         result = self.d_loglike(
             x, start_case=start_case, stop_case=stop_case, step_case=step_case, **kwargs
         )
         return -np.asarray(result)
 
-    def d_logloss(self, x=None, start_case=0, stop_case=-1, step_case=1, **kwargs):
+    def d_logloss(
+        self, x=None, start_case=None, stop_case=None, step_case=None, **kwargs
+    ):
         result = self.d_loglike(
             x, start_case=start_case, stop_case=stop_case, step_case=step_case, **kwargs
         )
@@ -2992,8 +2996,11 @@ class NumbaModel(_BaseModel):
                     {"selector": "td", "props": [("border", "1px solid #e5e5e5")]},
                 ]
             )
-            .applymap(bold_if_signif, subset=["signif"])
         )
+        if hasattr(output, "map"):
+            output = output.map(bold_if_signif, subset=["signif"])
+        else:
+            output = output.applymap(bold_if_signif, subset=["signif"])
         if caption:
             output.set_caption(caption).set_table_styles(
                 [
@@ -3025,7 +3032,7 @@ class NumbaModel(_BaseModel):
         width: int = 400,
         alt_labels: Literal["id", "name"] = "name",
         bins=None,
-    ) -> altair.vegalite.v5.api.FacetChart:
+    ) -> altair.FacetChart:
         """
         Create an Altair figure of the model's predictions based on idco attributes.
 

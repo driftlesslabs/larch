@@ -26,18 +26,19 @@ dependencies = [
     "xmle >=0.1.25",
     "rich",
     "sparse",
-    "scipy >=1.15,<1.16",
+    "scipy >=1.15",
     "Jinja2",
-    "sharrow >=2.15"
+    "sharrow >=2.16.2"
 ]
 readme = "README.md"
-requires-python = ">= 3.10"
+requires-python = ">= 3.11"
 
 [project.optional-dependencies]
 # development dependency groups
 test = [
     "pytest >=4.6",
-    "jax >=0.6,<0.7",
+    "ipython",
+    "jax >=0.6,<0.9",
     "tables",
     "geopandas",
     "matplotlib",
@@ -47,7 +48,7 @@ test = [
     "zarr",
     "tabulate",
     "altair",
-    "vl-convert-python",
+    "vl-convert-python >=1.9.0",
     "pydot",
     "pytest-regressions",
     "openmatrix",
@@ -62,7 +63,12 @@ include = ["larch*"]
 namespaces = false
 
 [tool.setuptools.package-data]
-data_warehouse = ["*.csv.gz", "*.omx", "*.zarr.zip", "*.parquet"]
+larch = [
+    "data_warehouse/*.csv.gz",
+    "data_warehouse/*.omx",
+    "data_warehouse/*.zip",
+    "data_warehouse/*.parquet",
+]
 
 [tool.setuptools_scm]
 fallback_version = "6.0"
@@ -87,7 +93,7 @@ testpaths = [
 [tool.ruff]
 fix = true
 line-length = 88
-target-version = "py310"
+target-version = "py311"
 extend-include = ["*.ipynb"]
 extend-exclude = ["sandbox"]
 
@@ -128,8 +134,7 @@ ignore-overlong-task-comments = true
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
+# TODO: remove when done with local testing and sharrow wheel for py314 is available
 [tool.uv.sources]
-sharrow = { workspace = true }
-
-[tool.uv.workspace]
-members = ["subs/*"]
+# Local development uses the same Python 3.14 fixes as the CI dependency wheel.
+sharrow = { path = "../sharrow", editable = true, marker = "python_version >= '3.14'" }

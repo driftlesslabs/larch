@@ -349,11 +349,14 @@ def maximize_loglike(
 
                 # args = getattr(model, "_null_slice", (0, -1, 1))
                 raw_result = minimize(
-                    model.logloss,
-                    model.pvals,
+                    lambda params, *args: float(model.logloss(params, *args)),
+                    np.asarray(model.pvals, dtype=np.float64),
                     # args=args,
                     method=method,
-                    jac=model.d_logloss,
+                    # SLSQP requires float64 even when a JAX model uses float32.
+                    jac=lambda params, *args: np.asarray(
+                        model.d_logloss(params, *args), dtype=np.float64
+                    ),
                     bounds=bounds,
                     callback=callback,
                     options=options,
