@@ -81,7 +81,9 @@ def test_active_parameter_bound_and_holdfast_covariance(compute_engine):
     covariance = model.parameters["covariance_matrix"].values
     np.testing.assert_allclose(covariance, np.diag([0, 0, 1 / 16]), atol=1e-6)
     np.testing.assert_allclose(model.pstderr, [0, 0, 0.25], atol=1e-5)
-    assert model.parameters["constrained"].sel(param_name="asc_1").item() == "fixed value"
+    assert (
+        model.parameters["constrained"].sel(param_name="asc_1").item() == "fixed value"
+    )
     assert model.parameters["constrained"].sel(param_name="asc_2").item()
     if compute_engine == "jax":
         np.testing.assert_allclose(result.stderr, model.pstderr)
@@ -93,7 +95,9 @@ def test_active_parameter_bound_and_holdfast_covariance(compute_engine):
     [slice(None), slice(5, 90, 2), slice(None, -1)],
     ids=["all", "slice", "exclude-last"],
 )
-def test_numba_objective_gradients_match_observations_and_finite_differences(case_slice):
+def test_numba_objective_gradients_match_observations_and_finite_differences(
+    case_slice,
+):
     model = _choice_model("numba")
     # Equal initial probabilities give gradients directly from observed counts.
     choices = np.repeat([1, 2, 3], [10, 30, 60])[case_slice]
@@ -108,7 +112,9 @@ def test_numba_objective_gradients_match_observations_and_finite_differences(cas
         }
     )
     np.testing.assert_allclose(model.neg_d_loglike(**slice_kwargs), -expected_gradient)
-    np.testing.assert_allclose(model.d_logloss(**slice_kwargs), -expected_gradient / 100)
+    np.testing.assert_allclose(
+        model.d_logloss(**slice_kwargs), -expected_gradient / 100
+    )
 
     params = np.asarray([-0.2, 0.3])
     epsilon = 1e-6

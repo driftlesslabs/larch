@@ -263,9 +263,12 @@ class OptimizeMixin(BucketAccess):
             gradient = self.__neg_d_loglike
             objective_scale = 1
             optimizer_constraints = kwargs.get("constraints")
-            if isinstance(
-                optimizer_constraints, (dict, LinearConstraint, NonlinearConstraint)
-            ) or optimizer_constraints:
+            if (
+                isinstance(
+                    optimizer_constraints, (dict, LinearConstraint, NonlinearConstraint)
+                )
+                or optimizer_constraints
+            ):
                 # Precondition constrained fits using mean logloss, as Numba
                 # does. Large total gradients can prevent SLSQP from reaching
                 # feasibility; leave unconstrained optimizer trajectories intact.
