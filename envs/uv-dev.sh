@@ -68,6 +68,20 @@ then
     curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 
+# uv 0.13.4 or newer is required: older versions trust the compromised eMudhra CA
+# https://discuss.python.org/t/information-for-python-users-regarding-emudhra-emsign-ca-certificate-security-incident/109576
+UV_MIN_VERSION="0.13.4"
+UV_VERSION=$(uv --version 2>/dev/null | awk '{print $2}')
+if [ -z "$UV_VERSION" ]; then
+    echo "uv is not on PATH yet; open a new terminal and rerun this script."
+    exit 1
+fi
+if [ "$(printf '%s\n' "$UV_MIN_VERSION" "$UV_VERSION" | sort -V | head -n 1)" != "$UV_MIN_VERSION" ]; then
+    echo "uv $UV_VERSION is too old; uv $UV_MIN_VERSION or newer is required."
+    echo "Update it with: uv self update --system-certs"
+    exit 1
+fi
+
 # check that gh is installed
 if ! command -v gh &> /dev/null
 then
@@ -131,7 +145,8 @@ uv run ./tools/rip_examples.py
 
 # ensure pre-commit hooks are installed
 echo "Ensuring pre-commit hooks are installed ..."
-uvx pre-commit install
+# virtualenv 21.14.12 bundles pip 26.2.2, which pre-commit uses to install hooks
+uvx --with "virtualenv>=21.14.12" pre-commit install
 
 # make this environment available to jupyter if --no-kernel option is not provided
 if [ "$NO_KERNEL" = false ]; then

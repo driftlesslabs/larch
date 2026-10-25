@@ -26,8 +26,16 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Install uv
+        uses: astral-sh/setup-uv@18d369b23da25a81e9458561248e1aafff6a70fa # v10.3.1
+        with:
+          version: "0.13.4"
+          enable-cache: false
       - name: Build wheel
         run: |
+          # Upgrade pip with uv, not with the runner's older pip, which trusts the
+          # compromised eMudhra CA (see the eMudhra note in pyproject.toml).
+          uv pip install --system "pip>=26.2.2"
           python tools/rip_examples.py
           python -m pip install -e ./subs/sharrow
           python -m pip install build

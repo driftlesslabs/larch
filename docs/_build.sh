@@ -8,7 +8,8 @@ cd "$(dirname "$0")"
 
 # create a new conda environment for the docs build
 mamba create -p ../.env/DOCBUILD "python=3.11" \
-  pip \
+  "pip>=26.2.2" \
+  "certifi>=2026.10.19" \
   addicty \
   dask \
   filelock \
