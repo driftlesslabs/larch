@@ -214,3 +214,75 @@ def test_jax_constrained_solver_applies_parameter_bounds_and_preserves_metadata(
         assert all(np.isfinite(multiplier).all() for multiplier in result.v)
         assert np.isfinite(result.lagrangian_grad).all()
         np.testing.assert_allclose(result.grad, -model.d_loglike(), atol=2e-5)
+
+
+@pytest.mark.parametrize("lock_method", ["plock", "pholdfast"])
+@pytest.mark.parametrize("method", ["slsqp", "trust-constr", "cobyla"])
+def test_jax_constraints_preserve_held_parameters_without_fixed_bounds(
+    lock_method, method
+):
+    jax = pytest.importorskip("jax")
+    with jax.experimental.enable_x64():
+        model = _choice_model("jax")
+        if lock_method == "plock":
+            model.plock(asc_1=-2)
+        else:
+            model.pvals = {"asc_1": -2}
+            model.pholdfast = {"asc_1": 1}
+        model.pvals = {"asc_2": -3}
+        model.constraints = [OrderingBound("asc_2", "asc_1")]
+        original_minimum = model.pminimum.copy()
+        original_maximum = model.pmaximum.copy()
+        if method == "trust-constr":
+            options = {
+                "gtol": 1e-9,
+                "initial_barrier_parameter": 1e-4,
+                "maxiter": 300,
+            }
+        elif method == "cobyla":
+            options = {"tol": 1e-8, "catol": 1e-8, "maxiter": 300}
+        else:
+            options = {"ftol": 1e-10, "maxiter": 100}
+        result = model.maximize_loglike(method=method, quiet=True, options=options)
+        assert result.success
+        # The free ASC would prefer a higher value, but the ordering binds it
+        # to the held ASC. Both the solver result and stored model must agree.
+        np.testing.assert_allclose(result.x, [-2, -2], atol=2e-5)
+        np.testing.assert_allclose(result.x, model.pvals, rtol=0, atol=1e-8)
+        assert model.get_value("asc_1") == -2
+        assert model.constraints[0].fun(model.pvals) >= -1e-8
+        assert result.loglike == approx(model.loglike(), abs=1e-6)
+        np.testing.assert_array_equal(model.pminimum, original_minimum)
+        np.testing.assert_array_equal(model.pmaximum, original_maximum)
+
+
+@pytest.mark.parametrize("curvature", ["hess", "hessp", "finite-difference"])
+def test_jax_constrained_fit_scales_caller_curvature(curvature):
+    jax = pytest.importorskip("jax")
+    with jax.experimental.enable_x64():
+        model = _choice_model("jax")
+        model.constraints = [OrderingBound("asc_2", "asc_1")]
+
+        def hessian(params):
+            # Analytic Hessian of the total negative log likelihood for this
+            # intercept-only MNL, independent of Larch's differentiation.
+            exp_utility = np.exp(params)
+            shares = exp_utility / (1 + exp_utility.sum())
+            return 100 * (np.diag(shares) - np.outer(shares, shares))
+
+        if curvature == "hess":
+            kwargs = {"hess": hessian}
+        elif curvature == "hessp":
+            kwargs = {"hessp": lambda params, vector: hessian(params) @ vector}
+        else:
+            kwargs = {"hess": "2-point"}
+        result = model.maximize_loglike(
+            method="trust-constr",
+            quiet=True,
+            options={"gtol": 1e-8, "maxiter": 100},
+            **kwargs,
+        )
+        assert result.success
+        np.testing.assert_allclose(result.x, np.log(1 / 3), atol=1e-4)
+        assert result.loglike == approx(model.loglike(), abs=1e-8)
+        np.testing.assert_allclose(result.grad, -model.d_loglike(), atol=1e-8)

@@ -31,7 +31,12 @@ trap cleanup EXIT
 
 apt-get --simulate install --no-install-recommends graphviz > "$graphviz_downloads/plan.txt"
 mapfile -t graphviz_packages < <(
-    awk '/^Inst / { version = $3; sub(/^\(/, "", version); print $2 "=" version }' "$graphviz_downloads/plan.txt"
+    # Upgrades include an [installed-version] field before (candidate-version).
+    awk '/^Inst / {
+        package = $2
+        sub(/^[^(]*\(/, "")
+        print package "=" $1
+    }' "$graphviz_downloads/plan.txt"
 )
 if [[ ${#graphviz_packages[@]} == 0 ]]; then
     echo "Graphviz is already installed; ensure its dot executable is on PATH." >&2

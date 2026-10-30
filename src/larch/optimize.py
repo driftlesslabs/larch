@@ -252,7 +252,42 @@ class OptimizeMixin(BucketAccess):
                 "powell",
                 "trust-constr",
             }:
-                kwargs["bounds"] = self.pbounds
+                bounds = self.pbounds
+                held = self.pholdfast != 0
+                # plock/pholdfast need not set parameter bounds. A zero
+                # gradient alone cannot prevent constraints from moving them.
+                kwargs["bounds"] = Bounds(
+                    np.where(held, self.pvals, bounds.lb),
+                    np.where(held, self.pvals, bounds.ub),
+                    keep_feasible=bounds.keep_feasible,
+                )
+                if held.any() and method.lower() in {"trust-constr", "cobyla"}:
+                    # Explicit constraints avoid trust-constr's approximate
+                    # fixed bounds and COBYLA's fixed-variable elimination.
+                    directions = np.eye(self.n_params)[held]
+                    values = self.pvals[held]
+                    if method.lower() == "cobyla":
+                        # Older SciPy COBYLA accepts only inequalities.
+                        directions = np.vstack((directions, -directions))
+                        values = np.concatenate((values, -values))
+                        fixed = LinearConstraint(directions, values, np.inf)
+                    else:
+                        fixed = LinearConstraint(directions, values, values)
+                    constraints = kwargs.get("constraints")
+                    if isinstance(
+                        constraints, (dict, LinearConstraint, NonlinearConstraint)
+                    ):
+                        constraints = [constraints]
+                    elif constraints is None:
+                        constraints = []
+                    else:
+                        constraints = list(constraints)
+                    kwargs["constraints"] = [*constraints, fixed]
+                    kwargs["bounds"] = Bounds(
+                        np.where(held, -np.inf, bounds.lb),
+                        np.where(held, np.inf, bounds.ub),
+                        keep_feasible=bounds.keep_feasible,
+                    )
             self.__neg_loglike(self.pvals)
             self.dashboard.update_content(
                 status="[yellow]compiling gradient function..."
@@ -277,6 +312,23 @@ class OptimizeMixin(BucketAccess):
                 )
                 objective = lambda params: self.__neg_loglike(params) / objective_scale
                 gradient = lambda params: self.__neg_d_loglike(params) / objective_scale
+                hess = kwargs.get("hess")
+                if callable(hess):
+
+                    def scaled_hessian(params, *args):
+                        result = hess(params, *args)
+                        # Preserve sparse matrices and LinearOperators, while
+                        # also accepting dense array-like return values.
+                        if isinstance(result, (list, tuple)):
+                            result = np.asarray(result)
+                        return result / objective_scale
+
+                    kwargs["hess"] = scaled_hessian
+                hessp = kwargs.get("hessp")
+                if callable(hessp):
+                    kwargs["hessp"] = lambda params, vector, *args: (
+                        np.asarray(hessp(params, vector, *args)) / objective_scale
+                    )
             result = minimize(
                 objective,
                 np.asarray(self.pvals, dtype=np.float64),
