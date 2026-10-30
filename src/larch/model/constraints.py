@@ -116,9 +116,13 @@ class RatioBound(ParametricConstraint):
                 self.cmax_den = 0
 
     def _min_fun(self, x):
+        if isinstance(x, pd.Series):
+            x = x.to_numpy()
         return x[self.i_num] * self.cmin_num + x[self.i_den] * self.cmin_den
 
     def _max_fun(self, x):
+        if isinstance(x, pd.Series):
+            x = x.to_numpy()
         return x[self.i_num] * self.cmax_num + x[self.i_den] * self.cmax_den
 
     def fun(self, x):
@@ -271,6 +275,8 @@ class OrderingBound(ParametricConstraint):
             self.scale = scale
 
     def fun(self, x):
+        if isinstance(x, pd.Series):
+            x = x.to_numpy()
         return (x[self.i_more] - x[self.i_less]) * self.scale
 
     def jac(self, x):

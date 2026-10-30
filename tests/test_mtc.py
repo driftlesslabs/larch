@@ -315,7 +315,7 @@ def test_mtc_22(compute_engine):
     )
 
 
-@pytest.mark.parametrize("compute_engine", ["numba"])
+@pytest.mark.parametrize("compute_engine", ["numba", "jax"])
 def test_mtc_30(compute_engine):
     m = lx.example(1)
     m.title = "MTC Example 30 (Constrained Simple MNL)"
@@ -326,7 +326,7 @@ def test_mtc_30(compute_engine):
     result_explicit = m_explicit.maximize_loglike(
         stderr=True, options={"maxiter": 1000, "ftol": 1e-10}
     )
-    revealed_x = dict(zip(m.pnames, result_explicit.x))
+    revealed_x = dict(zip(m_explicit.pnames, result_explicit.x))
     print(revealed_x)
     assert result_explicit.logloss == approx(0.7533452255366115)
     assert result_explicit.loglike == approx(-3788.5731392236194)
@@ -342,7 +342,7 @@ def test_mtc_30(compute_engine):
         "hhinc#4": -0.006153651399668838,
         "hhinc#5": -0.014112829960368308,
         "hhinc#6": -0.009343128298864946,
-        "totcost": -0.0017390713018709733,
+        "tottime": -0.0017390713018709733,
     }
     revealed_x = {k: v for k, v in revealed_x.items() if k in expected_x}
     assert revealed_x == approx(expected_x, rel=0.1)
@@ -366,6 +366,13 @@ def test_mtc_30(compute_engine):
     assert result.logloss == approx(0.753345269140234)
     assert result.message == "Optimization terminated successfully"
     assert m.total_weight() == 5029.0
+    assert m.get_value("totcost") / m.get_value("tottime") == approx(3.0, abs=1e-5)
+    covariance = m.parameters["covariance_matrix"].values
+    np.testing.assert_allclose(m.pstderr, np.sqrt(covariance.diagonal()))
+    constraint_gradient = m.constraints[0].jac(m.pvals)
+    assert constraint_gradient @ covariance @ constraint_gradient == approx(0, abs=1e-7)
+    if compute_engine == "jax":
+        np.testing.assert_allclose(result.stderr, m.pstderr)
     m.parameter_summary()
     _summary = m.parameter_summary()
     # assert_same_text(

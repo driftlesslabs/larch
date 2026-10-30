@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from rich.table import Table
-from scipy.optimize import Bounds, minimize
+from scipy.optimize import Bounds, LinearConstraint, NonlinearConstraint, minimize
 
 from ._optional import jax, jnp
 from .compiled import jitmethod
@@ -148,7 +148,7 @@ class OptimizeMixin(BucketAccess):
                     params=self.__rich_table(params),
                     bestloglike=self._cached_loglike_best,
                 )
-        return result
+        return float(result)
 
     def jax_neg_d_loglike(self, *args, **kwargs):
         return -self.jax_d_loglike(*args, **kwargs)
@@ -157,7 +157,9 @@ class OptimizeMixin(BucketAccess):
         result = self.jax_neg_d_loglike(*args, **kwargs)
         result = result.at[self.pholdfast != 0].set(0)  # zero out holdfast parameters
         self._latest_gradient = -result
-        return result
+        # SciPy's SLSQP implementation requires double precision inputs,
+        # including when JAX computes the gradient in single precision.
+        return np.asarray(result, dtype=np.float64)
 
     def _check_if_best(self, computed_ll, pvalues=None):
         if np.isnan(computed_ll):
@@ -212,28 +214,141 @@ class OptimizeMixin(BucketAccess):
             throttle=dashboard_update if dashboard else 9999,
         )
         try:
+            model_constraints = getattr(self, "constraints", ())
+            if model_constraints:
+                if method.lower() in {"slsqp", "cobyla"}:
+                    constraints = [
+                        constraint
+                        for model_constraint in model_constraints
+                        for constraint in model_constraint.as_constraint_dicts()
+                    ]
+                elif method.lower() == "trust-constr":
+                    constraints = [
+                        constraint
+                        for model_constraint in model_constraints
+                        for constraint in model_constraint.as_linear_constraints()
+                    ]
+                else:
+                    raise ValueError(
+                        f"{method} does not support model constraints; "
+                        "use SLSQP, COBYLA, or trust-constr"
+                    )
+                supplied_constraints = kwargs.get("constraints")
+                if supplied_constraints is not None:
+                    if isinstance(
+                        supplied_constraints,
+                        (dict, LinearConstraint, NonlinearConstraint),
+                    ):
+                        constraints.append(supplied_constraints)
+                    else:
+                        constraints.extend(supplied_constraints)
+                kwargs["constraints"] = constraints
             if method.lower() in {
                 "nelder-mead",
                 "l-bfgs-b",
                 "tnc",
                 "slsqp",
+                "cobyla",
                 "powell",
                 "trust-constr",
             }:
-                kwargs["bounds"] = self.pbounds
+                bounds = self.pbounds
+                held = self.pholdfast != 0
+                # plock/pholdfast need not set parameter bounds. A zero
+                # gradient alone cannot prevent constraints from moving them.
+                kwargs["bounds"] = Bounds(
+                    np.where(held, self.pvals, bounds.lb),
+                    np.where(held, self.pvals, bounds.ub),
+                    keep_feasible=bounds.keep_feasible,
+                )
+                if held.any() and method.lower() in {"trust-constr", "cobyla"}:
+                    # Explicit constraints avoid trust-constr's approximate
+                    # fixed bounds and COBYLA's fixed-variable elimination.
+                    directions = np.eye(self.n_params)[held]
+                    values = self.pvals[held]
+                    if method.lower() == "cobyla":
+                        # Older SciPy COBYLA accepts only inequalities.
+                        directions = np.vstack((directions, -directions))
+                        values = np.concatenate((values, -values))
+                        fixed = LinearConstraint(directions, values, np.inf)
+                    else:
+                        fixed = LinearConstraint(directions, values, values)
+                    constraints = kwargs.get("constraints")
+                    if isinstance(
+                        constraints, (dict, LinearConstraint, NonlinearConstraint)
+                    ):
+                        constraints = [constraints]
+                    elif constraints is None:
+                        constraints = []
+                    else:
+                        constraints = list(constraints)
+                    kwargs["constraints"] = [*constraints, fixed]
+                    kwargs["bounds"] = Bounds(
+                        np.where(held, -np.inf, bounds.lb),
+                        np.where(held, np.inf, bounds.ub),
+                        keep_feasible=bounds.keep_feasible,
+                    )
             self.__neg_loglike(self.pvals)
             self.dashboard.update_content(
                 status="[yellow]compiling gradient function..."
             )
             self.__neg_d_loglike(self.pvals)
             self.dashboard.update_content(status="[yellow]optimizing parameters...")
+            objective = self.__neg_loglike
+            gradient = self.__neg_d_loglike
+            objective_scale = 1
+            optimizer_constraints = kwargs.get("constraints")
+            if (
+                isinstance(
+                    optimizer_constraints, (dict, LinearConstraint, NonlinearConstraint)
+                )
+                or optimizer_constraints
+            ):
+                # Precondition constrained fits using mean logloss, as Numba
+                # does. Large total gradients can prevent SLSQP from reaching
+                # feasibility; leave unconstrained optimizer trajectories intact.
+                objective_scale = (
+                    self.total_weight() if hasattr(self, "total_weight") else 1
+                )
+                objective = lambda params: self.__neg_loglike(params) / objective_scale
+                gradient = lambda params: self.__neg_d_loglike(params) / objective_scale
+                hess = kwargs.get("hess")
+                if callable(hess):
+
+                    def scaled_hessian(params, *args):
+                        result = hess(params, *args)
+                        # Preserve sparse matrices and LinearOperators, while
+                        # also accepting dense array-like return values.
+                        if isinstance(result, (list, tuple)):
+                            result = np.asarray(result)
+                        return result / objective_scale
+
+                    kwargs["hess"] = scaled_hessian
+                hessp = kwargs.get("hessp")
+                if callable(hessp):
+                    kwargs["hessp"] = lambda params, vector, *args: (
+                        np.asarray(hessp(params, vector, *args)) / objective_scale
+                    )
             result = minimize(
-                self.__neg_loglike,
-                self.pvals,
-                jac=self.__neg_d_loglike,
+                objective,
+                np.asarray(self.pvals, dtype=np.float64),
+                jac=gradient if method.lower() != "cobyla" else None,
                 method=method,
                 **kwargs,
             )
+            # Restore total units for likelihood derivatives and multipliers.
+            # Solver-specific inverse Hessian approximations remain on the
+            # normalized optimizer scale.
+            if objective_scale != 1:
+                if "fun" in result:
+                    result["fun"] *= objective_scale
+                if "jac" in result and method.lower() != "trust-constr":
+                    result["jac"] *= objective_scale
+                for key in ("grad", "lagrangian_grad", "multipliers"):
+                    if key in result:
+                        result[key] *= objective_scale
+                if "v" in result:
+                    result["v"] = [values * objective_scale for values in result["v"]]
 
             try:
                 result["n_cases"] = self.n_cases
@@ -247,7 +362,9 @@ class OptimizeMixin(BucketAccess):
                     result["logloss"] = result["fun"] / self.total_weight()
                 result["loglike"] = -result["fun"]
                 del result["fun"]
-            if "jac" in result:
+            # trust-constr's jac describes the constraints; its grad retains
+            # SciPy's minimized-objective sign. Other jac results describe LL.
+            if "jac" in result and method.lower() != "trust-constr":
                 result["jac"] = -result["jac"]
             self.dashboard.update_content(
                 loglike=result["loglike"],
@@ -258,16 +375,11 @@ class OptimizeMixin(BucketAccess):
                 self.dashboard.update_content(
                     status="[yellow]computing standard errors..."
                 )
-                se, hess, ihess = self.jax_param_cov(result.x)
-                result["stderr"] = np.asarray(se)
-                hess = np.asarray(hess).copy()
-                hess[self.pholdfast.astype(bool), :] = 0
-                hess[:, self.pholdfast.astype(bool)] = 0
-                ihess = np.asarray(ihess).copy()
-                ihess[self.pholdfast.astype(bool), :] = 0
-                ihess[:, self.pholdfast.astype(bool)] = 0
-                self.add_parameter_array("hess", hess)
-                self.add_parameter_array("ihess", ihess)
+                self.calculate_parameter_covariance(result.x)
+                # The covariance calculation projects binding constraints into
+                # pstderr while retaining the unprojected inverse Hessian.
+                se = np.asarray(self.pstderr).copy()
+                result["stderr"] = se
                 self.dashboard.update_content(
                     params=self.__rich_table(result.x, se),
                 )

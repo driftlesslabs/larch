@@ -1,5 +1,6 @@
-# Use a Python image with uv pre-installed
-FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
+# Use a Python image with uv pre-installed. uv 0.13.4 or newer is required
+# (eMudhra CA incident); the bookworm images stopped updating at uv 0.9.30.
+FROM ghcr.io/astral-sh/uv:0.13.4-python3.13-trixie-slim
 
 # Install the project into `/app`
 WORKDIR /app

@@ -79,6 +79,20 @@ then
     curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 
+# uv 0.13.4 or newer is required: older versions trust the compromised eMudhra CA
+# https://discuss.python.org/t/information-for-python-users-regarding-emudhra-emsign-ca-certificate-security-incident/109576
+UV_MIN_VERSION="0.13.4"
+UV_VERSION=$(uv --version 2>/dev/null | awk '{print $2}')
+if [ -z "$UV_VERSION" ]; then
+    echo "uv is not on PATH yet; open a new terminal and rerun this script."
+    exit 1
+fi
+if [ "$(printf '%s\n' "$UV_MIN_VERSION" "$UV_VERSION" | sort -V | head -n 1)" != "$UV_MIN_VERSION" ]; then
+    echo "uv $UV_VERSION is too old; uv $UV_MIN_VERSION or newer is required."
+    echo "Update it with: uv self update --system-certs"
+    exit 1
+fi
+
 # check that gh is installed
 if ! command -v gh &> /dev/null
 then
@@ -96,7 +110,7 @@ cd -- "${TARGET_DIR}"
 eval "$(conda shell.bash hook)"
 
 # create a conda environment
-conda create -p .env/${TARGET_KERNEL} python=3.10 --yes
+conda create -p .env/${TARGET_KERNEL} python=3.11 --yes
 
 # activate the conda environment
 conda activate .env/${TARGET_KERNEL}
@@ -122,11 +136,13 @@ uv pip install altair asv "black<23" cytoolz dask filelock geopandas h5py isort 
   sphinx-argparse zarr zstandard xlsxwriter
 
 cd larch
-uvx pre-commit install
+# virtualenv 21.14.12 bundles pip 26.2.2, which pre-commit uses to install hooks
+uvx --with "virtualenv>=21.14.12" pre-commit install
 cd ..
 
 cd activitysim
-uvx pre-commit install
+# virtualenv 21.14.12 bundles pip 26.2.2, which pre-commit uses to install hooks
+uvx --with "virtualenv>=21.14.12" pre-commit install
 cd ..
 
 # make this environment available to jupyter if --no-kernel option is not provided

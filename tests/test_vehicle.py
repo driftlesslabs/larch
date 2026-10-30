@@ -3,6 +3,8 @@ from __future__ import annotations
 import jax  # noqa: F401
 import numpy as np
 import pandas as pd
+import scipy
+from packaging.version import Version
 from pytest import approx, fixture
 
 import larch as lx
@@ -113,9 +115,12 @@ def test_mixed_logit(simple_model: lx.Model):
         rtol=1e-5,
     )
 
-    result0 = mixed.maximize_loglike(stderr=True, options={"maxiter": 2})
+    # SciPy 1.16's SLSQP rewrite counts the first update toward maxiter.
+    # Keep this checkpoint at one update on both implementations.
+    maxiter = 2 if Version(scipy.__version__) < Version("1.16") else 1
+    result0 = mixed.maximize_loglike(stderr=True, options={"maxiter": maxiter})
     assert not result0["success"]
-    assert result0["nit"] == 2
+    assert result0["nit"] == maxiter
     assert result0["loglike"] == approx(-1565.2197265625)
     expected_value = {
         "ev": -0.14029760159652338,
