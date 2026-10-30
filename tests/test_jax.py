@@ -240,6 +240,8 @@ def test_prerolled_common(xlogit_artificial):
     for k, v in expected.items():
         if v is True:
             assert r[k], k
+        elif isinstance(v, str):
+            assert r[k] == v, k
         else:
             assert r[k] == approx(v, rel=1e-4), k
     assert m.d_loglike(
@@ -273,6 +275,8 @@ def test_prerolled_notcommon(xlogit_artificial):
     for k, v in expected.items():
         if v is True:
             assert r[k], k
+        elif isinstance(v, str):
+            assert r[k] == v, k
         else:
             assert r[k] == approx(v, rel=1e-4), k
 
@@ -332,6 +336,8 @@ def test_prerolled_common_panel(xlogit_artificial):
     for k, v in expected.items():
         if v is True:
             assert r[k], k
+        elif isinstance(v, str):
+            assert r[k] == v, k
         else:
             assert r[k] == approx(v, rel=1e-4), k
 
@@ -392,6 +398,8 @@ def test_prerolled_notcommon_panel(xlogit_artificial):
     for k, v in expected.items():
         if v is True:
             assert r[k], k
+        elif isinstance(v, str):
+            assert r[k] == v, k
         else:
             assert r[k] == approx(v, rel=1e-4), k
 
@@ -450,6 +458,8 @@ def test_prerolled_common_numpy(xlogit_artificial):
     for k, v in expected.items():
         if v is True:
             assert r[k], k
+        elif isinstance(v, str):
+            assert r[k] == v, k
         else:
             assert r[k] == approx(v, rel=1e-4), k
 
@@ -508,6 +518,8 @@ def test_prerolled_notcommon_numpy(xlogit_artificial):
     for k, v in expected.items():
         if v is True:
             assert r[k], k
+        elif isinstance(v, str):
+            assert r[k] == v, k
         else:
             assert r[k] == approx(v, rel=1.2e-4), k
 
@@ -530,6 +542,8 @@ def test_prerolled_common_panel_numpy(xlogit_artificial):
     for k, v in expected.items():
         if v is True:
             assert r[k], k
+        elif isinstance(v, str):
+            assert r[k] == v, k
         else:
             assert r[k] == approx(v, rel=1.3e-4), k
 
@@ -590,5 +604,7 @@ def test_prerolled_notcommon_panel_numpy(xlogit_artificial):
     for k, v in expected.items():
         if v is True:
             assert r[k], k
+        elif isinstance(v, str):
+            assert r[k] == v, k
         else:
             assert r[k] == approx(v, rel=1e-4), k
